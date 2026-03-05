@@ -1,0 +1,27 @@
+import Link from "next/link";
+
+import { Button } from "@/components/ui/button";
+
+export default function NotFound() {
+  return (
+    <div className="flex min-h-dvh items-center justify-center bg-background px-4">
+      <div className="w-full max-w-md space-y-4 rounded-xl border bg-card p-6 text-card-foreground">
+        <div className="space-y-1">
+          <h1 className="text-xl font-semibold tracking-tight">Page not found</h1>
+          <p className="text-sm text-muted-foreground">
+            The page you&apos;re looking for doesn&apos;t exist or you don&apos;t have access.
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <Button asChild>
+            <Link href="/login">Go to login</Link>
+          </Button>
+          <Button asChild variant="secondary">
+            <Link href="/">Home</Link>
+          </Button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
