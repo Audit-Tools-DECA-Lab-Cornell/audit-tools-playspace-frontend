@@ -72,7 +72,7 @@ export function AuditExecuteForm({ placeId }: AuditExecuteFormProps) {
 	const patchDraft = useMutation({
 		mutationFn: async (input: PatchDraftInput) => {
 			const response = await api.patch(
-				`/playsafe/places/${encodeURIComponent(input.placeId)}/audits/draft`,
+				`/playspace/places/${encodeURIComponent(input.placeId)}/audits/draft`,
 				input.draft
 			);
 			return response.data;

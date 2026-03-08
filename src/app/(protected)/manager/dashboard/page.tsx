@@ -57,7 +57,7 @@ export default function ManagerDashboardPage() {
 			}
 
 			const response = await api.post<ManagerSurveyLinkResponse>(
-				`/playsafe/places/${encodeURIComponent(trimmed)}/manager-survey-link`
+				`/playspace/places/${encodeURIComponent(trimmed)}/manager-survey-link`
 			);
 			return response.data;
 		},

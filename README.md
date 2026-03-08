@@ -63,14 +63,14 @@ If not set, the frontend defaults to `http://127.0.0.1:8000`.
 This repo currently uses a **frontend-only demo login** that sets cookies in the browser to simulate an authenticated session.
 
 - **Cookie names** (see `src/lib/auth/role.ts`):
-  - `playsafe_role`: `"manager"` or `"auditor"`
-  - `playsafe_access_token`: bearer token (demo-generated for now)
-  - `playsafe_auditor_code`: auditor-only identifier
+  - `playspace_role`: `"manager"` or `"auditor"`
+  - `playspace_access_token`: bearer token (demo-generated for now)
+  - `playspace_auditor_code`: auditor-only identifier
 
 The route guard is implemented in `middleware.ts` using those cookies:
 
-- `/manager/**` requires `playsafe_role="manager"`
-- `/auditor/**` requires `playsafe_role="auditor"`
+- `/manager/**` requires `playspace_role="manager"`
+- `/auditor/**` requires `playspace_role="auditor"`
 - `/settings` requires authentication (either role)
 
 ### App routes
@@ -99,7 +99,7 @@ The navigation items are derived from the active role and rendered dynamically.
 
 Axios client lives at `src/lib/api/api-client.ts`:
 
-- Adds `Authorization: Bearer <token>` from `playsafe_access_token`
+- Adds `Authorization: Bearer <token>` from `playspace_access_token`
 - On `401`, clears auth cookies and redirects to `/login`
 
 ### Auditor multi-step form + auto-save
@@ -113,13 +113,13 @@ Auto-save behavior:
 
 - Watches form values via React Hook Form.
 - Sends a debounced `PATCH` (900ms) with a **partial** payload to:
-  - `PATCH /playsafe/places/:placeId/audits/draft`
+  - `PATCH /playspace/places/:placeId/audits/draft`
 
 ### Manager survey link (Playspace-specific)
 
 The Manager dashboard includes a button that requests a “Manager Survey Link” and offers a copy-to-clipboard UX:
 
-- `POST /playsafe/places/:placeId/manager-survey-link`
+- `POST /playspace/places/:placeId/manager-survey-link`
 - Expected response shape:
   - `{ "survey_link": "https://..." }`
 
