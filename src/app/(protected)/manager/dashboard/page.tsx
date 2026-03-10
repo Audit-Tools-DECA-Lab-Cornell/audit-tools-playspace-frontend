@@ -1,189 +1,273 @@
 "use client";
 
-import { useMutation } from "@tanstack/react-query";
-import * as React from "react";
+import Link from "next/link";
+import { useQuery } from "@tanstack/react-query";
 
-import { api } from "@/lib/api/api-client";
+import {
+	PLAYSPACE_DEMO_ACCOUNT_ID,
+	playspaceApi,
+	type AccountDetail,
+	type AuditorSummary,
+	type ManagerProfile
+} from "@/lib/api/playspace";
+import { AuditorsTable } from "@/components/dashboard/auditors-table";
+import { DashboardHeader } from "@/components/dashboard/dashboard-header";
+import { EmptyState } from "@/components/dashboard/empty-state";
+import { ProjectsTable } from "@/components/dashboard/projects-table";
+import { StatCard } from "@/components/dashboard/stat-card";
+import { formatDateTimeLabel, formatScoreLabel } from "@/components/dashboard/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 
-interface ManagerSurveyLinkResponse {
-	survey_link: string;
-}
-
-interface RecentAuditRow {
-	id: string;
-	placeName: string;
-	completedAtIso: string;
-	audit_score: number;
-	combined_score: number | null;
-}
-
-const DEMO_RECENT_AUDITS: RecentAuditRow[] = [
-	{
-		id: "audit_001",
-		placeName: "Riverside Park",
-		completedAtIso: "2026-03-04T21:15:00Z",
-		audit_score: 82,
-		combined_score: 88
-	},
-	{
-		id: "audit_002",
-		placeName: "Maple Street Playground",
-		completedAtIso: "2026-03-03T16:40:00Z",
-		audit_score: 74,
-		combined_score: null
+function getErrorMessage(error: unknown): string {
+	if (error instanceof Error) {
+		return error.message;
 	}
-];
 
-function formatDate(iso: string): string {
-	const date = new Date(iso);
-	if (Number.isNaN(date.getTime())) return iso;
-	return date.toLocaleString();
+	return "Something went wrong while loading the dashboard.";
 }
 
-export default function ManagerDashboardPage() {
-	const [placeId, setPlaceId] = React.useState<string>("");
-	const [lastGeneratedLink, setLastGeneratedLink] = React.useState<string | null>(null);
-
-	const generateLink = useMutation({
-		mutationFn: async (input: { placeId: string }) => {
-			const trimmed = input.placeId.trim();
-			if (!trimmed) {
-				throw new Error("Place ID is required.");
-			}
-
-			const response = await api.post<ManagerSurveyLinkResponse>(
-				`/playspace/places/${encodeURIComponent(trimmed)}/manager-survey-link`
-			);
-			return response.data;
-		},
-		onSuccess: data => {
-			setLastGeneratedLink(data.survey_link);
-		}
-	});
-
+function LoadingState() {
 	return (
 		<div className="space-y-6">
-			<div className="space-y-1">
-				<h1 className="text-2xl font-semibold tracking-tight">Manager dashboard</h1>
-				<p className="text-sm text-muted-foreground">
-					High-level overview across projects, places, and audit outcomes.
-				</p>
+			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+				{Array.from({ length: 4 }).map((_, index) => {
+					return (
+						<Card key={`pulse-${index}`} className="animate-pulse">
+							<CardContent className="space-y-3 py-6">
+								<div className="h-4 w-24 rounded bg-secondary" />
+								<div className="h-8 w-20 rounded bg-secondary" />
+								<div className="h-4 w-40 rounded bg-secondary" />
+							</CardContent>
+						</Card>
+					);
+				})}
 			</div>
+			<Card className="animate-pulse">
+				<CardContent className="py-10">
+					<div className="h-40 rounded bg-secondary" />
+				</CardContent>
+			</Card>
+		</div>
+	);
+}
 
-			<div className="grid gap-4 md:grid-cols-3">
-				<Card>
-					<CardHeader>
-						<CardTitle className="text-sm font-medium text-muted-foreground">Active projects</CardTitle>
-					</CardHeader>
-					<CardContent>
-						<div className="text-2xl font-semibold">3</div>
-					</CardContent>
-				</Card>
-
-				<Card>
-					<CardHeader>
-						<CardTitle className="text-sm font-medium text-muted-foreground">Audits completed</CardTitle>
-					</CardHeader>
-					<CardContent>
-						<div className="text-2xl font-semibold">24</div>
-					</CardContent>
-				</Card>
-
-				<Card>
-					<CardHeader>
-						<CardTitle className="text-sm font-medium text-muted-foreground">Recent activity</CardTitle>
-					</CardHeader>
-					<CardContent>
-						<div className="text-2xl font-semibold">2</div>
-						<p className="mt-1 text-xs text-muted-foreground">audits in the last 48 hours</p>
-					</CardContent>
-				</Card>
-			</div>
-
+function OverviewPanels({
+	account,
+	managerProfiles,
+	auditors
+}: Readonly<{
+	account: AccountDetail;
+	managerProfiles: ManagerProfile[];
+	auditors: AuditorSummary[];
+}>) {
+	return (
+		<div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
 			<Card>
 				<CardHeader>
-					<CardTitle>Manager survey link</CardTitle>
+					<CardTitle>Primary manager</CardTitle>
 				</CardHeader>
-				<CardContent className="grid gap-4">
-					<div className="grid gap-2 sm:max-w-md">
-						<Label htmlFor="place_id">Place ID</Label>
-						<Input
-							id="place_id"
-							placeholder="e.g. place_123"
-							value={placeId}
-							onChange={e => setPlaceId(e.target.value)}
-						/>
-					</div>
-
-					<div className="flex flex-wrap items-center gap-2">
-						<Button
-							type="button"
-							onClick={() => generateLink.mutate({ placeId })}
-							disabled={generateLink.isPending}>
-							{generateLink.isPending ? "Generating…" : "Generate link"}
-						</Button>
-
-						{generateLink.isError ? (
-							<p className="text-sm text-destructive">
-								{generateLink.error instanceof Error
-									? generateLink.error.message
-									: "Could not generate link."}
-							</p>
-						) : null}
-					</div>
-
-					{lastGeneratedLink ? (
-						<div className="grid gap-2 sm:max-w-2xl">
-							<Label>Generated link</Label>
-							<div className="flex flex-col gap-2 sm:flex-row sm:items-center">
-								<Input readOnly value={lastGeneratedLink} />
-								<Button
-									type="button"
-									variant="secondary"
-									onClick={async () => {
-										if (!navigator.clipboard) return;
-										await navigator.clipboard.writeText(lastGeneratedLink);
-									}}>
-									Copy
-								</Button>
+				<CardContent className="space-y-4">
+					{account.primary_manager ? (
+						<>
+							<div className="space-y-1">
+								<p className="text-lg font-medium text-foreground">{account.primary_manager.full_name}</p>
+								<p className="text-sm text-muted-foreground">
+									{account.primary_manager.position ?? "Position pending"}
+								</p>
+								<p className="text-sm text-muted-foreground">{account.primary_manager.email}</p>
+								<p className="text-sm text-muted-foreground">
+									{account.primary_manager.phone ?? "Phone pending"}
+								</p>
 							</div>
-							<p className="text-xs text-muted-foreground">
-								Send this link to external place owners to complete the manager survey.
+							<p className="text-sm text-muted-foreground">
+								Account email: {account.email}
 							</p>
-						</div>
-					) : null}
+						</>
+					) : (
+						<p className="text-sm text-muted-foreground">No primary manager profile has been added yet.</p>
+					)}
 				</CardContent>
 			</Card>
 
 			<Card>
 				<CardHeader>
-					<CardTitle>Recent audits</CardTitle>
+					<CardTitle>Team snapshot</CardTitle>
+				</CardHeader>
+				<CardContent className="space-y-4">
+					<div className="flex flex-wrap gap-2">
+						<Badge variant="outline">{managerProfiles.length} managers</Badge>
+						<Badge variant="outline">{auditors.length} auditors</Badge>
+					</div>
+					<div className="space-y-3">
+						{managerProfiles.map(profile => {
+							return (
+								<div
+									key={profile.id}
+									className="flex items-start justify-between gap-4 rounded-field border border-border bg-secondary/60 p-3">
+									<div className="space-y-1">
+										<p className="font-medium text-foreground">{profile.full_name}</p>
+										<p className="text-sm text-muted-foreground">
+											{profile.position ?? "Position pending"}
+										</p>
+									</div>
+									{profile.is_primary ? <Badge>Primary</Badge> : <Badge variant="secondary">Manager</Badge>}
+								</div>
+							);
+						})}
+					</div>
+				</CardContent>
+			</Card>
+		</div>
+	);
+}
+
+export default function ManagerDashboardPage() {
+	const accountQuery = useQuery({
+		queryKey: ["playspace", "account", PLAYSPACE_DEMO_ACCOUNT_ID],
+		queryFn: () => playspaceApi.accounts.get(PLAYSPACE_DEMO_ACCOUNT_ID)
+	});
+
+	const managerProfilesQuery = useQuery({
+		queryKey: ["playspace", "account", PLAYSPACE_DEMO_ACCOUNT_ID, "managerProfiles"],
+		queryFn: () => playspaceApi.accounts.managerProfiles(PLAYSPACE_DEMO_ACCOUNT_ID)
+	});
+
+	const projectsQuery = useQuery({
+		queryKey: ["playspace", "account", PLAYSPACE_DEMO_ACCOUNT_ID, "projects"],
+		queryFn: () => playspaceApi.accounts.projects(PLAYSPACE_DEMO_ACCOUNT_ID)
+	});
+
+	const auditorsQuery = useQuery({
+		queryKey: ["playspace", "account", PLAYSPACE_DEMO_ACCOUNT_ID, "auditors"],
+		queryFn: () => playspaceApi.accounts.auditors(PLAYSPACE_DEMO_ACCOUNT_ID)
+	});
+
+	if (
+		accountQuery.isLoading ||
+		managerProfilesQuery.isLoading ||
+		projectsQuery.isLoading ||
+		auditorsQuery.isLoading
+	) {
+		return <LoadingState />;
+	}
+
+	if (accountQuery.isError || managerProfilesQuery.isError || projectsQuery.isError || auditorsQuery.isError) {
+		const error =
+			accountQuery.error ??
+			managerProfilesQuery.error ??
+			projectsQuery.error ??
+			auditorsQuery.error;
+
+		return (
+			<EmptyState
+				title="Dashboard unavailable"
+				description={getErrorMessage(error)}
+				action={
+					<Button type="button" onClick={() => window.location.reload()}>
+						Try again
+					</Button>
+				}
+			/>
+		);
+	}
+
+	if (!accountQuery.data || !managerProfilesQuery.data || !projectsQuery.data || !auditorsQuery.data) {
+		return <LoadingState />;
+	}
+
+	const account = accountQuery.data;
+	const managerProfiles = managerProfilesQuery.data;
+	const projects = projectsQuery.data;
+	const auditors = auditorsQuery.data;
+
+	return (
+		<div className="space-y-6">
+			<DashboardHeader
+				eyebrow="Manager Dashboard"
+				title={account.name}
+				description="Shared account-level view across projects, places, auditors, and recent submissions."
+				actions={
+					<Button asChild>
+						<Link href="/manager/projects">View projects</Link>
+					</Button>
+				}
+			/>
+
+			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+				<StatCard
+					title="Projects"
+					value={String(account.stats.total_projects)}
+					helper="Active and planned projects in this account."
+				/>
+				<StatCard
+					title="Places"
+					value={String(account.stats.total_places)}
+					helper="Total places connected to those projects."
+					tone="violet"
+				/>
+				<StatCard
+					title="Auditors"
+					value={String(account.stats.total_auditors)}
+					helper="Auditors currently assigned under this account."
+					tone="warning"
+				/>
+				<StatCard
+					title="Completed Audits"
+					value={String(account.stats.total_audits_completed)}
+					helper="Submitted audits available for review and reporting."
+					tone="success"
+				/>
+			</div>
+
+			<OverviewPanels account={account} managerProfiles={managerProfiles} auditors={auditors} />
+
+			{projects.length > 0 ? (
+				<ProjectsTable projects={projects} title="Project overview" />
+			) : (
+				<EmptyState
+					title="No projects yet"
+					description="Projects will appear here once the team starts creating audit workstreams."
+				/>
+			)}
+
+			{auditors.length > 0 ? (
+				<AuditorsTable auditors={auditors} title="Assigned auditors" />
+			) : (
+				<EmptyState
+					title="No auditors assigned"
+					description="Invite or assign auditors to see role, workload, and activity here."
+				/>
+			)}
+
+			<Card>
+				<CardHeader>
+					<CardTitle>Recent activity</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-3">
-					{DEMO_RECENT_AUDITS.map(row => {
-						return (
-							<div
-								key={row.id}
-								className="flex flex-col gap-2 rounded-lg border p-3 sm:flex-row sm:items-center sm:justify-between">
-								<div className="min-w-0">
-									<p className="truncate font-medium">{row.placeName}</p>
-									<p className="text-xs text-muted-foreground">{formatDate(row.completedAtIso)}</p>
+					{account.recent_activity.length > 0 ? (
+						account.recent_activity.map(activity => {
+							return (
+								<div
+									key={activity.audit_id}
+									className="flex flex-col gap-3 rounded-field border border-border bg-secondary/50 p-4 lg:flex-row lg:items-center lg:justify-between">
+									<div className="space-y-1">
+										<p className="font-medium text-foreground">{activity.place_name}</p>
+										<p className="text-sm text-muted-foreground">
+											{activity.project_name} · {activity.audit_code}
+										</p>
+										<p className="text-sm text-muted-foreground">
+											{formatDateTimeLabel(activity.completed_at)}
+										</p>
+									</div>
+									<Badge>{formatScoreLabel(activity.score)}</Badge>
 								</div>
-
-								<div className="flex flex-wrap items-center gap-2">
-									<Badge variant="secondary">audit_score: {row.audit_score}</Badge>
-									<Badge variant={row.combined_score === null ? "outline" : "default"}>
-										combined_score: {row.combined_score ?? "pending"}
-									</Badge>
-								</div>
-							</div>
-						);
-					})}
+							);
+						})
+					) : (
+						<p className="text-sm text-muted-foreground">No submitted audits yet.</p>
+					)}
 				</CardContent>
 			</Card>
 		</div>

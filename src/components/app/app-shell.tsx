@@ -47,7 +47,7 @@ function getNavItems(role: UserRole): NavItem[] {
 	];
 }
 
-function NavLinks({ items, onNavigate }: { items: NavItem[]; onNavigate?: () => void }) {
+function NavLinks({ items, onNavigate }: Readonly<{ items: NavItem[]; onNavigate?: () => void }>) {
 	const pathname = usePathname();
 
 	return (
@@ -74,7 +74,7 @@ function NavLinks({ items, onNavigate }: { items: NavItem[]; onNavigate?: () => 
 	);
 }
 
-function UserMenu({ role, auditorCode }: { role: UserRole; auditorCode: string | null }) {
+function UserMenu({ role, auditorCode }: Readonly<{ role: UserRole; auditorCode: string | null }>) {
 	const router = useRouter();
 
 	const label =
@@ -111,17 +111,17 @@ function UserMenu({ role, auditorCode }: { role: UserRole; auditorCode: string |
 	);
 }
 
-export function AppShell({ role, auditorCode, children }: AppShellProps) {
+export function AppShell({ role, auditorCode, children }: Readonly<AppShellProps>) {
 	const navItems = getNavItems(role);
 
 	return (
 		<div className="min-h-dvh bg-background">
 			<div className="mx-auto grid w-full grid-cols-1 md:grid-cols-[260px_1fr]">
-				<aside className="hidden border-r bg-card md:block">
+				<aside className="hidden border-r border-sidebar-border bg-sidebar md:block">
 					<div className="flex h-dvh flex-col">
-						<div className="flex items-center justify-between px-4 py-4">
+						<div className="flex items-center justify-between px-5 py-5">
 							<div className="grid">
-								<span className="text-sm font-semibold leading-5">Playspace Audit Tool</span>
+								<span className="text-base font-semibold leading-5">Playspace Audit Tool</span>
 								<span className="text-xs text-muted-foreground">Play Value &amp; Usability</span>
 							</div>
 						</div>
@@ -133,8 +133,8 @@ export function AppShell({ role, auditorCode, children }: AppShellProps) {
 				</aside>
 
 				<div className="min-w-0">
-					<header className="sticky top-0 z-10 border-b bg-background/80 backdrop-blur">
-						<div className="flex h-14 items-center gap-3 px-4">
+					<header className="sticky top-0 z-10 border-b border-border bg-background/90 backdrop-blur">
+						<div className="flex h-16 items-center gap-3 px-4 md:px-6">
 							<Sheet>
 								<SheetTrigger asChild>
 									<Button variant="ghost" size="icon" className="md:hidden" aria-label="Open menu">
@@ -157,7 +157,7 @@ export function AppShell({ role, auditorCode, children }: AppShellProps) {
 						</div>
 					</header>
 
-					<main className="px-4 py-6">{children}</main>
+					<main className="px-4 py-6 md:px-6 md:py-8">{children}</main>
 				</div>
 			</div>
 		</div>

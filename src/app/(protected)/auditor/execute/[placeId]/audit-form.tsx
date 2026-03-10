@@ -1,10 +1,8 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useMutation } from "@tanstack/react-query";
 import Link from "next/link";
 import * as React from "react";
-import { useForm, useWatch } from "react-hook-form";
 import { z } from "zod";
 
 import { api } from "@/lib/api/api-client";
@@ -25,6 +23,7 @@ const playspaceAuditDraftSchema = z.object({
 
 type PlayspaceAuditDraft = z.infer<typeof playspaceAuditDraftSchema>;
 type PlayspaceAuditDraftPatch = Partial<PlayspaceAuditDraft>;
+type PlayspaceAuditDraftErrors = Partial<Record<keyof PlayspaceAuditDraft, string>>;
 
 interface PatchDraftInput {
 	placeId: string;
@@ -50,24 +49,61 @@ export interface AuditExecuteFormProps {
 	placeId: string;
 }
 
-export function AuditExecuteForm({ placeId }: AuditExecuteFormProps) {
+const partialDraftSchema = playspaceAuditDraftSchema.partial();
+const visitStepSchema = playspaceAuditDraftSchema.pick({
+	visitDate: true,
+	notes: true
+});
+const playValueStepSchema = playspaceAuditDraftSchema.pick({
+	playValueScore: true
+});
+const usabilityStepSchema = playspaceAuditDraftSchema.pick({
+	usabilityScore: true
+});
+
+function buildFieldErrors(error: z.ZodError<unknown>): PlayspaceAuditDraftErrors {
+	const nextErrors: PlayspaceAuditDraftErrors = {};
+
+	for (const issue of error.issues) {
+		const field = issue.path[0];
+		if (typeof field !== "string") {
+			continue;
+		}
+
+		if (field === "visitDate" || field === "notes" || field === "playValueScore" || field === "usabilityScore") {
+			nextErrors[field] = issue.message;
+		}
+	}
+
+	return nextErrors;
+}
+
+export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 	const [stepIndex, setStepIndex] = React.useState<number>(0);
 	const [lastSavedAt, setLastSavedAt] = React.useState<Date | null>(null);
 	const [saveError, setSaveError] = React.useState<string | null>(null);
-
-	const form = useForm<PlayspaceAuditDraft>({
-		resolver: zodResolver(playspaceAuditDraftSchema),
-		defaultValues: {
-			visitDate: "",
-			notes: "",
-			playValueScore: 0,
-			usabilityScore: 0
-		},
-		mode: "onChange"
+	const [draft, setDraft] = React.useState<PlayspaceAuditDraft>({
+		visitDate: "",
+		notes: "",
+		playValueScore: 0,
+		usabilityScore: 0
 	});
-
-	const values = useWatch({ control: form.control });
+	const [fieldErrors, setFieldErrors] = React.useState<PlayspaceAuditDraftErrors>({});
 	const lastQueuedJsonRef = React.useRef<string | null>(null);
+
+	function updateDraft<KField extends keyof PlayspaceAuditDraft>(
+		field: KField,
+		value: PlayspaceAuditDraft[KField]
+	) {
+		setDraft(currentDraft => ({
+			...currentDraft,
+			[field]: value
+		}));
+		setFieldErrors(currentErrors => ({
+			...currentErrors,
+			[field]: undefined
+		}));
+	}
 
 	const patchDraft = useMutation({
 		mutationFn: async (input: PatchDraftInput) => {
@@ -88,7 +124,7 @@ export function AuditExecuteForm({ placeId }: AuditExecuteFormProps) {
 	});
 
 	React.useEffect(() => {
-		const parsed = playspaceAuditDraftSchema.partial().safeParse(values);
+		const parsed = partialDraftSchema.safeParse(draft);
 		if (!parsed.success) return;
 
 		const json = JSON.stringify(parsed.data);
@@ -97,14 +133,74 @@ export function AuditExecuteForm({ placeId }: AuditExecuteFormProps) {
 		lastQueuedJsonRef.current = json;
 		setSaveError(null);
 
-		const handle = window.setTimeout(() => {
+		const handle = globalThis.setTimeout(() => {
 			patchDraft.mutate({ placeId, draft: parsed.data });
 		}, 900);
 
 		return () => {
-			window.clearTimeout(handle);
+			globalThis.clearTimeout(handle);
 		};
-	}, [placeId, patchDraft, values]);
+	}, [draft, patchDraft, placeId]);
+
+	function validateCurrentStep(): boolean {
+		if (step.id === "visit") {
+			const parsedVisitStep = visitStepSchema.safeParse({
+				visitDate: draft.visitDate,
+				notes: draft.notes
+			});
+			if (!parsedVisitStep.success) {
+				setFieldErrors(currentErrors => ({
+					...currentErrors,
+					...buildFieldErrors(parsedVisitStep.error)
+				}));
+				return false;
+			}
+			return true;
+		}
+
+		if (step.id === "play-value") {
+			const parsedPlayValueStep = playValueStepSchema.safeParse({
+				playValueScore: draft.playValueScore
+			});
+			if (!parsedPlayValueStep.success) {
+				setFieldErrors(currentErrors => ({
+					...currentErrors,
+					...buildFieldErrors(parsedPlayValueStep.error)
+				}));
+				return false;
+			}
+			return true;
+		}
+
+		const parsedUsabilityStep = usabilityStepSchema.safeParse({
+			usabilityScore: draft.usabilityScore
+		});
+		if (!parsedUsabilityStep.success) {
+			setFieldErrors(currentErrors => ({
+				...currentErrors,
+				...buildFieldErrors(parsedUsabilityStep.error)
+			}));
+			return false;
+		}
+
+		return true;
+	}
+
+	function handleSaveNow() {
+		const parsedDraft = partialDraftSchema.safeParse(draft);
+		if (!parsedDraft.success) {
+			setFieldErrors(currentErrors => ({
+				...currentErrors,
+				...buildFieldErrors(parsedDraft.error)
+			}));
+			return;
+		}
+
+		patchDraft.mutate({
+			placeId,
+			draft: parsedDraft.data
+		});
+	}
 
 	const step = STEPS[stepIndex];
 
@@ -160,10 +256,15 @@ export function AuditExecuteForm({ placeId }: AuditExecuteFormProps) {
 							<div className="grid gap-4 sm:max-w-xl">
 								<div className="grid gap-2">
 									<Label htmlFor="visit_date">Visit date</Label>
-									<Input id="visit_date" type="date" {...form.register("visitDate")} />
-									{form.formState.errors.visitDate?.message ? (
+									<Input
+										id="visit_date"
+										type="date"
+										value={draft.visitDate}
+										onChange={event => updateDraft("visitDate", event.target.value)}
+									/>
+									{fieldErrors.visitDate ? (
 										<p className="text-sm text-destructive">
-											{form.formState.errors.visitDate.message}
+											{fieldErrors.visitDate}
 										</p>
 									) : null}
 								</div>
@@ -174,11 +275,12 @@ export function AuditExecuteForm({ placeId }: AuditExecuteFormProps) {
 										id="notes"
 										rows={6}
 										placeholder="Optional notes about the visit..."
-										{...form.register("notes")}
+										value={draft.notes ?? ""}
+										onChange={event => updateDraft("notes", event.target.value)}
 									/>
-									{form.formState.errors.notes?.message ? (
+									{fieldErrors.notes ? (
 										<p className="text-sm text-destructive">
-											{form.formState.errors.notes.message}
+											{fieldErrors.notes}
 										</p>
 									) : null}
 								</div>
@@ -192,19 +294,16 @@ export function AuditExecuteForm({ placeId }: AuditExecuteFormProps) {
 									<Input
 										id="play_value_score"
 										inputMode="numeric"
-										value={String(form.getValues("playValueScore"))}
+										value={String(draft.playValueScore)}
 										onChange={e => {
 											const nextValue = safeNumber(e.target.value);
 											if (nextValue === null) return;
-											form.setValue("playValueScore", nextValue, {
-												shouldDirty: true,
-												shouldValidate: true
-											});
+											updateDraft("playValueScore", nextValue);
 										}}
 									/>
-									{form.formState.errors.playValueScore?.message ? (
+									{fieldErrors.playValueScore ? (
 										<p className="text-sm text-destructive">
-											{form.formState.errors.playValueScore.message}
+											{fieldErrors.playValueScore}
 										</p>
 									) : null}
 								</div>
@@ -218,19 +317,16 @@ export function AuditExecuteForm({ placeId }: AuditExecuteFormProps) {
 									<Input
 										id="usability_score"
 										inputMode="numeric"
-										value={String(form.getValues("usabilityScore"))}
+										value={String(draft.usabilityScore)}
 										onChange={e => {
 											const nextValue = safeNumber(e.target.value);
 											if (nextValue === null) return;
-											form.setValue("usabilityScore", nextValue, {
-												shouldDirty: true,
-												shouldValidate: true
-											});
+											updateDraft("usabilityScore", nextValue);
 										}}
 									/>
-									{form.formState.errors.usabilityScore?.message ? (
+									{fieldErrors.usabilityScore ? (
 										<p className="text-sm text-destructive">
-											{form.formState.errors.usabilityScore.message}
+											{fieldErrors.usabilityScore}
 										</p>
 									) : null}
 								</div>
@@ -251,38 +347,15 @@ export function AuditExecuteForm({ placeId }: AuditExecuteFormProps) {
 							<Button
 								type="button"
 								variant="secondary"
-								onClick={() => {
-									patchDraft.mutate({
-										placeId,
-										draft: playspaceAuditDraftSchema.partial().parse(form.getValues())
-									});
-								}}
+								onClick={handleSaveNow}
 								disabled={patchDraft.isPending}>
 								Save now
 							</Button>
 
 							<Button
 								type="button"
-								onClick={async () => {
-									if (step.id === "visit") {
-										const value = form.getValues("visitDate");
-										if (value.trim().length === 0) {
-											form.setError("visitDate", {
-												type: "manual",
-												message: "Visit date is required."
-											});
-											return;
-										}
-									}
-
-									const fieldsToValidate =
-										step.id === "play-value"
-											? (["playValueScore"] as const)
-											: (["usabilityScore"] as const);
-
-									const isStepValid = await form.trigger(fieldsToValidate);
-									if (!isStepValid) return;
-
+								onClick={() => {
+									if (!validateCurrentStep()) return;
 									setStepIndex(idx => Math.min(STEPS.length - 1, idx + 1));
 								}}
 								disabled={stepIndex === STEPS.length - 1}>

@@ -1,8 +1,7 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
+import * as React from "react";
 import { z } from "zod";
 
 import { setBrowserAuthSession } from "@/lib/auth/browser-session";
@@ -14,7 +13,7 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 
 const managerLoginSchema = z.object({
-	email: z.string().email(),
+	email: z.email(),
 	password: z.string().min(8)
 });
 
@@ -59,20 +58,70 @@ export interface LoginFormProps {
 	nextParam: string | null;
 }
 
-export function LoginForm({ nextParam }: LoginFormProps) {
+export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 	const router = useRouter();
-
-	const managerForm = useForm<ManagerLoginValues>({
-		resolver: zodResolver(managerLoginSchema),
-		defaultValues: { email: "", password: "" },
-		mode: "onSubmit"
+	const [managerValues, setManagerValues] = React.useState<ManagerLoginValues>({
+		email: "",
+		password: ""
 	});
-
-	const auditorForm = useForm<AuditorLoginValues>({
-		resolver: zodResolver(auditorLoginSchema),
-		defaultValues: { auditorCode: "" },
-		mode: "onSubmit"
+	const [managerErrors, setManagerErrors] = React.useState<Partial<Record<keyof ManagerLoginValues, string>>>({});
+	const [auditorValues, setAuditorValues] = React.useState<AuditorLoginValues>({
+		auditorCode: ""
 	});
+	const [auditorErrors, setAuditorErrors] = React.useState<Partial<Record<keyof AuditorLoginValues, string>>>({});
+
+	const handleManagerSubmit: React.FormEventHandler<HTMLFormElement> = event => {
+		event.preventDefault();
+
+		const parsedValues = managerLoginSchema.safeParse(managerValues);
+		if (!parsedValues.success) {
+			const nextErrors: Partial<Record<keyof ManagerLoginValues, string>> = {};
+			const emailIssue = parsedValues.error.issues.find(issue => issue.path[0] === "email");
+			const passwordIssue = parsedValues.error.issues.find(issue => issue.path[0] === "password");
+
+			if (emailIssue?.message) {
+				nextErrors.email = emailIssue.message;
+			}
+			if (passwordIssue?.message) {
+				nextErrors.password = passwordIssue.message;
+			}
+
+			setManagerErrors(nextErrors);
+			return;
+		}
+
+		setManagerErrors({});
+		setBrowserAuthSession({
+			role: "manager",
+			accessToken: createDemoAccessToken()
+		});
+
+		const redirectPath = getRedirectAfterLogin("manager", nextParam);
+		router.push(redirectPath);
+	};
+
+	const handleAuditorSubmit: React.FormEventHandler<HTMLFormElement> = event => {
+		event.preventDefault();
+
+		const parsedValues = auditorLoginSchema.safeParse(auditorValues);
+		if (!parsedValues.success) {
+			const auditorCodeIssue = parsedValues.error.issues.find(issue => issue.path[0] === "auditorCode");
+			setAuditorErrors({
+				auditorCode: auditorCodeIssue?.message ?? "Auditor code is invalid."
+			});
+			return;
+		}
+
+		setAuditorErrors({});
+		setBrowserAuthSession({
+			role: "auditor",
+			accessToken: createDemoAccessToken(),
+			auditorCode: parsedValues.data.auditorCode
+		});
+
+		const redirectPath = getRedirectAfterLogin("auditor", nextParam);
+		router.push(redirectPath);
+	};
 
 	return (
 		<div className="min-h-dvh bg-background">
@@ -86,17 +135,7 @@ export function LoginForm({ nextParam }: LoginFormProps) {
 							</CardDescription>
 						</CardHeader>
 						<CardContent>
-							<form
-								className="grid gap-4"
-								onSubmit={managerForm.handleSubmit(() => {
-									setBrowserAuthSession({
-										role: "manager",
-										accessToken: createDemoAccessToken()
-									});
-
-									const redirectPath = getRedirectAfterLogin("manager", nextParam);
-									router.push(redirectPath);
-								})}>
+							<form className="grid gap-4" onSubmit={handleManagerSubmit}>
 								<div className="grid gap-2">
 									<Label htmlFor="manager_email">Email</Label>
 									<Input
@@ -104,11 +143,22 @@ export function LoginForm({ nextParam }: LoginFormProps) {
 										type="email"
 										autoComplete="email"
 										placeholder="manager@company.com"
-										{...managerForm.register("email")}
+										value={managerValues.email}
+										onChange={event => {
+											const nextEmail = event.target.value;
+											setManagerValues(currentValues => ({
+												...currentValues,
+												email: nextEmail
+											}));
+											setManagerErrors(currentErrors => ({
+												...currentErrors,
+												email: undefined
+											}));
+										}}
 									/>
-									{managerForm.formState.errors.email?.message ? (
+									{managerErrors.email ? (
 										<p className="text-sm text-destructive">
-											{managerForm.formState.errors.email.message}
+											{managerErrors.email}
 										</p>
 									) : null}
 								</div>
@@ -119,11 +169,22 @@ export function LoginForm({ nextParam }: LoginFormProps) {
 										id="manager_password"
 										type="password"
 										autoComplete="current-password"
-										{...managerForm.register("password")}
+										value={managerValues.password}
+										onChange={event => {
+											const nextPassword = event.target.value;
+											setManagerValues(currentValues => ({
+												...currentValues,
+												password: nextPassword
+											}));
+											setManagerErrors(currentErrors => ({
+												...currentErrors,
+												password: undefined
+											}));
+										}}
 									/>
-									{managerForm.formState.errors.password?.message ? (
+									{managerErrors.password ? (
 										<p className="text-sm text-destructive">
-											{managerForm.formState.errors.password.message}
+											{managerErrors.password}
 										</p>
 									) : null}
 								</div>
@@ -141,29 +202,23 @@ export function LoginForm({ nextParam }: LoginFormProps) {
 							</CardDescription>
 						</CardHeader>
 						<CardContent>
-							<form
-								className="grid gap-4"
-								onSubmit={auditorForm.handleSubmit(values => {
-									setBrowserAuthSession({
-										role: "auditor",
-										accessToken: createDemoAccessToken(),
-										auditorCode: values.auditorCode
-									});
-
-									const redirectPath = getRedirectAfterLogin("auditor", nextParam);
-									router.push(redirectPath);
-								})}>
+							<form className="grid gap-4" onSubmit={handleAuditorSubmit}>
 								<div className="grid gap-2">
 									<Label htmlFor="auditor_code">Auditor code</Label>
 									<Input
 										id="auditor_code"
 										autoComplete="off"
 										placeholder="A1B2C3"
-										{...auditorForm.register("auditorCode")}
+										value={auditorValues.auditorCode}
+										onChange={event => {
+											const nextAuditorCode = event.target.value;
+											setAuditorValues({ auditorCode: nextAuditorCode });
+											setAuditorErrors({ auditorCode: undefined });
+										}}
 									/>
-									{auditorForm.formState.errors.auditorCode?.message ? (
+									{auditorErrors.auditorCode ? (
 										<p className="text-sm text-destructive">
-											{auditorForm.formState.errors.auditorCode.message}
+											{auditorErrors.auditorCode}
 										</p>
 									) : null}
 								</div>

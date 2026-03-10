@@ -1,53 +1,91 @@
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+"use client";
 
-interface ProjectRow {
-	id: string;
-	name: string;
-	places: number;
-	auditors: number;
-	status: "active" | "archived";
+import { useQuery } from "@tanstack/react-query";
+
+import { PLAYSPACE_DEMO_ACCOUNT_ID, playspaceApi } from "@/lib/api/playspace";
+import { DashboardHeader } from "@/components/dashboard/dashboard-header";
+import { EmptyState } from "@/components/dashboard/empty-state";
+import { ProjectsTable } from "@/components/dashboard/projects-table";
+import { Button } from "@/components/ui/button";
+
+function getErrorMessage(error: unknown): string {
+	if (error instanceof Error) {
+		return error.message;
+	}
+
+	return "Could not load projects.";
 }
 
-const DEMO_PROJECTS: ProjectRow[] = [
-	{ id: "proj_001", name: "Citywide Spring 2026", places: 12, auditors: 4, status: "active" },
-	{ id: "proj_002", name: "School District Review", places: 7, auditors: 2, status: "active" }
-];
-
 export default function ManagerProjectsPage() {
+	const projectsQuery = useQuery({
+		queryKey: ["playspace", "account", PLAYSPACE_DEMO_ACCOUNT_ID, "projects"],
+		queryFn: () => playspaceApi.accounts.projects(PLAYSPACE_DEMO_ACCOUNT_ID)
+	});
+
+	if (projectsQuery.isLoading) {
+		return (
+			<div className="space-y-6">
+				<DashboardHeader
+					eyebrow="Manager Workspace"
+					title="Projects"
+					description="Project-level tracking, stats, and place coverage across the account."
+				/>
+				<div className="h-56 animate-pulse rounded-card border border-border bg-card" />
+			</div>
+		);
+	}
+
+	if (projectsQuery.isError) {
+		return (
+			<EmptyState
+				title="Projects unavailable"
+				description={getErrorMessage(projectsQuery.error)}
+				action={
+					<Button type="button" onClick={() => globalThis.location.reload()}>
+						Try again
+					</Button>
+				}
+			/>
+		);
+	}
+
+	if (!projectsQuery.data) {
+		return (
+			<div className="space-y-6">
+				<DashboardHeader
+					eyebrow="Manager Workspace"
+					title="Projects"
+					description="Project-level tracking, stats, and place coverage across the account."
+				/>
+				<div className="h-56 animate-pulse rounded-card border border-border bg-card" />
+			</div>
+		);
+	}
+
+	if (projectsQuery.data.length === 0) {
+		return (
+			<div className="space-y-6">
+				<DashboardHeader
+					eyebrow="Manager Workspace"
+					title="Projects"
+					description="Project-level tracking, stats, and place coverage across the account."
+				/>
+				<EmptyState
+					title="No projects yet"
+					description="Projects will appear here once the account starts setting up audit work."
+				/>
+			</div>
+		);
+	}
+
 	return (
 		<div className="space-y-6">
-			<div className="space-y-1">
-				<h1 className="text-2xl font-semibold tracking-tight">Projects</h1>
-				<p className="text-sm text-muted-foreground">
-					Create and manage projects, places, and auditor assignments.
-				</p>
-			</div>
-
-			<Card>
-				<CardHeader>
-					<CardTitle>All projects</CardTitle>
-				</CardHeader>
-				<CardContent className="space-y-3">
-					{DEMO_PROJECTS.map(project => {
-						return (
-							<div
-								key={project.id}
-								className="flex flex-col gap-2 rounded-lg border p-3 sm:flex-row sm:items-center sm:justify-between">
-								<div className="min-w-0">
-									<p className="truncate font-medium">{project.name}</p>
-									<p className="text-xs text-muted-foreground">
-										{project.places} places • {project.auditors} auditors
-									</p>
-								</div>
-								<Badge variant={project.status === "active" ? "default" : "secondary"}>
-									{project.status}
-								</Badge>
-							</div>
-						);
-					})}
-				</CardContent>
-			</Card>
+			<DashboardHeader
+				eyebrow="Manager Workspace"
+				title="Projects"
+				description="Project-level tracking, stats, and place coverage across the account."
+			/>
+			<ProjectsTable projects={projectsQuery.data} title="All projects" />
 		</div>
 	);
 }

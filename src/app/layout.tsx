@@ -1,15 +1,21 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Geist, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { Providers } from "./providers";
 
-const geistSans = Geist({
-	variable: "--font-geist-sans",
+const bodyFont = Geist({
+	variable: "--font-body",
 	subsets: ["latin"]
 });
 
-const geistMono = Geist_Mono({
-	variable: "--font-geist-mono",
+const headingFont = Space_Grotesk({
+	variable: "--font-heading",
+	subsets: ["latin"],
+	weight: ["500", "700"]
+});
+
+const monoFont = JetBrains_Mono({
+	variable: "--font-code",
 	subsets: ["latin"]
 });
 
@@ -24,8 +30,8 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang="en">
-			<body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+		<html lang="en" className="dark">
+			<body className={`${bodyFont.variable} ${headingFont.variable} ${monoFont.variable} antialiased`}>
 				<Providers>{children}</Providers>
 			</body>
 		</html>
