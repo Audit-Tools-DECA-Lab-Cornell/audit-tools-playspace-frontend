@@ -10,6 +10,7 @@ export const PLAYSPACE_DEMO_ACCOUNT_ID = "11111111-1111-4111-8111-111111111111";
 const accountTypeSchema = z.enum(["MANAGER", "AUDITOR"]);
 const projectStatusSchema = z.enum(["planned", "active", "completed"]);
 const placeStatusSchema = z.enum(["not_started", "in_progress", "submitted"]);
+const auditorSignupRequestStateSchema = z.enum(["pending", "approved", "declined"]);
 
 const managerProfileSchema = z.object({
 	id: z.string().uuid(),
@@ -120,6 +121,42 @@ const placeSummarySchema = z.object({
 	last_audited_at: z.string().datetime().nullable()
 });
 
+const auditorSignupRequestSchema = z.object({
+	id: z.string().uuid(),
+	account_id: z.string().uuid(),
+	manager_email: z.string().email(),
+	full_name: z.string(),
+	email: z.string().email(),
+	note: z.string().nullable(),
+	status: auditorSignupRequestStateSchema,
+	requested_at: z.string().datetime(),
+	reviewed_at: z.string().datetime().nullable(),
+	assigned_project_id: z.string().uuid().nullable(),
+	assigned_place_id: z.string().uuid().nullable()
+});
+
+const approvedAuditorSchema = z.object({
+	auditor_account_id: z.string().uuid(),
+	auditor_profile_id: z.string().uuid(),
+	auditor_code: z.string(),
+	full_name: z.string(),
+	assigned_project_id: z.string().uuid().nullable(),
+	assigned_project_name: z.string().nullable(),
+	assigned_place_id: z.string().uuid().nullable(),
+	assigned_place_name: z.string().nullable()
+});
+
+const auditorSignupApprovalSchema = z.object({
+	request: auditorSignupRequestSchema,
+	approved_auditor: approvedAuditorSchema
+});
+
+const auditorCodeLoginSchema = z.object({
+	account_id: z.string().uuid(),
+	auditor_profile_id: z.string().uuid(),
+	auditor_code: z.string()
+});
+
 export type ManagerProfile = z.infer<typeof managerProfileSchema>;
 export type AccountDetail = z.infer<typeof accountDetailSchema>;
 export type ProjectSummary = z.infer<typeof projectSummarySchema>;
@@ -127,6 +164,28 @@ export type ProjectDetail = z.infer<typeof projectDetailSchema>;
 export type ProjectStats = z.infer<typeof projectStatsSchema>;
 export type AuditorSummary = z.infer<typeof auditorSummarySchema>;
 export type PlaceSummary = z.infer<typeof placeSummarySchema>;
+export type AuditorSignupRequest = z.infer<typeof auditorSignupRequestSchema>;
+export type ApprovedAuditor = z.infer<typeof approvedAuditorSchema>;
+export type AuditorSignupApproval = z.infer<typeof auditorSignupApprovalSchema>;
+export type AuditorCodeLogin = z.infer<typeof auditorCodeLoginSchema>;
+
+/**
+ * Public payload for requesting auditor access from the login screen.
+ */
+export interface CreateAuditorSignupRequestInput {
+	managerEmail: string;
+	fullName: string;
+	email: string;
+	note: string;
+}
+
+/**
+ * Manager payload for approving a request with a required assignment.
+ */
+export interface ApproveAuditorSignupRequestInput {
+	projectId?: string;
+	placeId?: string;
+}
 
 /**
  * Structured error for API failures and validation issues.
@@ -228,6 +287,25 @@ async function fetchValidatedJson<TValue>(
  * Playspace dashboard API surface used by the web app.
  */
 export const playspaceApi = {
+	auth: {
+		loginWithAuditorCode: async (auditorCode: string): Promise<AuditorCodeLogin> =>
+			fetchValidatedJson("/playspace/auditor-code-login", auditorCodeLoginSchema, {
+				method: "POST",
+				body: JSON.stringify({
+					auditor_code: auditorCode
+				})
+			}),
+		requestAuditorAccess: async (input: CreateAuditorSignupRequestInput): Promise<AuditorSignupRequest> =>
+			fetchValidatedJson("/playspace/auditor-signup-requests", auditorSignupRequestSchema, {
+				method: "POST",
+				body: JSON.stringify({
+					manager_email: input.managerEmail,
+					full_name: input.fullName,
+					email: input.email,
+					note: input.note
+				})
+			})
+	},
 	accounts: {
 		get: async (accountId: string): Promise<AccountDetail> =>
 			fetchValidatedJson(`/playspace/accounts/${encodeURIComponent(accountId)}`, accountDetailSchema),
@@ -245,16 +323,42 @@ export const playspaceApi = {
 			fetchValidatedJson(
 				`/playspace/accounts/${encodeURIComponent(accountId)}/auditors`,
 				z.array(auditorSummarySchema)
+			),
+		auditorSignupRequests: async (accountId: string): Promise<AuditorSignupRequest[]> =>
+			fetchValidatedJson(
+				`/playspace/accounts/${encodeURIComponent(accountId)}/auditor-signup-requests`,
+				z.array(auditorSignupRequestSchema)
+			),
+		approveAuditorSignupRequest: async (
+			accountId: string,
+			requestId: string,
+			input: ApproveAuditorSignupRequestInput
+		): Promise<AuditorSignupApproval> =>
+			fetchValidatedJson(
+				`/playspace/accounts/${encodeURIComponent(accountId)}/auditor-signup-requests/${encodeURIComponent(requestId)}/approve`,
+				auditorSignupApprovalSchema,
+				{
+					method: "POST",
+					body: JSON.stringify({
+						project_id: input.projectId ?? null,
+						place_id: input.placeId ?? null
+					})
+				}
+			),
+		declineAuditorSignupRequest: async (accountId: string, requestId: string): Promise<AuditorSignupRequest> =>
+			fetchValidatedJson(
+				`/playspace/accounts/${encodeURIComponent(accountId)}/auditor-signup-requests/${encodeURIComponent(requestId)}/decline`,
+				auditorSignupRequestSchema,
+				{
+					method: "POST"
+				}
 			)
 	},
 	projects: {
 		get: async (projectId: string): Promise<ProjectDetail> =>
 			fetchValidatedJson(`/playspace/projects/${encodeURIComponent(projectId)}`, projectDetailSchema),
 		stats: async (projectId: string): Promise<ProjectStats> =>
-			fetchValidatedJson(
-				`/playspace/projects/${encodeURIComponent(projectId)}/stats`,
-				projectStatsSchema
-			),
+			fetchValidatedJson(`/playspace/projects/${encodeURIComponent(projectId)}/stats`, projectStatsSchema),
 		places: async (projectId: string): Promise<PlaceSummary[]> =>
 			fetchValidatedJson(
 				`/playspace/projects/${encodeURIComponent(projectId)}/places`,

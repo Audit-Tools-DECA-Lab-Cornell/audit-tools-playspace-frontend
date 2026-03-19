@@ -9,6 +9,7 @@ export interface ServerAuthSession {
 	 * Auditors are identified strictly by an alphanumeric code (no real names).
 	 */
 	auditorCode: string | null;
+	managerEmail: string | null;
 }
 
 /**
@@ -23,6 +24,7 @@ export async function getServerAuthSession(): Promise<ServerAuthSession | null> 
 	if (!role || !accessToken) return null;
 
 	const auditorCode = role === "auditor" ? (cookieStore.get(AUTH_COOKIE_NAMES.auditorCode)?.value ?? null) : null;
+	const managerEmail = role === "manager" ? (cookieStore.get(AUTH_COOKIE_NAMES.managerEmail)?.value ?? null) : null;
 
-	return { role, accessToken, auditorCode };
+	return { role, accessToken, auditorCode, managerEmail };
 }

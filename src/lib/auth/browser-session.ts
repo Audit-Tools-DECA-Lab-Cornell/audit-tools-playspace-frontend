@@ -6,6 +6,7 @@ export interface BrowserAuthSession {
 	role: UserRole;
 	accessToken: string;
 	auditorCode: string | null;
+	managerEmail: string | null;
 }
 
 function getCookieValue(name: string): string | null {
@@ -48,11 +49,17 @@ export function getBrowserAuthSession(): BrowserAuthSession | null {
 	if (!role || !accessToken) return null;
 
 	const auditorCode = role === "auditor" ? getCookieValue(AUTH_COOKIE_NAMES.auditorCode) || null : null;
+	const managerEmail = role === "manager" ? getCookieValue(AUTH_COOKIE_NAMES.managerEmail) || null : null;
 
-	return { role, accessToken, auditorCode };
+	return { role, accessToken, auditorCode, managerEmail };
 }
 
-export function setBrowserAuthSession(input: { role: UserRole; accessToken: string; auditorCode?: string }) {
+export function setBrowserAuthSession(input: {
+	role: UserRole;
+	accessToken: string;
+	auditorCode?: string;
+	managerEmail?: string;
+}) {
 	// 8 hours
 	const maxAgeSeconds = 60 * 60 * 8;
 
@@ -65,8 +72,14 @@ export function setBrowserAuthSession(input: { role: UserRole; accessToken: stri
 		} else {
 			clearCookie(AUTH_COOKIE_NAMES.auditorCode);
 		}
+		clearCookie(AUTH_COOKIE_NAMES.managerEmail);
 	} else {
 		clearCookie(AUTH_COOKIE_NAMES.auditorCode);
+		if (input.managerEmail && input.managerEmail.trim().length > 0) {
+			setCookieValue(AUTH_COOKIE_NAMES.managerEmail, input.managerEmail.trim().toLowerCase(), maxAgeSeconds);
+		} else {
+			clearCookie(AUTH_COOKIE_NAMES.managerEmail);
+		}
 	}
 }
 
@@ -74,4 +87,5 @@ export function clearBrowserAuthSession() {
 	clearCookie(AUTH_COOKIE_NAMES.role);
 	clearCookie(AUTH_COOKIE_NAMES.accessToken);
 	clearCookie(AUTH_COOKIE_NAMES.auditorCode);
+	clearCookie(AUTH_COOKIE_NAMES.managerEmail);
 }

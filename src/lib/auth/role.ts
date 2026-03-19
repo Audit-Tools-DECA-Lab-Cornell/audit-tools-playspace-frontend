@@ -3,7 +3,8 @@ export type UserRole = "manager" | "auditor";
 export const AUTH_COOKIE_NAMES = {
 	accessToken: "playspace_access_token",
 	role: "playspace_role",
-	auditorCode: "playspace_auditor_code"
+	auditorCode: "playspace_auditor_code",
+	managerEmail: "playspace_manager_email"
 } as const;
 
 export function isUserRole(value: string): value is UserRole {

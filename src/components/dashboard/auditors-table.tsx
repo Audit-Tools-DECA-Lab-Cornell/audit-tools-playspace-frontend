@@ -37,7 +37,9 @@ export function AuditorsTable({ auditors, title = "Auditors" }: Readonly<Auditor
 											<div className="space-y-1">
 												<div className="flex flex-wrap items-center gap-2">
 													<p className="font-medium text-foreground">{auditor.full_name}</p>
-													<span className="font-mono text-xs text-primary">{auditor.auditor_code}</span>
+													<span className="font-mono text-xs text-primary">
+														{auditor.auditor_code}
+													</span>
 												</div>
 												<p className="text-muted-foreground">
 													{auditor.email ?? "Email pending"}

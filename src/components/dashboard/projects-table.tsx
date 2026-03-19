@@ -65,7 +65,9 @@ export function ProjectsTable({
 											{formatScoreLabel(project.average_score)}
 										</td>
 										<td className="px-4 py-4 align-top">
-											<Badge variant="outline" className={getProjectStatusClassName(project.status)}>
+											<Badge
+												variant="outline"
+												className={getProjectStatusClassName(project.status)}>
 												{project.status}
 											</Badge>
 										</td>

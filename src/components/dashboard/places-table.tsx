@@ -2,12 +2,7 @@ import type { PlaceSummary } from "@/lib/api/playspace";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-import {
-	formatDateTimeLabel,
-	formatLocationLabel,
-	formatScoreLabel,
-	getPlaceStatusClassName
-} from "./utils";
+import { formatDateTimeLabel, formatLocationLabel, formatScoreLabel, getPlaceStatusClassName } from "./utils";
 
 export interface PlacesTableProps {
 	places: PlaceSummary[];

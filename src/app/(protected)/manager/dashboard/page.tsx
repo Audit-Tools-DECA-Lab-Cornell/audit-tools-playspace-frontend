@@ -10,6 +10,7 @@ import {
 	type AuditorSummary,
 	type ManagerProfile
 } from "@/lib/api/playspace";
+import { AuditorAccessRequestsPanel } from "@/components/dashboard/auditor-access-requests-panel";
 import { AuditorsTable } from "@/components/dashboard/auditors-table";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
@@ -19,6 +20,8 @@ import { formatDateTimeLabel, formatScoreLabel } from "@/components/dashboard/ut
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+const LOADING_CARD_IDS = ["projects", "places", "auditors", "audits"] as const;
 
 function getErrorMessage(error: unknown): string {
 	if (error instanceof Error) {
@@ -32,9 +35,9 @@ function LoadingState() {
 	return (
 		<div className="space-y-6">
 			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-				{Array.from({ length: 4 }).map((_, index) => {
+				{LOADING_CARD_IDS.map(cardId => {
 					return (
-						<Card key={`pulse-${index}`} className="animate-pulse">
+						<Card key={cardId} className="animate-pulse">
 							<CardContent className="space-y-3 py-6">
 								<div className="h-4 w-24 rounded bg-secondary" />
 								<div className="h-8 w-20 rounded bg-secondary" />
@@ -72,7 +75,9 @@ function OverviewPanels({
 					{account.primary_manager ? (
 						<>
 							<div className="space-y-1">
-								<p className="text-lg font-medium text-foreground">{account.primary_manager.full_name}</p>
+								<p className="text-lg font-medium text-foreground">
+									{account.primary_manager.full_name}
+								</p>
 								<p className="text-sm text-muted-foreground">
 									{account.primary_manager.position ?? "Position pending"}
 								</p>
@@ -81,9 +86,7 @@ function OverviewPanels({
 									{account.primary_manager.phone ?? "Phone pending"}
 								</p>
 							</div>
-							<p className="text-sm text-muted-foreground">
-								Account email: {account.email}
-							</p>
+							<p className="text-sm text-muted-foreground">Account email: {account.email}</p>
 						</>
 					) : (
 						<p className="text-sm text-muted-foreground">No primary manager profile has been added yet.</p>
@@ -112,7 +115,11 @@ function OverviewPanels({
 											{profile.position ?? "Position pending"}
 										</p>
 									</div>
-									{profile.is_primary ? <Badge>Primary</Badge> : <Badge variant="secondary">Manager</Badge>}
+									{profile.is_primary ? (
+										<Badge>Primary</Badge>
+									) : (
+										<Badge variant="secondary">Manager</Badge>
+									)}
 								</div>
 							);
 						})}
@@ -154,18 +161,18 @@ export default function ManagerDashboardPage() {
 	}
 
 	if (accountQuery.isError || managerProfilesQuery.isError || projectsQuery.isError || auditorsQuery.isError) {
-		const error =
-			accountQuery.error ??
-			managerProfilesQuery.error ??
-			projectsQuery.error ??
-			auditorsQuery.error;
+		const error = accountQuery.error ?? managerProfilesQuery.error ?? projectsQuery.error ?? auditorsQuery.error;
 
 		return (
 			<EmptyState
 				title="Dashboard unavailable"
 				description={getErrorMessage(error)}
 				action={
-					<Button type="button" onClick={() => window.location.reload()}>
+					<Button
+						type="button"
+						onClick={() => {
+							globalThis.window.location.reload();
+						}}>
 						Try again
 					</Button>
 				}
@@ -222,6 +229,8 @@ export default function ManagerDashboardPage() {
 			</div>
 
 			<OverviewPanels account={account} managerProfiles={managerProfiles} auditors={auditors} />
+
+			<AuditorAccessRequestsPanel accountId={account.id} projects={projects} />
 
 			{projects.length > 0 ? (
 				<ProjectsTable projects={projects} title="Project overview" />

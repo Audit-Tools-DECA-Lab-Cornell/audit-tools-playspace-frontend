@@ -56,8 +56,8 @@ export function formatScoreLabel(value: number | null): string {
  * Build a location label from the place summary fields.
  */
 export function formatLocationLabel(place: Pick<PlaceSummary, "city" | "province" | "country">): string {
-	const parts = [place.city, place.province, place.country].filter(
-		(part): part is string => Boolean(part && part.trim().length > 0)
+	const parts = [place.city, place.province, place.country].filter((part): part is string =>
+		Boolean(part && part.trim().length > 0)
 	);
 
 	if (parts.length === 0) {

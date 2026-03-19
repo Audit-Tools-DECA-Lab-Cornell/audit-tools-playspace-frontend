@@ -54,14 +54,15 @@ function attachAuthToken(config: InternalAxiosRequestConfig) {
 }
 
 function handleUnauthorized(error: AxiosError) {
-	if (typeof window === "undefined") return;
+	if (globalThis.window === undefined) return;
 	if (error.response?.status !== 401) return;
 
 	clearCookie(AUTH_COOKIE_NAMES.role);
 	clearCookie(AUTH_COOKIE_NAMES.accessToken);
 	clearCookie(AUTH_COOKIE_NAMES.auditorCode);
+	clearCookie(AUTH_COOKIE_NAMES.managerEmail);
 
-	window.location.assign("/login");
+	globalThis.window.location.assign("/login");
 }
 
 export function createApiClient(options: ApiClientOptions = {}): AxiosInstance {

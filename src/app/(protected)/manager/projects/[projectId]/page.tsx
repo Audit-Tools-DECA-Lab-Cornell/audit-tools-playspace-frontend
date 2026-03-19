@@ -53,7 +53,9 @@ export default function ManagerProjectDetailPage({ params }: Readonly<ManagerPro
 				<div className="h-20 animate-pulse rounded-card border border-border bg-card" />
 				<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
 					{Array.from({ length: 4 }).map((_, index) => {
-						return <div key={index} className="h-36 animate-pulse rounded-card border border-border bg-card" />;
+						return (
+							<div key={index} className="h-36 animate-pulse rounded-card border border-border bg-card" />
+						);
 					})}
 				</div>
 				<div className="h-64 animate-pulse rounded-card border border-border bg-card" />
@@ -62,8 +64,7 @@ export default function ManagerProjectDetailPage({ params }: Readonly<ManagerPro
 	}
 
 	if (projectQuery.isError || projectStatsQuery.isError || projectPlacesQuery.isError) {
-		const error =
-			projectQuery.error ?? projectStatsQuery.error ?? projectPlacesQuery.error;
+		const error = projectQuery.error ?? projectStatsQuery.error ?? projectPlacesQuery.error;
 
 		return (
 			<EmptyState
@@ -84,7 +85,9 @@ export default function ManagerProjectDetailPage({ params }: Readonly<ManagerPro
 				<div className="h-20 animate-pulse rounded-card border border-border bg-card" />
 				<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
 					{Array.from({ length: 4 }).map((_, index) => {
-						return <div key={index} className="h-36 animate-pulse rounded-card border border-border bg-card" />;
+						return (
+							<div key={index} className="h-36 animate-pulse rounded-card border border-border bg-card" />
+						);
 					})}
 				</div>
 				<div className="h-64 animate-pulse rounded-card border border-border bg-card" />

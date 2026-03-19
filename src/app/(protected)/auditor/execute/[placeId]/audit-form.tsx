@@ -91,10 +91,7 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 	const [fieldErrors, setFieldErrors] = React.useState<PlayspaceAuditDraftErrors>({});
 	const lastQueuedJsonRef = React.useRef<string | null>(null);
 
-	function updateDraft<KField extends keyof PlayspaceAuditDraft>(
-		field: KField,
-		value: PlayspaceAuditDraft[KField]
-	) {
+	function updateDraft<KField extends keyof PlayspaceAuditDraft>(field: KField, value: PlayspaceAuditDraft[KField]) {
 		setDraft(currentDraft => ({
 			...currentDraft,
 			[field]: value
@@ -263,9 +260,7 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 										onChange={event => updateDraft("visitDate", event.target.value)}
 									/>
 									{fieldErrors.visitDate ? (
-										<p className="text-sm text-destructive">
-											{fieldErrors.visitDate}
-										</p>
+										<p className="text-sm text-destructive">{fieldErrors.visitDate}</p>
 									) : null}
 								</div>
 
@@ -279,9 +274,7 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 										onChange={event => updateDraft("notes", event.target.value)}
 									/>
 									{fieldErrors.notes ? (
-										<p className="text-sm text-destructive">
-											{fieldErrors.notes}
-										</p>
+										<p className="text-sm text-destructive">{fieldErrors.notes}</p>
 									) : null}
 								</div>
 							</div>
@@ -302,9 +295,7 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 										}}
 									/>
 									{fieldErrors.playValueScore ? (
-										<p className="text-sm text-destructive">
-											{fieldErrors.playValueScore}
-										</p>
+										<p className="text-sm text-destructive">{fieldErrors.playValueScore}</p>
 									) : null}
 								</div>
 							</div>
@@ -325,9 +316,7 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 										}}
 									/>
 									{fieldErrors.usabilityScore ? (
-										<p className="text-sm text-destructive">
-											{fieldErrors.usabilityScore}
-										</p>
+										<p className="text-sm text-destructive">{fieldErrors.usabilityScore}</p>
 									) : null}
 								</div>
 							</div>

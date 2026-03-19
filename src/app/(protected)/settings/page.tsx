@@ -4,27 +4,11 @@ import Link from "next/link";
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import {
-	LayoutDashboard,
-	LogOut,
-	Palette,
-	ShieldCheck,
-	Sparkles,
-	UserRound
-} from "lucide-react";
+import { LayoutDashboard, LogOut, Palette, ShieldCheck, Sparkles, UserRound } from "lucide-react";
 import { z } from "zod";
 
-import {
-	PLAYSPACE_DEMO_ACCOUNT_ID,
-	playspaceApi,
-	type AccountDetail,
-	type ManagerProfile
-} from "@/lib/api/playspace";
-import {
-	clearBrowserAuthSession,
-	getBrowserAuthSession,
-	type BrowserAuthSession
-} from "@/lib/auth/browser-session";
+import { PLAYSPACE_DEMO_ACCOUNT_ID, playspaceApi, type AccountDetail, type ManagerProfile } from "@/lib/api/playspace";
+import { clearBrowserAuthSession, getBrowserAuthSession, type BrowserAuthSession } from "@/lib/auth/browser-session";
 import type { UserRole } from "@/lib/auth/role";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { formatDateLabel } from "@/components/dashboard/utils";
@@ -278,11 +262,13 @@ function getWorkspaceLabel(role: UserRole): string {
 /**
  * Resolve the best manager settings error message from the active queries.
  */
-function getManagerSettingsErrorMessage(input: Readonly<{
-	isManager: boolean;
-	accountError: unknown;
-	managerProfilesError: unknown;
-}>): string | null {
+function getManagerSettingsErrorMessage(
+	input: Readonly<{
+		isManager: boolean;
+		accountError: unknown;
+		managerProfilesError: unknown;
+	}>
+): string | null {
 	if (!input.isManager) {
 		return null;
 	}
@@ -457,7 +443,6 @@ function SettingsActionBar({ dashboardHref }: Readonly<{ dashboardHref: string }
 	);
 }
 
-
 /**
  * Session profile summary card shared across both roles.
  */
@@ -498,10 +483,7 @@ function ProfileAccessCard({
 				<div className="grid gap-4 sm:grid-cols-2">
 					<DetailItem label="Role" value={formatRoleLabel(session.role)} />
 					<DetailItem label="Workspace" value={getWorkspaceLabel(session.role)} />
-					<DetailItem
-						label="Account email"
-						value={managerAccount?.email ?? "Not available"}
-					/>
+					<DetailItem label="Account email" value={managerAccount?.email ?? "Not available"} />
 					<DetailItem
 						label="Member since"
 						value={managerAccount ? formatDateLabel(managerAccount.created_at) : "Not available"}
@@ -535,10 +517,7 @@ function SecuritySessionCard({
 				<div className="grid gap-4 sm:grid-cols-2">
 					<DetailItem label="Status" value="Signed in" />
 					<DetailItem label="Access" value={getWorkspaceLabel(session.role)} />
-					<DetailItem
-						label="Auditor code"
-						value={session.auditorCode ?? "Not applicable"}
-					/>
+					<DetailItem label="Auditor code" value={session.auditorCode ?? "Not applicable"} />
 					<DetailItem label="This device" value="Active session" />
 				</div>
 
@@ -723,7 +702,9 @@ function ManagerSettingsSection({
 					<CardDescription>Organization details will appear here when they are available.</CardDescription>
 				</CardHeader>
 				<CardContent className="space-y-4">
-					<p className="text-sm text-muted-foreground">{errorMessage ?? "We could not load your organization details right now."}</p>
+					<p className="text-sm text-muted-foreground">
+						{errorMessage ?? "We could not load your organization details right now."}
+					</p>
 					<Button asChild variant="outline">
 						<Link href="/manager/dashboard">Return to dashboard</Link>
 					</Button>
@@ -746,7 +727,9 @@ function ManagerSettingsSection({
 			<Card>
 				<CardHeader>
 					<CardTitle>Organization account</CardTitle>
-					<CardDescription>Review the organization and main contact attached to this workspace.</CardDescription>
+					<CardDescription>
+						Review the organization and main contact attached to this workspace.
+					</CardDescription>
 				</CardHeader>
 				<CardContent className="space-y-5">
 					<div className="grid gap-4 sm:grid-cols-2">
