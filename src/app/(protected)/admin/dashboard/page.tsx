@@ -109,9 +109,7 @@ export default function AdminDashboardPage() {
 				</CardHeader>
 				<CardContent className="space-y-3">
 					{latestAudits.length === 0 ? (
-						<p className="text-sm text-muted-foreground">
-							{t("latestAudits.empty")}
-						</p>
+						<p className="text-sm text-muted-foreground">{t("latestAudits.empty")}</p>
 					) : (
 						latestAudits.map(audit => (
 							<div

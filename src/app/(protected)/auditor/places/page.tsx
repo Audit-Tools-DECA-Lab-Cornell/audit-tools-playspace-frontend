@@ -20,7 +20,12 @@ function getStatusBadgeVariant(status: "IN_PROGRESS" | "PAUSED" | "SUBMITTED" | 
 	return "outline";
 }
 
-function formatLocation(city: string | null, province: string | null, country: string | null, pendingLabel: string): string {
+function formatLocation(
+	city: string | null,
+	province: string | null,
+	country: string | null,
+	pendingLabel: string
+): string {
 	const parts = [city, province, country].filter((part): part is string => Boolean(part && part.trim().length > 0));
 	if (parts.length === 0) return pendingLabel;
 	return parts.join(", ");
@@ -82,9 +87,7 @@ export default function AuditorPlacesPage() {
 					<CardTitle>{t("list.title")}</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-3">
-					{places.length === 0 ? (
-						<p className="text-sm text-muted-foreground">{t("list.empty")}</p>
-					) : null}
+					{places.length === 0 ? <p className="text-sm text-muted-foreground">{t("list.empty")}</p> : null}
 					{paginatedPlaces.map(place => {
 						const executeHref = `/auditor/execute/${encodeURIComponent(place.place_id)}`;
 						const reportHref =
@@ -101,12 +104,19 @@ export default function AuditorPlacesPage() {
 									<p className="font-medium text-foreground">{place.place_name}</p>
 									<p className="text-sm text-muted-foreground">{place.project_name}</p>
 									<p className="text-xs text-muted-foreground">
-										{formatLocation(place.city, place.province, place.country, t("list.locationPending"))}
+										{formatLocation(
+											place.city,
+											place.province,
+											place.country,
+											t("list.locationPending")
+										)}
 									</p>
 								</div>
 								<div className="flex flex-wrap items-center gap-2">
 									<Badge variant={getStatusBadgeVariant(place.audit_status)} className="font-medium">
-										{place.audit_status ? t(`status.${place.audit_status.toLowerCase()}`) : t("status.not_started")}
+										{place.audit_status
+											? t(`status.${place.audit_status.toLowerCase()}`)
+											: t("status.not_started")}
 									</Badge>
 									<Button asChild size="sm" variant={isResumeAction ? "outline" : "default"}>
 										<Link href={executeHref}>{primaryActionLabel}</Link>

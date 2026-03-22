@@ -56,7 +56,9 @@ export function DashboardHeader({
 						</BreadcrumbList>
 					</Breadcrumb>
 				</div>
-			) : <div className="h-5" />}
+			) : (
+				<div className="h-5" />
+			)}
 			<div className="flex flex-col gap-4 rounded-card border border-border/70 bg-card/70 p-6 shadow-card md:p-7">
 				<div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
 					<div className="space-y-2">

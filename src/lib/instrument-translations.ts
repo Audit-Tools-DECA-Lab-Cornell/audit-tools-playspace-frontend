@@ -1,17 +1,18 @@
 import { useMemo } from "react";
 
 import type {
-    ChoiceOption,
-    InstrumentQuestion,
-    InstrumentSection,
-    PlayspaceInstrument,
-    PreAuditQuestion,
-    QuestionScale,
-    ScaleDefinition,
-    ScaleKey,
-    ScaleOption,
+	ChoiceOption,
+	InstrumentQuestion,
+	InstrumentSection,
+	PlayspaceInstrument,
+	PreAuditQuestion,
+	QuestionScale,
+	ScaleDefinition,
+	ScaleKey,
+	ScaleOption
 } from "@/types/audit";
 import { BASE_PLAYSPACE_INSTRUMENT } from "@/lib/instrument";
+import { resolveSupportedLanguage, type ResolvedLanguage } from "@/i18n/config";
 
 import { enInstrumentTranslations } from "@/lib/enInstrument";
 import { usePreferences } from "@/components/app/preferences-provider";
@@ -23,76 +24,76 @@ import { usePreferences } from "@/components/app/preferences-provider";
 /**
  * Supported instrument translation locales.
  */
-export type InstrumentLocale = "en";
+export type InstrumentLocale = ResolvedLanguage;
 
 /**
  * Localized copy for a choice-like option.
  */
 export type InstrumentOptionTranslation = Readonly<{
-    label?: string;
-    description?: string | null;
+	label?: string;
+	description?: string | null;
 }>;
 
 /**
  * Localized copy for a pre-audit question.
  */
 export type InstrumentPreAuditQuestionTranslation = Readonly<{
-    label?: string;
-    description?: string | null;
-    options?: Readonly<Record<string, InstrumentOptionTranslation>>;
+	label?: string;
+	description?: string | null;
+	options?: Readonly<Record<string, InstrumentOptionTranslation>>;
 }>;
 
 /**
  * Localized copy for a scale and its options.
  */
 export type InstrumentScaleTranslation = Readonly<{
-    title?: string;
-    prompt?: string;
-    description?: string;
-    options?: Readonly<Record<string, InstrumentOptionTranslation>>;
+	title?: string;
+	prompt?: string;
+	description?: string;
+	options?: Readonly<Record<string, InstrumentOptionTranslation>>;
 }>;
 
 /**
  * Localized copy for a question prompt.
  */
 export type InstrumentQuestionTranslation = Readonly<{
-    prompt?: string;
+	prompt?: string;
 }>;
 
 /**
  * Localized copy for a section and its child questions.
  */
 export type InstrumentSectionTranslation = Readonly<{
-    title?: string;
-    description?: string | null;
-    instruction?: string;
-    notesPrompt?: string | null;
-    questions?: Readonly<Record<string, InstrumentQuestionTranslation>>;
+	title?: string;
+	description?: string | null;
+	instruction?: string;
+	notesPrompt?: string | null;
+	questions?: Readonly<Record<string, InstrumentQuestionTranslation>>;
 }>;
 
 /**
  * Compact translation bundle keyed by stable instrument identifiers.
  */
 export type InstrumentTranslations = Readonly<{
-    metadata?: Readonly<{
-        instrumentName?: string;
-        currentSheet?: string;
-    }>;
-    preamble?: readonly string[];
-    executionModes?: Readonly<Record<string, InstrumentOptionTranslation>>;
-    preAuditQuestions?: Readonly<Record<string, InstrumentPreAuditQuestionTranslation>>;
-    scales?: Readonly<Record<ScaleKey, InstrumentScaleTranslation>>;
-    sections?: Readonly<Record<string, InstrumentSectionTranslation>>;
+	metadata?: Readonly<{
+		instrumentName?: string;
+		currentSheet?: string;
+	}>;
+	preamble?: readonly string[];
+	executionModes?: Readonly<Record<string, InstrumentOptionTranslation>>;
+	preAuditQuestions?: Readonly<Record<string, InstrumentPreAuditQuestionTranslation>>;
+	scales?: Readonly<Record<ScaleKey, InstrumentScaleTranslation>>;
+	sections?: Readonly<Record<string, InstrumentSectionTranslation>>;
 }>;
 
 const INSTRUMENT_TRANSLATIONS_BY_LOCALE: Readonly<
-    Record<InstrumentLocale, InstrumentTranslations>
+	Partial<Record<InstrumentLocale, InstrumentTranslations>>
 > = {
-    en: enInstrumentTranslations,
-    // de: deInstrumentTranslations,
-    // fr: frInstrumentTranslations,
-    // hi: hiInstrumentTranslations,
-    // ja: jaInstrumentTranslations,
+	en: enInstrumentTranslations
+	// de: deInstrumentTranslations,
+	// fr: frInstrumentTranslations,
+	// hi: hiInstrumentTranslations,
+	// ja: jaInstrumentTranslations,
 };
 
 /**
@@ -102,11 +103,7 @@ const INSTRUMENT_TRANSLATIONS_BY_LOCALE: Readonly<
  * @returns The best matching instrument locale.
  */
 export function normalizeInstrumentLocale(languageTag: string | undefined): InstrumentLocale {
-    if (typeof languageTag !== "string" || languageTag.length === 0) {
-        return "en";
-    }
-
-    return "en";
+	return resolveSupportedLanguage(languageTag);
 }
 
 /**
@@ -117,15 +114,15 @@ export function normalizeInstrumentLocale(languageTag: string | undefined): Inst
  * @returns The translated text or the base value when missing.
  */
 function resolveString(baseValue: string, translatedValue: string | undefined): string {
-    if (translatedValue === undefined) {
-        return baseValue;
-    }
+	if (translatedValue === undefined) {
+		return baseValue;
+	}
 
-    if (baseValue.includes("**") && !hasBalancedBoldMarkers(translatedValue)) {
-        return baseValue;
-    }
+	if (baseValue.includes("**") && !hasBalancedBoldMarkers(translatedValue)) {
+		return baseValue;
+	}
 
-    return translatedValue;
+	return translatedValue;
 }
 
 /**
@@ -136,26 +133,22 @@ function resolveString(baseValue: string, translatedValue: string | undefined): 
  * @returns The translated text, explicit null, or the base value when missing.
  */
 function resolveNullableString(
-    baseValue: string | null | undefined,
-    translatedValue: string | null | undefined,
+	baseValue: string | null | undefined,
+	translatedValue: string | null | undefined
 ): string | null | undefined {
-    if (translatedValue === null) {
-        return null;
-    }
+	if (translatedValue === null) {
+		return null;
+	}
 
-    if (typeof translatedValue === "string") {
-        if (
-            typeof baseValue === "string" &&
-            baseValue.includes("**") &&
-            !hasBalancedBoldMarkers(translatedValue)
-        ) {
-            return baseValue;
-        }
+	if (typeof translatedValue === "string") {
+		if (typeof baseValue === "string" && baseValue.includes("**") && !hasBalancedBoldMarkers(translatedValue)) {
+			return baseValue;
+		}
 
-        return translatedValue;
-    }
+		return translatedValue;
+	}
 
-    return baseValue;
+	return baseValue;
 }
 
 /**
@@ -165,7 +158,7 @@ function resolveNullableString(
  * @returns True when `**` markers appear in balanced pairs.
  */
 function hasBalancedBoldMarkers(value: string): boolean {
-    return (value.match(/\*\*/g) ?? []).length % 2 === 0;
+	return (value.match(/\*\*/g) ?? []).length % 2 === 0;
 }
 
 /**
@@ -176,14 +169,14 @@ function hasBalancedBoldMarkers(value: string): boolean {
  * @returns The localized option with English fallback.
  */
 function localizeChoiceOption(
-    baseOption: ChoiceOption,
-    translation: InstrumentOptionTranslation | undefined,
+	baseOption: ChoiceOption,
+	translation: InstrumentOptionTranslation | undefined
 ): ChoiceOption {
-    return {
-        ...baseOption,
-        label: resolveString(baseOption.label, translation?.label),
-        description: resolveNullableString(baseOption.description, translation?.description),
-    };
+	return {
+		...baseOption,
+		label: resolveString(baseOption.label, translation?.label),
+		description: resolveNullableString(baseOption.description, translation?.description)
+	};
 }
 
 /**
@@ -194,13 +187,13 @@ function localizeChoiceOption(
  * @returns The localized scale option with English fallback.
  */
 function localizeScaleOption(
-    baseOption: ScaleOption,
-    translation: InstrumentOptionTranslation | undefined,
+	baseOption: ScaleOption,
+	translation: InstrumentOptionTranslation | undefined
 ): ScaleOption {
-    return {
-        ...baseOption,
-        label: resolveString(baseOption.label, translation?.label),
-    };
+	return {
+		...baseOption,
+		label: resolveString(baseOption.label, translation?.label)
+	};
 }
 
 /**
@@ -211,18 +204,16 @@ function localizeScaleOption(
  * @returns The localized scale guidance with English fallback.
  */
 function localizeScaleDefinition(
-    baseScale: ScaleDefinition,
-    translation: InstrumentScaleTranslation | undefined,
+	baseScale: ScaleDefinition,
+	translation: InstrumentScaleTranslation | undefined
 ): ScaleDefinition {
-    return {
-        ...baseScale,
-        title: resolveString(baseScale.title, translation?.title),
-        prompt: resolveString(baseScale.prompt, translation?.prompt),
-        description: resolveString(baseScale.description, translation?.description),
-        options: baseScale.options.map((option) =>
-            localizeScaleOption(option, translation?.options?.[option.key]),
-        ),
-    };
+	return {
+		...baseScale,
+		title: resolveString(baseScale.title, translation?.title),
+		prompt: resolveString(baseScale.prompt, translation?.prompt),
+		description: resolveString(baseScale.description, translation?.description),
+		options: baseScale.options.map(option => localizeScaleOption(option, translation?.options?.[option.key]))
+	};
 }
 
 /**
@@ -233,17 +224,15 @@ function localizeScaleDefinition(
  * @returns The localized question scale with English fallback.
  */
 function localizeQuestionScale(
-    baseScale: QuestionScale,
-    translation: InstrumentScaleTranslation | undefined,
+	baseScale: QuestionScale,
+	translation: InstrumentScaleTranslation | undefined
 ): QuestionScale {
-    return {
-        ...baseScale,
-        title: resolveString(baseScale.title, translation?.title),
-        prompt: resolveString(baseScale.prompt, translation?.prompt),
-        options: baseScale.options.map((option) =>
-            localizeScaleOption(option, translation?.options?.[option.key]),
-        ),
-    };
+	return {
+		...baseScale,
+		title: resolveString(baseScale.title, translation?.title),
+		prompt: resolveString(baseScale.prompt, translation?.prompt),
+		options: baseScale.options.map(option => localizeScaleOption(option, translation?.options?.[option.key]))
+	};
 }
 
 /**
@@ -254,17 +243,15 @@ function localizeQuestionScale(
  * @returns The localized pre-audit question with English fallback.
  */
 function localizePreAuditQuestion(
-    baseQuestion: PreAuditQuestion,
-    translation: InstrumentPreAuditQuestionTranslation | undefined,
+	baseQuestion: PreAuditQuestion,
+	translation: InstrumentPreAuditQuestionTranslation | undefined
 ): PreAuditQuestion {
-    return {
-        ...baseQuestion,
-        label: resolveString(baseQuestion.label, translation?.label),
-        description: resolveNullableString(baseQuestion.description, translation?.description),
-        options: baseQuestion.options.map((option) =>
-            localizeChoiceOption(option, translation?.options?.[option.key]),
-        ),
-    };
+	return {
+		...baseQuestion,
+		label: resolveString(baseQuestion.label, translation?.label),
+		description: resolveNullableString(baseQuestion.description, translation?.description),
+		options: baseQuestion.options.map(option => localizeChoiceOption(option, translation?.options?.[option.key]))
+	};
 }
 
 /**
@@ -276,17 +263,15 @@ function localizePreAuditQuestion(
  * @returns The localized question with English fallback.
  */
 function localizeInstrumentQuestion(
-    baseQuestion: InstrumentQuestion,
-    translation: InstrumentQuestionTranslation | undefined,
-    scaleTranslations: InstrumentTranslations["scales"] | undefined,
+	baseQuestion: InstrumentQuestion,
+	translation: InstrumentQuestionTranslation | undefined,
+	scaleTranslations: InstrumentTranslations["scales"] | undefined
 ): InstrumentQuestion {
-    return {
-        ...baseQuestion,
-        prompt: resolveString(baseQuestion.prompt, translation?.prompt),
-        scales: baseQuestion.scales.map((scale) =>
-            localizeQuestionScale(scale, scaleTranslations?.[scale.key]),
-        ),
-    };
+	return {
+		...baseQuestion,
+		prompt: resolveString(baseQuestion.prompt, translation?.prompt),
+		scales: baseQuestion.scales.map(scale => localizeQuestionScale(scale, scaleTranslations?.[scale.key]))
+	};
 }
 
 /**
@@ -298,24 +283,20 @@ function localizeInstrumentQuestion(
  * @returns The localized section with English fallback.
  */
 function localizeInstrumentSection(
-    baseSection: InstrumentSection,
-    translation: InstrumentSectionTranslation | undefined,
-    scaleTranslations: InstrumentTranslations["scales"] | undefined,
+	baseSection: InstrumentSection,
+	translation: InstrumentSectionTranslation | undefined,
+	scaleTranslations: InstrumentTranslations["scales"] | undefined
 ): InstrumentSection {
-    return {
-        ...baseSection,
-        title: resolveString(baseSection.title, translation?.title),
-        description: resolveNullableString(baseSection.description, translation?.description),
-        instruction: resolveString(baseSection.instruction, translation?.instruction),
-        notes_prompt: resolveNullableString(baseSection.notes_prompt, translation?.notesPrompt),
-        questions: baseSection.questions.map((question) =>
-            localizeInstrumentQuestion(
-                question,
-                translation?.questions?.[question.question_key],
-                scaleTranslations,
-            ),
-        ),
-    };
+	return {
+		...baseSection,
+		title: resolveString(baseSection.title, translation?.title),
+		description: resolveNullableString(baseSection.description, translation?.description),
+		instruction: resolveString(baseSection.instruction, translation?.instruction),
+		notes_prompt: resolveNullableString(baseSection.notes_prompt, translation?.notesPrompt),
+		questions: baseSection.questions.map(question =>
+			localizeInstrumentQuestion(question, translation?.questions?.[question.question_key], scaleTranslations)
+		)
+	};
 }
 
 /**
@@ -325,7 +306,7 @@ function localizeInstrumentSection(
  * @returns The best matching compact translation bundle.
  */
 export function getInstrumentTranslations(languageTag: string | undefined): InstrumentTranslations {
-    return INSTRUMENT_TRANSLATIONS_BY_LOCALE[normalizeInstrumentLocale(languageTag)];
+	return INSTRUMENT_TRANSLATIONS_BY_LOCALE[normalizeInstrumentLocale(languageTag)] ?? enInstrumentTranslations;
 }
 
 /**
@@ -336,41 +317,29 @@ export function getInstrumentTranslations(languageTag: string | undefined): Inst
  * @returns A localized instrument with English fallback for missing entries.
  */
 export function localizeInstrument(
-    baseInstrument: PlayspaceInstrument,
-    translations: InstrumentTranslations,
+	baseInstrument: PlayspaceInstrument,
+	translations: InstrumentTranslations
 ): PlayspaceInstrument {
-    const scaleTranslations = translations.scales;
+	const scaleTranslations = translations.scales;
 
-    return {
-        ...baseInstrument,
-        instrument_name: resolveString(
-            baseInstrument.instrument_name,
-            translations.metadata?.instrumentName,
-        ),
-        current_sheet: resolveString(
-            baseInstrument.current_sheet,
-            translations.metadata?.currentSheet,
-        ),
-        preamble: baseInstrument.preamble.map(
-            (paragraph, index) => translations.preamble?.[index] ?? paragraph,
-        ),
-        execution_modes: baseInstrument.execution_modes.map((mode) =>
-            localizeChoiceOption(mode, translations.executionModes?.[mode.key]),
-        ),
-        pre_audit_questions: baseInstrument.pre_audit_questions.map((question) =>
-            localizePreAuditQuestion(question, translations.preAuditQuestions?.[question.key]),
-        ),
-        scale_guidance: baseInstrument.scale_guidance.map((scale) =>
-            localizeScaleDefinition(scale, scaleTranslations?.[scale.key]),
-        ),
-        sections: baseInstrument.sections.map((section) =>
-            localizeInstrumentSection(
-                section,
-                translations.sections?.[section.section_key],
-                scaleTranslations,
-            ),
-        ),
-    };
+	return {
+		...baseInstrument,
+		instrument_name: resolveString(baseInstrument.instrument_name, translations.metadata?.instrumentName),
+		current_sheet: resolveString(baseInstrument.current_sheet, translations.metadata?.currentSheet),
+		preamble: baseInstrument.preamble.map((paragraph, index) => translations.preamble?.[index] ?? paragraph),
+		execution_modes: baseInstrument.execution_modes.map(mode =>
+			localizeChoiceOption(mode, translations.executionModes?.[mode.key])
+		),
+		pre_audit_questions: baseInstrument.pre_audit_questions.map(question =>
+			localizePreAuditQuestion(question, translations.preAuditQuestions?.[question.key])
+		),
+		scale_guidance: baseInstrument.scale_guidance.map(scale =>
+			localizeScaleDefinition(scale, scaleTranslations?.[scale.key])
+		),
+		sections: baseInstrument.sections.map(section =>
+			localizeInstrumentSection(section, translations.sections?.[section.section_key], scaleTranslations)
+		)
+	};
 }
 
 /**
@@ -382,10 +351,10 @@ export function localizeInstrument(
  * @returns The localized playspace instrument for the active language.
  */
 export function useLocalizedInstrument(): PlayspaceInstrument {
-    const activeLanguage = usePreferences().resolvedLanguage;
+	const activeLanguage = usePreferences().resolvedLanguage;
 
-    return useMemo(() => {
-        const translations = getInstrumentTranslations(activeLanguage);
-        return localizeInstrument(BASE_PLAYSPACE_INSTRUMENT, translations);
-    }, [activeLanguage]);
+	return useMemo(() => {
+		const translations = getInstrumentTranslations(activeLanguage);
+		return localizeInstrument(BASE_PLAYSPACE_INSTRUMENT, translations);
+	}, [activeLanguage]);
 }

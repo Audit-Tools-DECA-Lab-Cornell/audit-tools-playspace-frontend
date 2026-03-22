@@ -54,7 +54,9 @@ export default function AdminProjectsPage() {
 		{
 			id: "date_range",
 			accessorFn: row => `${row.start_date ?? ""}|${row.end_date ?? ""}`,
-			header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.dates")} align="end" />,
+			header: ({ column }) => (
+				<DataTableColumnHeader column={column} title={t("table.columns.dates")} align="end" />
+			),
 			cell: ({ row }) => (
 				<span className="block text-right text-sm text-muted-foreground tabular-nums">
 					{formatProjectDateRange(row.original, formatT)}
@@ -68,28 +70,36 @@ export default function AdminProjectsPage() {
 		},
 		{
 			accessorKey: "places_count",
-			header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.places")} align="end" />,
+			header: ({ column }) => (
+				<DataTableColumnHeader column={column} title={t("table.columns.places")} align="end" />
+			),
 			cell: ({ row }) => (
 				<span className="block text-right font-mono tabular-nums">{row.original.places_count}</span>
 			)
 		},
 		{
 			accessorKey: "auditors_count",
-			header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.auditors")} align="end" />,
+			header: ({ column }) => (
+				<DataTableColumnHeader column={column} title={t("table.columns.auditors")} align="end" />
+			),
 			cell: ({ row }) => (
 				<span className="block text-right font-mono tabular-nums">{row.original.auditors_count}</span>
 			)
 		},
 		{
 			accessorKey: "audits_completed",
-			header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.completed")} align="end" />,
+			header: ({ column }) => (
+				<DataTableColumnHeader column={column} title={t("table.columns.completed")} align="end" />
+			),
 			cell: ({ row }) => (
 				<span className="block text-right font-mono tabular-nums">{row.original.audits_completed}</span>
 			)
 		},
 		{
 			accessorKey: "average_score",
-			header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.meanScore")} align="end" />,
+			header: ({ column }) => (
+				<DataTableColumnHeader column={column} title={t("table.columns.meanScore")} align="end" />
+			),
 			cell: ({ row }) => (
 				<span className="block text-right font-mono text-foreground tabular-nums">
 					{formatScoreLabel(row.original.average_score, formatT)}

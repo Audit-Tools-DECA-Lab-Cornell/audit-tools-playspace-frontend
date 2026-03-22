@@ -120,7 +120,9 @@ export default function AuditorDashboardPage() {
 								? `/auditor/reports/${encodeURIComponent(place.audit_id)}`
 								: "/auditor/reports";
 						const isResumeAction = place.audit_status === "IN_PROGRESS" || place.audit_status === "PAUSED";
-						const actionLabel = isResumeAction ? t("assignedPlaces.resumeAudit") : t("assignedPlaces.startAudit");
+						const actionLabel = isResumeAction
+							? t("assignedPlaces.resumeAudit")
+							: t("assignedPlaces.startAudit");
 
 						return (
 							<div
@@ -133,7 +135,9 @@ export default function AuditorDashboardPage() {
 
 								<div className="flex flex-wrap items-center gap-2">
 									<Badge variant={getStatusBadgeVariant(place.audit_status)} className="font-medium">
-										{place.audit_status ? t(`status.${place.audit_status.toLowerCase()}`) : t("status.not_started")}
+										{place.audit_status
+											? t(`status.${place.audit_status.toLowerCase()}`)
+											: t("status.not_started")}
 									</Badge>
 									{place.audit_status === "SUBMITTED" ? (
 										<Button asChild size="sm" variant="secondary">

@@ -2,10 +2,7 @@ import type { PlaceSummary, ProjectSummary } from "@/lib/api/playspace";
 
 export type DashboardTextValues = Record<string, string | number | Date>;
 
-export type DashboardTranslator = (
-	key: string,
-	values?: DashboardTextValues
-) => string;
+export type DashboardTranslator = (key: string, values?: DashboardTextValues) => string;
 
 /**
  * Resolve the current document language when available for locale formatting.

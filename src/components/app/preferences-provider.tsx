@@ -1,13 +1,21 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import * as React from "react";
 import { z } from "zod";
+import {
+	LANGUAGE_PREFERENCES,
+	LOCALE_PREFERENCE_COOKIE_NAME,
+	resolveLanguagePreference,
+	resolveSupportedLanguage,
+	type LanguagePreference,
+	type ResolvedLanguage
+} from "@/i18n/config";
 
 const PREFERENCES_STORAGE_KEY = "playspace_web_preferences";
 const MIN_FONT_SCALE = 0.85;
 const MAX_FONT_SCALE = 1.3;
 const THEME_MODES = ["system", "light", "dark"] as const;
-const LANGUAGE_PREFERENCES = ["system", "en", "de", "fr", "ja", "hi"] as const;
 
 const preferencesSchema = z.object({
 	themeMode: z.enum(THEME_MODES),
@@ -19,8 +27,6 @@ const preferencesSchema = z.object({
 
 export type ThemeMode = (typeof THEME_MODES)[number];
 export type ResolvedTheme = "light" | "dark";
-export type LanguagePreference = (typeof LANGUAGE_PREFERENCES)[number];
-export type ResolvedLanguage = Exclude<LanguagePreference, "system">;
 
 export interface PreferencesContextValue {
 	themeMode: ThemeMode;
@@ -41,6 +47,8 @@ export interface PreferencesContextValue {
 
 interface PreferencesProviderProps {
 	children: React.ReactNode;
+	initialLanguagePreference: LanguagePreference;
+	initialResolvedLanguage: ResolvedLanguage;
 }
 
 interface PreferencesState {
@@ -52,7 +60,7 @@ interface PreferencesState {
 }
 
 const DEFAULT_PREFERENCES: PreferencesState = {
-	themeMode: "system",
+	themeMode: "dark",
 	languagePreference: "system",
 	fontScale: 1,
 	highContrast: false,
@@ -60,6 +68,8 @@ const DEFAULT_PREFERENCES: PreferencesState = {
 };
 
 const PreferencesContext = React.createContext<PreferencesContextValue | null>(null);
+
+export type { LanguagePreference, ResolvedLanguage } from "@/i18n/config";
 
 /**
  * Resolve the current OS theme for system-mode preferences.
@@ -91,60 +101,32 @@ function resolveTheme(themeMode: ThemeMode, systemTheme: ResolvedTheme): Resolve
 }
 
 /**
- * Normalize system language tags to the supported web preference codes.
- */
-function resolveLanguage(languagePreference: LanguagePreference): ResolvedLanguage {
-	if (languagePreference !== "system") {
-		return languagePreference;
-	}
-
-	if (globalThis.window === undefined) {
-		return "en";
-	}
-
-	const browserLanguage = globalThis.window.navigator.language.toLowerCase();
-	if (browserLanguage.startsWith("de")) {
-		return "de";
-	}
-	if (browserLanguage.startsWith("fr")) {
-		return "fr";
-	}
-	if (browserLanguage.startsWith("ja")) {
-		return "ja";
-	}
-	if (browserLanguage.startsWith("hi")) {
-		return "hi";
-	}
-	return "en";
-}
-
-/**
  * Read persisted preferences from browser storage with runtime validation.
  */
-function readStoredPreferences(): PreferencesState {
+function readStoredPreferences(fallbackPreferences: PreferencesState): PreferencesState {
 	if (globalThis.window === undefined) {
-		return DEFAULT_PREFERENCES;
+		return fallbackPreferences;
 	}
 
 	try {
 		const rawValue = globalThis.window.localStorage.getItem(PREFERENCES_STORAGE_KEY);
 		if (!rawValue) {
-			return DEFAULT_PREFERENCES;
+			return fallbackPreferences;
 		}
 
 		const parsedValue: unknown = JSON.parse(rawValue);
 		const result = preferencesSchema.safeParse(parsedValue);
 		return result.success
 			? {
-					themeMode: result.data.themeMode,
-					languagePreference: result.data.languagePreference,
-					fontScale: clampFontScale(result.data.fontScale),
-					highContrast: result.data.highContrast,
-					dyslexicFont: result.data.dyslexicFont
-				}
-			: DEFAULT_PREFERENCES;
+				themeMode: result.data.themeMode,
+				languagePreference: result.data.languagePreference,
+				fontScale: clampFontScale(result.data.fontScale),
+				highContrast: result.data.highContrast,
+				dyslexicFont: result.data.dyslexicFont
+			}
+			: fallbackPreferences;
 	} catch {
-		return DEFAULT_PREFERENCES;
+		return fallbackPreferences;
 	}
 }
 
@@ -161,6 +143,20 @@ function writeStoredPreferences(preferences: PreferencesState): void {
 	} catch {
 		// Ignore storage failures so the app remains usable.
 	}
+}
+
+/**
+ * Persist the language preference in a cookie that the server can read during
+ * the next request.
+ */
+function writeLanguagePreferenceCookie(languagePreference: LanguagePreference): void {
+	if (globalThis.document === undefined) {
+		return;
+	}
+
+	const encodedPreference = encodeURIComponent(languagePreference);
+	const oneYearInSeconds = 60 * 60 * 24 * 365;
+	globalThis.document.cookie = `${LOCALE_PREFERENCE_COOKIE_NAME}=${encodedPreference}; Path=/; Max-Age=${oneYearInSeconds}; SameSite=Lax`;
 }
 
 /**
@@ -188,15 +184,34 @@ function applyPreferencesToDocument(input: {
 /**
  * Web preference provider for theme, language, and accessibility controls.
  */
-export function PreferencesProvider({ children }: Readonly<PreferencesProviderProps>) {
-	const [preferences, setPreferences] = React.useState<PreferencesState>(DEFAULT_PREFERENCES);
+export function PreferencesProvider({
+	children,
+	initialLanguagePreference,
+	initialResolvedLanguage
+}: Readonly<PreferencesProviderProps>) {
+	const router = useRouter();
+	const [preferences, setPreferences] = React.useState<PreferencesState>(() => ({
+		...DEFAULT_PREFERENCES,
+		languagePreference: initialLanguagePreference
+	}));
 	const [systemTheme, setSystemTheme] = React.useState<ResolvedTheme>("dark");
+	const [systemLanguage, setSystemLanguage] = React.useState<ResolvedLanguage>(initialResolvedLanguage);
 	const [isHydrated, setIsHydrated] = React.useState(false);
+	const lastResolvedLanguageRef = React.useRef<ResolvedLanguage>(initialResolvedLanguage);
+	const initialPreferences = React.useMemo<PreferencesState>(() => {
+		return {
+			...DEFAULT_PREFERENCES,
+			languagePreference: initialLanguagePreference
+		};
+	}, [initialLanguagePreference]);
 
 	React.useEffect(() => {
 		const nextSystemTheme = getSystemTheme();
 		setSystemTheme(nextSystemTheme);
-		setPreferences(readStoredPreferences());
+		setSystemLanguage(
+			resolveSupportedLanguage(globalThis.window?.navigator.language ?? initialResolvedLanguage)
+		);
+		setPreferences(readStoredPreferences(initialPreferences));
 		setIsHydrated(true);
 
 		if (globalThis.window === undefined) {
@@ -212,10 +227,10 @@ export function PreferencesProvider({ children }: Readonly<PreferencesProviderPr
 		return () => {
 			mediaQuery.removeEventListener("change", handleChange);
 		};
-	}, []);
+	}, [initialPreferences, initialResolvedLanguage]);
 
 	const resolvedTheme = resolveTheme(preferences.themeMode, systemTheme);
-	const resolvedLanguage = resolveLanguage(preferences.languagePreference);
+	const resolvedLanguage = resolveLanguagePreference(preferences.languagePreference, systemLanguage);
 
 	React.useEffect(() => {
 		applyPreferencesToDocument({
@@ -233,7 +248,21 @@ export function PreferencesProvider({ children }: Readonly<PreferencesProviderPr
 		}
 
 		writeStoredPreferences(preferences);
+		writeLanguagePreferenceCookie(preferences.languagePreference);
 	}, [isHydrated, preferences]);
+
+	React.useEffect(() => {
+		if (!isHydrated) {
+			return;
+		}
+
+		if (lastResolvedLanguageRef.current === resolvedLanguage) {
+			return;
+		}
+
+		lastResolvedLanguageRef.current = resolvedLanguage;
+		router.refresh();
+	}, [isHydrated, resolvedLanguage, router]);
 
 	const value = React.useMemo<PreferencesContextValue>(() => {
 		return {

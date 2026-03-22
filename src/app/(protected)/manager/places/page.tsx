@@ -120,14 +120,18 @@ export default function ManagerPlacesPage() {
 			},
 			{
 				accessorKey: "audits_completed",
-				header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.audits")} align="end" />,
+				header: ({ column }) => (
+					<DataTableColumnHeader column={column} title={t("table.columns.audits")} align="end" />
+				),
 				cell: ({ row }) => (
 					<span className="block text-right font-mono tabular-nums">{row.original.audits_completed}</span>
 				)
 			},
 			{
 				accessorKey: "average_score",
-				header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.meanScore")} align="end" />,
+				header: ({ column }) => (
+					<DataTableColumnHeader column={column} title={t("table.columns.meanScore")} align="end" />
+				),
 				cell: ({ row }) => (
 					<span className="block text-right font-mono text-foreground tabular-nums">
 						{formatScoreLabel(row.original.average_score, formatT)}
@@ -136,7 +140,9 @@ export default function ManagerPlacesPage() {
 			},
 			{
 				accessorKey: "last_audited_at",
-				header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.lastAudited")} align="end" />,
+				header: ({ column }) => (
+					<DataTableColumnHeader column={column} title={t("table.columns.lastAudited")} align="end" />
+				),
 				cell: ({ row }) => (
 					<span className="block text-right text-sm text-muted-foreground tabular-nums">
 						{formatDateTimeLabel(row.original.last_audited_at, formatT)}
@@ -182,9 +188,7 @@ export default function ManagerPlacesPage() {
 				/>
 				<Card>
 					<CardContent className="py-8">
-						<p className="text-sm text-muted-foreground">
-							{t("missingAccount")}
-						</p>
+						<p className="text-sm text-muted-foreground">{t("missingAccount")}</p>
 					</CardContent>
 				</Card>
 			</div>
@@ -323,11 +327,7 @@ export default function ManagerPlacesPage() {
 						}))
 					}
 				]}
-				emptyMessage={
-					places.length === 0
-						? t("table.emptyState.noPlaces")
-						: t("table.emptyState.noMatches")
-				}
+				emptyMessage={places.length === 0 ? t("table.emptyState.noPlaces") : t("table.emptyState.noMatches")}
 				initialSorting={[{ id: "last_audited_at", desc: true }]}
 			/>
 		</div>

@@ -79,9 +79,7 @@ export default function AuditorReportsPage() {
 					<CardTitle>{t("list.title")}</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-3">
-					{audits.length === 0 ? (
-						<p className="text-sm text-muted-foreground">{t("list.empty")}</p>
-					) : null}
+					{audits.length === 0 ? <p className="text-sm text-muted-foreground">{t("list.empty")}</p> : null}
 					{paginatedAudits.map(audit => {
 						const detailHref =
 							audit.status === "SUBMITTED"
@@ -106,7 +104,8 @@ export default function AuditorReportsPage() {
 										</code>
 									</div>
 									<p className="text-xs text-muted-foreground">
-										{t("list.startedAt", { value: formatDateTimeLabel(audit.started_at, formatT) })} · {submissionLabel}
+										{t("list.startedAt", { value: formatDateTimeLabel(audit.started_at, formatT) })}{" "}
+										· {submissionLabel}
 									</p>
 								</div>
 								<div className="flex flex-wrap items-center gap-2">

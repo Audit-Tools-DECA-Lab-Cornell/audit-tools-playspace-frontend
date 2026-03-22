@@ -46,10 +46,7 @@ interface NavItem {
 
 type NavigationTranslator = (key: string) => string;
 
-function getNavItems(
-	role: UserRole,
-	t: NavigationTranslator
-): NavItem[] {
+function getNavItems(role: UserRole, t: NavigationTranslator): NavItem[] {
 	if (role === "admin") {
 		return [
 			{ label: t("dashboard"), href: "/admin/dashboard", icon: LayoutDashboard },
@@ -197,7 +194,11 @@ export function AppShell({ role, auditorCode, children }: Readonly<AppShellProps
 						<div className="flex h-16 items-center gap-3 px-4 md:px-6">
 							<Sheet>
 								<SheetTrigger asChild>
-									<Button variant="ghost" size="icon" className="md:hidden" aria-label={shellT("openMenu")}>
+									<Button
+										variant="ghost"
+										size="icon"
+										className="md:hidden"
+										aria-label={shellT("openMenu")}>
 										<Menu className="h-5 w-5" aria-hidden="true" />
 									</Button>
 								</SheetTrigger>

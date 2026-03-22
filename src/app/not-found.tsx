@@ -11,9 +11,7 @@ export default async function NotFound() {
 			<div className="w-full max-w-md space-y-4 rounded-xl border bg-card p-6 text-card-foreground">
 				<div className="space-y-1">
 					<h1 className="text-xl font-semibold tracking-tight">{t("title")}</h1>
-					<p className="text-sm text-muted-foreground">
-						{t("description")}
-					</p>
+					<p className="text-sm text-muted-foreground">{t("description")}</p>
 				</div>
 				<div className="flex flex-wrap gap-2">
 					<Button asChild>

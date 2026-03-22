@@ -182,9 +182,7 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 					<Card>
 						<CardHeader>
 							<CardTitle>{t("admin.title")}</CardTitle>
-							<CardDescription>
-								{t("admin.description")}
-							</CardDescription>
+							<CardDescription>{t("admin.description")}</CardDescription>
 						</CardHeader>
 						<CardContent>
 							<form className="grid gap-4" onSubmit={handleAdminSubmit}>
@@ -239,7 +237,8 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 
 								<Button type="submit">{t("actions.signIn")}</Button>
 								<p className="text-xs text-muted-foreground">
-									{t("admin.demoLabel")} <span className="font-mono">playspace.admin@example.org</span>
+									{t("admin.demoLabel")}{" "}
+									<span className="font-mono">playspace.admin@example.org</span>
 								</p>
 							</form>
 						</CardContent>
@@ -248,9 +247,7 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 					<Card>
 						<CardHeader>
 							<CardTitle>{t("manager.title")}</CardTitle>
-							<CardDescription>
-								{t("manager.description")}
-							</CardDescription>
+							<CardDescription>{t("manager.description")}</CardDescription>
 						</CardHeader>
 						<CardContent>
 							<form className="grid gap-4" onSubmit={handleManagerSubmit}>
@@ -305,7 +302,8 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 
 								<Button type="submit">{t("actions.signIn")}</Button>
 								<p className="text-xs text-muted-foreground">
-									{t("manager.demoLabel")} <span className="font-mono">manager@example.org</span> {t("manager.demoOr")}{" "}
+									{t("manager.demoLabel")} <span className="font-mono">manager@example.org</span>{" "}
+									{t("manager.demoOr")}{" "}
 									<span className="font-mono">canterbury.manager@example.org</span>
 								</p>
 							</form>
@@ -315,9 +313,7 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 					<Card>
 						<CardHeader>
 							<CardTitle>{t("auditor.title")}</CardTitle>
-							<CardDescription>
-								{t("auditor.description")}
-							</CardDescription>
+							<CardDescription>{t("auditor.description")}</CardDescription>
 						</CardHeader>
 						<CardContent>
 							<form className="grid gap-4" onSubmit={handleAuditorSubmit}>
@@ -344,9 +340,7 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 
 							<Separator className="my-6" />
 
-							<p className="text-sm text-muted-foreground">
-								{t("auditor.note")}
-							</p>
+							<p className="text-sm text-muted-foreground">{t("auditor.note")}</p>
 							<p className="text-xs text-muted-foreground">
 								{t("auditor.demoLabel")} <span className="font-mono">AKL-01</span>,{" "}
 								<span className="font-mono">AKL-02</span>, or <span className="font-mono">CHC-01</span>

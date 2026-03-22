@@ -33,10 +33,7 @@ export function DataTablePagination<TData>({
 			<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end sm:gap-2">
 				<div className="inline-flex min-w-max items-center gap-3 text-sm text-muted-foreground whitespace-nowrap">
 					<span className="text-sm text-muted-foreground whitespace-nowrap">{t("rowsPerPage")}</span>
-					<Select
-						value={pageSize.toString()}
-						onValueChange={value => table.setPageSize(Number(value))}
-					>
+					<Select value={pageSize.toString()} onValueChange={value => table.setPageSize(Number(value))}>
 						<SelectTrigger>
 							<SelectValue placeholder={t("rowsPerPage")} />
 						</SelectTrigger>

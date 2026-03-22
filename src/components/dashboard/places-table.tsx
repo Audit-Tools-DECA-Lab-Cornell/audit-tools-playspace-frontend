@@ -87,7 +87,9 @@ export function PlacesTable({
 			},
 			{
 				accessorKey: "audits_completed",
-				header: ({ column }) => <DataTableColumnHeader column={column} title={t("columns.audits")} align="end" />,
+				header: ({ column }) => (
+					<DataTableColumnHeader column={column} title={t("columns.audits")} align="end" />
+				),
 				cell: ({ row }) => (
 					<span className="block text-right font-mono text-foreground tabular-nums">
 						{row.original.audits_completed}
@@ -96,7 +98,9 @@ export function PlacesTable({
 			},
 			{
 				accessorKey: "average_score",
-				header: ({ column }) => <DataTableColumnHeader column={column} title={t("columns.meanScore")} align="end" />,
+				header: ({ column }) => (
+					<DataTableColumnHeader column={column} title={t("columns.meanScore")} align="end" />
+				),
 				cell: ({ row }) => (
 					<span className="block text-right font-mono text-foreground tabular-nums">
 						{formatScoreLabel(row.original.average_score, formatT)}

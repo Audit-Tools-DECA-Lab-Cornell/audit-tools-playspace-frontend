@@ -97,19 +97,27 @@ export default function AdminSystemPage() {
 					</CardHeader>
 					<CardContent className="grid gap-5 pb-5 sm:grid-cols-2">
 						<div className="space-y-1">
-							<p className="text-xs font-semibold tracking-[0.08em] text-foreground/70">{t("instrumentMetadata.key")}</p>
+							<p className="text-xs font-semibold tracking-[0.08em] text-foreground/70">
+								{t("instrumentMetadata.key")}
+							</p>
 							<p className="font-mono text-sm text-foreground">{system.instrument_key}</p>
 						</div>
 						<div className="space-y-1">
-							<p className="text-xs font-semibold tracking-[0.08em] text-foreground/70">{t("instrumentMetadata.name")}</p>
+							<p className="text-xs font-semibold tracking-[0.08em] text-foreground/70">
+								{t("instrumentMetadata.name")}
+							</p>
 							<p className="text-sm font-medium text-foreground">{instrument.instrument_name}</p>
 						</div>
 						<div className="space-y-1">
-							<p className="text-xs font-semibold tracking-[0.08em] text-foreground/70">{t("instrumentMetadata.currentSheet")}</p>
+							<p className="text-xs font-semibold tracking-[0.08em] text-foreground/70">
+								{t("instrumentMetadata.currentSheet")}
+							</p>
 							<p className="text-sm text-foreground">{instrument.current_sheet}</p>
 						</div>
 						<div className="space-y-1">
-							<p className="text-xs font-semibold tracking-[0.08em] text-foreground/70">{t("instrumentMetadata.generated")}</p>
+							<p className="text-xs font-semibold tracking-[0.08em] text-foreground/70">
+								{t("instrumentMetadata.generated")}
+							</p>
 							<p className="text-sm text-foreground tabular-nums">
 								{formatDateTimeLabel(system.generated_at, formatT)}
 							</p>
@@ -121,9 +129,7 @@ export default function AdminSystemPage() {
 						<CardTitle>{t("executionCoverage.title")}</CardTitle>
 					</CardHeader>
 					<CardContent className="space-y-4 pb-5">
-						<p className="text-sm text-muted-foreground">
-							{t("executionCoverage.description")}
-						</p>
+						<p className="text-sm text-muted-foreground">{t("executionCoverage.description")}</p>
 						<div className="flex flex-wrap gap-2">
 							{instrument.execution_modes.map(mode => (
 								<Badge key={mode.key} variant="outline">

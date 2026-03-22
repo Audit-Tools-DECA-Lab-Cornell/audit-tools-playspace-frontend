@@ -61,7 +61,12 @@ export default function AdminPlacesPage() {
 						{row.original.account_name} · {row.original.project_name}
 					</p>
 					<p className="text-sm text-muted-foreground">
-						{formatLocation(row.original.city, row.original.province, row.original.country, formatT("locationPending"))}
+						{formatLocation(
+							row.original.city,
+							row.original.province,
+							row.original.country,
+							formatT("locationPending")
+						)}
 					</p>
 				</div>
 			),
@@ -69,14 +74,18 @@ export default function AdminPlacesPage() {
 		},
 		{
 			accessorKey: "audits_completed",
-			header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.completed")} align="end" />,
+			header: ({ column }) => (
+				<DataTableColumnHeader column={column} title={t("table.columns.completed")} align="end" />
+			),
 			cell: ({ row }) => (
 				<span className="block text-right font-mono tabular-nums">{row.original.audits_completed}</span>
 			)
 		},
 		{
 			accessorKey: "average_score",
-			header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.meanScore")} align="end" />,
+			header: ({ column }) => (
+				<DataTableColumnHeader column={column} title={t("table.columns.meanScore")} align="end" />
+			),
 			cell: ({ row }) => (
 				<span className="block text-right font-mono text-foreground tabular-nums">
 					{formatScoreLabel(row.original.average_score, formatT)}
@@ -85,7 +94,9 @@ export default function AdminPlacesPage() {
 		},
 		{
 			accessorKey: "last_audited_at",
-			header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.latestAudit")} align="end" />,
+			header: ({ column }) => (
+				<DataTableColumnHeader column={column} title={t("table.columns.latestAudit")} align="end" />
+			),
 			cell: ({ row }) => (
 				<span className="block text-right text-sm text-muted-foreground tabular-nums">
 					{formatDateTimeLabel(row.original.last_audited_at, formatT)}

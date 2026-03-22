@@ -23,7 +23,7 @@ const tabsListVariants = cva(
 	{
 		variants: {
 			variant: {
-				default: "bg-secondary",
+				default: "bg-secondary"
 			}
 		},
 		defaultVariants: {

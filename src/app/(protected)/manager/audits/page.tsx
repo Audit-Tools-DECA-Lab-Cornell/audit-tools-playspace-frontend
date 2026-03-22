@@ -196,11 +196,7 @@ export default function ManagerAuditsPage() {
 				rows={audits}
 				title={t("table.title")}
 				description={t("table.description")}
-				emptyMessage={
-					audits.length === 0
-						? t("table.emptyState.noAudits")
-						: t("table.emptyState.noMatches")
-				}
+				emptyMessage={audits.length === 0 ? t("table.emptyState.noAudits") : t("table.emptyState.noMatches")}
 			/>
 		</div>
 	);

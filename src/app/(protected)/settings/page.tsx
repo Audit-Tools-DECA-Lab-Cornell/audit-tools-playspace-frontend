@@ -152,11 +152,7 @@ function getSessionDisplayName(
 /**
  * Resolve a subtitle line for the signed-in user.
  */
-function getProfileSubtitle(
-	session: AuthSession,
-	managerAccount: AccountDetail | null,
-	t: SettingsTranslator
-): string {
+function getProfileSubtitle(session: AuthSession, managerAccount: AccountDetail | null, t: SettingsTranslator): string {
 	if (session.role === "manager") {
 		return managerAccount?.name ?? t("managerWorkspaceFallback");
 	}
@@ -165,19 +161,13 @@ function getProfileSubtitle(
 		return t("adminSubtitle");
 	}
 
-	return session.auditorCode
-		? t("auditorCodeSubtitle", { code: session.auditorCode })
-		: t("auditorSubtitle");
+	return session.auditorCode ? t("auditorCodeSubtitle", { code: session.auditorCode }) : t("auditorSubtitle");
 }
 
 /**
  * Resolve the most appropriate account email visible in settings.
  */
-function getProfileEmail(
-	session: AuthSession,
-	managerAccount: AccountDetail | null,
-	t: SettingsTranslator
-): string {
+function getProfileEmail(session: AuthSession, managerAccount: AccountDetail | null, t: SettingsTranslator): string {
 	if (session.role === "manager" && managerAccount) {
 		return managerAccount.email;
 	}
@@ -506,7 +496,10 @@ function ProfileSummaryCard({
 					) : (
 						<>
 							<DetailItem label={t("fields.role")} value={formatRoleLabel(session.role, roleT)} />
-							<DetailItem label={t("fields.workspace")} value={getWorkspaceLabel(session.role, workspaceT)} />
+							<DetailItem
+								label={t("fields.workspace")}
+								value={getWorkspaceLabel(session.role, workspaceT)}
+							/>
 							<DetailItem label={t("fields.email")} value={getProfileEmail(session, managerAccount, t)} />
 							<DetailItem
 								label={t("fields.memberSince")}
@@ -550,7 +543,10 @@ function SecurityCard({
 				<div className="grid gap-4 sm:grid-cols-2">
 					<DetailItem label={t("fields.status")} value={t("values.signedIn")} />
 					<DetailItem label={t("fields.currentAccess")} value={formatRoleLabel(session.role, roleT)} />
-					<DetailItem label={t("fields.auditorCode")} value={session.auditorCode ?? t("values.notApplicable")} />
+					<DetailItem
+						label={t("fields.auditorCode")}
+						value={session.auditorCode ?? t("values.notApplicable")}
+					/>
 					<DetailItem label={t("fields.device")} value={t("values.currentBrowserSession")} />
 				</div>
 
@@ -898,9 +894,7 @@ function ManagerOrganizationCard({
 						</div>
 					</>
 				) : account === null ? (
-					<p className="text-sm text-muted-foreground">
-						{errorMessage ?? t("messages.loadFailed")}
-					</p>
+					<p className="text-sm text-muted-foreground">{errorMessage ?? t("messages.loadFailed")}</p>
 				) : (
 					<>
 						<div className="grid gap-4 sm:grid-cols-2">
@@ -910,7 +904,10 @@ function ManagerOrganizationCard({
 								label={t("fields.primaryContact")}
 								value={primaryManagerProfile?.full_name ?? t("values.pending")}
 							/>
-							<DetailItem label={t("fields.memberSince")} value={formatDateLabel(account.created_at, formatT)} />
+							<DetailItem
+								label={t("fields.memberSince")}
+								value={formatDateLabel(account.created_at, formatT)}
+							/>
 						</div>
 
 						{isEditingOrganization ? (
@@ -971,9 +968,7 @@ function ManagerOrganizationCard({
 										</p>
 									</div>
 								) : (
-									<p className="mt-3 text-sm text-muted-foreground">
-										{t("primaryContact.empty")}
-									</p>
+									<p className="mt-3 text-sm text-muted-foreground">{t("primaryContact.empty")}</p>
 								)}
 							</div>
 						)}
@@ -1028,28 +1023,28 @@ function ManagerContactsCard({
 				{errorMessage
 					? null
 					: managerProfiles.map(profile => (
-						<div
-							key={profile.id}
-							className="flex items-start gap-3 rounded-card border border-border bg-card p-4">
-							<Avatar size="sm">
-								<AvatarFallback>{getAvatarFallbackLabel(profile.full_name)}</AvatarFallback>
-							</Avatar>
-							<div className="min-w-0 flex-1 space-y-1">
-								<div className="flex flex-wrap items-center gap-2">
-									<p className="font-medium text-foreground">{profile.full_name}</p>
-									{profile.is_primary ? (
-										<Badge>{t("primaryContactBadge")}</Badge>
-									) : (
-										<Badge variant="secondary">{t("managerBadge")}</Badge>
-									)}
+							<div
+								key={profile.id}
+								className="flex items-start gap-3 rounded-card border border-border bg-card p-4">
+								<Avatar size="sm">
+									<AvatarFallback>{getAvatarFallbackLabel(profile.full_name)}</AvatarFallback>
+								</Avatar>
+								<div className="min-w-0 flex-1 space-y-1">
+									<div className="flex flex-wrap items-center gap-2">
+										<p className="font-medium text-foreground">{profile.full_name}</p>
+										{profile.is_primary ? (
+											<Badge>{t("primaryContactBadge")}</Badge>
+										) : (
+											<Badge variant="secondary">{t("managerBadge")}</Badge>
+										)}
+									</div>
+									<p className="text-sm text-muted-foreground">
+										{profile.position ?? t("positionPending")}
+									</p>
+									<p className="text-sm text-muted-foreground">{profile.email}</p>
 								</div>
-								<p className="text-sm text-muted-foreground">
-									{profile.position ?? t("positionPending")}
-								</p>
-								<p className="text-sm text-muted-foreground">{profile.email}</p>
 							</div>
-						</div>
-					))}
+						))}
 			</CardContent>
 		</Card>
 	);

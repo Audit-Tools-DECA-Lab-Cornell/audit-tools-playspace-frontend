@@ -77,14 +77,14 @@ export default function AuditorReportDetailPage() {
 	});
 	const audit = auditQuery.data ?? null;
 	const sectionTitleByKey = React.useMemo(() => {
-		return Object.fromEntries(
-			instrument.sections.map(section => [section.section_key, section.title])
-		) as Readonly<Record<string, string>>;
+		return Object.fromEntries(instrument.sections.map(section => [section.section_key, section.title])) as Readonly<
+			Record<string, string>
+		>;
 	}, [instrument]);
 	const preAuditQuestionByKey = React.useMemo(() => {
-		return Object.fromEntries(
-			instrument.pre_audit_questions.map(question => [question.key, question])
-		) as Readonly<Record<string, PreAuditQuestion>>;
+		return Object.fromEntries(instrument.pre_audit_questions.map(question => [question.key, question])) as Readonly<
+			Record<string, PreAuditQuestion>
+		>;
 	}, [instrument]);
 	const sectionRows = React.useMemo(() => {
 		return audit ? Object.values(audit.sections) : [];
@@ -180,9 +180,7 @@ export default function AuditorReportDetailPage() {
 						<CardTitle>{t("metadata.title")}</CardTitle>
 					</CardHeader>
 					<CardContent className="space-y-2 text-sm text-muted-foreground">
-						<p>
-							{t("metadata.started", { value: formatDateTimeLabel(audit.started_at, formatT) })}
-						</p>
+						<p>{t("metadata.started", { value: formatDateTimeLabel(audit.started_at, formatT) })}</p>
 						<p>{t("metadata.submitted", { value: formatDateTimeLabel(audit.submitted_at, formatT) })}</p>
 						<p>
 							{t("metadata.executionMode", {
@@ -191,7 +189,11 @@ export default function AuditorReportDetailPage() {
 									: t("metadata.notSelected")
 							})}
 						</p>
-						<p>{t("metadata.readyToSubmit", { value: audit.progress.ready_to_submit ? t("metadata.yes") : t("metadata.no") })}</p>
+						<p>
+							{t("metadata.readyToSubmit", {
+								value: audit.progress.ready_to_submit ? t("metadata.yes") : t("metadata.no")
+							})}
+						</p>
 					</CardContent>
 				</Card>
 				<Card>
@@ -211,17 +213,23 @@ export default function AuditorReportDetailPage() {
 						</p>
 						<p>
 							{t("scores.playValue", {
-								value: audit.scores.overall ? String(audit.scores.overall.play_value_total) : formatT("pending")
+								value: audit.scores.overall
+									? String(audit.scores.overall.play_value_total)
+									: formatT("pending")
 							})}
 						</p>
 						<p>
 							{t("scores.usability", {
-								value: audit.scores.overall ? String(audit.scores.overall.usability_total) : formatT("pending")
+								value: audit.scores.overall
+									? String(audit.scores.overall.usability_total)
+									: formatT("pending")
 							})}
 						</p>
 						<p>
 							{t("scores.sociability", {
-								value: audit.scores.overall ? String(audit.scores.overall.sociability_total) : formatT("pending")
+								value: audit.scores.overall
+									? String(audit.scores.overall.sociability_total)
+									: formatT("pending")
 							})}
 						</p>
 					</CardContent>
@@ -305,7 +313,10 @@ export default function AuditorReportDetailPage() {
 						<>
 							<div className="flex flex-wrap items-center justify-between gap-3">
 								<p className="text-sm text-muted-foreground">
-									{t("sectionNotes.summary", { notedCount: notedSectionCount, totalCount: sectionRows.length })}
+									{t("sectionNotes.summary", {
+										notedCount: notedSectionCount,
+										totalCount: sectionRows.length
+									})}
 								</p>
 								<div className="flex flex-wrap items-center gap-2">
 									{emptySectionCount > 0 ? (
@@ -328,14 +339,20 @@ export default function AuditorReportDetailPage() {
 										onClick={() => {
 											setShowSectionCodes(currentValue => !currentValue);
 										}}>
-										{showSectionCodes ? t("sectionNotes.hideSectionCodes") : t("sectionNotes.showSectionCodes")}
+										{showSectionCodes
+											? t("sectionNotes.hideSectionCodes")
+											: t("sectionNotes.showSectionCodes")}
 									</Button>
 								</div>
 							</div>
 							{orderedSectionRows.length === 0 ? (
 								<div className="rounded-card border border-dashed border-border p-4">
-									<p className="font-medium text-foreground">{t("sectionNotes.noCapturedNotesTitle")}</p>
-									<p className="mt-2 text-sm text-muted-foreground">{t("sectionNotes.noCapturedNotesDescription")}</p>
+									<p className="font-medium text-foreground">
+										{t("sectionNotes.noCapturedNotesTitle")}
+									</p>
+									<p className="mt-2 text-sm text-muted-foreground">
+										{t("sectionNotes.noCapturedNotesDescription")}
+									</p>
 								</div>
 							) : (
 								<div className="grid gap-3 md:grid-cols-2">
@@ -362,7 +379,9 @@ export default function AuditorReportDetailPage() {
 													<Badge
 														variant={hasNote ? "secondary" : "outline"}
 														className="font-medium">
-														{hasNote ? t("sectionNotes.capturedNote") : t("sectionNotes.emptyBadge")}
+														{hasNote
+															? t("sectionNotes.capturedNote")
+															: t("sectionNotes.emptyBadge")}
 													</Badge>
 												</div>
 												<p className="mt-3 text-sm text-muted-foreground">

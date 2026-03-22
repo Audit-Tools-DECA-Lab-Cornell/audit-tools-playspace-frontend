@@ -46,7 +46,9 @@ export default function AdminAccountsPage() {
 			cell: ({ row }) => (
 				<div className="min-w-[220px] space-y-1">
 					<p className="font-medium text-foreground">{row.original.name}</p>
-					<p className="text-sm text-muted-foreground">{row.original.email_masked ?? t("table.emailHidden")}</p>
+					<p className="text-sm text-muted-foreground">
+						{row.original.email_masked ?? t("table.emailHidden")}
+					</p>
 				</div>
 			)
 		},
@@ -62,28 +64,36 @@ export default function AdminAccountsPage() {
 		},
 		{
 			accessorKey: "projects_count",
-			header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.projects")} align="end" />,
+			header: ({ column }) => (
+				<DataTableColumnHeader column={column} title={t("table.columns.projects")} align="end" />
+			),
 			cell: ({ row }) => (
 				<span className="block text-right font-mono tabular-nums">{row.original.projects_count}</span>
 			)
 		},
 		{
 			accessorKey: "places_count",
-			header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.places")} align="end" />,
+			header: ({ column }) => (
+				<DataTableColumnHeader column={column} title={t("table.columns.places")} align="end" />
+			),
 			cell: ({ row }) => (
 				<span className="block text-right font-mono tabular-nums">{row.original.places_count}</span>
 			)
 		},
 		{
 			accessorKey: "auditors_count",
-			header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.auditors")} align="end" />,
+			header: ({ column }) => (
+				<DataTableColumnHeader column={column} title={t("table.columns.auditors")} align="end" />
+			),
 			cell: ({ row }) => (
 				<span className="block text-right font-mono tabular-nums">{row.original.auditors_count}</span>
 			)
 		},
 		{
 			accessorKey: "created_at",
-			header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.created")} align="end" />,
+			header: ({ column }) => (
+				<DataTableColumnHeader column={column} title={t("table.columns.created")} align="end" />
+			),
 			cell: ({ row }) => (
 				<span className="block text-right text-sm text-muted-foreground tabular-nums">
 					{formatDateTimeLabel(row.original.created_at, formatT)}

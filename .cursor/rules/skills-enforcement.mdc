@@ -1,7 +1,6 @@
 ---
-alwaysApply: true
+alwaysApply: false
 ---
-
 # Skill Enforcement Rule
 
 Before writing ANY code, making ANY design decision, or proposing ANY fix,

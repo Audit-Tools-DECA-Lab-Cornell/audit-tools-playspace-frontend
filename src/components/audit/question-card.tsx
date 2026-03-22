@@ -87,9 +87,7 @@ export function AuditQuestionCard({
 				})}
 
 				{question.scales.length > 1 && !showFollowUpScales ? (
-					<p className="text-xs text-muted-foreground">
-						{t("followUpScalesHidden")}
-					</p>
+					<p className="text-xs text-muted-foreground">{t("followUpScalesHidden")}</p>
 				) : null}
 			</div>
 		</div>

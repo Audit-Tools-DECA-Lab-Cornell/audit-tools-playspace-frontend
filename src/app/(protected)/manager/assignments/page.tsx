@@ -277,9 +277,7 @@ export default function ManagerAssignmentsPage() {
 				/>
 				<Card>
 					<CardContent className="py-8">
-						<p className="text-sm text-muted-foreground">
-							{t("missingAccount")}
-						</p>
+						<p className="text-sm text-muted-foreground">{t("missingAccount")}</p>
 					</CardContent>
 				</Card>
 			</div>
@@ -335,9 +333,7 @@ export default function ManagerAssignmentsPage() {
 
 		if (selectedProjectId.trim().length === 0) {
 			nextFieldErrors.projectId =
-				scope === "place"
-					? t("validation.projectRequiredForPlace")
-					: t("validation.projectRequired");
+				scope === "place" ? t("validation.projectRequiredForPlace") : t("validation.projectRequired");
 		}
 
 		if (scope === "place" && selectedPlaceId.trim().length === 0) {
@@ -463,9 +459,7 @@ export default function ManagerAssignmentsPage() {
 							{fieldErrors.auditorId ? (
 								<p className="text-sm text-destructive">{fieldErrors.auditorId}</p>
 							) : (
-								<p className="text-sm text-muted-foreground">
-									{t("auditorFocus.auditorHelp")}
-								</p>
+								<p className="text-sm text-muted-foreground">{t("auditorFocus.auditorHelp")}</p>
 							)}
 						</div>
 						<div className="rounded-field border border-border/70 bg-muted/35 p-4">
@@ -497,16 +491,18 @@ export default function ManagerAssignmentsPage() {
 									<Badge variant="outline">
 										{t("auditorSummary.loadedAssignments", { count: assignments.length })}
 									</Badge>
-									<Badge variant="outline">{t("auditorSummary.completedAudits", { count: selectedAuditor.completed_audits })}</Badge>
+									<Badge variant="outline">
+										{t("auditorSummary.completedAudits", {
+											count: selectedAuditor.completed_audits
+										})}
+									</Badge>
 								</div>
 							</div>
 						) : (
 							<div className="space-y-4">
 								<div className="space-y-1">
 									<p className="font-medium text-foreground">{t("preview.title")}</p>
-									<p className="text-sm text-muted-foreground">
-										{t("preview.description")}
-									</p>
+									<p className="text-sm text-muted-foreground">{t("preview.description")}</p>
 								</div>
 								<div className="grid gap-3 sm:grid-cols-2">
 									<div className="rounded-field border border-border/70 bg-muted/35 p-4">
@@ -600,7 +596,9 @@ export default function ManagerAssignmentsPage() {
 									? (projectNameById.get(assignment.project_id) ??
 										t("assignment.projectFallback", { id: assignment.project_id.slice(0, 8) }))
 									: t("assignment.assignmentFallback", { id: assignment.id.slice(0, 8) }));
-							const scopeLabel = assignedPlace ? t("assignment.placeScope") : t("assignment.projectScope");
+							const scopeLabel = assignedPlace
+								? t("assignment.placeScope")
+								: t("assignment.projectScope");
 							const deleteScopeLabel = assignedPlace ? t("assignment.place") : t("assignment.project");
 							const scopeHref =
 								assignment.place_id !== null
@@ -636,7 +634,9 @@ export default function ManagerAssignmentsPage() {
 										{scopeHref ? (
 											<Button asChild type="button" variant="outline">
 												<Link href={scopeHref}>
-													{assignedPlace ? t("assignment.openPlace") : t("assignment.openProject")}
+													{assignedPlace
+														? t("assignment.openPlace")
+														: t("assignment.openProject")}
 												</Link>
 											</Button>
 										) : null}
@@ -664,9 +664,7 @@ export default function ManagerAssignmentsPage() {
 				<SheetContent side="right" className="w-full gap-0 sm:max-w-xl">
 					<SheetHeader className="border-b border-border/70 px-6 py-5">
 						<SheetTitle>{t("sheet.title")}</SheetTitle>
-						<SheetDescription>
-							{t("sheet.description")}
-						</SheetDescription>
+						<SheetDescription>{t("sheet.description")}</SheetDescription>
 					</SheetHeader>
 					<div className="grid min-h-0 flex-1 gap-4 overflow-y-auto px-6 py-5 md:grid-cols-2">
 						<div className="grid gap-2">
@@ -760,9 +758,7 @@ export default function ManagerAssignmentsPage() {
 							{fieldErrors.projectId ? (
 								<p className="text-sm text-destructive">{fieldErrors.projectId}</p>
 							) : (
-								<p className="text-sm text-muted-foreground">
-									{t("sheet.projectHelp")}
-								</p>
+								<p className="text-sm text-muted-foreground">{t("sheet.projectHelp")}</p>
 							)}
 						</div>
 						<div className="grid gap-2">
@@ -809,10 +805,10 @@ export default function ManagerAssignmentsPage() {
 							)}
 						</div>
 						<fieldset className="grid gap-2 md:col-span-2">
-							<legend className="text-sm font-medium text-foreground">{t("sheet.capabilitiesTitle")}</legend>
-							<p className="text-sm text-muted-foreground">
-								{t("sheet.capabilitiesDescription")}
-							</p>
+							<legend className="text-sm font-medium text-foreground">
+								{t("sheet.capabilitiesTitle")}
+							</legend>
+							<p className="text-sm text-muted-foreground">{t("sheet.capabilitiesDescription")}</p>
 							<div className="flex flex-wrap items-center gap-4">
 								<label className="flex items-center gap-2 text-sm">
 									<input
@@ -875,9 +871,9 @@ export default function ManagerAssignmentsPage() {
 				description={
 					assignmentPendingDelete
 						? t("confirmDelete.descriptionWithScope", {
-							scopeLabel: assignmentPendingDelete.scopeLabel,
-							scopeName: assignmentPendingDelete.scopeName
-						})
+								scopeLabel: assignmentPendingDelete.scopeLabel,
+								scopeName: assignmentPendingDelete.scopeName
+							})
 						: t("confirmDelete.description")
 				}
 				confirmLabel={t("confirmDelete.confirmLabel")}

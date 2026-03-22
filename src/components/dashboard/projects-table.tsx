@@ -104,7 +104,9 @@ export function ProjectsTable({
 			{
 				id: "date_range",
 				accessorFn: project => `${project.start_date ?? ""}|${project.end_date ?? ""}`,
-				header: ({ column }) => <DataTableColumnHeader column={column} title={t("columns.dates")} align="end" />,
+				header: ({ column }) => (
+					<DataTableColumnHeader column={column} title={t("columns.dates")} align="end" />
+				),
 				cell: ({ row }) => (
 					<span className="block min-w-[150px] text-right text-sm text-muted-foreground tabular-nums">
 						{formatProjectDateRange(row.original, formatT)}
@@ -119,7 +121,9 @@ export function ProjectsTable({
 			{
 				id: "coverage",
 				accessorFn: project => project.places_count,
-				header: ({ column }) => <DataTableColumnHeader column={column} title={t("columns.coverage")} align="end" />,
+				header: ({ column }) => (
+					<DataTableColumnHeader column={column} title={t("columns.coverage")} align="end" />
+				),
 				cell: ({ row }) => (
 					<div className="min-w-[140px] text-right text-sm text-muted-foreground tabular-nums">
 						<p>{t("coverage.places", { count: row.original.places_count })}</p>
@@ -129,7 +133,9 @@ export function ProjectsTable({
 			},
 			{
 				accessorKey: "average_score",
-				header: ({ column }) => <DataTableColumnHeader column={column} title={t("columns.meanScore")} align="end" />,
+				header: ({ column }) => (
+					<DataTableColumnHeader column={column} title={t("columns.meanScore")} align="end" />
+				),
 				cell: ({ row }) => (
 					<span className="block min-w-[110px] text-right font-mono text-foreground tabular-nums">
 						{formatScoreLabel(row.original.average_score, formatT)}

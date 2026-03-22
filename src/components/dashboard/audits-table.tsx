@@ -168,7 +168,9 @@ export function AuditsTable({
 			},
 			{
 				accessorKey: "startedAt",
-				header: ({ column }) => <DataTableColumnHeader column={column} title={t("columns.started")} align="end" />,
+				header: ({ column }) => (
+					<DataTableColumnHeader column={column} title={t("columns.started")} align="end" />
+				),
 				cell: ({ row }) => (
 					<span className="block text-right text-sm text-muted-foreground tabular-nums">
 						{formatDateTimeLabel(row.original.startedAt, formatT)}
@@ -188,7 +190,9 @@ export function AuditsTable({
 			},
 			{
 				accessorKey: "score",
-				header: ({ column }) => <DataTableColumnHeader column={column} title={t("columns.score")} align="end" />,
+				header: ({ column }) => (
+					<DataTableColumnHeader column={column} title={t("columns.score")} align="end" />
+				),
 				cell: ({ row }) => (
 					<span className="block text-right font-mono text-foreground tabular-nums">
 						{formatScoreLabel(row.original.score, formatT)}
@@ -197,13 +201,13 @@ export function AuditsTable({
 			},
 			...(getRowActions
 				? [
-					{
-						id: "actions",
-						enableSorting: false,
-						enableHiding: false,
-						cell: ({ row }) => <EntityRowActions actions={getRowActions(row.original)} />
-					} satisfies ColumnDef<AuditActivityRow>
-				]
+						{
+							id: "actions",
+							enableSorting: false,
+							enableHiding: false,
+							cell: ({ row }) => <EntityRowActions actions={getRowActions(row.original)} />
+						} satisfies ColumnDef<AuditActivityRow>
+					]
 				: [])
 		],
 		[formatT, getRowActions, t]

@@ -49,28 +49,36 @@ export default function AdminAuditorsPage() {
 					<Badge variant="outline" className="font-mono text-primary uppercase tracking-[0.14em]">
 						{row.original.auditor_code}
 					</Badge>
-					<p className="text-sm text-muted-foreground">{row.original.email_masked ?? t("table.emailHidden")}</p>
+					<p className="text-sm text-muted-foreground">
+						{row.original.email_masked ?? t("table.emailHidden")}
+					</p>
 				</div>
 			),
 			enableHiding: false
 		},
 		{
 			accessorKey: "assignments_count",
-			header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.assignments")} align="end" />,
+			header: ({ column }) => (
+				<DataTableColumnHeader column={column} title={t("table.columns.assignments")} align="end" />
+			),
 			cell: ({ row }) => (
 				<span className="block text-right font-mono tabular-nums">{row.original.assignments_count}</span>
 			)
 		},
 		{
 			accessorKey: "completed_audits",
-			header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.completed")} align="end" />,
+			header: ({ column }) => (
+				<DataTableColumnHeader column={column} title={t("table.columns.completed")} align="end" />
+			),
 			cell: ({ row }) => (
 				<span className="block text-right font-mono tabular-nums">{row.original.completed_audits}</span>
 			)
 		},
 		{
 			accessorKey: "last_active_at",
-			header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.lastActive")} align="end" />,
+			header: ({ column }) => (
+				<DataTableColumnHeader column={column} title={t("table.columns.lastActive")} align="end" />
+			),
 			cell: ({ row }) => (
 				<span className="block text-right text-sm text-muted-foreground tabular-nums">
 					{formatDateTimeLabel(row.original.last_active_at, formatT)}

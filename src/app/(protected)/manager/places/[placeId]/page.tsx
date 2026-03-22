@@ -93,7 +93,11 @@ export default function ManagerPlaceDetailPage() {
 				/>
 				<StatCard
 					title={t("stats.latestSubmitted.title")}
-					value={history.latest_submitted_at ? formatDateTimeLabel(history.latest_submitted_at, formatT) : formatT("pending")}
+					value={
+						history.latest_submitted_at
+							? formatDateTimeLabel(history.latest_submitted_at, formatT)
+							: formatT("pending")
+					}
 					valueClassName="font-sans text-lg leading-snug md:text-xl"
 					helper={t("stats.latestSubmitted.helper")}
 					tone="success"

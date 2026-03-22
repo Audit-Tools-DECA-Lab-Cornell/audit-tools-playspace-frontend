@@ -160,7 +160,6 @@ export function DataTableToolbar<TData>({
 					</DropdownMenu>
 				</div>
 			</div>
-
 		</div>
 	);
 }

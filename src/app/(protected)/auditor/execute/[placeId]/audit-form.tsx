@@ -346,10 +346,7 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 			? orderedSectionRows[activeSectionIndex + 1]
 			: null;
 
-	const requiredPreAuditComplete = isRequiredPreAuditComplete(
-		instrument.pre_audit_questions,
-		preAuditValues
-	);
+	const requiredPreAuditComplete = isRequiredPreAuditComplete(instrument.pre_audit_questions, preAuditValues);
 	const answeredVisibleQuestions = sectionRows.reduce((totalAnswered, sectionRow) => {
 		return totalAnswered + sectionRow.progress.answeredQuestionCount;
 	}, 0);
@@ -483,9 +480,7 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 			<div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
 				<div className="space-y-2">
 					<h1 className="text-2xl font-semibold tracking-tight">{t("header.title")}</h1>
-					<p className="text-sm text-muted-foreground">
-						{t("header.place", { name: session.place_name })}
-					</p>
+					<p className="text-sm text-muted-foreground">{t("header.place", { name: session.place_name })}</p>
 				</div>
 
 				<div className="flex flex-wrap items-center gap-2">
@@ -523,12 +518,12 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 								{formatAuditCodeReference(session.audit_code)}
 							</code>
 						</p>
-						<p className="tabular-nums">{t("overview.started", { value: new Date(session.started_at).toLocaleString() })}</p>
+						<p className="tabular-nums">
+							{t("overview.started", { value: new Date(session.started_at).toLocaleString() })}
+						</p>
 						<p>
 							{t("overview.assignmentRoles")}{" "}
-							{session.assignment_roles
-								.map(role => formatAssignmentRoleLabel(role, t))
-								.join(", ")}
+							{session.assignment_roles.map(role => formatAssignmentRoleLabel(role, t)).join(", ")}
 						</p>
 					</div>
 					<div className="space-y-2 text-sm text-muted-foreground">
@@ -563,9 +558,7 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 				</CardHeader>
 				<CardContent className="space-y-3">
 					<p className="text-sm text-muted-foreground">
-						{readyToSubmit
-							? t("submission.readyDescription")
-							: t("submission.incompleteDescription")}
+						{readyToSubmit ? t("submission.readyDescription") : t("submission.incompleteDescription")}
 					</p>
 					{submissionBlockers.length > 0 ? (
 						<ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
@@ -712,7 +705,9 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 													<p className="text-xs text-muted-foreground">
 														{sectionRow.progress.isComplete
 															? t("sections.allRequiredComplete")
-															: t("sections.questionsRemaining", { count: remainingQuestionCount })}
+															: t("sections.questionsRemaining", {
+																	count: remainingQuestionCount
+																})}
 													</p>
 												</div>
 												<Badge
@@ -753,7 +748,7 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 									question={question}
 									selectedAnswers={
 										sectionDrafts[activeSection.section.section_key]?.responses[
-										question.question_key
+											question.question_key
 										] ?? {}
 									}
 									disabled={isReadOnly}
@@ -771,10 +766,11 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 						</div>
 
 						<div className="space-y-2">
-							<Label htmlFor={`section-note-${activeSection.section.section_key}`}>{t("activeSection.notesLabel")}</Label>
+							<Label htmlFor={`section-note-${activeSection.section.section_key}`}>
+								{t("activeSection.notesLabel")}
+							</Label>
 							<p className="text-sm text-muted-foreground">
-								{activeSection.section.notes_prompt ??
-									t("activeSection.notesFallback")}
+								{activeSection.section.notes_prompt ?? t("activeSection.notesFallback")}
 							</p>
 							<Textarea
 								id={`section-note-${activeSection.section.section_key}`}

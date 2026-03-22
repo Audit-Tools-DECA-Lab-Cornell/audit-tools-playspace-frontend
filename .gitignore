@@ -47,5 +47,4 @@ skills-lock.json
 .DS_Store
 
 # screenshots scripts
-screenshots/llm.md
-screenshots/capture_routes.py
+scripts/screenshots/*

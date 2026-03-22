@@ -259,7 +259,9 @@ export default function ManagerProjectDetailPage({ params }: Readonly<ManagerPro
 							</CardHeader>
 							<CardContent className="space-y-4">
 								<div className="rounded-field border border-border/70 bg-muted/40 p-4">
-									<p className="text-sm font-medium text-foreground">{t("deliverySignals.currentSubmittedMeanScore")}</p>
+									<p className="text-sm font-medium text-foreground">
+										{t("deliverySignals.currentSubmittedMeanScore")}
+									</p>
 									<p className="mt-2 font-mono text-3xl text-foreground">
 										{formatScoreLabel(stats.average_score, formatT)}
 									</p>

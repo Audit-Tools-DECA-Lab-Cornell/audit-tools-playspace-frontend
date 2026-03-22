@@ -4,6 +4,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations } from "next-intl/server";
 import "@fontsource/opendyslexic/400.css";
 import "@fontsource/opendyslexic/700.css";
+import { getRequestLanguageState } from "@/i18n/server-locale";
 import "./globals.css";
 import { Providers } from "./providers";
 
@@ -37,13 +38,18 @@ export default async function RootLayout({
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
+	const { locale, preference } = await getRequestLanguageState();
 	const messages = await getMessages();
 
 	return (
-		<html lang="en" suppressHydrationWarning>
+		<html lang={locale} suppressHydrationWarning>
 			<body className={`${bodyFont.variable} ${headingFont.variable} ${monoFont.variable} antialiased`}>
-				<NextIntlClientProvider messages={messages}>
-					<Providers>{children}</Providers>
+				<NextIntlClientProvider locale={locale} messages={messages}>
+					<Providers
+						initialLanguagePreference={preference}
+						initialResolvedLanguage={locale}>
+						{children}
+					</Providers>
 				</NextIntlClientProvider>
 			</body>
 		</html>

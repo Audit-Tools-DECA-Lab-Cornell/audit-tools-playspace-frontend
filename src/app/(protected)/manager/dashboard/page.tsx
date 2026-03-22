@@ -89,7 +89,9 @@ function OverviewPanels({
 									{account.primary_manager.phone ?? t("primaryManager.phonePending")}
 								</p>
 							</div>
-							<p className="text-sm text-muted-foreground">{t("primaryManager.accountEmail", { email: account.email })}</p>
+							<p className="text-sm text-muted-foreground">
+								{t("primaryManager.accountEmail", { email: account.email })}
+							</p>
 						</>
 					) : (
 						<p className="text-sm text-muted-foreground">{t("primaryManager.empty")}</p>
@@ -103,7 +105,9 @@ function OverviewPanels({
 				</CardHeader>
 				<CardContent className="space-y-4">
 					<div className="flex flex-wrap gap-2">
-						<Badge variant="outline">{t("teamSnapshot.managerCount", { count: managerProfiles.length })}</Badge>
+						<Badge variant="outline">
+							{t("teamSnapshot.managerCount", { count: managerProfiles.length })}
+						</Badge>
 						<Badge variant="outline">{t("teamSnapshot.auditorCount", { count: auditors.length })}</Badge>
 					</div>
 					<div className="space-y-3">
@@ -184,12 +188,7 @@ export default function ManagerDashboardPage() {
 	});
 
 	if (!accountId) {
-		return (
-			<EmptyState
-				title={t("emptyState.title")}
-				description={t("emptyState.missingAccount")}
-			/>
-		);
+		return <EmptyState title={t("emptyState.title")} description={t("emptyState.missingAccount")} />;
 	}
 
 	if (
