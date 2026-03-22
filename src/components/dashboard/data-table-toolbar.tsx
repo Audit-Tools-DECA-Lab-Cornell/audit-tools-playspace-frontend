@@ -2,6 +2,7 @@
 
 import type { Table } from "@tanstack/react-table";
 import { ListFilterIcon, Settings2Icon, XIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -91,14 +92,16 @@ function DataTableFilterMenu<TData>({
 export function DataTableToolbar<TData>({
 	table,
 	searchColumnId,
-	searchPlaceholder = "Search records...",
+	searchPlaceholder,
 	filterConfigs = [],
 	action
 }: Readonly<DataTableToolbarProps<TData>>) {
+	const t = useTranslations("tables.shared.toolbar");
 	const searchColumn = searchColumnId ? table.getColumn(searchColumnId) : null;
 	const searchValue =
 		typeof searchColumn?.getFilterValue() === "string" ? (searchColumn.getFilterValue() as string) : "";
 	const hasActiveFilters = table.getState().columnFilters.length > 0;
+	const resolvedSearchPlaceholder = searchPlaceholder ?? t("searchPlaceholder");
 
 	return (
 		<div className="flex flex-col gap-4 border-b border-border/70 px-6 pb-5 lg:justify-between">
@@ -106,9 +109,9 @@ export function DataTableToolbar<TData>({
 				<Input
 					value={searchValue}
 					onChange={event => searchColumn.setFilterValue(event.target.value)}
-					placeholder={searchPlaceholder}
+					placeholder={resolvedSearchPlaceholder}
 					className="h-10 w-full"
-					aria-label={searchPlaceholder}
+					aria-label={resolvedSearchPlaceholder}
 				/>
 			) : null}
 			<div className="flex flex-1 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start justify-between">
@@ -126,7 +129,7 @@ export function DataTableToolbar<TData>({
 							className="gap-2"
 							onClick={() => table.resetColumnFilters()}>
 							<XIcon className="size-4" />
-							<span>Reset</span>
+							<span>{t("reset")}</span>
 						</Button>
 					) : null}
 				</div>
@@ -136,11 +139,11 @@ export function DataTableToolbar<TData>({
 						<DropdownMenuTrigger asChild>
 							<Button type="button" variant="outline" size="sm" className="h-9 gap-2 px-3.5">
 								<Settings2Icon className="size-4" />
-								<span>Columns</span>
+								<span>{t("columns")}</span>
 							</Button>
 						</DropdownMenuTrigger>
 						<DropdownMenuContent align="end" className="w-52">
-							<DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
+							<DropdownMenuLabel>{t("toggleColumns")}</DropdownMenuLabel>
 							<DropdownMenuSeparator />
 							{table
 								.getAllColumns()

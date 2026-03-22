@@ -1,6 +1,7 @@
 "use client";
 
 import { Fragment } from "react";
+import { useTranslations } from "next-intl";
 
 import type { InstrumentQuestion, QuestionScale } from "@/types/audit";
 import { Button } from "@/components/ui/button";
@@ -45,6 +46,7 @@ export function AuditQuestionCard({
 	onSelectAnswer,
 	disabled = false
 }: Readonly<AuditQuestionCardProps>) {
+	const t = useTranslations("auditor.execute.questionCard");
 	const quantityScale = question.scales[0];
 	const selectedQuantityKey = quantityScale && selectedAnswers[quantityScale.key];
 	const selectedQuantityOption = quantityScale?.options.find(option => option.key === selectedQuantityKey);
@@ -56,7 +58,7 @@ export function AuditQuestionCard({
 			<div className="field-card-body space-y-5">
 				<p className="text-base leading-7 text-foreground">
 					<span className="block text-sm font-semibold uppercase tracking-[0.16em] text-primary">
-						This playspace
+						{t("thisPlayspace")}
 					</span>
 					{promptSegments.map((segment, index) => (
 						<Fragment key={`${question.question_key}-segment-${index.toString()}`}>
@@ -86,7 +88,7 @@ export function AuditQuestionCard({
 
 				{question.scales.length > 1 && !showFollowUpScales ? (
 					<p className="text-xs text-muted-foreground">
-						Follow-up scales stay hidden until the selected quantity option allows them.
+						{t("followUpScalesHidden")}
 					</p>
 				) : null}
 			</div>

@@ -1,0 +1,1431 @@
+{
+	"metadata": {
+		"title": "Playspace Audit Tool",
+		"description": "Playspace Play Value and Usability Audit Tool"
+	},
+	"common": {
+		"roles": {
+			"administrator": "Administrator",
+			"manager": "Manager",
+			"auditor": "Auditor"
+		},
+		"workspace": {
+			"administrator": "Administrator Workspace",
+			"manager": "Manager Workspace",
+			"auditor": "Auditor Workspace"
+		},
+		"format": {
+			"notSet": "Not set",
+			"noRecentActivity": "No recent activity",
+			"pending": "Pending",
+			"locationPending": "Location pending",
+			"datesPending": "Dates pending",
+			"starts": "Starts {date}",
+			"ends": "Ends {date}"
+		}
+	},
+	"shell": {
+		"productName": "Playspace Audit Tool",
+		"productTagline": "Play Value & Usability",
+		"workspaceLabel": "Workspace",
+		"openMenu": "Open menu",
+		"navigationTitle": "Navigation",
+		"mobileBrand": "Playspace",
+		"navigation": {
+			"dashboard": "Dashboard",
+			"accounts": "Accounts",
+			"projects": "Projects",
+			"places": "Places",
+			"auditors": "Auditors",
+			"audits": "Audits",
+			"system": "System",
+			"settings": "Settings",
+			"assignments": "Assignments",
+			"reports": "Reports"
+		},
+		"userMenu": {
+			"auditorWithCode": "Auditor ({code})",
+			"accountLabel": "Account",
+			"settings": "Settings",
+			"signOut": "Sign out"
+		}
+	},
+	"shared": {
+		"dialog": {
+			"close": "Close"
+		},
+		"sheet": {
+			"close": "Close"
+		},
+		"confirmDialog": {
+			"cancel": "Cancel"
+		},
+		"pagination": {
+			"showing": "Showing {start}-{end} of {total} {itemLabel}",
+			"previous": "Previous",
+			"next": "Next",
+			"page": "Page {current} of {total}"
+		},
+		"entityRowActions": {
+			"label": "Actions"
+		}
+	},
+	"tables": {
+		"shared": {
+			"emptyMessage": "No results found.",
+			"toolbar": {
+				"searchPlaceholder": "Search records...",
+				"reset": "Reset",
+				"columns": "Columns",
+				"toggleColumns": "Toggle columns"
+			},
+			"pagination": {
+				"showing": "Showing {start} to {end} of {total} results",
+				"rowsPerPage": "Rows per page",
+				"page": "Page {current} of {total}"
+			}
+		},
+		"audits": {
+			"title": "Audit activity",
+			"description": "Review audit progress, lineage, recency, and score output.",
+			"emptyMessage": "No audit activity matches the current filters.",
+			"searchPlaceholder": "Search audits...",
+			"copyAuditCode": "Copy audit code {auditCode}",
+			"copied": "Copied",
+			"copyId": "Copy ID",
+			"auditorLabel": "Auditor",
+			"columns": {
+				"audit": "Audit",
+				"status": "Status",
+				"started": "Started",
+				"submitted": "Submitted",
+				"score": "Score"
+			},
+			"status": {
+				"submitted": "submitted",
+				"in_progress": "in progress",
+				"paused": "paused"
+			}
+		},
+		"auditors": {
+			"title": "Auditors",
+			"description": "Review roster identity, assignment load, and recent activity.",
+			"emptyMessage": "No auditors match the current filters.",
+			"searchPlaceholder": "Search auditors...",
+			"emailPending": "Email pending",
+			"rolePending": "Role pending",
+			"columns": {
+				"auditor": "Auditor",
+				"role": "Role",
+				"assignments": "Assignments",
+				"completed": "Completed",
+				"lastActive": "Last Active"
+			}
+		},
+		"projects": {
+			"title": "Projects",
+			"description": "Track project scope, operational status, and delivery health.",
+			"emptyMessage": "No projects match the current filters.",
+			"searchPlaceholder": "Search projects...",
+			"overviewPending": "Overview pending.",
+			"notSpecified": "Not specified",
+			"coverage": {
+				"places": "{count} places",
+				"auditors": "{count} auditors"
+			},
+			"columns": {
+				"project": "Project",
+				"placeTypes": "Place Types",
+				"status": "Status",
+				"dates": "Dates",
+				"coverage": "Coverage",
+				"meanScore": "Mean Score"
+			},
+			"status": {
+				"planned": "planned",
+				"active": "active",
+				"completed": "completed"
+			}
+		},
+		"places": {
+			"title": "Places",
+			"description": "Monitor place status, audit throughput, and recency at a glance.",
+			"emptyMessage": "No places match the current filters.",
+			"searchPlaceholder": "Search places...",
+			"typePending": "Type pending",
+			"columns": {
+				"place": "Place",
+				"type": "Type",
+				"status": "Status",
+				"audits": "Audits",
+				"meanScore": "Mean Score",
+				"lastAudited": "Last Audited"
+			},
+			"status": {
+				"submitted": "submitted",
+				"in_progress": "in progress",
+				"not_started": "not started"
+			}
+		}
+	},
+	"admin": {
+		"dashboard": {
+			"error": {
+				"title": "Administrator dashboard unavailable",
+				"description": "Refresh this page to retry. If the issue continues, verify the administrator sign-in context and reopen the dashboard.",
+				"retry": "Try again"
+			},
+			"header": {
+				"eyebrow": "Administrator Workspace",
+				"title": "Platform overview",
+				"description": "Global visibility across accounts, projects, places, auditors, and audit state.",
+				"actions": {
+					"accounts": "Accounts",
+					"audits": "Audits"
+				}
+			},
+			"stats": {
+				"accounts": {
+					"title": "Accounts",
+					"helper": "Registered workspace accounts."
+				},
+				"projects": {
+					"title": "Projects",
+					"helper": "Tracked programs across accounts."
+				},
+				"places": {
+					"title": "Places",
+					"helper": "Active audit locations in the platform."
+				},
+				"auditors": {
+					"title": "Auditors",
+					"helper": "Profiles with field delivery access."
+				},
+				"audits": {
+					"title": "Audits",
+					"helper": "All audit sessions discovered platform-wide."
+				},
+				"submitted": {
+					"title": "Submitted",
+					"helper": "Completed sessions with scoring."
+				},
+				"inProgress": {
+					"title": "In progress",
+					"helper": "Sessions still being worked on."
+				}
+			},
+			"latestAudits": {
+				"title": "Latest audits",
+				"empty": "Recent audit activity will appear here once accounts begin submitting sessions.",
+				"auditorLabel": "Auditor"
+			},
+			"status": {
+				"submitted": "submitted",
+				"in_progress": "in progress",
+				"paused": "paused"
+			}
+		},
+		"accounts": {
+			"error": {
+				"title": "Accounts unavailable",
+				"description": "Refresh this page to retry. If the issue continues, reopen the administrator dashboard and try again.",
+				"retry": "Try again"
+			},
+			"header": {
+				"eyebrow": "Administrator Workspace",
+				"title": "Accounts",
+				"description": "Global account registry with privacy-masked emails and entity counts."
+			},
+			"breadcrumbs": {
+				"dashboard": "Dashboard",
+				"accounts": "Accounts"
+			},
+			"table": {
+				"title": "Account Registry",
+				"description": "Search and compare account scale using privacy-safe identifiers and counts.",
+				"searchPlaceholder": "Search accounts...",
+				"emptyMessage": "No accounts match the current filters.",
+				"emailHidden": "Email hidden",
+				"columns": {
+					"account": "Account",
+					"type": "Type",
+					"projects": "Projects",
+					"places": "Places",
+					"auditors": "Auditors",
+					"created": "Created"
+				}
+			}
+		},
+		"auditors": {
+			"error": {
+				"title": "Auditors unavailable",
+				"description": "Refresh this page to retry. If the issue continues, return to the administrator dashboard and reopen auditors.",
+				"retry": "Try again"
+			},
+			"header": {
+				"eyebrow": "Administrator Workspace",
+				"title": "Auditors",
+				"description": "Privacy-safe global auditor roster using auditor codes."
+			},
+			"breadcrumbs": {
+				"dashboard": "Dashboard",
+				"auditors": "Auditors"
+			},
+			"table": {
+				"title": "Global Auditor Roster",
+				"description": "Privacy-safe workforce visibility across assignments and delivery output.",
+				"searchPlaceholder": "Search auditors...",
+				"emptyMessage": "No auditors match the current filters.",
+				"emailHidden": "Email hidden",
+				"columns": {
+					"auditor": "Auditor",
+					"assignments": "Assignments",
+					"completed": "Completed",
+					"lastActive": "Last Active"
+				}
+			}
+		},
+		"projects": {
+			"error": {
+				"title": "Projects unavailable",
+				"description": "Refresh this page to retry. If the issue continues, return to the administrator dashboard and reopen projects.",
+				"retry": "Try again"
+			},
+			"header": {
+				"eyebrow": "Administrator Workspace",
+				"title": "Projects",
+				"description": "Cross-account project catalog with coverage and output indicators."
+			},
+			"breadcrumbs": {
+				"dashboard": "Dashboard",
+				"projects": "Projects"
+			},
+			"table": {
+				"title": "Project Catalog",
+				"description": "Review cross-account project scale, staffing, and scoring at an enterprise level.",
+				"searchPlaceholder": "Search projects...",
+				"emptyMessage": "No projects match the current filters.",
+				"columns": {
+					"project": "Project",
+					"dates": "Dates",
+					"places": "Places",
+					"auditors": "Auditors",
+					"completed": "Completed",
+					"meanScore": "Mean Score"
+				}
+			}
+		},
+		"places": {
+			"error": {
+				"title": "Places unavailable",
+				"description": "Refresh this page to retry. If the issue continues, return to the administrator dashboard and reopen places.",
+				"retry": "Try again"
+			},
+			"header": {
+				"eyebrow": "Administrator Workspace",
+				"title": "Places",
+				"description": "Cross-account place inventory with aggregate audit throughput."
+			},
+			"breadcrumbs": {
+				"dashboard": "Dashboard",
+				"places": "Places"
+			},
+			"table": {
+				"title": "Place Inventory",
+				"description": "Audit throughput and latest activity across every tracked place.",
+				"searchPlaceholder": "Search places...",
+				"emptyMessage": "No places match the current filters.",
+				"columns": {
+					"place": "Place",
+					"completed": "Completed",
+					"meanScore": "Mean Score",
+					"latestAudit": "Latest Audit"
+				}
+			}
+		},
+		"audits": {
+			"error": {
+				"title": "Audits unavailable",
+				"description": "Refresh this page to retry. If the issue continues, return to the administrator dashboard and reopen audits.",
+				"retry": "Try again"
+			},
+			"header": {
+				"eyebrow": "Administrator Workspace",
+				"title": "Audits",
+				"description": "Global audit activity feed with account/project/place lineage."
+			},
+			"breadcrumbs": {
+				"dashboard": "Dashboard",
+				"audits": "Audits"
+			},
+			"table": {
+				"title": "Audit Activity",
+				"description": "Monitor platform-wide audit throughput, lineage, and delivery status.",
+				"emptyMessage": "No audits match the current filters."
+			}
+		},
+		"system": {
+			"error": {
+				"title": "System metadata unavailable",
+				"description": "Refresh this page to retry. If the issue continues, return to the administrator dashboard and reopen system metadata.",
+				"retry": "Try again"
+			},
+			"header": {
+				"eyebrow": "Administrator Workspace",
+				"title": "System metadata",
+				"description": "Runtime metadata and instrument versioning for the audit platform.",
+				"back": "Back to dashboard"
+			},
+			"breadcrumbs": {
+				"dashboard": "Dashboard",
+				"system": "System"
+			},
+			"stats": {
+				"instrumentVersion": {
+					"title": "Instrument Version",
+					"helper": "Current version served to audit sessions."
+				},
+				"auditSections": {
+					"title": "Audit Sections",
+					"helper": "Structured domains in the core instrument."
+				},
+				"questionCount": {
+					"title": "Question Count",
+					"helper": "{preAuditCount} pre-audit prompts and {sectionCount} section questions."
+				},
+				"executionModes": {
+					"title": "Execution Modes",
+					"helper": "Supported combinations of onsite and survey workflows."
+				}
+			},
+			"instrumentMetadata": {
+				"title": "Instrument metadata",
+				"key": "Key",
+				"name": "Name",
+				"currentSheet": "Current sheet",
+				"generated": "Generated"
+			},
+			"executionCoverage": {
+				"title": "Execution coverage",
+				"description": "The platform currently supports distinct onsite, survey, and combined audit paths. These modes control which sections unlock during execution."
+			}
+		}
+	},
+	"login": {
+		"validation": {
+			"auditorCodeAlphanumeric": "Auditor code must be alphanumeric.",
+			"auditorCodeInvalid": "Auditor code is invalid."
+		},
+		"fields": {
+			"email": "Email",
+			"password": "Password",
+			"auditorCode": "Auditor code"
+		},
+		"actions": {
+			"signIn": "Sign in",
+			"continue": "Continue"
+		},
+		"admin": {
+			"title": "Administrator sign in",
+			"description": "Global oversight across accounts, projects, places, and audit activity.",
+			"emailPlaceholder": "admin@company.com",
+			"demoLabel": "Demo admin:"
+		},
+		"manager": {
+			"title": "Manager sign in",
+			"description": "Full-access dashboard: projects, places, auditors, and combined scores.",
+			"emailPlaceholder": "manager@company.com",
+			"demoLabel": "Demo managers:",
+			"demoOr": "or"
+		},
+		"auditor": {
+			"title": "Auditor sign in",
+			"description": "Limited access: execute assigned audits using your auditor code.",
+			"codePlaceholder": "A1B2C3",
+			"note": "Auditors are identified strictly by code. No real names are displayed in the UI.",
+			"demoLabel": "Try demo codes:"
+		}
+	},
+	"manager": {
+		"dashboard": {
+			"errors": {
+				"accountContextUnavailable": "Manager account context is unavailable.",
+				"loadFailed": "Something went wrong while loading the dashboard."
+			},
+			"emptyState": {
+				"title": "Dashboard unavailable",
+				"missingAccount": "Manager account context is missing from the current session."
+			},
+			"actions": {
+				"tryAgain": "Try again"
+			},
+			"header": {
+				"eyebrow": "Manager Dashboard",
+				"description": "Shared account-level view across projects, places, auditors, and recent submissions.",
+				"viewProjects": "View projects"
+			},
+			"stats": {
+				"projects": {
+					"title": "Projects",
+					"helper": "Active and planned projects in this account."
+				},
+				"places": {
+					"title": "Places",
+					"helper": "Total places connected to those projects."
+				},
+				"auditors": {
+					"title": "Auditors",
+					"helper": "Auditors currently assigned under this account."
+				},
+				"completedAudits": {
+					"title": "Completed Audits",
+					"helper": "Submitted audits available for review and reporting."
+				}
+			},
+			"overview": {
+				"primaryManager": {
+					"title": "Primary manager",
+					"positionPending": "Position pending",
+					"phonePending": "Phone pending",
+					"accountEmail": "Account email: {email}",
+					"empty": "No primary manager profile has been added yet."
+				},
+				"teamSnapshot": {
+					"title": "Team snapshot",
+					"managerCount": "{count} managers",
+					"auditorCount": "{count} auditors",
+					"positionPending": "Position pending",
+					"primary": "Primary",
+					"manager": "Manager"
+				}
+			},
+			"tabs": {
+				"projects": "Projects",
+				"auditors": "Auditors",
+				"description": "Focus on the highest-signal rows here, then open the full worklists when you need more detail."
+			},
+			"projectOverview": {
+				"title": "Project overview",
+				"description": "Highest-signal projects for daily monitoring.",
+				"viewAll": "View all projects",
+				"emptyTitle": "No projects yet",
+				"emptyDescription": "Projects will appear here once the team starts creating audit workstreams.",
+				"openProjects": "Open projects"
+			},
+			"auditorOverview": {
+				"title": "Assigned auditors",
+				"description": "Current roster activity and assignment load.",
+				"viewAll": "View all auditors",
+				"emptyTitle": "No auditors assigned",
+				"emptyDescription": "Invite or assign auditors to see role, workload, and activity here.",
+				"openAuditors": "Open auditors"
+			},
+			"recentActivity": {
+				"title": "Recent activity",
+				"viewAll": "View all audits",
+				"submitted": "Submitted",
+				"empty": "No submitted audits yet."
+			}
+		},
+		"audits": {
+			"header": {
+				"eyebrow": "Manager Workspace",
+				"title": "Audits",
+				"description": "Track audit throughput and session health across your account.",
+				"actions": {
+					"openPlaces": "Open places",
+					"manageAssignments": "Manage assignments"
+				}
+			},
+			"breadcrumbs": {
+				"dashboard": "Dashboard",
+				"audits": "Audits"
+			},
+			"missingAccount": "Manager account context is missing from the current session.",
+			"error": {
+				"title": "Audits unavailable",
+				"retry": "Try again"
+			},
+			"stats": {
+				"totalAudits": {
+					"title": "Total Audits",
+					"helper": "All audit sessions discovered across manager places."
+				},
+				"submitted": {
+					"title": "Submitted",
+					"helper": "Sessions that have been completed and submitted."
+				},
+				"inProgress": {
+					"title": "In Progress",
+					"helper": "Sessions still being worked on or paused."
+				},
+				"meanScore": {
+					"title": "Mean Score",
+					"helper": "Average across submitted sessions with scoring."
+				}
+			},
+			"table": {
+				"title": "Audit Activity",
+				"description": "Search and filter audit sessions across projects and places.",
+				"emptyState": {
+					"noAudits": "No audits yet. Assign auditors to a project or place, then ask them to start the first audit.",
+					"noMatches": "No audits match the current filters."
+				}
+			}
+		},
+		"places": {
+			"errors": {
+				"accountContextUnavailable": "Manager account context is unavailable."
+			},
+			"header": {
+				"eyebrow": "Manager Workspace",
+				"title": "Places",
+				"loadingDescription": "Operational visibility into every place across your account.",
+				"description": "Operational visibility into every place across your account. Add new places from a project workspace.",
+				"openProjects": "Open projects to add place"
+			},
+			"breadcrumbs": {
+				"dashboard": "Dashboard",
+				"places": "Places"
+			},
+			"missingAccount": "Manager account context is missing from the current session.",
+			"error": {
+				"title": "Places unavailable",
+				"description": "Unable to load manager places."
+			},
+			"actions": {
+				"tryAgain": "Try again"
+			},
+			"stats": {
+				"totalPlaces": {
+					"title": "Total Places",
+					"helper": "All places currently linked to your projects."
+				},
+				"submitted": {
+					"title": "Submitted",
+					"helper": "Places with completed audit activity."
+				},
+				"inProgress": {
+					"title": "In Progress",
+					"helper": "Places with active draft audit work."
+				},
+				"meanScore": {
+					"title": "Mean Score",
+					"helper": "Average across places with submitted scoring."
+				}
+			},
+			"table": {
+				"title": "Place Operations",
+				"description": "Search, sort, and drill into every place from one account-wide table.",
+				"searchPlaceholder": "Search places...",
+				"typePending": "Type pending",
+				"columns": {
+					"place": "Place",
+					"project": "Project",
+					"type": "Type",
+					"status": "Status",
+					"audits": "Audits",
+					"meanScore": "Mean Score",
+					"lastAudited": "Last Audited"
+				},
+				"actions": {
+					"openPlace": "Open place",
+					"openProject": "Open project"
+				},
+				"status": {
+					"submitted": "submitted",
+					"in_progress": "in progress",
+					"not_started": "not started"
+				},
+				"emptyState": {
+					"noPlaces": "No places yet. Add places from a project workspace to start audit operations.",
+					"noMatches": "No places match the current filters."
+				}
+			}
+		},
+		"placeDetail": {
+			"error": {
+				"title": "Unable to load place history",
+				"description": "Try refreshing this page. If needed, return to places and open this location again."
+			},
+			"actions": {
+				"backToPlaces": "Back to places"
+			},
+			"header": {
+				"eyebrow": "Place Activity",
+				"description": "Audit history, submission recency, and score trends for this place."
+			},
+			"breadcrumbs": {
+				"dashboard": "Dashboard",
+				"places": "Places"
+			},
+			"stats": {
+				"totalAudits": {
+					"title": "Total Audits",
+					"helper": "All draft and submitted audit sessions for this place."
+				},
+				"submitted": {
+					"title": "Submitted",
+					"helper": "Completed audit sessions with final scoring."
+				},
+				"inProgress": {
+					"title": "In Progress",
+					"helper": "Sessions that still need completion."
+				},
+				"meanScore": {
+					"title": "Mean Score",
+					"helper": "Average across submitted audits only."
+				},
+				"latestSubmitted": {
+					"title": "Latest Submitted",
+					"helper": "Most recent submission"
+				}
+			},
+			"table": {
+				"title": "Audit History",
+				"description": "Track every audit session for this place in a filterable activity table.",
+				"emptyMessage": "No audits have been created for this place yet."
+			}
+		},
+		"projectDetail": {
+			"error": {
+				"title": "Project unavailable",
+				"description": "Could not load the project."
+			},
+			"actions": {
+				"backToProjects": "Back to projects",
+				"editProject": "Edit project",
+				"newPlace": "New place"
+			},
+			"header": {
+				"eyebrow": "Project Workspace",
+				"overviewPending": "Project overview is still being refined."
+			},
+			"breadcrumbs": {
+				"dashboard": "Dashboard",
+				"projects": "Projects"
+			},
+			"stats": {
+				"places": {
+					"title": "Places",
+					"helper": "{count} places already have audit activity."
+				},
+				"auditsCompleted": {
+					"title": "Audits Completed",
+					"helper": "{count} audits still in progress."
+				},
+				"auditorsAssigned": {
+					"title": "Auditors Assigned",
+					"helper": "Unique auditors assigned across project and place scope."
+				},
+				"overallMeanScore": {
+					"title": "Overall Mean Score",
+					"helper": "Average across submitted audits only."
+				}
+			},
+			"tabs": {
+				"overview": "Overview",
+				"places": "Places"
+			},
+			"overview": {
+				"title": "Project settings",
+				"placeTypesPending": "Place types pending",
+				"timeline": "Timeline",
+				"estimatedPlaces": "Estimated places",
+				"estimatedAuditors": "Estimated auditors",
+				"created": "Created",
+				"auditorGuidance": "Auditor guidance",
+				"auditorGuidancePending": "Auditor profile description pending."
+			},
+			"deliverySignals": {
+				"title": "Delivery signals",
+				"currentSubmittedMeanScore": "Current submitted mean score",
+				"placesWithAudits": "{count} places already have audit activity.",
+				"auditsInProgress": "{count} audits are still in progress.",
+				"auditorsAssigned": "{count} unique auditors are assigned across this project."
+			},
+			"placesTable": {
+				"title": "Project Places",
+				"description": "Manage every audit location in this project from a single operational table.",
+				"emptyMessage": "No places yet. Create the first place to start audit operations for this project.",
+				"actions": {
+					"openPlace": "Open place",
+					"deletePlace": "Delete place"
+				}
+			},
+			"projectDialog": {
+				"title": "Edit project",
+				"description": "Update project planning metadata and auditor guidance.",
+				"submitLabel": "Save changes"
+			},
+			"placeSheet": {
+				"title": "Create place",
+				"description": "Add a new audit location to this project.",
+				"submitLabel": "Create place"
+			},
+			"confirmDelete": {
+				"title": "Delete place",
+				"description": "Delete this place? This action cannot be undone.",
+				"descriptionWithName": "Delete \"{name}\"? This action cannot be undone.",
+				"confirmLabel": "Delete place"
+			}
+		},
+		"assignments": {
+			"header": {
+				"eyebrow": "Manager Workspace",
+				"title": "Assignment management",
+				"description": "Assign auditors by project or place scope and tune execution capabilities."
+			},
+			"breadcrumbs": {
+				"dashboard": "Dashboard",
+				"assignments": "Assignments"
+			},
+			"missingAccount": "Manager account context is missing from the current session.",
+			"errors": {
+				"accountContextUnavailable": "Manager account context is unavailable.",
+				"selectAuditorBeforeCreate": "Select an auditor before creating assignments.",
+				"selectAuditorBeforeDelete": "Select an auditor before deleting assignments.",
+				"unableToCreateAssignment": "Unable to create assignment.",
+				"unableToDeleteAssignment": "Unable to delete assignment."
+			},
+			"error": {
+				"title": "Assignments unavailable",
+				"description": "Unable to load assignments."
+			},
+			"actions": {
+				"tryAgain": "Try again",
+				"newAssignment": "New assignment",
+				"clear": "Clear",
+				"delete": "Delete",
+				"cancel": "Cancel",
+				"creating": "Creating...",
+				"createAssignment": "Create assignment"
+			},
+			"validation": {
+				"auditorRequired": "Select an auditor before creating an assignment.",
+				"projectRequiredForPlace": "Select the parent project so you can choose one of its places.",
+				"projectRequired": "Select the project this assignment should cover.",
+				"placeRequired": "Select the place this assignment should cover.",
+				"rolesRequired": "Select at least one capability for this assignment."
+			},
+			"roles": {
+				"auditor": "auditor",
+				"place_admin": "place admin"
+			},
+			"auditorFocus": {
+				"title": "Auditor focus",
+				"chooseAuditorTitle": "Choose an auditor",
+				"chooseAuditorDescription": "Filter the roster, then load one auditor's current project and place access before you make changes.",
+				"searchLabel": "Search auditors",
+				"searchPlaceholder": "Search by code, name, or email.",
+				"searchResults": "{count} auditor{count, plural, one {} other {s}} match the current filter.",
+				"auditorLabel": "Auditor",
+				"noMatchingAuditors": "No matching auditors",
+				"selectAuditor": "Select an auditor",
+				"matchingAuditors": "Matching auditors",
+				"auditorHelp": "Choose an auditor to review assignment coverage or remove outdated access.",
+				"reviewHowItWorksTitle": "How assignment review works",
+				"reviewSteps": {
+					"step1": "1. Load one auditor to see current access across projects and places.",
+					"step2": "2. Review coverage before adding or removing assignments.",
+					"step3": "3. Use New assignment to grant access, then return here to verify it."
+				}
+			},
+			"auditorSummary": {
+				"loadedAssignments": "{count} loaded assignment{count, plural, one {} other {s}}",
+				"completedAudits": "{count} completed audits"
+			},
+			"preview": {
+				"title": "Assignment preview",
+				"description": "Select an auditor to reveal their current project and place coverage, recent audit volume, and the management actions available on this page.",
+				"projectScopeTitle": "Project scope",
+				"projectScopeDescription": "Grant access across every place in a project when the auditor needs wider coverage.",
+				"placeScopeTitle": "Place scope",
+				"placeScopeDescription": "Grant access to one location when you need tighter field control.",
+				"openAuditors": "Open auditors"
+			},
+			"coverage": {
+				"title": "Assignment coverage",
+				"selectAuditorTitle": "Select an auditor to load assignments",
+				"selectAuditorDescription": "This panel shows what the selected auditor can currently access, including project scope, place scope, granted capabilities, and direct links back to the underlying record.",
+				"whatAppearsTitle": "What appears here",
+				"whatAppears": {
+					"projectAndPlaceCoverage": "Current project and place coverage",
+					"capabilityBadges": "Capability badges for audit and place-admin access",
+					"openAndDeleteActions": "Open and delete actions for each assignment"
+				},
+				"loadingAssignments": "Loading assignments...",
+				"errorTitle": "Assignments unavailable",
+				"errorDescription": "Unable to load assignments.",
+				"emptyTitle": "No assignments yet",
+				"emptyDescriptionWithAuditor": "Use New assignment to grant {name} access to a project or place.",
+				"emptyDescription": "Use New assignment to grant project or place access.",
+				"recommendedNextStepTitle": "Recommended next step",
+				"recommendedNextStepDescription": "Start with project scope when the auditor needs wider coverage, then add place-only access when you need tighter control."
+			},
+			"assignment": {
+				"projectFallback": "Project {id}",
+				"projectPending": "Project pending",
+				"assignmentFallback": "Assignment {id}",
+				"placeScope": "Place scope",
+				"projectScope": "Project scope",
+				"place": "place",
+				"project": "project",
+				"assignedAt": "Assigned {value}",
+				"openPlace": "Open place",
+				"openProject": "Open project"
+			},
+			"sheet": {
+				"title": "Create assignment",
+				"description": "Grant project or place access and choose what the auditor can do inside that scope.",
+				"auditorLabel": "Auditor",
+				"selectAuditor": "Select auditor",
+				"auditors": "Auditors",
+				"auditorHelp": "Choose who should receive this access.",
+				"scopeLabel": "Scope",
+				"assignmentScope": "Assignment scope",
+				"project": "Project",
+				"place": "Place",
+				"projectScopeDescription": "Project scope lets the auditor work across every place in one project.",
+				"placeScopeDescription": "Place scope grants access to a single location only.",
+				"projectLabel": "Project",
+				"selectProject": "Select project",
+				"projects": "Projects",
+				"projectHelp": "Choose the project this assignment should unlock.",
+				"placeLabel": "Place",
+				"selectPlace": "Select place",
+				"selectProjectFirst": "Select a project first",
+				"places": "Places",
+				"selectProjectFirstHelp": "Select a project first to load its places.",
+				"placeHelp": "Choose the one place this assignment should cover.",
+				"placeOptionalHelp": "Place selection is only required for place scope.",
+				"capabilitiesTitle": "Capabilities",
+				"capabilitiesDescription": "Choose what the auditor can do inside the selected scope.",
+				"auditCapability": "Audit capability",
+				"placeAdminCapability": "Place admin capability"
+			},
+			"confirmDelete": {
+				"title": "Delete assignment",
+				"description": "Remove this assignment? The auditor will lose this access until you assign it again.",
+				"descriptionWithScope": "Remove {scopeLabel} access for \"{scopeName}\"? The auditor will lose this access until you assign it again.",
+				"confirmLabel": "Delete assignment"
+			}
+		}
+	},
+	"auditor": {
+		"dashboard": {
+			"header": {
+				"eyebrow": "Auditor Workspace",
+				"title": "Auditor dashboard",
+				"description": "Your assigned places and audit execution tasks."
+			},
+			"error": {
+				"title": "Unable to load auditor dashboard",
+				"description": "Try refreshing the page. If the issue persists, verify your sign-in role and auditor code."
+			},
+			"actions": {
+				"refresh": "Refresh"
+			},
+			"stats": {
+				"assignedPlaces": {
+					"title": "Assigned places",
+					"helper": "Places currently in your field roster."
+				},
+				"inProgress": {
+					"title": "In progress",
+					"helper": "Active or paused sessions awaiting completion."
+				},
+				"submitted": {
+					"title": "Submitted",
+					"helper": "Completed sessions already turned in."
+				},
+				"pendingPlaces": {
+					"title": "Pending places",
+					"helper": "Assigned locations without a submitted audit yet."
+				},
+				"meanSubmittedScore": {
+					"title": "Mean submitted score",
+					"helper": "Average across submitted sessions only."
+				}
+			},
+			"assignedPlaces": {
+				"title": "Assigned places",
+				"empty": "Assigned places will appear here after a manager grants access. Refresh if you were just assigned.",
+				"resumeAudit": "Resume audit",
+				"startAudit": "Start audit",
+				"openReport": "Open report",
+				"viewAll": "View all assigned places"
+			},
+			"status": {
+				"in_progress": "in progress",
+				"paused": "paused",
+				"submitted": "submitted",
+				"not_started": "not started"
+			}
+		},
+		"places": {
+			"error": {
+				"title": "Unable to load places",
+				"description": "Try refreshing the page. If this continues, check your sign-in role and access scope."
+			},
+			"actions": {
+				"refresh": "Refresh"
+			},
+			"header": {
+				"eyebrow": "Auditor Workspace",
+				"title": "Assigned places",
+				"description": "Review place context, status, and continue execution."
+			},
+			"breadcrumbs": {
+				"dashboard": "Dashboard",
+				"places": "Places"
+			},
+			"list": {
+				"title": "Places",
+				"empty": "Assigned places will appear here after a manager grants access. Refresh if you were just assigned.",
+				"resumeAudit": "Resume audit",
+				"startAudit": "Start audit",
+				"locationPending": "Location pending",
+				"openReport": "Open report"
+			},
+			"status": {
+				"in_progress": "in progress",
+				"paused": "paused",
+				"submitted": "submitted",
+				"not_started": "not started"
+			},
+			"pagination": {
+				"itemLabel": "places"
+			}
+		},
+		"reports": {
+			"error": {
+				"title": "Unable to load reports",
+				"description": "Try refreshing the page. If this continues, verify your sign-in context."
+			},
+			"actions": {
+				"refresh": "Refresh"
+			},
+			"header": {
+				"eyebrow": "Auditor Workspace",
+				"title": "Reports",
+				"description": "Review submitted and in-progress audit sessions."
+			},
+			"breadcrumbs": {
+				"dashboard": "Dashboard",
+				"reports": "Reports"
+			},
+			"list": {
+				"title": "Audit sessions",
+				"empty": "Submitted and in-progress sessions will appear here after you start an assigned audit.",
+				"openReport": "Open report",
+				"resumeAudit": "Resume audit",
+				"submittedAt": "Submitted {value}",
+				"draftNotSubmitted": "Draft not submitted yet",
+				"startedAt": "Started {value}"
+			},
+			"status": {
+				"in_progress": "in progress",
+				"paused": "paused",
+				"submitted": "submitted"
+			},
+			"pagination": {
+				"itemLabel": "audit sessions"
+			},
+			"summary": {
+				"title": "Submitted report count",
+				"description": "Sessions that have been submitted and are ready for review."
+			}
+		},
+		"reportDetail": {
+			"error": {
+				"title": "Unable to load audit detail",
+				"description": "Try refreshing the page or return to reports and re-open the audit."
+			},
+			"header": {
+				"eyebrow": "Auditor Report Detail",
+				"description": "Audit {auditCode} · {status}"
+			},
+			"actions": {
+				"resumeAudit": "Resume audit",
+				"backToReports": "Back to reports"
+			},
+			"inProgressCard": {
+				"title": "Audit still in progress",
+				"description": "Use the execution workspace to finish required questions before this session can be submitted.",
+				"continue": "Continue in execution workspace"
+			},
+			"metadata": {
+				"title": "Session metadata",
+				"started": "Started: {value}",
+				"submitted": "Submitted: {value}",
+				"executionMode": "Execution mode: {value}",
+				"notSelected": "Not selected",
+				"readyToSubmit": "Ready to submit: {value}",
+				"yes": "Yes",
+				"no": "No"
+			},
+			"executionMode": {
+				"both": "Onsite audit and survey",
+				"survey": "Survey only",
+				"audit": "Onsite audit only"
+			},
+			"scores": {
+				"title": "Scores",
+				"summary": "Summary: {value}",
+				"playValue": "Play value: {value}",
+				"usability": "Usability: {value}",
+				"sociability": "Sociability: {value}"
+			},
+			"preAudit": {
+				"title": "Pre-audit answers",
+				"notProvided": "Not provided",
+				"season": "Season: {value}",
+				"userCount": "User count: {value}",
+				"placeSize": "Place size: {value}",
+				"weather": "Weather: {value}",
+				"usersPresent": "Users present: {value}",
+				"ageGroups": "Age groups: {value}"
+			},
+			"sectionNotes": {
+				"title": "Section notes",
+				"empty": "No section data available yet.",
+				"summary": "{notedCount} of {totalCount} sections include notes.",
+				"showEmptySections": "Show empty sections ({count})",
+				"hideEmptySections": "Hide empty sections ({count})",
+				"showSectionCodes": "Show section codes",
+				"hideSectionCodes": "Hide section codes",
+				"noCapturedNotesTitle": "No captured notes yet",
+				"noCapturedNotesDescription": "Empty sections are currently hidden. Show them if you want to review the full instrument structure.",
+				"capturedNote": "Captured note",
+				"emptyBadge": "Empty",
+				"noNoteCaptured": "No note captured."
+			},
+			"status": {
+				"in_progress": "in progress",
+				"paused": "paused",
+				"submitted": "submitted"
+			}
+		},
+		"execute": {
+			"errors": {
+				"autoSaveFailed": "Auto-save failed.",
+				"submitFailed": "Submit failed."
+			},
+			"error": {
+				"title": "Unable to open audit",
+				"description": "Verify this place is assigned to your auditor account and try again."
+			},
+			"status": {
+				"in_progress": "in progress",
+				"paused": "paused",
+				"submitted": "submitted"
+			},
+			"common": {
+				"complete": "Complete",
+				"incomplete": "Incomplete",
+				"yes": "Yes",
+				"notYet": "Not yet"
+			},
+			"roles": {
+				"auditor": "auditor",
+				"place_admin": "place admin"
+			},
+			"actions": {
+				"backToPlaces": "Back to places",
+				"saveNow": "Save now",
+				"submitting": "Submitting...",
+				"submitAudit": "Submit audit"
+			},
+			"header": {
+				"title": "Execute Audit",
+				"place": "Place: {name}",
+				"questionsAnswered": "{answered} / {total} questions answered",
+				"saving": "Saving...",
+				"savedAt": "Saved {time}",
+				"noUnsavedChanges": "No unsaved changes"
+			},
+			"overview": {
+				"title": "Audit Overview",
+				"auditCode": "Audit code:",
+				"started": "Started: {value}",
+				"assignmentRoles": "Assignment roles:",
+				"preAudit": "Pre-audit:",
+				"sections": "Sections:",
+				"sectionsComplete": "{completed}/{total} complete",
+				"readyToSubmit": "Ready to submit:"
+			},
+			"submission": {
+				"title": "Submission readiness",
+				"readyDescription": "Everything required for submission is complete. Review your notes, then submit when you are ready.",
+				"incompleteDescription": "Complete the remaining checkpoints before submitting this audit.",
+				"readyBadge": "Ready to submit",
+				"remainingBadge": "{count} checkpoint{count, plural, one {} other {s}} remaining",
+				"blockers": {
+					"chooseExecutionMode": "Choose an execution mode.",
+					"completePreAudit": "Complete the required pre-audit questions.",
+					"finishRemainingSections": "Finish {count} remaining section{count, plural, one {} other {s}}."
+				}
+			},
+			"executionMode": {
+				"title": "Execution Mode",
+				"noDescription": "No description."
+			},
+			"preAudit": {
+				"title": "Pre-Audit",
+				"auto": {
+					"generatedOnSubmit": "Generated on submit",
+					"calculatedOnSubmit": "Calculated on submit",
+					"minutes": "{count} minutes"
+				}
+			},
+			"sections": {
+				"title": "Sections",
+				"chooseMode": "Choose an execution mode to unlock the matching instrument sections.",
+				"incompleteSummary": "{count} sections still need attention. Completed sections are grouped at the end for faster scanning.",
+				"completeSummary": "All sections are complete. Completed sections stay grouped together so you can review them quickly.",
+				"remainingBadge": "{count} section{count, plural, one {} other {s}} remaining",
+				"answered": "{answered} / {total} answered",
+				"allRequiredComplete": "All required questions are complete.",
+				"questionsRemaining": "{count} question{count, plural, one {} other {s}} remaining",
+				"remainingShort": "{count} remaining"
+			},
+			"activeSection": {
+				"notesLabel": "Section notes",
+				"notesFallback": "Add observations or recommendations for this section.",
+				"notesPlaceholder": "Record observations, missing features, or recommendations.",
+				"previousSection": "Previous section",
+				"nextSection": "Next section"
+			},
+			"questionCard": {
+				"thisPlayspace": "This playspace",
+				"followUpScalesHidden": "Follow-up scales stay hidden until the selected quantity option allows them."
+			},
+			"submittedCard": {
+				"title": "Audit submitted",
+				"description": "This audit has been submitted and is now read-only. Open the report to review the final record.",
+				"openReport": "Open submitted report"
+			}
+		}
+	},
+	"settings": {
+		"errors": {
+			"accountContextUnavailable": "Manager account context is unavailable."
+		},
+		"header": {
+			"eyebrow": "Workspace Settings",
+			"title": "Settings",
+			"description": "Manage your account summary, appearance, and accessibility preferences.",
+			"backToDashboard": "Back to dashboard"
+		},
+		"breadcrumbs": {
+			"dashboard": "Dashboard",
+			"settings": "Settings"
+		},
+		"common": {
+			"on": "On",
+			"off": "Off"
+		},
+		"sessionUnavailable": {
+			"header": {
+				"eyebrow": "Workspace Settings",
+				"title": "Settings",
+				"description": "Sign in to manage display preferences, accessibility, and workspace details.",
+				"goToLogin": "Go to login"
+			},
+			"card": {
+				"title": "Sign-in required",
+				"description": "You need to sign in before opening settings.",
+				"body": "Sign in again to review your account details and update how the workspace looks on this device."
+			}
+		},
+		"profile": {
+			"title": "Your account",
+			"description": "Review the identity and role shown in this workspace.",
+			"managerFallback": "Manager",
+			"adminDisplayName": "Playspace Administrator",
+			"auditorWithCode": "Auditor {code}",
+			"auditorFallback": "Auditor",
+			"managerWorkspaceFallback": "Manager workspace",
+			"adminSubtitle": "Global platform oversight",
+			"auditorCodeSubtitle": "Auditor code {code}",
+			"auditorSubtitle": "Field audit workspace",
+			"emailFallback": "Available after full sign-in rollout",
+			"memberSinceFallback": "Available after account setup",
+			"fields": {
+				"role": "Role",
+				"workspace": "Workspace",
+				"email": "Email",
+				"memberSince": "Member since"
+			}
+		},
+		"security": {
+			"title": "Security",
+			"description": "Review your current session and sign out when you are done.",
+			"fields": {
+				"status": "Status",
+				"currentAccess": "Current access",
+				"auditorCode": "Auditor code",
+				"device": "Device"
+			},
+			"values": {
+				"signedIn": "Signed in",
+				"notApplicable": "Not applicable",
+				"currentBrowserSession": "Current browser session"
+			},
+			"sharedDeviceTitle": "Using a shared device?",
+			"sharedDeviceDescription": "Sign out before you leave to keep your account secure.",
+			"signOut": "Sign out"
+		},
+		"appearance": {
+			"title": "Appearance",
+			"description": "Choose the theme and language preference used across the web workspace.",
+			"themeTitle": "Theme",
+			"languageTitle": "Language",
+			"currentTheme": "Current theme: {value}",
+			"currentLocale": "Current locale: {value}",
+			"resolvedTheme": {
+				"light": "Light",
+				"dark": "Dark"
+			},
+			"themeOptions": {
+				"system": {
+					"label": "System",
+					"description": "Follow your device setting."
+				},
+				"light": {
+					"label": "Light",
+					"description": "Use the brighter workspace palette."
+				},
+				"dark": {
+					"label": "Dark",
+					"description": "Use the lower-glare workspace palette."
+				}
+			},
+			"languageOptions": {
+				"system": {
+					"label": "System default",
+					"description": "Follow your browser locale."
+				},
+				"en": {
+					"label": "English",
+					"description": "Use English for locale formatting."
+				},
+				"de": {
+					"label": "German",
+					"description": "Use German for locale formatting."
+				},
+				"fr": {
+					"label": "French",
+					"description": "Use French for locale formatting."
+				},
+				"ja": {
+					"label": "Japanese",
+					"description": "Use Japanese for locale formatting."
+				},
+				"hi": {
+					"label": "Hindi",
+					"description": "Use Hindi for locale formatting."
+				}
+			}
+		},
+		"accessibility": {
+			"title": "Accessibility",
+			"description": "Adjust readability and contrast for longer review and audit sessions.",
+			"highContrast": {
+				"title": "High contrast",
+				"description": "Increase contrast across text, borders, and status colors."
+			},
+			"dyslexicFont": {
+				"title": "Dyslexic font",
+				"description": "Switch body and heading text to OpenDyslexic across the app."
+			},
+			"fontSize": {
+				"title": "Font size",
+				"description": "Scale all rem-based typography and spacing from {min}% to {max}%."
+			},
+			"reset": "Reset accessibility defaults"
+		},
+		"managerOrganization": {
+			"title": "Organization profile",
+			"description": "Review or update the organization attached to this manager workspace.",
+			"fields": {
+				"organization": "Organization",
+				"organizationName": "Organization name",
+				"accountEmail": "Account email",
+				"primaryContact": "Primary contact",
+				"memberSince": "Member since"
+			},
+			"actions": {
+				"edit": "Edit",
+				"cancel": "Cancel",
+				"saveChanges": "Save changes"
+			},
+			"values": {
+				"pending": "Pending"
+			},
+			"primaryContact": {
+				"title": "Primary contact",
+				"positionPending": "Position pending",
+				"phonePending": "Phone pending",
+				"empty": "Primary contact information will appear here once the account owner is configured."
+			},
+			"messages": {
+				"organizationUnavailable": "Organization details are unavailable.",
+				"organizationSaved": "Organization details saved.",
+				"unableToUpdate": "Unable to update organization details.",
+				"organizationNameRequired": "Organization name is required.",
+				"accountEmailRequired": "Account email is required.",
+				"loadFailed": "We could not load your organization details right now."
+			}
+		},
+		"managerContacts": {
+			"title": "Manager contacts",
+			"description": "People with manager access to this workspace.",
+			"empty": "Manager contact information will appear here once the account roster is configured.",
+			"primaryContactBadge": "Primary contact",
+			"managerBadge": "Manager",
+			"positionPending": "Position pending"
+		},
+		"adminWorkspace": {
+			"title": "Administrator access",
+			"description": "Global oversight across all accounts, places, and audits.",
+			"fields": {
+				"role": "Role",
+				"scope": "Scope",
+				"emailVisibility": "Email visibility",
+				"auditorIdentity": "Auditor identity"
+			},
+			"values": {
+				"role": "Administrator",
+				"scope": "Platform-wide",
+				"emailVisibility": "Manager emails only",
+				"auditorIdentity": "Auditor code first"
+			}
+		},
+		"auditorWorkspace": {
+			"title": "Auditor access",
+			"description": "Review the audit access tied to your current sign-in.",
+			"fields": {
+				"role": "Role",
+				"auditorCode": "Auditor code",
+				"workspace": "Workspace",
+				"accessType": "Access type"
+			},
+			"values": {
+				"role": "Auditor",
+				"codePending": "Code pending",
+				"workspace": "Field audits",
+				"accessType": "Assignment-based"
+			}
+		}
+	},
+	"notFound": {
+		"title": "Page not found",
+		"description": "The page you're looking for doesn't exist or you don't have access.",
+		"actions": {
+			"login": "Go to login",
+			"home": "Home"
+		}
+	}
+}

@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { PencilLineIcon, PlusIcon, Trash2Icon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 import { use } from "react";
 
@@ -26,15 +27,17 @@ interface ManagerProjectDetailPageProps {
 	}>;
 }
 
-function getErrorMessage(error: unknown): string {
+function getErrorMessage(error: unknown, fallbackMessage: string): string {
 	if (error instanceof Error) {
 		return error.message;
 	}
 
-	return "Could not load the project.";
+	return fallbackMessage;
 }
 
 export default function ManagerProjectDetailPage({ params }: Readonly<ManagerProjectDetailPageProps>) {
+	const t = useTranslations("manager.projectDetail");
+	const formatT = useTranslations("common.format");
 	const projectParams = use(params);
 	const projectId = projectParams.projectId;
 	const queryClient = useQueryClient();
@@ -123,9 +126,9 @@ export default function ManagerProjectDetailPage({ params }: Readonly<ManagerPro
 
 		return (
 			<EmptyState
-				title="Project unavailable"
-				description={getErrorMessage(error)}
-				action={<BackButton href="/manager/projects" label="Back to projects" />}
+				title={t("error.title")}
+				description={getErrorMessage(error, t("error.description"))}
+				action={<BackButton href="/manager/projects" label={t("actions.backToProjects")} />}
 			/>
 		);
 	}
@@ -149,72 +152,72 @@ export default function ManagerProjectDetailPage({ params }: Readonly<ManagerPro
 	const project = projectQuery.data;
 	const stats = projectStatsQuery.data;
 	const places = projectPlacesQuery.data;
-	const placeTypeLabel = project.place_types.length > 0 ? project.place_types : ["Place types pending"];
+	const placeTypeLabel = project.place_types.length > 0 ? project.place_types : [t("overview.placeTypesPending")];
 
 	return (
 		<div className="space-y-6">
 			<DashboardHeader
-				eyebrow="Project Workspace"
+				eyebrow={t("header.eyebrow")}
 				title={project.name}
-				description={project.overview ?? "Project overview is still being refined."}
+				description={project.overview ?? t("header.overviewPending")}
 				breadcrumbs={[
-					{ label: "Dashboard", href: "/manager/dashboard" },
-					{ label: "Projects", href: "/manager/projects" },
+					{ label: t("breadcrumbs.dashboard"), href: "/manager/dashboard" },
+					{ label: t("breadcrumbs.projects"), href: "/manager/projects" },
 					{ label: project.name }
 				]}
 				actions={
 					<div className="flex flex-wrap items-center gap-2">
-						<BackButton href="/manager/projects" label="Back to projects" />
+						<BackButton href="/manager/projects" label={t("actions.backToProjects")} />
 						<Button
 							type="button"
 							variant="outline"
 							className="gap-2"
 							onClick={() => setIsProjectDialogOpen(true)}>
 							<PencilLineIcon className="size-4" />
-							<span>Edit project</span>
+							<span>{t("actions.editProject")}</span>
 						</Button>
 						<Button type="button" className="gap-2" onClick={() => setIsPlaceSheetOpen(true)}>
 							<PlusIcon className="size-4" />
-							<span>New place</span>
+							<span>{t("actions.newPlace")}</span>
 						</Button>
 					</div>
 				}
 			/>
 			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
 				<StatCard
-					title="Places"
+					title={t("stats.places.title")}
 					value={String(stats.places_count)}
-					helper={`${stats.places_with_audits} places already have audit activity.`}
+					helper={t("stats.places.helper", { count: stats.places_with_audits })}
 				/>
 				<StatCard
-					title="Audits Completed"
+					title={t("stats.auditsCompleted.title")}
 					value={String(stats.audits_completed)}
-					helper={`${stats.in_progress_audits} audits still in progress.`}
+					helper={t("stats.auditsCompleted.helper", { count: stats.in_progress_audits })}
 					tone="success"
 				/>
 				<StatCard
-					title="Auditors Assigned"
+					title={t("stats.auditorsAssigned.title")}
 					value={String(stats.auditors_count)}
-					helper="Unique auditors assigned across project and place scope."
+					helper={t("stats.auditorsAssigned.helper")}
 					tone="warning"
 				/>
 				<StatCard
-					title="Overall Mean Score"
-					value={formatScoreLabel(stats.average_score)}
-					helper="Average across submitted audits only."
+					title={t("stats.overallMeanScore.title")}
+					value={formatScoreLabel(stats.average_score, formatT)}
+					helper={t("stats.overallMeanScore.helper")}
 					tone="violet"
 				/>
 			</div>
 			<Tabs defaultValue="overview">
 				<TabsList>
-					<TabsTrigger value="overview">Overview</TabsTrigger>
-					<TabsTrigger value="places">Places</TabsTrigger>
+					<TabsTrigger value="overview">{t("tabs.overview")}</TabsTrigger>
+					<TabsTrigger value="places">{t("tabs.places")}</TabsTrigger>
 				</TabsList>
 				<TabsContent value="overview">
 					<div className="grid gap-5 xl:grid-cols-[1.15fr_0.85fr]">
 						<Card>
 							<CardHeader>
-								<CardTitle>Project settings</CardTitle>
+								<CardTitle>{t("overview.title")}</CardTitle>
 							</CardHeader>
 							<CardContent className="space-y-5">
 								<div className="flex flex-wrap gap-2">
@@ -226,45 +229,45 @@ export default function ManagerProjectDetailPage({ params }: Readonly<ManagerPro
 								</div>
 								<div className="grid gap-4 text-sm text-muted-foreground md:grid-cols-2">
 									<div className="space-y-1">
-										<p className="font-medium text-foreground">Timeline</p>
-										<p>{formatProjectDateRange(project)}</p>
+										<p className="font-medium text-foreground">{t("overview.timeline")}</p>
+										<p>{formatProjectDateRange(project, formatT)}</p>
 									</div>
 									<div className="space-y-1">
-										<p className="font-medium text-foreground">Estimated places</p>
-										<p>{project.est_places ?? "Pending"}</p>
+										<p className="font-medium text-foreground">{t("overview.estimatedPlaces")}</p>
+										<p>{project.est_places ?? formatT("pending")}</p>
 									</div>
 									<div className="space-y-1">
-										<p className="font-medium text-foreground">Estimated auditors</p>
-										<p>{project.est_auditors ?? "Pending"}</p>
+										<p className="font-medium text-foreground">{t("overview.estimatedAuditors")}</p>
+										<p>{project.est_auditors ?? formatT("pending")}</p>
 									</div>
 									<div className="space-y-1">
-										<p className="font-medium text-foreground">Created</p>
-										<p className="tabular-nums">{formatDateLabel(project.created_at)}</p>
+										<p className="font-medium text-foreground">{t("overview.created")}</p>
+										<p className="tabular-nums">{formatDateLabel(project.created_at, formatT)}</p>
 									</div>
 								</div>
 								<div className="space-y-1">
-									<p className="font-medium text-foreground">Auditor guidance</p>
+									<p className="font-medium text-foreground">{t("overview.auditorGuidance")}</p>
 									<p className="text-sm text-muted-foreground">
-										{project.auditor_description ?? "Auditor profile description pending."}
+										{project.auditor_description ?? t("overview.auditorGuidancePending")}
 									</p>
 								</div>
 							</CardContent>
 						</Card>
 						<Card>
 							<CardHeader>
-								<CardTitle>Delivery signals</CardTitle>
+								<CardTitle>{t("deliverySignals.title")}</CardTitle>
 							</CardHeader>
 							<CardContent className="space-y-4">
 								<div className="rounded-field border border-border/70 bg-muted/40 p-4">
-									<p className="text-sm font-medium text-foreground">Current submitted mean score</p>
+									<p className="text-sm font-medium text-foreground">{t("deliverySignals.currentSubmittedMeanScore")}</p>
 									<p className="mt-2 font-mono text-3xl text-foreground">
-										{formatScoreLabel(stats.average_score)}
+										{formatScoreLabel(stats.average_score, formatT)}
 									</p>
 								</div>
 								<div className="grid gap-3 text-sm text-muted-foreground">
-									<p>{stats.places_with_audits} places already have audit activity.</p>
-									<p>{stats.in_progress_audits} audits are still in progress.</p>
-									<p>{stats.auditors_count} unique auditors are assigned across this project.</p>
+									<p>{t("deliverySignals.placesWithAudits", { count: stats.places_with_audits })}</p>
+									<p>{t("deliverySignals.auditsInProgress", { count: stats.in_progress_audits })}</p>
+									<p>{t("deliverySignals.auditorsAssigned", { count: stats.auditors_count })}</p>
 								</div>
 							</CardContent>
 						</Card>
@@ -273,15 +276,15 @@ export default function ManagerProjectDetailPage({ params }: Readonly<ManagerPro
 				<TabsContent value="places">
 					<PlacesTable
 						places={places}
-						title="Project Places"
-						description="Manage every audit location in this project from a single operational table."
+						title={t("placesTable.title")}
+						description={t("placesTable.description")}
 						getRowActions={place => [
 							{
-								label: "Open place",
+								label: t("placesTable.actions.openPlace"),
 								href: `/manager/places/${encodeURIComponent(place.id)}`
 							},
 							{
-								label: "Delete place",
+								label: t("placesTable.actions.deletePlace"),
 								onSelect: () =>
 									setPlacePendingDelete({
 										id: place.id,
@@ -291,16 +294,16 @@ export default function ManagerProjectDetailPage({ params }: Readonly<ManagerPro
 								variant: "destructive"
 							}
 						]}
-						emptyMessage="No places yet. Create the first place to start audit operations for this project."
+						emptyMessage={t("placesTable.emptyMessage")}
 					/>
 				</TabsContent>
 			</Tabs>
 			<ProjectDialog
 				open={isProjectDialogOpen}
 				onOpenChange={setIsProjectDialogOpen}
-				title="Edit project"
-				description="Update project planning metadata and auditor guidance."
-				submitLabel="Save changes"
+				title={t("projectDialog.title")}
+				description={t("projectDialog.description")}
+				submitLabel={t("projectDialog.submitLabel")}
 				initialValues={{
 					name: project.name,
 					overview: project.overview,
@@ -319,9 +322,9 @@ export default function ManagerProjectDetailPage({ params }: Readonly<ManagerPro
 			<PlaceSheet
 				open={isPlaceSheetOpen}
 				onOpenChange={setIsPlaceSheetOpen}
-				title="Create place"
-				description="Add a new audit location to this project."
-				submitLabel="Create place"
+				title={t("placeSheet.title")}
+				description={t("placeSheet.description")}
+				submitLabel={t("placeSheet.submitLabel")}
 				isPending={createPlace.isPending}
 				onSubmit={async payload => {
 					await createPlace.mutateAsync({
@@ -337,13 +340,13 @@ export default function ManagerProjectDetailPage({ params }: Readonly<ManagerPro
 						setPlacePendingDelete(null);
 					}
 				}}
-				title="Delete place"
+				title={t("confirmDelete.title")}
 				description={
 					placePendingDelete
-						? `Delete "${placePendingDelete.name}"? This action cannot be undone.`
-						: "Delete this place? This action cannot be undone."
+						? t("confirmDelete.descriptionWithName", { name: placePendingDelete.name })
+						: t("confirmDelete.description")
 				}
-				confirmLabel="Delete place"
+				confirmLabel={t("confirmDelete.confirmLabel")}
 				isPending={deletePlace.isPending}
 				onConfirm={() => {
 					if (!placePendingDelete) {

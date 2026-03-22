@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 import {
 	ClipboardList,
@@ -43,37 +44,42 @@ interface NavItem {
 	icon: LucideIcon;
 }
 
-function getNavItems(role: UserRole): NavItem[] {
+type NavigationTranslator = (key: string) => string;
+
+function getNavItems(
+	role: UserRole,
+	t: NavigationTranslator
+): NavItem[] {
 	if (role === "admin") {
 		return [
-			{ label: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
-			{ label: "Accounts", href: "/admin/accounts", icon: Shield },
-			{ label: "Projects", href: "/admin/projects", icon: FolderKanban },
-			{ label: "Places", href: "/admin/places", icon: MapPin },
-			{ label: "Auditors", href: "/admin/auditors", icon: Users },
-			{ label: "Audits", href: "/admin/audits", icon: ClipboardList },
-			{ label: "System", href: "/admin/system", icon: Settings },
-			{ label: "Settings", href: "/settings", icon: Settings }
+			{ label: t("dashboard"), href: "/admin/dashboard", icon: LayoutDashboard },
+			{ label: t("accounts"), href: "/admin/accounts", icon: Shield },
+			{ label: t("projects"), href: "/admin/projects", icon: FolderKanban },
+			{ label: t("places"), href: "/admin/places", icon: MapPin },
+			{ label: t("auditors"), href: "/admin/auditors", icon: Users },
+			{ label: t("audits"), href: "/admin/audits", icon: ClipboardList },
+			{ label: t("system"), href: "/admin/system", icon: Settings },
+			{ label: t("settings"), href: "/settings", icon: Settings }
 		];
 	}
 
 	if (role === "manager") {
 		return [
-			{ label: "Dashboard", href: "/manager/dashboard", icon: LayoutDashboard },
-			{ label: "Projects", href: "/manager/projects", icon: FolderKanban },
-			{ label: "Places", href: "/manager/places", icon: MapPin },
-			{ label: "Audits", href: "/manager/audits", icon: ClipboardList },
-			{ label: "Auditors", href: "/manager/auditors", icon: Users },
-			{ label: "Assignments", href: "/manager/assignments", icon: ClipboardList },
-			{ label: "Settings", href: "/settings", icon: Settings }
+			{ label: t("dashboard"), href: "/manager/dashboard", icon: LayoutDashboard },
+			{ label: t("projects"), href: "/manager/projects", icon: FolderKanban },
+			{ label: t("places"), href: "/manager/places", icon: MapPin },
+			{ label: t("audits"), href: "/manager/audits", icon: ClipboardList },
+			{ label: t("auditors"), href: "/manager/auditors", icon: Users },
+			{ label: t("assignments"), href: "/manager/assignments", icon: ClipboardList },
+			{ label: t("settings"), href: "/settings", icon: Settings }
 		];
 	}
 
 	return [
-		{ label: "Dashboard", href: "/auditor/dashboard", icon: LayoutDashboard },
-		{ label: "Places", href: "/auditor/places", icon: MapPin },
-		{ label: "Reports", href: "/auditor/reports", icon: ClipboardList },
-		{ label: "Settings", href: "/settings", icon: Settings }
+		{ label: t("dashboard"), href: "/auditor/dashboard", icon: LayoutDashboard },
+		{ label: t("places"), href: "/auditor/places", icon: MapPin },
+		{ label: t("reports"), href: "/auditor/reports", icon: ClipboardList },
+		{ label: t("settings"), href: "/settings", icon: Settings }
 	];
 }
 
@@ -106,15 +112,17 @@ function NavLinks({ items, onNavigate }: Readonly<{ items: NavItem[]; onNavigate
 
 function UserMenu({ role, auditorCode }: Readonly<{ role: UserRole; auditorCode: string | null }>) {
 	const router = useRouter();
+	const t = useTranslations("shell.userMenu");
+	const commonT = useTranslations("common.roles");
 
 	const label =
 		role === "auditor"
 			? auditorCode
-				? `Auditor (${auditorCode})`
-				: "Auditor"
+				? t("auditorWithCode", { code: auditorCode })
+				: commonT("auditor")
 			: role === "admin"
-				? "Administrator"
-				: "Manager";
+				? commonT("administrator")
+				: commonT("manager");
 
 	return (
 		<DropdownMenu>
@@ -124,12 +132,12 @@ function UserMenu({ role, auditorCode }: Readonly<{ role: UserRole; auditorCode:
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="end" className="w-56">
-				<DropdownMenuLabel>Account</DropdownMenuLabel>
+				<DropdownMenuLabel>{t("accountLabel")}</DropdownMenuLabel>
 				<DropdownMenuSeparator />
 				<DropdownMenuItem asChild>
 					<Link href="/settings" className="flex items-center gap-2">
 						<Settings className="h-4 w-4" aria-hidden="true" />
-						<span>Settings</span>
+						<span>{t("settings")}</span>
 					</Link>
 				</DropdownMenuItem>
 				<DropdownMenuSeparator />
@@ -140,7 +148,7 @@ function UserMenu({ role, auditorCode }: Readonly<{ role: UserRole; auditorCode:
 						router.push("/login");
 					}}>
 					<LogOut className="h-4 w-4" aria-hidden="true" />
-					<span>Sign out</span>
+					<span>{t("signOut")}</span>
 				</DropdownMenuItem>
 			</DropdownMenuContent>
 		</DropdownMenu>
@@ -148,9 +156,12 @@ function UserMenu({ role, auditorCode }: Readonly<{ role: UserRole; auditorCode:
 }
 
 export function AppShell({ role, auditorCode, children }: Readonly<AppShellProps>) {
-	const navItems = getNavItems(role);
+	const navigationT = useTranslations("shell.navigation");
+	const shellT = useTranslations("shell");
+	const roleT = useTranslations("common.workspace");
+	const navItems = getNavItems(role, navigationT);
 	const roleLabel =
-		role === "admin" ? "Administrator Workspace" : role === "manager" ? "Manager Workspace" : "Auditor Workspace";
+		role === "admin" ? roleT("administrator") : role === "manager" ? roleT("manager") : roleT("auditor");
 
 	return (
 		<div className="min-h-dvh bg-background">
@@ -163,8 +174,8 @@ export function AppShell({ role, auditorCode, children }: Readonly<AppShellProps
 									PA
 								</div>
 								<div className="grid">
-									<span className="text-base font-semibold leading-5">Playspace Audit Tool</span>
-									<span className="text-xs text-muted-foreground">Play Value &amp; Usability</span>
+									<span className="text-base font-semibold leading-5">{shellT("productName")}</span>
+									<span className="text-xs text-muted-foreground">{shellT("productTagline")}</span>
 								</div>
 							</div>
 							<div className="inline-flex w-fit rounded-pill border border-border/70 bg-muted/60 px-3 py-1 text-xs font-semibold tracking-[0.14em] text-muted-foreground uppercase">
@@ -174,7 +185,7 @@ export function AppShell({ role, auditorCode, children }: Readonly<AppShellProps
 						<Separator />
 						<div className="flex-1 overflow-auto p-3">
 							<p className="px-3 pb-2 text-xs font-semibold tracking-[0.18em] text-muted-foreground uppercase">
-								Workspace
+								{shellT("workspaceLabel")}
 							</p>
 							<NavLinks items={navItems} />
 						</div>
@@ -186,13 +197,13 @@ export function AppShell({ role, auditorCode, children }: Readonly<AppShellProps
 						<div className="flex h-16 items-center gap-3 px-4 md:px-6">
 							<Sheet>
 								<SheetTrigger asChild>
-									<Button variant="ghost" size="icon" className="md:hidden" aria-label="Open menu">
+									<Button variant="ghost" size="icon" className="md:hidden" aria-label={shellT("openMenu")}>
 										<Menu className="h-5 w-5" aria-hidden="true" />
 									</Button>
 								</SheetTrigger>
 								<SheetContent side="left" className="w-80 p-0">
 									<SheetHeader className="px-4 py-4">
-										<SheetTitle>Navigation</SheetTitle>
+										<SheetTitle>{shellT("navigationTitle")}</SheetTitle>
 									</SheetHeader>
 									<Separator />
 									<div className="p-3">
@@ -201,7 +212,7 @@ export function AppShell({ role, auditorCode, children }: Readonly<AppShellProps
 								</SheetContent>
 							</Sheet>
 
-							<div className="text-sm font-semibold md:hidden">Playspace</div>
+							<div className="text-sm font-semibold md:hidden">{shellT("mobileBrand")}</div>
 							<div className="flex-1" />
 							<UserMenu role={role} auditorCode={auditorCode} />
 						</div>

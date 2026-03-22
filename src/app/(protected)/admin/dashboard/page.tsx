@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 
 import { playspaceApi } from "@/lib/api/playspace";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
@@ -13,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function AdminDashboardPage() {
+	const t = useTranslations("admin.dashboard");
 	const overviewQuery = useQuery({
 		queryKey: ["playspace", "admin", "overview"],
 		queryFn: () => playspaceApi.admin.overview()
@@ -29,11 +31,11 @@ export default function AdminDashboardPage() {
 	if (overviewQuery.isError || auditsQuery.isError || !overviewQuery.data || !auditsQuery.data) {
 		return (
 			<EmptyState
-				title="Administrator dashboard unavailable"
-				description="Refresh this page to retry. If the issue continues, verify the administrator sign-in context and reopen the dashboard."
+				title={t("error.title")}
+				description={t("error.description")}
 				action={
 					<Button type="button" onClick={() => globalThis.location.reload()}>
-						Try again
+						{t("error.retry")}
 					</Button>
 				}
 			/>
@@ -46,69 +48,69 @@ export default function AdminDashboardPage() {
 	return (
 		<div className="space-y-6">
 			<DashboardHeader
-				eyebrow="Administrator Workspace"
-				title="Platform overview"
-				description="Global visibility across accounts, projects, places, auditors, and audit state."
+				eyebrow={t("header.eyebrow")}
+				title={t("header.title")}
+				description={t("header.description")}
 				actions={
 					<div className="flex flex-wrap items-center gap-2">
 						<Button asChild variant="secondary">
-							<Link href="/admin/accounts">Accounts</Link>
+							<Link href="/admin/accounts">{t("header.actions.accounts")}</Link>
 						</Button>
 						<Button asChild variant="secondary">
-							<Link href="/admin/audits">Audits</Link>
+							<Link href="/admin/audits">{t("header.actions.audits")}</Link>
 						</Button>
 					</div>
 				}
 			/>
 			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-7">
 				<StatCard
-					title="Accounts"
+					title={t("stats.accounts.title")}
 					value={String(overview.total_accounts)}
-					helper="Registered workspace accounts."
+					helper={t("stats.accounts.helper")}
 				/>
 				<StatCard
-					title="Projects"
+					title={t("stats.projects.title")}
 					value={String(overview.total_projects)}
-					helper="Tracked programs across accounts."
+					helper={t("stats.projects.helper")}
 				/>
 				<StatCard
-					title="Places"
+					title={t("stats.places.title")}
 					value={String(overview.total_places)}
-					helper="Active audit locations in the platform."
+					helper={t("stats.places.helper")}
 					tone="violet"
 				/>
 				<StatCard
-					title="Auditors"
+					title={t("stats.auditors.title")}
 					value={String(overview.total_auditors)}
-					helper="Profiles with field delivery access."
+					helper={t("stats.auditors.helper")}
 					tone="warning"
 				/>
 				<StatCard
-					title="Audits"
+					title={t("stats.audits.title")}
 					value={String(overview.total_audits)}
-					helper="All audit sessions discovered platform-wide."
+					helper={t("stats.audits.helper")}
 				/>
 				<StatCard
-					title="Submitted"
+					title={t("stats.submitted.title")}
 					value={String(overview.submitted_audits)}
-					helper="Completed sessions with scoring."
+					helper={t("stats.submitted.helper")}
 					tone="success"
 				/>
 				<StatCard
-					title="In progress"
+					title={t("stats.inProgress.title")}
 					value={String(overview.in_progress_audits)}
-					helper="Sessions still being worked on."
+					helper={t("stats.inProgress.helper")}
 					tone="warning"
 				/>
 			</div>
 			<Card>
 				<CardHeader>
-					<CardTitle>Latest audits</CardTitle>
+					<CardTitle>{t("latestAudits.title")}</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-3">
 					{latestAudits.length === 0 ? (
 						<p className="text-sm text-muted-foreground">
-							Recent audit activity will appear here once accounts begin submitting sessions.
+							{t("latestAudits.empty")}
 						</p>
 					) : (
 						latestAudits.map(audit => (
@@ -127,7 +129,7 @@ export default function AdminDashboardPage() {
 											{formatAuditCodeReference(audit.audit_code)}
 										</code>
 										<span>
-											Auditor{" "}
+											{t("latestAudits.auditorLabel")}{" "}
 											<span className="font-mono text-foreground tracking-[0.04em]">
 												{audit.auditor_code}
 											</span>
@@ -137,7 +139,7 @@ export default function AdminDashboardPage() {
 								<Badge
 									variant={audit.status === "SUBMITTED" ? "default" : "secondary"}
 									className="font-medium">
-									{audit.status.toLowerCase().replaceAll("_", " ")}
+									{t(`status.${audit.status.toLowerCase()}`)}
 								</Badge>
 							</div>
 						))

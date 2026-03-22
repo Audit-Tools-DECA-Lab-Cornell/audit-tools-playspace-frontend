@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { LucideIcon } from "lucide-react";
 import { MoreHorizontalIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -32,20 +33,27 @@ export interface EntityRowActionsProps {
  * Reusable dropdown action menu used by entity tables.
  */
 export function EntityRowActions({ label = "Actions", actions }: Readonly<EntityRowActionsProps>) {
+	const t = useTranslations("shared.entityRowActions");
 	const visibleActions = actions.filter(action => !action.disabled);
 	if (visibleActions.length === 0) {
 		return null;
 	}
+	const resolvedLabel = label === "Actions" ? t("label") : label;
 
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
-				<Button type="button" variant="ghost" size="icon" className="touch-manipulation" aria-label={label}>
+				<Button
+					type="button"
+					variant="ghost"
+					size="icon"
+					className="touch-manipulation"
+					aria-label={resolvedLabel}>
 					<MoreHorizontalIcon className="size-4" />
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="end" className="w-52">
-				<DropdownMenuLabel>{label}</DropdownMenuLabel>
+				<DropdownMenuLabel>{resolvedLabel}</DropdownMenuLabel>
 				<DropdownMenuSeparator />
 				{visibleActions.map(action => {
 					const Icon = action.icon;

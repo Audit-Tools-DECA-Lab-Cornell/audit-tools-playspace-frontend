@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 
 import { playspaceApi } from "@/lib/api/playspace";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
@@ -17,12 +18,9 @@ function getStatusBadgeVariant(status: "IN_PROGRESS" | "PAUSED" | "SUBMITTED" | 
 	return "outline";
 }
 
-function getStatusLabel(status: "IN_PROGRESS" | "PAUSED" | "SUBMITTED" | null): string {
-	if (!status) return "not started";
-	return status.toLowerCase().replaceAll("_", " ");
-}
-
 export default function AuditorDashboardPage() {
+	const t = useTranslations("auditor.dashboard");
+	const formatT = useTranslations("common.format");
 	const placesQuery = useQuery({
 		queryKey: ["playspace", "auditor", "assignedPlaces"],
 		queryFn: () => playspaceApi.auditor.assignedPlaces()
@@ -47,20 +45,18 @@ export default function AuditorDashboardPage() {
 		return (
 			<div className="space-y-6">
 				<DashboardHeader
-					eyebrow="Auditor Workspace"
-					title="Auditor dashboard"
-					description="Your assigned places and audit execution tasks."
+					eyebrow={t("header.eyebrow")}
+					title={t("header.title")}
+					description={t("header.description")}
 				/>
 				<Card>
 					<CardHeader>
-						<CardTitle>Unable to load auditor dashboard</CardTitle>
+						<CardTitle>{t("error.title")}</CardTitle>
 					</CardHeader>
 					<CardContent className="space-y-3">
-						<p className="text-sm text-muted-foreground">
-							Try refreshing the page. If the issue persists, verify your sign-in role and auditor code.
-						</p>
+						<p className="text-sm text-muted-foreground">{t("error.description")}</p>
 						<Button type="button" onClick={() => globalThis.location.reload()}>
-							Refresh
+							{t("actions.refresh")}
 						</Button>
 					</CardContent>
 				</Card>
@@ -73,52 +69,49 @@ export default function AuditorDashboardPage() {
 	return (
 		<div className="space-y-6">
 			<DashboardHeader
-				eyebrow="Auditor Workspace"
-				title="Auditor dashboard"
-				description="Your assigned places and audit execution tasks."
+				eyebrow={t("header.eyebrow")}
+				title={t("header.title")}
+				description={t("header.description")}
 			/>
 
 			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
 				<StatCard
-					title="Assigned places"
+					title={t("stats.assignedPlaces.title")}
 					value={String(summary.total_assigned_places)}
-					helper="Places currently in your field roster."
+					helper={t("stats.assignedPlaces.helper")}
 				/>
 				<StatCard
-					title="In progress"
+					title={t("stats.inProgress.title")}
 					value={String(summary.in_progress_audits)}
-					helper="Active or paused sessions awaiting completion."
+					helper={t("stats.inProgress.helper")}
 					tone="warning"
 				/>
 				<StatCard
-					title="Submitted"
+					title={t("stats.submitted.title")}
 					value={String(summary.submitted_audits)}
-					helper="Completed sessions already turned in."
+					helper={t("stats.submitted.helper")}
 					tone="success"
 				/>
 				<StatCard
-					title="Pending places"
+					title={t("stats.pendingPlaces.title")}
 					value={String(summary.pending_places)}
-					helper="Assigned locations without a submitted audit yet."
+					helper={t("stats.pendingPlaces.helper")}
 				/>
 				<StatCard
-					title="Mean submitted score"
-					value={formatScoreLabel(summary.average_submitted_score)}
-					helper="Average across submitted sessions only."
+					title={t("stats.meanSubmittedScore.title")}
+					value={formatScoreLabel(summary.average_submitted_score, formatT)}
+					helper={t("stats.meanSubmittedScore.helper")}
 					tone="violet"
 				/>
 			</div>
 
 			<Card>
 				<CardHeader>
-					<CardTitle>Assigned places</CardTitle>
+					<CardTitle>{t("assignedPlaces.title")}</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-3">
 					{places.length === 0 ? (
-						<p className="text-sm text-muted-foreground">
-							Assigned places will appear here after a manager grants access. Refresh if you were just
-							assigned.
-						</p>
+						<p className="text-sm text-muted-foreground">{t("assignedPlaces.empty")}</p>
 					) : null}
 					{featuredPlaces.map(place => {
 						const actionHref = `/auditor/execute/${encodeURIComponent(place.place_id)}`;
@@ -127,7 +120,7 @@ export default function AuditorDashboardPage() {
 								? `/auditor/reports/${encodeURIComponent(place.audit_id)}`
 								: "/auditor/reports";
 						const isResumeAction = place.audit_status === "IN_PROGRESS" || place.audit_status === "PAUSED";
-						const actionLabel = isResumeAction ? "Resume audit" : "Start audit";
+						const actionLabel = isResumeAction ? t("assignedPlaces.resumeAudit") : t("assignedPlaces.startAudit");
 
 						return (
 							<div
@@ -140,11 +133,11 @@ export default function AuditorDashboardPage() {
 
 								<div className="flex flex-wrap items-center gap-2">
 									<Badge variant={getStatusBadgeVariant(place.audit_status)} className="font-medium">
-										{getStatusLabel(place.audit_status)}
+										{place.audit_status ? t(`status.${place.audit_status.toLowerCase()}`) : t("status.not_started")}
 									</Badge>
 									{place.audit_status === "SUBMITTED" ? (
 										<Button asChild size="sm" variant="secondary">
-											<Link href={reportHref}>Open report</Link>
+											<Link href={reportHref}>{t("assignedPlaces.openReport")}</Link>
 										</Button>
 									) : (
 										<Button asChild size="sm" variant={isResumeAction ? "outline" : "default"}>
@@ -158,7 +151,7 @@ export default function AuditorDashboardPage() {
 					{places.length > featuredPlaces.length ? (
 						<div className="border-t border-border pt-4">
 							<Button asChild variant="outline">
-								<Link href="/auditor/places">View all assigned places</Link>
+								<Link href="/auditor/places">{t("assignedPlaces.viewAll")}</Link>
 							</Button>
 						</div>
 					) : null}

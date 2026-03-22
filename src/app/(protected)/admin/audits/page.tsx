@@ -1,6 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 
 import { playspaceApi } from "@/lib/api/playspace";
 import { AuditsTable } from "@/components/dashboard/audits-table";
@@ -9,6 +10,7 @@ import { EmptyState } from "@/components/dashboard/empty-state";
 import { Button } from "@/components/ui/button";
 
 export default function AdminAuditsPage() {
+	const t = useTranslations("admin.audits");
 	const auditsQuery = useQuery({
 		queryKey: ["playspace", "admin", "audits"],
 		queryFn: () => playspaceApi.admin.audits()
@@ -21,11 +23,11 @@ export default function AdminAuditsPage() {
 	if (auditsQuery.isError || !auditsQuery.data) {
 		return (
 			<EmptyState
-				title="Audits unavailable"
-				description="Refresh this page to retry. If the issue continues, return to the administrator dashboard and reopen audits."
+				title={t("error.title")}
+				description={t("error.description")}
 				action={
 					<Button type="button" onClick={() => globalThis.location.reload()}>
-						Try again
+						{t("error.retry")}
 					</Button>
 				}
 			/>
@@ -35,10 +37,13 @@ export default function AdminAuditsPage() {
 	return (
 		<div className="space-y-6">
 			<DashboardHeader
-				eyebrow="Administrator Workspace"
-				title="Audits"
-				description="Global audit activity feed with account/project/place lineage."
-				breadcrumbs={[{ label: "Dashboard", href: "/admin/dashboard" }, { label: "Audits" }]}
+				eyebrow={t("header.eyebrow")}
+				title={t("header.title")}
+				description={t("header.description")}
+				breadcrumbs={[
+					{ label: t("breadcrumbs.dashboard"), href: "/admin/dashboard" },
+					{ label: t("breadcrumbs.audits") }
+				]}
 			/>
 			<AuditsTable
 				rows={auditsQuery.data.map(audit => ({
@@ -53,9 +58,9 @@ export default function AdminAuditsPage() {
 					submittedAt: audit.submitted_at,
 					score: audit.summary_score
 				}))}
-				title="Audit Activity"
-				description="Monitor platform-wide audit throughput, lineage, and delivery status."
-				emptyMessage="No audits match the current filters."
+				title={t("table.title")}
+				description={t("table.description")}
+				emptyMessage={t("table.emptyMessage")}
 			/>
 		</div>
 	);

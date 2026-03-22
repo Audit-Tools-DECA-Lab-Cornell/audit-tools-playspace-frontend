@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 
 import { playspaceApi } from "@/lib/api/playspace";
@@ -21,6 +22,8 @@ function getStatusBadgeVariant(status: "IN_PROGRESS" | "PAUSED" | "SUBMITTED") {
 }
 
 export default function AuditorReportsPage() {
+	const t = useTranslations("auditor.reports");
+	const formatT = useTranslations("common.format");
 	const [currentPage, setCurrentPage] = React.useState(1);
 	const auditsQuery = useQuery({
 		queryKey: ["playspace", "auditor", "audits", "reports"],
@@ -48,14 +51,12 @@ export default function AuditorReportsPage() {
 		return (
 			<Card>
 				<CardHeader>
-					<CardTitle>Unable to load reports</CardTitle>
+					<CardTitle>{t("error.title")}</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-3">
-					<p className="text-sm text-muted-foreground">
-						Try refreshing the page. If this continues, verify your sign-in context.
-					</p>
+					<p className="text-sm text-muted-foreground">{t("error.description")}</p>
 					<Button type="button" onClick={() => globalThis.location.reload()}>
-						Refresh
+						{t("actions.refresh")}
 					</Button>
 				</CardContent>
 			</Card>
@@ -65,30 +66,31 @@ export default function AuditorReportsPage() {
 	return (
 		<div className="space-y-6">
 			<DashboardHeader
-				eyebrow="Auditor Workspace"
-				title="Reports"
-				description="Review submitted and in-progress audit sessions."
-				breadcrumbs={[{ label: "Dashboard", href: "/auditor/dashboard" }, { label: "Reports" }]}
+				eyebrow={t("header.eyebrow")}
+				title={t("header.title")}
+				description={t("header.description")}
+				breadcrumbs={[
+					{ label: t("breadcrumbs.dashboard"), href: "/auditor/dashboard" },
+					{ label: t("breadcrumbs.reports") }
+				]}
 			/>
 			<Card>
 				<CardHeader>
-					<CardTitle>Audit sessions</CardTitle>
+					<CardTitle>{t("list.title")}</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-3">
 					{audits.length === 0 ? (
-						<p className="text-sm text-muted-foreground">
-							Submitted and in-progress sessions will appear here after you start an assigned audit.
-						</p>
+						<p className="text-sm text-muted-foreground">{t("list.empty")}</p>
 					) : null}
 					{paginatedAudits.map(audit => {
 						const detailHref =
 							audit.status === "SUBMITTED"
 								? `/auditor/reports/${encodeURIComponent(audit.audit_id)}`
 								: `/auditor/execute/${encodeURIComponent(audit.place_id)}`;
-						const detailLabel = audit.status === "SUBMITTED" ? "Open report" : "Resume audit";
+						const detailLabel = audit.status === "SUBMITTED" ? t("list.openReport") : t("list.resumeAudit");
 						const submissionLabel = audit.submitted_at
-							? `Submitted ${formatDateTimeLabel(audit.submitted_at)}`
-							: "Draft not submitted yet";
+							? t("list.submittedAt", { value: formatDateTimeLabel(audit.submitted_at, formatT) })
+							: t("list.draftNotSubmitted");
 						return (
 							<div
 								key={audit.audit_id}
@@ -104,15 +106,15 @@ export default function AuditorReportsPage() {
 										</code>
 									</div>
 									<p className="text-xs text-muted-foreground">
-										Started {formatDateTimeLabel(audit.started_at)} · {submissionLabel}
+										{t("list.startedAt", { value: formatDateTimeLabel(audit.started_at, formatT) })} · {submissionLabel}
 									</p>
 								</div>
 								<div className="flex flex-wrap items-center gap-2">
 									<Badge variant={getStatusBadgeVariant(audit.status)} className="font-medium">
-										{audit.status.toLowerCase().replaceAll("_", " ")}
+										{t(`status.${audit.status.toLowerCase()}`)}
 									</Badge>
 									<Badge variant="outline" className="font-mono tabular-nums">
-										{formatScoreLabel(audit.summary_score)}
+										{formatScoreLabel(audit.summary_score, formatT)}
 									</Badge>
 									<Button
 										asChild
@@ -129,22 +131,20 @@ export default function AuditorReportsPage() {
 						pageCount={pageCount}
 						totalItems={audits.length}
 						pageSize={AUDITOR_REPORTS_PAGE_SIZE}
-						itemLabel="audit sessions"
+						itemLabel={t("pagination.itemLabel")}
 						onPageChange={setCurrentPage}
 					/>
 				</CardContent>
 			</Card>
 			<Card>
 				<CardHeader>
-					<CardTitle className="text-base text-foreground/70">Submitted report count</CardTitle>
+					<CardTitle className="text-base text-foreground/70">{t("summary.title")}</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-2">
 					<p className="font-mono text-[2rem] font-semibold leading-none tabular-nums">
 						{submittedAudits.length}
 					</p>
-					<p className="text-sm text-muted-foreground">
-						Sessions that have been submitted and are ready for review.
-					</p>
+					<p className="text-sm text-muted-foreground">{t("summary.description")}</p>
 				</CardContent>
 			</Card>
 		</div>

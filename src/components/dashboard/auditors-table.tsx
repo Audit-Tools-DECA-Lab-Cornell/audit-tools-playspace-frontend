@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import type { ColumnDef } from "@tanstack/react-table";
+import { useTranslations } from "next-intl";
 
 import type { AuditorSummary } from "@/lib/api/playspace";
 import { Badge } from "@/components/ui/badge";
@@ -28,19 +29,21 @@ export interface AuditorsTableProps {
  */
 export function AuditorsTable({
 	auditors,
-	title = "Auditors",
-	description = "Review roster identity, assignment load, and recent activity.",
+	title,
+	description,
 	action,
 	getRowActions,
 	pageSize = 10,
-	emptyMessage = "No auditors match the current filters."
+	emptyMessage
 }: Readonly<AuditorsTableProps>) {
+	const t = useTranslations("tables.auditors");
+	const formatT = useTranslations("common.format");
 	const columns = React.useMemo<ColumnDef<AuditorSummary>[]>(
 		() => [
 			{
 				id: "identity",
 				accessorFn: auditor => `${auditor.auditor_code} ${auditor.full_name} ${auditor.email ?? ""}`,
-				header: ({ column }) => <DataTableColumnHeader column={column} title="Auditor" />,
+				header: ({ column }) => <DataTableColumnHeader column={column} title={t("columns.auditor")} />,
 				cell: ({ row }) => (
 					<div className="min-w-[240px] space-y-1">
 						<div className="flex flex-wrap items-center gap-2">
@@ -50,22 +53,24 @@ export function AuditorsTable({
 							{row.original.role ? <Badge variant="secondary">{row.original.role}</Badge> : null}
 						</div>
 						<p className="font-medium text-foreground">{row.original.full_name}</p>
-						<p className="text-sm text-muted-foreground">{row.original.email ?? "Email pending"}</p>
+						<p className="text-sm text-muted-foreground">{row.original.email ?? t("emailPending")}</p>
 					</div>
 				),
 				enableHiding: false
 			},
 			{
 				accessorKey: "role",
-				header: ({ column }) => <DataTableColumnHeader column={column} title="Role" />,
+				header: ({ column }) => <DataTableColumnHeader column={column} title={t("columns.role")} />,
 				filterFn: getMultiValueFilterFn<AuditorSummary>(),
 				cell: ({ row }) => (
-					<span className="text-sm text-muted-foreground">{row.original.role ?? "Role pending"}</span>
+					<span className="text-sm text-muted-foreground">{row.original.role ?? t("rolePending")}</span>
 				)
 			},
 			{
 				accessorKey: "assignments_count",
-				header: ({ column }) => <DataTableColumnHeader column={column} title="Assignments" align="end" />,
+				header: ({ column }) => (
+					<DataTableColumnHeader column={column} title={t("columns.assignments")} align="end" />
+				),
 				cell: ({ row }) => (
 					<span className="block text-right font-mono text-foreground tabular-nums">
 						{row.original.assignments_count}
@@ -74,7 +79,9 @@ export function AuditorsTable({
 			},
 			{
 				accessorKey: "completed_audits",
-				header: ({ column }) => <DataTableColumnHeader column={column} title="Completed" align="end" />,
+				header: ({ column }) => (
+					<DataTableColumnHeader column={column} title={t("columns.completed")} align="end" />
+				),
 				cell: ({ row }) => (
 					<span className="block text-right font-mono text-foreground tabular-nums">
 						{row.original.completed_audits}
@@ -83,10 +90,12 @@ export function AuditorsTable({
 			},
 			{
 				accessorKey: "last_active_at",
-				header: ({ column }) => <DataTableColumnHeader column={column} title="Last Active" align="end" />,
+				header: ({ column }) => (
+					<DataTableColumnHeader column={column} title={t("columns.lastActive")} align="end" />
+				),
 				cell: ({ row }) => (
 					<span className="block text-right text-sm text-muted-foreground tabular-nums">
-						{formatDateTimeLabel(row.original.last_active_at)}
+						{formatDateTimeLabel(row.original.last_active_at, formatT)}
 					</span>
 				)
 			},
@@ -101,7 +110,7 @@ export function AuditorsTable({
 					]
 				: [])
 		],
-		[getRowActions]
+		[formatT, getRowActions, t]
 	);
 
 	const roleOptions = React.useMemo(() => {
@@ -117,22 +126,22 @@ export function AuditorsTable({
 
 	return (
 		<DataTable
-			title={title}
-			description={description}
+			title={title ?? t("title")}
+			description={description ?? t("description")}
 			columns={columns}
 			data={auditors}
 			searchColumnId="identity"
-			searchPlaceholder="Search auditors..."
+			searchPlaceholder={t("searchPlaceholder")}
 			filterConfigs={[
 				{
 					columnId: "role",
-					title: "Role",
+					title: t("columns.role"),
 					options: roleOptions
 				}
 			]}
 			action={action}
 			pageSize={pageSize}
-			emptyMessage={emptyMessage}
+			emptyMessage={emptyMessage ?? t("emptyMessage")}
 			initialSorting={[{ id: "last_active_at", desc: true }]}
 		/>
 	);

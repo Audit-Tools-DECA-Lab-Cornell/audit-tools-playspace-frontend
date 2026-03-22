@@ -4,6 +4,7 @@ import Link from "next/link";
 import * as React from "react";
 import { useRouter } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import {
 	Accessibility,
 	Building2,
@@ -33,7 +34,7 @@ import {
 } from "@/components/app/preferences-provider";
 import { BackButton } from "@/components/dashboard/back-button";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
-import { formatDateLabel } from "@/components/dashboard/utils";
+import { formatDateLabel, type DashboardTranslator } from "@/components/dashboard/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -53,59 +54,58 @@ interface ChoiceOption<TValue extends string> {
 	icon: LucideIcon;
 }
 
-const THEME_OPTIONS: readonly ChoiceOption<ThemeMode>[] = [
-	{
-		value: "system",
-		label: "System",
-		description: "Follow your device setting.",
-		icon: Monitor
-	},
-	{
-		value: "light",
-		label: "Light",
-		description: "Use the brighter workspace palette.",
-		icon: Sun
-	},
-	{
-		value: "dark",
-		label: "Dark",
-		description: "Use the lower-glare workspace palette.",
-		icon: Moon
+type SettingsTranslator = (key: string, values?: Record<string, string | number>) => string;
+type SettingsRoleTranslator = (key: "administrator" | "manager" | "auditor") => string;
+
+function getRoleTranslationKey(role: AuthSession["role"]): "administrator" | "manager" | "auditor" {
+	if (role === "admin") {
+		return "administrator";
 	}
-] as const;
 
-const LANGUAGE_LABELS: Record<LanguagePreference, string> = {
-	system: "System default",
-	en: "English",
-	de: "German",
-	fr: "French",
-	ja: "Japanese",
-	hi: "Hindi"
-};
+	return role;
+}
 
-const LANGUAGE_OPTIONS: readonly ChoiceOption<LanguagePreference>[] = WEB_LANGUAGE_OPTIONS.map(language => ({
-	value: language,
-	label: LANGUAGE_LABELS[language],
-	description:
-		language === "system"
-			? "Follow your browser locale."
-			: `Use ${LANGUAGE_LABELS[language]} for locale formatting.`,
-	icon: Globe
-}));
+function getThemeOptions(t: SettingsTranslator): readonly ChoiceOption<ThemeMode>[] {
+	return [
+		{
+			value: "system",
+			label: t("themeOptions.system.label"),
+			description: t("themeOptions.system.description"),
+			icon: Monitor
+		},
+		{
+			value: "light",
+			label: t("themeOptions.light.label"),
+			description: t("themeOptions.light.description"),
+			icon: Sun
+		},
+		{
+			value: "dark",
+			label: t("themeOptions.dark.label"),
+			description: t("themeOptions.dark.description"),
+			icon: Moon
+		}
+	] as const;
+}
+
+function getLanguageLabel(language: LanguagePreference, t: SettingsTranslator): string {
+	return t(`languageOptions.${language}.label`);
+}
+
+function getLanguageOptions(t: SettingsTranslator): readonly ChoiceOption<LanguagePreference>[] {
+	return WEB_LANGUAGE_OPTIONS.map(language => ({
+		value: language,
+		label: getLanguageLabel(language, t),
+		description: t(`languageOptions.${language}.description`),
+		icon: Globe
+	}));
+}
 
 /**
  * Format a stored role into a user-facing label.
  */
-function formatRoleLabel(role: AuthSession["role"]): string {
-	if (role === "admin") {
-		return "Administrator";
-	}
-
-	if (role === "manager") {
-		return "Manager";
-	}
-
-	return "Auditor";
+function formatRoleLabel(role: AuthSession["role"], roleT: SettingsRoleTranslator): string {
+	return roleT(getRoleTranslationKey(role));
 }
 
 /**
@@ -126,57 +126,63 @@ function getDashboardHref(role: AuthSession["role"]): string {
 /**
  * Resolve a user-facing workspace label from the current role.
  */
-function getWorkspaceLabel(role: AuthSession["role"]): string {
-	if (role === "admin") {
-		return "Administrator workspace";
-	}
-
-	if (role === "manager") {
-		return "Manager workspace";
-	}
-
-	return "Auditor workspace";
+function getWorkspaceLabel(role: AuthSession["role"], workspaceT: SettingsRoleTranslator): string {
+	return workspaceT(getRoleTranslationKey(role));
 }
 
 /**
  * Resolve a user-facing display name from the current session.
  */
-function getSessionDisplayName(session: AuthSession, managerAccount: AccountDetail | null): string {
+function getSessionDisplayName(
+	session: AuthSession,
+	managerAccount: AccountDetail | null,
+	t: SettingsTranslator
+): string {
 	if (session.role === "manager") {
-		return managerAccount?.primary_manager?.full_name ?? managerAccount?.name ?? "Manager";
+		return managerAccount?.primary_manager?.full_name ?? managerAccount?.name ?? t("managerFallback");
 	}
 
 	if (session.role === "admin") {
-		return "Playspace Administrator";
+		return t("adminDisplayName");
 	}
 
-	return session.auditorCode ? `Auditor ${session.auditorCode}` : "Auditor";
+	return session.auditorCode ? t("auditorWithCode", { code: session.auditorCode }) : t("auditorFallback");
 }
 
 /**
  * Resolve a subtitle line for the signed-in user.
  */
-function getProfileSubtitle(session: AuthSession, managerAccount: AccountDetail | null): string {
+function getProfileSubtitle(
+	session: AuthSession,
+	managerAccount: AccountDetail | null,
+	t: SettingsTranslator
+): string {
 	if (session.role === "manager") {
-		return managerAccount?.name ?? "Manager workspace";
+		return managerAccount?.name ?? t("managerWorkspaceFallback");
 	}
 
 	if (session.role === "admin") {
-		return "Global platform oversight";
+		return t("adminSubtitle");
 	}
 
-	return session.auditorCode ? `Auditor code ${session.auditorCode}` : "Field audit workspace";
+	return session.auditorCode
+		? t("auditorCodeSubtitle", { code: session.auditorCode })
+		: t("auditorSubtitle");
 }
 
 /**
  * Resolve the most appropriate account email visible in settings.
  */
-function getProfileEmail(session: AuthSession, managerAccount: AccountDetail | null): string {
+function getProfileEmail(
+	session: AuthSession,
+	managerAccount: AccountDetail | null,
+	t: SettingsTranslator
+): string {
 	if (session.role === "manager" && managerAccount) {
 		return managerAccount.email;
 	}
 
-	return "Available after full sign-in rollout";
+	return t("emailFallback");
 }
 
 /**
@@ -286,28 +292,28 @@ function SettingsPageSkeleton() {
  * Empty state shown when a protected screen has no auth session.
  */
 function SessionUnavailableState() {
+	const t = useTranslations("settings.sessionUnavailable");
+
 	return (
 		<div className="space-y-6">
 			<DashboardHeader
-				eyebrow="Workspace Settings"
-				title="Settings"
-				description="Sign in to manage display preferences, accessibility, and workspace details."
+				eyebrow={t("header.eyebrow")}
+				title={t("header.title")}
+				description={t("header.description")}
 				actions={
 					<Button asChild variant="outline">
-						<Link href="/login">Go to login</Link>
+						<Link href="/login">{t("header.goToLogin")}</Link>
 					</Button>
 				}
 			/>
 
 			<Card>
 				<CardHeader>
-					<CardTitle>Sign-in required</CardTitle>
-					<CardDescription>You need to sign in before opening settings.</CardDescription>
+					<CardTitle>{t("card.title")}</CardTitle>
+					<CardDescription>{t("card.description")}</CardDescription>
 				</CardHeader>
 				<CardContent>
-					<p className="text-sm text-muted-foreground">
-						Sign in again to review your account details and update how the workspace looks on this device.
-					</p>
+					<p className="text-sm text-muted-foreground">{t("card.body")}</p>
 				</CardContent>
 			</Card>
 		</div>
@@ -318,7 +324,9 @@ function SessionUnavailableState() {
  * Header action buttons for the role-aware settings page.
  */
 function SettingsActionBar({ dashboardHref }: Readonly<{ dashboardHref: string }>) {
-	return <BackButton href={dashboardHref} label="Back to dashboard" />;
+	const t = useTranslations("settings.header");
+
+	return <BackButton href={dashboardHref} label={t("backToDashboard")} />;
 }
 
 /**
@@ -401,6 +409,8 @@ function PreferenceToggleRow({
 	enabled: boolean;
 	onToggle: (enabled: boolean) => void;
 }>) {
+	const t = useTranslations("settings.common");
+
 	return (
 		<div className="flex flex-col gap-4 rounded-card border border-border/70 bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
 			<div className="flex items-start gap-3">
@@ -419,7 +429,7 @@ function PreferenceToggleRow({
 				onClick={() => {
 					onToggle(!enabled);
 				}}>
-				{enabled ? "On" : "Off"}
+				{enabled ? t("on") : t("off")}
 			</Button>
 		</div>
 	);
@@ -431,21 +441,26 @@ function PreferenceToggleRow({
 function ProfileSummaryCard({
 	session,
 	managerAccount,
-	isLoading
+	isLoading,
+	formatT
 }: Readonly<{
 	session: AuthSession;
 	managerAccount: AccountDetail | null;
 	isLoading: boolean;
+	formatT: DashboardTranslator;
 }>) {
+	const t = useTranslations("settings.profile");
+	const roleT = useTranslations("common.roles");
+	const workspaceT = useTranslations("common.workspace");
 	const isManagerIdentityLoading = session.role === "manager" && isLoading && managerAccount === null;
-	const resolvedDisplayName = getSessionDisplayName(session, managerAccount);
-	const profileSubtitle = getProfileSubtitle(session, managerAccount);
+	const resolvedDisplayName = getSessionDisplayName(session, managerAccount, t);
+	const profileSubtitle = getProfileSubtitle(session, managerAccount, t);
 
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle>Your account</CardTitle>
-				<CardDescription>Review the identity and role shown in this workspace.</CardDescription>
+				<CardTitle>{t("title")}</CardTitle>
+				<CardDescription>{t("description")}</CardDescription>
 				<CardAction>
 					<UserRound className="h-4 w-4 text-primary" aria-hidden="true" />
 				</CardAction>
@@ -469,7 +484,7 @@ function ProfileSummaryCard({
 							{isManagerIdentityLoading ? (
 								<SettingsInlineSkeleton className="h-6 w-20 rounded-full" />
 							) : (
-								<Badge>{formatRoleLabel(session.role)}</Badge>
+								<Badge>{formatRoleLabel(session.role, roleT)}</Badge>
 							)}
 						</div>
 						{isManagerIdentityLoading ? (
@@ -483,22 +498,22 @@ function ProfileSummaryCard({
 				<div className="grid gap-4 sm:grid-cols-2">
 					{isManagerIdentityLoading ? (
 						<>
-							<DetailItemSkeleton label="Role" />
-							<DetailItemSkeleton label="Workspace" />
-							<DetailItemSkeleton label="Email" />
-							<DetailItemSkeleton label="Member since" />
+							<DetailItemSkeleton label={t("fields.role")} />
+							<DetailItemSkeleton label={t("fields.workspace")} />
+							<DetailItemSkeleton label={t("fields.email")} />
+							<DetailItemSkeleton label={t("fields.memberSince")} />
 						</>
 					) : (
 						<>
-							<DetailItem label="Role" value={formatRoleLabel(session.role)} />
-							<DetailItem label="Workspace" value={getWorkspaceLabel(session.role)} />
-							<DetailItem label="Email" value={getProfileEmail(session, managerAccount)} />
+							<DetailItem label={t("fields.role")} value={formatRoleLabel(session.role, roleT)} />
+							<DetailItem label={t("fields.workspace")} value={getWorkspaceLabel(session.role, workspaceT)} />
+							<DetailItem label={t("fields.email")} value={getProfileEmail(session, managerAccount, t)} />
 							<DetailItem
-								label="Member since"
+								label={t("fields.memberSince")}
 								value={
 									managerAccount
-										? formatDateLabel(managerAccount.created_at)
-										: "Available after account setup"
+										? formatDateLabel(managerAccount.created_at, formatT)
+										: t("memberSinceFallback")
 								}
 							/>
 						</>
@@ -519,33 +534,34 @@ function SecurityCard({
 	session: AuthSession;
 	onSignOut: () => void;
 }>) {
+	const t = useTranslations("settings.security");
+	const roleT = useTranslations("common.roles");
+
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle>Security</CardTitle>
-				<CardDescription>Review your current session and sign out when you are done.</CardDescription>
+				<CardTitle>{t("title")}</CardTitle>
+				<CardDescription>{t("description")}</CardDescription>
 				<CardAction>
 					<ShieldCheck className="h-4 w-4 text-primary" aria-hidden="true" />
 				</CardAction>
 			</CardHeader>
 			<CardContent className="space-y-5">
 				<div className="grid gap-4 sm:grid-cols-2">
-					<DetailItem label="Status" value="Signed in" />
-					<DetailItem label="Current access" value={formatRoleLabel(session.role)} />
-					<DetailItem label="Auditor code" value={session.auditorCode ?? "Not applicable"} />
-					<DetailItem label="Device" value="Current browser session" />
+					<DetailItem label={t("fields.status")} value={t("values.signedIn")} />
+					<DetailItem label={t("fields.currentAccess")} value={formatRoleLabel(session.role, roleT)} />
+					<DetailItem label={t("fields.auditorCode")} value={session.auditorCode ?? t("values.notApplicable")} />
+					<DetailItem label={t("fields.device")} value={t("values.currentBrowserSession")} />
 				</div>
 
 				<div className="rounded-card border border-border bg-secondary/40 p-4">
-					<p className="text-sm font-medium text-foreground">Using a shared device?</p>
-					<p className="mt-2 text-sm text-muted-foreground">
-						Sign out before you leave to keep your account secure.
-					</p>
+					<p className="text-sm font-medium text-foreground">{t("sharedDeviceTitle")}</p>
+					<p className="mt-2 text-sm text-muted-foreground">{t("sharedDeviceDescription")}</p>
 				</div>
 
 				<Button type="button" variant="secondary" onClick={onSignOut}>
 					<LogOut className="h-4 w-4" aria-hidden="true" />
-					Sign out
+					{t("signOut")}
 				</Button>
 			</CardContent>
 		</Card>
@@ -557,14 +573,15 @@ function SecurityCard({
  */
 function AppearancePreferencesCard() {
 	const preferences = usePreferences();
+	const t = useTranslations("settings.appearance");
+	const themeOptions = React.useMemo(() => getThemeOptions(t), [t]);
+	const languageOptions = React.useMemo(() => getLanguageOptions(t), [t]);
 
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle>Appearance</CardTitle>
-				<CardDescription>
-					Choose the theme and language preference used across the web workspace.
-				</CardDescription>
+				<CardTitle>{t("title")}</CardTitle>
+				<CardDescription>{t("description")}</CardDescription>
 				<CardAction>
 					<Palette className="h-4 w-4 text-primary" aria-hidden="true" />
 				</CardAction>
@@ -572,18 +589,22 @@ function AppearancePreferencesCard() {
 			<CardContent className="space-y-5">
 				<div className="grid gap-6 xl:grid-cols-2">
 					<ChoiceCardGroup
-						title="Theme"
-						description={`Current theme: ${preferences.resolvedTheme === "dark" ? "Dark" : "Light"}`}
+						title={t("themeTitle")}
+						description={t("currentTheme", {
+							value: t(`resolvedTheme.${preferences.resolvedTheme === "dark" ? "dark" : "light"}`)
+						})}
 						value={preferences.themeMode}
-						options={THEME_OPTIONS}
+						options={themeOptions}
 						onChange={preferences.setThemeMode}
 					/>
 
 					<ChoiceCardGroup
-						title="Language"
-						description={`Current locale: ${LANGUAGE_LABELS[preferences.resolvedLanguage]}`}
+						title={t("languageTitle")}
+						description={t("currentLocale", {
+							value: getLanguageLabel(preferences.resolvedLanguage, t)
+						})}
 						value={preferences.languagePreference}
-						options={LANGUAGE_OPTIONS}
+						options={languageOptions}
 						onChange={preferences.setLanguagePreference}
 					/>
 				</div>
@@ -597,13 +618,14 @@ function AppearancePreferencesCard() {
  */
 function AccessibilityPreferencesCard() {
 	const preferences = usePreferences();
+	const t = useTranslations("settings.accessibility");
 	const fontScalePercent = Math.round(preferences.fontScale * 100);
 
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle>Accessibility</CardTitle>
-				<CardDescription>Adjust readability and contrast for longer review and audit sessions.</CardDescription>
+				<CardTitle>{t("title")}</CardTitle>
+				<CardDescription>{t("description")}</CardDescription>
 				<CardAction>
 					<Accessibility className="h-4 w-4 text-primary" aria-hidden="true" />
 				</CardAction>
@@ -611,15 +633,15 @@ function AccessibilityPreferencesCard() {
 			<CardContent className="space-y-4">
 				<PreferenceToggleRow
 					icon={Accessibility}
-					title="High contrast"
-					description="Increase contrast across text, borders, and status colors."
+					title={t("highContrast.title")}
+					description={t("highContrast.description")}
 					enabled={preferences.highContrast}
 					onToggle={preferences.setHighContrast}
 				/>
 				<PreferenceToggleRow
 					icon={Type}
-					title="Dyslexic font"
-					description="Switch body and heading text to OpenDyslexic across the app."
+					title={t("dyslexicFont.title")}
+					description={t("dyslexicFont.description")}
 					enabled={preferences.dyslexicFont}
 					onToggle={preferences.setDyslexicFont}
 				/>
@@ -627,10 +649,12 @@ function AccessibilityPreferencesCard() {
 				<div className="rounded-card border border-border bg-card p-4">
 					<div className="flex items-center justify-between gap-3">
 						<div className="space-y-1">
-							<p className="font-medium text-foreground">Font size</p>
+							<p className="font-medium text-foreground">{t("fontSize.title")}</p>
 							<p id="font_scale_description" className="text-sm text-muted-foreground">
-								Scale all rem-based typography and spacing from {Math.round(WEB_MIN_FONT_SCALE * 100)}%
-								to {Math.round(WEB_MAX_FONT_SCALE * 100)}%.
+								{t("fontSize.description", {
+									min: Math.round(WEB_MIN_FONT_SCALE * 100),
+									max: Math.round(WEB_MAX_FONT_SCALE * 100)
+								})}
 							</p>
 						</div>
 						<Badge variant="secondary">{fontScalePercent}%</Badge>
@@ -643,7 +667,7 @@ function AccessibilityPreferencesCard() {
 						max={String(WEB_MAX_FONT_SCALE)}
 						step="0.05"
 						value={String(preferences.fontScale)}
-						aria-label="Font size"
+						aria-label={t("fontSize.title")}
 						aria-describedby="font_scale_description"
 						onChange={event => {
 							preferences.setFontScale(Number(event.target.value));
@@ -654,7 +678,7 @@ function AccessibilityPreferencesCard() {
 
 				<div className="flex justify-end">
 					<Button type="button" size="sm" variant="outline" onClick={preferences.resetPreferences}>
-						Reset accessibility defaults
+						{t("reset")}
 					</Button>
 				</div>
 			</CardContent>
@@ -671,7 +695,8 @@ function ManagerWorkspaceSection({
 	accountIsLoading,
 	managerProfilesIsLoading,
 	accountErrorMessage,
-	managerProfilesErrorMessage
+	managerProfilesErrorMessage,
+	formatT
 }: Readonly<{
 	account: AccountDetail | null;
 	managerProfiles: ManagerProfile[];
@@ -679,7 +704,9 @@ function ManagerWorkspaceSection({
 	managerProfilesIsLoading: boolean;
 	accountErrorMessage: string | null;
 	managerProfilesErrorMessage: string | null;
+	formatT: DashboardTranslator;
 }>) {
+	const t = useTranslations("settings.managerOrganization");
 	const queryClient = useQueryClient();
 	const [isEditingOrganization, setIsEditingOrganization] = React.useState(false);
 	const [accountNameInput, setAccountNameInput] = React.useState(account?.name ?? "");
@@ -696,7 +723,7 @@ function ManagerWorkspaceSection({
 	const updateAccountMutation = useMutation({
 		mutationFn: async () => {
 			if (!account) {
-				throw new Error("Organization details are unavailable.");
+				throw new Error(t("messages.organizationUnavailable"));
 			}
 
 			return playspaceApi.management.accounts.update(account.id, {
@@ -710,7 +737,7 @@ function ManagerWorkspaceSection({
 			}
 
 			setSaveError(null);
-			setSaveSuccess("Organization details saved.");
+			setSaveSuccess(t("messages.organizationSaved"));
 			setIsEditingOrganization(false);
 			await Promise.all([
 				queryClient.invalidateQueries({
@@ -723,7 +750,7 @@ function ManagerWorkspaceSection({
 		},
 		onError: error => {
 			setSaveSuccess(null);
-			setSaveError(error instanceof Error ? error.message : "Unable to update organization details.");
+			setSaveError(error instanceof Error ? error.message : t("messages.unableToUpdate"));
 		}
 	});
 
@@ -750,12 +777,12 @@ function ManagerWorkspaceSection({
 
 	const handleSave = () => {
 		if (accountNameInput.trim().length === 0) {
-			setSaveError("Organization name is required.");
+			setSaveError(t("messages.organizationNameRequired"));
 			return;
 		}
 
 		if (accountEmailInput.trim().length === 0) {
-			setSaveError("Account email is required.");
+			setSaveError(t("messages.accountEmailRequired"));
 			return;
 		}
 
@@ -786,6 +813,7 @@ function ManagerWorkspaceSection({
 				saveError={saveError}
 				saveSuccess={saveSuccess}
 				isPending={updateAccountMutation.isPending}
+				formatT={formatT}
 				onToggleEditing={handleToggleEditing}
 				onAccountNameChange={handleAccountNameChange}
 				onAccountEmailChange={handleAccountEmailChange}
@@ -812,6 +840,7 @@ function ManagerOrganizationCard({
 	saveError,
 	saveSuccess,
 	isPending,
+	formatT,
 	onToggleEditing,
 	onAccountNameChange,
 	onAccountEmailChange,
@@ -828,17 +857,20 @@ function ManagerOrganizationCard({
 	saveError: string | null;
 	saveSuccess: string | null;
 	isPending: boolean;
+	formatT: DashboardTranslator;
 	onToggleEditing: () => void;
 	onAccountNameChange: (value: string) => void;
 	onAccountEmailChange: (value: string) => void;
 	onSave: () => void;
 	onCancelEditing: () => void;
 }>) {
+	const t = useTranslations("settings.managerOrganization");
+
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle>Organization profile</CardTitle>
-				<CardDescription>Review or update the organization attached to this manager workspace.</CardDescription>
+				<CardTitle>{t("title")}</CardTitle>
+				<CardDescription>{t("description")}</CardDescription>
 				<CardAction>
 					<Button
 						type="button"
@@ -846,7 +878,7 @@ function ManagerOrganizationCard({
 						size="sm"
 						disabled={accountIsLoading || !account}
 						onClick={onToggleEditing}>
-						{isEditingOrganization ? "Cancel" : "Edit"}
+						{isEditingOrganization ? t("actions.cancel") : t("actions.edit")}
 					</Button>
 				</CardAction>
 			</CardHeader>
@@ -854,10 +886,10 @@ function ManagerOrganizationCard({
 				{accountIsLoading && !account ? (
 					<>
 						<div className="grid gap-4 sm:grid-cols-2">
-							<DetailItemSkeleton label="Organization" />
-							<DetailItemSkeleton label="Account email" />
-							<DetailItemSkeleton label="Primary contact" />
-							<DetailItemSkeleton label="Member since" />
+							<DetailItemSkeleton label={t("fields.organization")} />
+							<DetailItemSkeleton label={t("fields.accountEmail")} />
+							<DetailItemSkeleton label={t("fields.primaryContact")} />
+							<DetailItemSkeleton label={t("fields.memberSince")} />
 						</div>
 						<div className="rounded-card border border-border bg-secondary/40 p-4">
 							<SettingsInlineSkeleton className="h-4 w-28" />
@@ -867,21 +899,24 @@ function ManagerOrganizationCard({
 					</>
 				) : account === null ? (
 					<p className="text-sm text-muted-foreground">
-						{errorMessage ?? "We could not load your organization details right now."}
+						{errorMessage ?? t("messages.loadFailed")}
 					</p>
 				) : (
 					<>
 						<div className="grid gap-4 sm:grid-cols-2">
-							<DetailItem label="Organization" value={account.name} />
-							<DetailItem label="Account email" value={account.email} />
-							<DetailItem label="Primary contact" value={primaryManagerProfile?.full_name ?? "Pending"} />
-							<DetailItem label="Member since" value={formatDateLabel(account.created_at)} />
+							<DetailItem label={t("fields.organization")} value={account.name} />
+							<DetailItem label={t("fields.accountEmail")} value={account.email} />
+							<DetailItem
+								label={t("fields.primaryContact")}
+								value={primaryManagerProfile?.full_name ?? t("values.pending")}
+							/>
+							<DetailItem label={t("fields.memberSince")} value={formatDateLabel(account.created_at, formatT)} />
 						</div>
 
 						{isEditingOrganization ? (
 							<div className="space-y-4 rounded-card border border-border bg-secondary/40 p-4">
 								<div className="grid gap-2">
-									<Label htmlFor="organization_name">Organization name</Label>
+									<Label htmlFor="organization_name">{t("fields.organizationName")}</Label>
 									<Input
 										id="organization_name"
 										name="organizationName"
@@ -891,7 +926,7 @@ function ManagerOrganizationCard({
 									/>
 								</div>
 								<div className="grid gap-2">
-									<Label htmlFor="organization_email">Account email</Label>
+									<Label htmlFor="organization_email">{t("fields.accountEmail")}</Label>
 									<Input
 										id="organization_email"
 										name="organizationEmail"
@@ -914,31 +949,30 @@ function ManagerOrganizationCard({
 								) : null}
 								<div className="flex flex-wrap gap-2">
 									<Button type="button" disabled={isPending} onClick={onSave}>
-										Save changes
+										{t("actions.saveChanges")}
 									</Button>
 									<Button type="button" variant="outline" onClick={onCancelEditing}>
-										Cancel
+										{t("actions.cancel")}
 									</Button>
 								</div>
 							</div>
 						) : (
 							<div className="rounded-card border border-border bg-secondary/40 p-4">
-								<p className="text-sm font-medium text-foreground">Primary contact</p>
+								<p className="text-sm font-medium text-foreground">{t("primaryContact.title")}</p>
 								{primaryManagerProfile ? (
 									<div className="mt-3 space-y-1">
 										<p className="text-sm text-foreground">{primaryManagerProfile.full_name}</p>
 										<p className="text-sm text-muted-foreground">
-											{primaryManagerProfile.position ?? "Position pending"}
+											{primaryManagerProfile.position ?? t("primaryContact.positionPending")}
 										</p>
 										<p className="text-sm text-muted-foreground">{primaryManagerProfile.email}</p>
 										<p className="text-sm text-muted-foreground">
-											{primaryManagerProfile.phone ?? "Phone pending"}
+											{primaryManagerProfile.phone ?? t("primaryContact.phonePending")}
 										</p>
 									</div>
 								) : (
 									<p className="mt-3 text-sm text-muted-foreground">
-										Primary contact information will appear here once the account owner is
-										configured.
+										{t("primaryContact.empty")}
 									</p>
 								)}
 							</div>
@@ -959,11 +993,13 @@ function ManagerContactsCard({
 	isLoading: boolean;
 	errorMessage: string | null;
 }>) {
+	const t = useTranslations("settings.managerContacts");
+
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle>Manager contacts</CardTitle>
-				<CardDescription>People with manager access to this workspace.</CardDescription>
+				<CardTitle>{t("title")}</CardTitle>
+				<CardDescription>{t("description")}</CardDescription>
 				<CardAction>
 					<Building2 className="h-4 w-4 text-primary" aria-hidden="true" />
 				</CardAction>
@@ -987,9 +1023,7 @@ function ManagerContactsCard({
 				) : errorMessage ? (
 					<p className="text-sm text-muted-foreground">{errorMessage}</p>
 				) : managerProfiles.length === 0 ? (
-					<p className="text-sm text-muted-foreground">
-						Manager contact information will appear here once the account roster is configured.
-					</p>
+					<p className="text-sm text-muted-foreground">{t("empty")}</p>
 				) : null}
 				{errorMessage
 					? null
@@ -1004,13 +1038,13 @@ function ManagerContactsCard({
 								<div className="flex flex-wrap items-center gap-2">
 									<p className="font-medium text-foreground">{profile.full_name}</p>
 									{profile.is_primary ? (
-										<Badge>Primary contact</Badge>
+										<Badge>{t("primaryContactBadge")}</Badge>
 									) : (
-										<Badge variant="secondary">Manager</Badge>
+										<Badge variant="secondary">{t("managerBadge")}</Badge>
 									)}
 								</div>
 								<p className="text-sm text-muted-foreground">
-									{profile.position ?? "Position pending"}
+									{profile.position ?? t("positionPending")}
 								</p>
 								<p className="text-sm text-muted-foreground">{profile.email}</p>
 							</div>
@@ -1025,17 +1059,19 @@ function ManagerContactsCard({
  * Administrator-only workspace summary.
  */
 function AdminWorkspaceCard() {
+	const t = useTranslations("settings.adminWorkspace");
+
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle>Administrator access</CardTitle>
-				<CardDescription>Global oversight across all accounts, places, and audits.</CardDescription>
+				<CardTitle>{t("title")}</CardTitle>
+				<CardDescription>{t("description")}</CardDescription>
 			</CardHeader>
 			<CardContent className="grid gap-4 sm:grid-cols-2">
-				<DetailItem label="Role" value="Administrator" />
-				<DetailItem label="Scope" value="Platform-wide" />
-				<DetailItem label="Email visibility" value="Manager emails only" />
-				<DetailItem label="Auditor identity" value="Auditor code first" />
+				<DetailItem label={t("fields.role")} value={t("values.role")} />
+				<DetailItem label={t("fields.scope")} value={t("values.scope")} />
+				<DetailItem label={t("fields.emailVisibility")} value={t("values.emailVisibility")} />
+				<DetailItem label={t("fields.auditorIdentity")} value={t("values.auditorIdentity")} />
 			</CardContent>
 		</Card>
 	);
@@ -1045,17 +1081,19 @@ function AdminWorkspaceCard() {
  * Auditor-only workspace summary.
  */
 function AuditorWorkspaceCard({ session }: Readonly<{ session: AuthSession }>) {
+	const t = useTranslations("settings.auditorWorkspace");
+
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle>Auditor access</CardTitle>
-				<CardDescription>Review the audit access tied to your current sign-in.</CardDescription>
+				<CardTitle>{t("title")}</CardTitle>
+				<CardDescription>{t("description")}</CardDescription>
 			</CardHeader>
 			<CardContent className="grid gap-4 sm:grid-cols-2">
-				<DetailItem label="Role" value="Auditor" />
-				<DetailItem label="Auditor code" value={session.auditorCode ?? "Code pending"} />
-				<DetailItem label="Workspace" value="Field audits" />
-				<DetailItem label="Access type" value="Assignment-based" />
+				<DetailItem label={t("fields.role")} value={t("values.role")} />
+				<DetailItem label={t("fields.auditorCode")} value={session.auditorCode ?? t("values.codePending")} />
+				<DetailItem label={t("fields.workspace")} value={t("values.workspace")} />
+				<DetailItem label={t("fields.accessType")} value={t("values.accessType")} />
 			</CardContent>
 		</Card>
 	);
@@ -1065,6 +1103,8 @@ export default function SettingsPage() {
 	const router = useRouter();
 	const session = useAuthSession();
 	const preferences = usePreferences();
+	const t = useTranslations("settings");
+	const formatT = useTranslations("common.format");
 
 	const isManager = session?.role === "manager";
 	const managerAccountId = isManager ? session.accountId : null;
@@ -1073,7 +1113,7 @@ export default function SettingsPage() {
 		queryKey: ["playspace", "settings", "account", managerAccountId],
 		queryFn: async () => {
 			if (!managerAccountId) {
-				throw new Error("Manager account context is unavailable.");
+				throw new Error(t("errors.accountContextUnavailable"));
 			}
 
 			return playspaceApi.accounts.get(managerAccountId);
@@ -1085,7 +1125,7 @@ export default function SettingsPage() {
 		queryKey: ["playspace", "settings", "account", managerAccountId, "managerProfiles"],
 		queryFn: async () => {
 			if (!managerAccountId) {
-				throw new Error("Manager account context is unavailable.");
+				throw new Error(t("errors.accountContextUnavailable"));
 			}
 
 			return playspaceApi.accounts.managerProfiles(managerAccountId);
@@ -1106,12 +1146,12 @@ export default function SettingsPage() {
 	return (
 		<div className="space-y-6">
 			<DashboardHeader
-				eyebrow="Workspace Settings"
-				title="Settings"
-				description="Manage your account summary, appearance, and accessibility preferences."
+				eyebrow={t("header.eyebrow")}
+				title={t("header.title")}
+				description={t("header.description")}
 				breadcrumbs={[
-					{ label: "Dashboard", href: getDashboardHref(session.role) },
-					{ label: "Settings" }
+					{ label: t("breadcrumbs.dashboard"), href: getDashboardHref(session.role) },
+					{ label: t("breadcrumbs.settings") }
 				]}
 				actions={<SettingsActionBar dashboardHref={getDashboardHref(session.role)} />}
 			/>
@@ -1121,6 +1161,7 @@ export default function SettingsPage() {
 					session={session}
 					managerAccount={managerAccount}
 					isLoading={session.role === "manager" && accountQuery.isLoading}
+					formatT={formatT}
 				/>
 				<SecurityCard
 					session={session}
@@ -1144,6 +1185,7 @@ export default function SettingsPage() {
 					managerProfilesIsLoading={managerProfilesQuery.isLoading}
 					accountErrorMessage={getErrorMessageFromUnknown(accountQuery.error)}
 					managerProfilesErrorMessage={getErrorMessageFromUnknown(managerProfilesQuery.error)}
+					formatT={formatT}
 				/>
 			) : session.role === "admin" ? (
 				<AdminWorkspaceCard />

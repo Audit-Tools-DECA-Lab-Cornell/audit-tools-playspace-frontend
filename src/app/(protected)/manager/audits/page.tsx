@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import { ClipboardListIcon, MapPinnedIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { playspaceApi } from "@/lib/api/playspace";
 import { useAuthSession } from "@/components/app/auth-session-provider";
@@ -22,6 +23,8 @@ function getErrorMessage(error: unknown): string {
 }
 
 export default function ManagerAuditsPage() {
+	const t = useTranslations("manager.audits");
+	const formatT = useTranslations("common.format");
 	const session = useAuthSession();
 	const accountId = session?.role === "manager" ? session.accountId : null;
 
@@ -72,16 +75,17 @@ export default function ManagerAuditsPage() {
 		return (
 			<div className="space-y-6">
 				<DashboardHeader
-					eyebrow="Manager Workspace"
-					title="Audits"
-					description="Track audit throughput and session health across your account."
-					breadcrumbs={[{ label: "Dashboard", href: "/manager/dashboard" }, { label: "Audits" }]}
+					eyebrow={t("header.eyebrow")}
+					title={t("header.title")}
+					description={t("header.description")}
+					breadcrumbs={[
+						{ label: t("breadcrumbs.dashboard"), href: "/manager/dashboard" },
+						{ label: t("breadcrumbs.audits") }
+					]}
 				/>
 				<Card>
 					<CardContent className="py-8">
-						<p className="text-sm text-muted-foreground">
-							Manager account context is missing from the current session.
-						</p>
+						<p className="text-sm text-muted-foreground">{t("missingAccount")}</p>
 					</CardContent>
 				</Card>
 			</div>
@@ -92,10 +96,13 @@ export default function ManagerAuditsPage() {
 		return (
 			<div className="space-y-6">
 				<DashboardHeader
-					eyebrow="Manager Workspace"
-					title="Audits"
-					description="Track audit throughput and session health across your account."
-					breadcrumbs={[{ label: "Dashboard", href: "/manager/dashboard" }, { label: "Audits" }]}
+					eyebrow={t("header.eyebrow")}
+					title={t("header.title")}
+					description={t("header.description")}
+					breadcrumbs={[
+						{ label: t("breadcrumbs.dashboard"), href: "/manager/dashboard" },
+						{ label: t("breadcrumbs.audits") }
+					]}
 				/>
 				<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
 					{Array.from({ length: 4 }).map((_, index) => (
@@ -113,11 +120,11 @@ export default function ManagerAuditsPage() {
 	if (auditsQuery.isError || !auditsQuery.data) {
 		return (
 			<EmptyState
-				title="Audits unavailable"
+				title={t("error.title")}
 				description={getErrorMessage(auditsQuery.error)}
 				action={
 					<Button type="button" onClick={() => globalThis.location.reload()}>
-						Try again
+						{t("error.retry")}
 					</Button>
 				}
 			/>
@@ -131,27 +138,30 @@ export default function ManagerAuditsPage() {
 	const meanScore =
 		scoredAudits.length > 0
 			? `${Math.round((scoredAudits.reduce((runningTotal, audit) => runningTotal + audit.score, 0) / scoredAudits.length) * 10) / 10}`
-			: "Pending";
+			: formatT("pending");
 
 	return (
 		<div className="space-y-6">
 			<DashboardHeader
-				eyebrow="Manager Workspace"
-				title="Audits"
-				description="Track audit throughput and session health across your account."
-				breadcrumbs={[{ label: "Dashboard", href: "/manager/dashboard" }, { label: "Audits" }]}
+				eyebrow={t("header.eyebrow")}
+				title={t("header.title")}
+				description={t("header.description")}
+				breadcrumbs={[
+					{ label: t("breadcrumbs.dashboard"), href: "/manager/dashboard" },
+					{ label: t("breadcrumbs.audits") }
+				]}
 				actions={
 					<div className="flex flex-wrap items-center gap-2">
 						<Button asChild variant="outline">
 							<Link href="/manager/places" className="gap-2">
 								<MapPinnedIcon className="size-4" />
-								<span>Open places</span>
+								<span>{t("header.actions.openPlaces")}</span>
 							</Link>
 						</Button>
 						<Button asChild variant="outline">
 							<Link href="/manager/assignments" className="gap-2">
 								<ClipboardListIcon className="size-4" />
-								<span>Manage assignments</span>
+								<span>{t("header.actions.manageAssignments")}</span>
 							</Link>
 						</Button>
 					</div>
@@ -159,37 +169,37 @@ export default function ManagerAuditsPage() {
 			/>
 			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
 				<StatCard
-					title="Total Audits"
+					title={t("stats.totalAudits.title")}
 					value={String(audits.length)}
-					helper="All audit sessions discovered across manager places."
+					helper={t("stats.totalAudits.helper")}
 				/>
 				<StatCard
-					title="Submitted"
+					title={t("stats.submitted.title")}
 					value={String(submittedAudits)}
-					helper="Sessions that have been completed and submitted."
+					helper={t("stats.submitted.helper")}
 					tone="success"
 				/>
 				<StatCard
-					title="In Progress"
+					title={t("stats.inProgress.title")}
 					value={String(inProgressAudits)}
-					helper="Sessions still being worked on or paused."
+					helper={t("stats.inProgress.helper")}
 					tone="warning"
 				/>
 				<StatCard
-					title="Mean Score"
+					title={t("stats.meanScore.title")}
 					value={meanScore}
-					helper="Average across submitted sessions with scoring."
+					helper={t("stats.meanScore.helper")}
 					tone="violet"
 				/>
 			</div>
 			<AuditsTable
 				rows={audits}
-				title="Audit Activity"
-				description="Search and filter audit sessions across projects and places."
+				title={t("table.title")}
+				description={t("table.description")}
 				emptyMessage={
 					audits.length === 0
-						? "No audits yet. Assign auditors to a project or place, then ask them to start the first audit."
-						: "No audits match the current filters."
+						? t("table.emptyState.noAudits")
+						: t("table.emptyState.noMatches")
 				}
 			/>
 		</div>

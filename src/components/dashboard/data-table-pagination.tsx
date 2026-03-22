@@ -2,6 +2,7 @@
 
 import type { Table } from "@tanstack/react-table";
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import { Select, SelectItem, SelectContent, SelectTrigger, SelectValue } from "../ui/select";
@@ -18,6 +19,7 @@ export function DataTablePagination<TData>({
 	table,
 	pageSizeOptions = [5, 10, 20, 50, 100]
 }: Readonly<DataTablePaginationProps<TData>>) {
+	const t = useTranslations("tables.shared.pagination");
 	const totalFilteredRows = table.getFilteredRowModel().rows.length;
 	const { pageIndex, pageSize } = table.getState().pagination;
 	const startRow = totalFilteredRows === 0 ? 0 : pageIndex * pageSize + 1;
@@ -26,17 +28,17 @@ export function DataTablePagination<TData>({
 	return (
 		<div className="flex flex-col border-t border-border/70 px-6 py-4 lg:flex-row lg:items-center lg:justify-between">
 			<div className="text-sm text-muted-foreground flex-1">
-				Showing {startRow} to {endRow} of {totalFilteredRows} results
+				{t("showing", { start: startRow, end: endRow, total: totalFilteredRows })}
 			</div>
 			<div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end sm:gap-2">
 				<div className="inline-flex min-w-max items-center gap-3 text-sm text-muted-foreground whitespace-nowrap">
-					<span className="text-sm text-muted-foreground whitespace-nowrap">Rows per page</span>
+					<span className="text-sm text-muted-foreground whitespace-nowrap">{t("rowsPerPage")}</span>
 					<Select
 						value={pageSize.toString()}
 						onValueChange={value => table.setPageSize(Number(value))}
 					>
 						<SelectTrigger>
-							<SelectValue placeholder="Rows per page" />
+							<SelectValue placeholder={t("rowsPerPage")} />
 						</SelectTrigger>
 						<SelectContent>
 							{pageSizeOptions.map(option => (
@@ -59,7 +61,7 @@ export function DataTablePagination<TData>({
 						{/* <span>Previous</span> */}
 					</Button>
 					<div className="min-w-max text-center text-sm text-muted-foreground tabular-nums">
-						Page {pageIndex + 1} of {Math.max(1, table.getPageCount())}
+						{t("page", { current: pageIndex + 1, total: Math.max(1, table.getPageCount()) })}
 					</div>
 					<Button
 						type="button"

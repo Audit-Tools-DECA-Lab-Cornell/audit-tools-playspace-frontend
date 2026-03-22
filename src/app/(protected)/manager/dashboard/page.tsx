@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 
 import { playspaceApi, type AccountDetail, type AuditorSummary, type ManagerProfile } from "@/lib/api/playspace";
 import { useAuthSession } from "@/components/app/auth-session-provider";
@@ -19,12 +20,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const LOADING_STAT_CARD_IDS = ["projects", "places", "auditors", "audits"] as const;
 
-function getErrorMessage(error: unknown): string {
+function getErrorMessage(error: unknown, fallbackMessage: string): string {
 	if (error instanceof Error) {
 		return error.message;
 	}
 
-	return "Something went wrong while loading the dashboard.";
+	return fallbackMessage;
 }
 
 function LoadingState() {
@@ -65,11 +66,13 @@ function OverviewPanels({
 	managerProfiles: ManagerProfile[];
 	auditors: AuditorSummary[];
 }>) {
+	const t = useTranslations("manager.dashboard.overview");
+
 	return (
 		<div className="grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
 			<Card>
 				<CardHeader>
-					<CardTitle>Primary manager</CardTitle>
+					<CardTitle>{t("primaryManager.title")}</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-4">
 					{account.primary_manager ? (
@@ -79,29 +82,29 @@ function OverviewPanels({
 									{account.primary_manager.full_name}
 								</p>
 								<p className="text-sm text-muted-foreground">
-									{account.primary_manager.position ?? "Position pending"}
+									{account.primary_manager.position ?? t("primaryManager.positionPending")}
 								</p>
 								<p className="text-sm text-muted-foreground">{account.primary_manager.email}</p>
 								<p className="text-sm text-muted-foreground">
-									{account.primary_manager.phone ?? "Phone pending"}
+									{account.primary_manager.phone ?? t("primaryManager.phonePending")}
 								</p>
 							</div>
-							<p className="text-sm text-muted-foreground">Account email: {account.email}</p>
+							<p className="text-sm text-muted-foreground">{t("primaryManager.accountEmail", { email: account.email })}</p>
 						</>
 					) : (
-						<p className="text-sm text-muted-foreground">No primary manager profile has been added yet.</p>
+						<p className="text-sm text-muted-foreground">{t("primaryManager.empty")}</p>
 					)}
 				</CardContent>
 			</Card>
 
 			<Card>
 				<CardHeader>
-					<CardTitle>Team snapshot</CardTitle>
+					<CardTitle>{t("teamSnapshot.title")}</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-4">
 					<div className="flex flex-wrap gap-2">
-						<Badge variant="outline">{managerProfiles.length} managers</Badge>
-						<Badge variant="outline">{auditors.length} auditors</Badge>
+						<Badge variant="outline">{t("teamSnapshot.managerCount", { count: managerProfiles.length })}</Badge>
+						<Badge variant="outline">{t("teamSnapshot.auditorCount", { count: auditors.length })}</Badge>
 					</div>
 					<div className="space-y-3">
 						{managerProfiles.map(profile => {
@@ -112,13 +115,13 @@ function OverviewPanels({
 									<div className="space-y-1">
 										<p className="font-medium text-foreground">{profile.full_name}</p>
 										<p className="text-sm text-muted-foreground">
-											{profile.position ?? "Position pending"}
+											{profile.position ?? t("teamSnapshot.positionPending")}
 										</p>
 									</div>
 									{profile.is_primary ? (
-										<Badge>Primary</Badge>
+										<Badge>{t("teamSnapshot.primary")}</Badge>
 									) : (
-										<Badge variant="secondary">Manager</Badge>
+										<Badge variant="secondary">{t("teamSnapshot.manager")}</Badge>
 									)}
 								</div>
 							);
@@ -131,6 +134,8 @@ function OverviewPanels({
 }
 
 export default function ManagerDashboardPage() {
+	const t = useTranslations("manager.dashboard");
+	const formatT = useTranslations("common.format");
 	const session = useAuthSession();
 	const accountId = session?.role === "manager" ? session.accountId : null;
 
@@ -138,7 +143,7 @@ export default function ManagerDashboardPage() {
 		queryKey: ["playspace", "account", accountId],
 		queryFn: async () => {
 			if (!accountId) {
-				throw new Error("Manager account context is unavailable.");
+				throw new Error(t("errors.accountContextUnavailable"));
 			}
 			return playspaceApi.accounts.get(accountId);
 		},
@@ -149,7 +154,7 @@ export default function ManagerDashboardPage() {
 		queryKey: ["playspace", "account", accountId, "managerProfiles"],
 		queryFn: async () => {
 			if (!accountId) {
-				throw new Error("Manager account context is unavailable.");
+				throw new Error(t("errors.accountContextUnavailable"));
 			}
 			return playspaceApi.accounts.managerProfiles(accountId);
 		},
@@ -160,7 +165,7 @@ export default function ManagerDashboardPage() {
 		queryKey: ["playspace", "account", accountId, "projects"],
 		queryFn: async () => {
 			if (!accountId) {
-				throw new Error("Manager account context is unavailable.");
+				throw new Error(t("errors.accountContextUnavailable"));
 			}
 			return playspaceApi.accounts.projects(accountId);
 		},
@@ -171,7 +176,7 @@ export default function ManagerDashboardPage() {
 		queryKey: ["playspace", "account", accountId, "auditors"],
 		queryFn: async () => {
 			if (!accountId) {
-				throw new Error("Manager account context is unavailable.");
+				throw new Error(t("errors.accountContextUnavailable"));
 			}
 			return playspaceApi.accounts.auditors(accountId);
 		},
@@ -181,8 +186,8 @@ export default function ManagerDashboardPage() {
 	if (!accountId) {
 		return (
 			<EmptyState
-				title="Dashboard unavailable"
-				description="Manager account context is missing from the current session."
+				title={t("emptyState.title")}
+				description={t("emptyState.missingAccount")}
 			/>
 		);
 	}
@@ -201,11 +206,11 @@ export default function ManagerDashboardPage() {
 
 		return (
 			<EmptyState
-				title="Dashboard unavailable"
-				description={getErrorMessage(error)}
+				title={t("emptyState.title")}
+				description={getErrorMessage(error, t("errors.loadFailed"))}
 				action={
 					<Button type="button" onClick={() => globalThis.location.reload()}>
-						Try again
+						{t("actions.tryAgain")}
 					</Button>
 				}
 			/>
@@ -225,38 +230,38 @@ export default function ManagerDashboardPage() {
 	return (
 		<div className="space-y-6">
 			<DashboardHeader
-				eyebrow="Manager Dashboard"
+				eyebrow={t("header.eyebrow")}
 				title={account.name}
-				description="Shared account-level view across projects, places, auditors, and recent submissions."
+				description={t("header.description")}
 				actions={
 					<Button asChild>
-						<Link href="/manager/projects">View projects</Link>
+						<Link href="/manager/projects">{t("header.viewProjects")}</Link>
 					</Button>
 				}
 			/>
 
 			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
 				<StatCard
-					title="Projects"
+					title={t("stats.projects.title")}
 					value={String(account.stats.total_projects)}
-					helper="Active and planned projects in this account."
+					helper={t("stats.projects.helper")}
 				/>
 				<StatCard
-					title="Places"
+					title={t("stats.places.title")}
 					value={String(account.stats.total_places)}
-					helper="Total places connected to those projects."
+					helper={t("stats.places.helper")}
 					tone="violet"
 				/>
 				<StatCard
-					title="Auditors"
+					title={t("stats.auditors.title")}
 					value={String(account.stats.total_auditors)}
-					helper="Auditors currently assigned under this account."
+					helper={t("stats.auditors.helper")}
 					tone="warning"
 				/>
 				<StatCard
-					title="Completed Audits"
+					title={t("stats.completedAudits.title")}
 					value={String(account.stats.total_audits_completed)}
-					helper="Submitted audits available for review and reporting."
+					helper={t("stats.completedAudits.helper")}
 					tone="success"
 				/>
 			</div>
@@ -267,34 +272,31 @@ export default function ManagerDashboardPage() {
 				<Tabs defaultValue={projects.length > 0 ? "projects" : "auditors"} className="gap-4">
 					<div className="flex flex-wrap items-center justify-between gap-3">
 						<TabsList>
-							<TabsTrigger value="projects">Projects</TabsTrigger>
-							<TabsTrigger value="auditors">Auditors</TabsTrigger>
+							<TabsTrigger value="projects">{t("tabs.projects")}</TabsTrigger>
+							<TabsTrigger value="auditors">{t("tabs.auditors")}</TabsTrigger>
 						</TabsList>
-						<p className="text-sm text-muted-foreground">
-							Focus on the highest-signal rows here, then open the full worklists when you need more
-							detail.
-						</p>
+						<p className="text-sm text-muted-foreground">{t("tabs.description")}</p>
 					</div>
 					<TabsContent value="projects">
 						{projects.length > 0 ? (
 							<ProjectsTable
 								projects={projects}
-								title="Project overview"
-								description="Highest-signal projects for daily monitoring."
+								title={t("projectOverview.title")}
+								description={t("projectOverview.description")}
 								pageSize={5}
 								action={
 									<Button asChild size="sm" variant="outline" className="h-9 gap-2 px-3.5">
-										<Link href="/manager/projects">View all projects</Link>
+										<Link href="/manager/projects">{t("projectOverview.viewAll")}</Link>
 									</Button>
 								}
 							/>
 						) : (
 							<EmptyState
-								title="No projects yet"
-								description="Projects will appear here once the team starts creating audit workstreams."
+								title={t("projectOverview.emptyTitle")}
+								description={t("projectOverview.emptyDescription")}
 								action={
 									<Button asChild variant="outline">
-										<Link href="/manager/projects">Open projects</Link>
+										<Link href="/manager/projects">{t("projectOverview.openProjects")}</Link>
 									</Button>
 								}
 							/>
@@ -304,22 +306,22 @@ export default function ManagerDashboardPage() {
 						{auditors.length > 0 ? (
 							<AuditorsTable
 								auditors={auditors}
-								title="Assigned auditors"
-								description="Current roster activity and assignment load."
+								title={t("auditorOverview.title")}
+								description={t("auditorOverview.description")}
 								pageSize={5}
 								action={
 									<Button asChild size="sm" variant="outline">
-										<Link href="/manager/auditors">View all auditors</Link>
+										<Link href="/manager/auditors">{t("auditorOverview.viewAll")}</Link>
 									</Button>
 								}
 							/>
 						) : (
 							<EmptyState
-								title="No auditors assigned"
-								description="Invite or assign auditors to see role, workload, and activity here."
+								title={t("auditorOverview.emptyTitle")}
+								description={t("auditorOverview.emptyDescription")}
 								action={
 									<Button asChild variant="outline">
-										<Link href="/manager/auditors">Open auditors</Link>
+										<Link href="/manager/auditors">{t("auditorOverview.openAuditors")}</Link>
 									</Button>
 								}
 							/>
@@ -328,10 +330,10 @@ export default function ManagerDashboardPage() {
 				</Tabs>
 				<Card>
 					<CardHeader>
-						<CardTitle>Recent activity</CardTitle>
+						<CardTitle>{t("recentActivity.title")}</CardTitle>
 						<CardAction>
 							<Button asChild size="sm" variant="outline">
-								<Link href="/manager/audits">View all audits</Link>
+								<Link href="/manager/audits">{t("recentActivity.viewAll")}</Link>
 							</Button>
 						</CardAction>
 					</CardHeader>
@@ -351,22 +353,22 @@ export default function ManagerDashboardPage() {
 													className="rounded-md bg-muted/65 px-2 py-1 font-mono text-[11px] tracking-[0.04em] text-foreground/80">
 													{formatAuditCodeReference(activity.audit_code)}
 												</code>
-												<span>{formatDateTimeLabel(activity.completed_at)}</span>
+												<span>{formatDateTimeLabel(activity.completed_at, formatT)}</span>
 											</div>
 										</div>
 										<div className="flex items-center justify-between gap-2">
 											<Badge variant="secondary" className="font-medium">
-												Submitted
+												{t("recentActivity.submitted")}
 											</Badge>
 											<Badge className="font-mono tabular-nums">
-												{formatScoreLabel(activity.score)}
+												{formatScoreLabel(activity.score, formatT)}
 											</Badge>
 										</div>
 									</div>
 								);
 							})
 						) : (
-							<p className="text-sm text-muted-foreground">No submitted audits yet.</p>
+							<p className="text-sm text-muted-foreground">{t("recentActivity.empty")}</p>
 						)}
 					</CardContent>
 				</Card>

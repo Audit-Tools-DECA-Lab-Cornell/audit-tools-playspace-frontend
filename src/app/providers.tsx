@@ -2,7 +2,6 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as React from "react";
-import { NextIntlClientProvider } from "next-intl";
 
 import { PreferencesProvider } from "@/components/app/preferences-provider";
 
@@ -30,10 +29,8 @@ export function Providers({ children }: Readonly<ProvidersProps>) {
 	});
 
 	return (
-		<NextIntlClientProvider locale="en">
-			<PreferencesProvider>
-				<QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-			</PreferencesProvider>
-		</NextIntlClientProvider>
+		<PreferencesProvider>
+			<QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+		</PreferencesProvider>
 	);
 }

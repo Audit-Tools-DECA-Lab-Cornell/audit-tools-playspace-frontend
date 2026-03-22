@@ -3,6 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import type { ColumnDef } from "@tanstack/react-table";
+import { useTranslations } from "next-intl";
 
 import type { ProjectSummary } from "@/lib/api/playspace";
 import { Badge } from "@/components/ui/badge";
@@ -32,18 +33,20 @@ export interface ProjectsTableProps {
 export function ProjectsTable({
 	projects,
 	basePath = "/manager/projects",
-	title = "Projects",
-	description = "Track project scope, operational status, and delivery health.",
+	title,
+	description,
 	action,
 	getRowActions,
 	pageSize = 8,
-	emptyMessage = "No projects match the current filters."
+	emptyMessage
 }: Readonly<ProjectsTableProps>) {
+	const t = useTranslations("tables.projects");
+	const formatT = useTranslations("common.format");
 	const columns = React.useMemo<ColumnDef<ProjectSummary>[]>(
 		() => [
 			{
 				accessorKey: "name",
-				header: ({ column }) => <DataTableColumnHeader column={column} title="Project" />,
+				header: ({ column }) => <DataTableColumnHeader column={column} title={t("columns.project")} />,
 				cell: ({ row }) => {
 					const project = row.original;
 
@@ -55,7 +58,7 @@ export function ProjectsTable({
 								{project.name}
 							</Link>
 							<p className="max-w-xl text-sm text-muted-foreground">
-								{project.overview ?? "Overview pending."}
+								{project.overview ?? t("overviewPending")}
 							</p>
 						</div>
 					);
@@ -63,12 +66,12 @@ export function ProjectsTable({
 			},
 			{
 				accessorKey: "place_types",
-				header: ({ column }) => <DataTableColumnHeader column={column} title="Place Types" />,
+				header: ({ column }) => <DataTableColumnHeader column={column} title={t("columns.placeTypes")} />,
 				filterFn: getMultiValueFilterFn<ProjectSummary>(),
 				cell: ({ row }) => {
 					const placeTypes = row.original.place_types;
 					if (placeTypes.length === 0) {
-						return <span className="text-sm text-muted-foreground">Not specified</span>;
+						return <span className="text-sm text-muted-foreground">{t("notSpecified")}</span>;
 					}
 
 					return (
@@ -85,7 +88,7 @@ export function ProjectsTable({
 			},
 			{
 				accessorKey: "status",
-				header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
+				header: ({ column }) => <DataTableColumnHeader column={column} title={t("columns.status")} />,
 				filterFn: getMultiValueFilterFn<ProjectSummary>(),
 				cell: ({ row }) => (
 					<Badge
@@ -94,17 +97,17 @@ export function ProjectsTable({
 							getProjectStatusClassName(row.original.status),
 							"min-w-[110px] font-medium justify-center"
 						)}>
-						{row.original.status}
+						{t(`status.${row.original.status}`)}
 					</Badge>
 				)
 			},
 			{
 				id: "date_range",
 				accessorFn: project => `${project.start_date ?? ""}|${project.end_date ?? ""}`,
-				header: ({ column }) => <DataTableColumnHeader column={column} title="Dates" align="end" />,
+				header: ({ column }) => <DataTableColumnHeader column={column} title={t("columns.dates")} align="end" />,
 				cell: ({ row }) => (
 					<span className="block min-w-[150px] text-right text-sm text-muted-foreground tabular-nums">
-						{formatProjectDateRange(row.original)}
+						{formatProjectDateRange(row.original, formatT)}
 					</span>
 				),
 				sortingFn: (leftRow, rightRow) => {
@@ -116,20 +119,20 @@ export function ProjectsTable({
 			{
 				id: "coverage",
 				accessorFn: project => project.places_count,
-				header: ({ column }) => <DataTableColumnHeader column={column} title="Coverage" align="end" />,
+				header: ({ column }) => <DataTableColumnHeader column={column} title={t("columns.coverage")} align="end" />,
 				cell: ({ row }) => (
 					<div className="min-w-[140px] text-right text-sm text-muted-foreground tabular-nums">
-						<p>{row.original.places_count} places</p>
-						<p>{row.original.auditors_count} auditors</p>
+						<p>{t("coverage.places", { count: row.original.places_count })}</p>
+						<p>{t("coverage.auditors", { count: row.original.auditors_count })}</p>
 					</div>
 				)
 			},
 			{
 				accessorKey: "average_score",
-				header: ({ column }) => <DataTableColumnHeader column={column} title="Mean Score" align="end" />,
+				header: ({ column }) => <DataTableColumnHeader column={column} title={t("columns.meanScore")} align="end" />,
 				cell: ({ row }) => (
 					<span className="block min-w-[110px] text-right font-mono text-foreground tabular-nums">
-						{formatScoreLabel(row.original.average_score)}
+						{formatScoreLabel(row.original.average_score, formatT)}
 					</span>
 				)
 			},
@@ -144,7 +147,7 @@ export function ProjectsTable({
 					]
 				: [])
 		],
-		[basePath, getRowActions]
+		[basePath, formatT, getRowActions, t]
 	);
 
 	const placeTypeOptions = React.useMemo(() => {
@@ -160,34 +163,34 @@ export function ProjectsTable({
 
 	const statusOptions = React.useMemo(() => {
 		return Array.from(new Set(projects.map(project => project.status))).map(status => ({
-			label: status,
+			label: t(`status.${status}`),
 			value: status
 		}));
-	}, [projects]);
+	}, [projects, t]);
 
 	return (
 		<DataTable
-			title={title}
-			description={description}
+			title={title ?? t("title")}
+			description={description ?? t("description")}
 			columns={columns}
 			data={projects}
 			searchColumnId="name"
-			searchPlaceholder="Search projects..."
+			searchPlaceholder={t("searchPlaceholder")}
 			filterConfigs={[
 				{
 					columnId: "status",
-					title: "Status",
+					title: t("columns.status"),
 					options: statusOptions
 				},
 				{
 					columnId: "place_types",
-					title: "Place types",
+					title: t("columns.placeTypes"),
 					options: placeTypeOptions
 				}
 			]}
 			action={action}
 			pageSize={pageSize}
-			emptyMessage={emptyMessage}
+			emptyMessage={emptyMessage ?? t("emptyMessage")}
 			initialSorting={[{ id: "name", desc: false }]}
 		/>
 	);

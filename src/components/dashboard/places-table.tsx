@@ -3,6 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import type { ColumnDef } from "@tanstack/react-table";
+import { useTranslations } from "next-intl";
 
 import type { PlaceSummary } from "@/lib/api/playspace";
 import { Badge } from "@/components/ui/badge";
@@ -31,19 +32,21 @@ export interface PlacesTableProps {
  */
 export function PlacesTable({
 	places,
-	title = "Places",
-	description = "Monitor place status, audit throughput, and recency at a glance.",
+	title,
+	description,
 	basePath = "/manager/places",
 	action,
 	getRowActions,
 	pageSize = 8,
-	emptyMessage = "No places match the current filters."
+	emptyMessage
 }: Readonly<PlacesTableProps>) {
+	const t = useTranslations("tables.places");
+	const formatT = useTranslations("common.format");
 	const columns = React.useMemo<ColumnDef<PlaceSummary>[]>(
 		() => [
 			{
 				accessorKey: "name",
-				header: ({ column }) => <DataTableColumnHeader column={column} title="Place" />,
+				header: ({ column }) => <DataTableColumnHeader column={column} title={t("columns.place")} />,
 				cell: ({ row }) => {
 					const place = row.original;
 
@@ -54,37 +57,37 @@ export function PlacesTable({
 								className="font-medium text-foreground transition-colors hover:text-primary">
 								{place.name}
 							</Link>
-							<p className="text-sm text-muted-foreground">{formatLocationLabel(place)}</p>
+							<p className="text-sm text-muted-foreground">{formatLocationLabel(place, formatT)}</p>
 						</div>
 					);
 				}
 			},
 			{
 				accessorKey: "place_type",
-				header: ({ column }) => <DataTableColumnHeader column={column} title="Type" />,
+				header: ({ column }) => <DataTableColumnHeader column={column} title={t("columns.type")} />,
 				filterFn: getMultiValueFilterFn<PlaceSummary>(),
 				cell: ({ row }) =>
 					row.original.place_type ? (
 						<Badge variant="secondary">{row.original.place_type}</Badge>
 					) : (
-						<span className="text-sm text-muted-foreground">Type pending</span>
+						<span className="text-sm text-muted-foreground">{t("typePending")}</span>
 					)
 			},
 			{
 				accessorKey: "status",
-				header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
+				header: ({ column }) => <DataTableColumnHeader column={column} title={t("columns.status")} />,
 				filterFn: getMultiValueFilterFn<PlaceSummary>(),
 				cell: ({ row }) => (
 					<Badge
 						variant="outline"
 						className={cn(getPlaceStatusClassName(row.original.status), "font-medium")}>
-						{row.original.status.replaceAll("_", " ")}
+						{t(`status.${row.original.status}`)}
 					</Badge>
 				)
 			},
 			{
 				accessorKey: "audits_completed",
-				header: ({ column }) => <DataTableColumnHeader column={column} title="Audits" align="end" />,
+				header: ({ column }) => <DataTableColumnHeader column={column} title={t("columns.audits")} align="end" />,
 				cell: ({ row }) => (
 					<span className="block text-right font-mono text-foreground tabular-nums">
 						{row.original.audits_completed}
@@ -93,19 +96,21 @@ export function PlacesTable({
 			},
 			{
 				accessorKey: "average_score",
-				header: ({ column }) => <DataTableColumnHeader column={column} title="Mean Score" align="end" />,
+				header: ({ column }) => <DataTableColumnHeader column={column} title={t("columns.meanScore")} align="end" />,
 				cell: ({ row }) => (
 					<span className="block text-right font-mono text-foreground tabular-nums">
-						{formatScoreLabel(row.original.average_score)}
+						{formatScoreLabel(row.original.average_score, formatT)}
 					</span>
 				)
 			},
 			{
 				accessorKey: "last_audited_at",
-				header: ({ column }) => <DataTableColumnHeader column={column} title="Last Audited" align="end" />,
+				header: ({ column }) => (
+					<DataTableColumnHeader column={column} title={t("columns.lastAudited")} align="end" />
+				),
 				cell: ({ row }) => (
 					<span className="block text-right text-sm text-muted-foreground tabular-nums">
-						{formatDateTimeLabel(row.original.last_audited_at)}
+						{formatDateTimeLabel(row.original.last_audited_at, formatT)}
 					</span>
 				)
 			},
@@ -120,15 +125,15 @@ export function PlacesTable({
 					]
 				: [])
 		],
-		[basePath, getRowActions]
+		[basePath, formatT, getRowActions, t]
 	);
 
 	const statusOptions = React.useMemo(() => {
 		return Array.from(new Set(places.map(place => place.status))).map(status => ({
-			label: status.replaceAll("_", " "),
+			label: t(`status.${status}`),
 			value: status
 		}));
-	}, [places]);
+	}, [places, t]);
 
 	const placeTypeOptions = React.useMemo(() => {
 		return Array.from(
@@ -143,27 +148,27 @@ export function PlacesTable({
 
 	return (
 		<DataTable
-			title={title}
-			description={description}
+			title={title ?? t("title")}
+			description={description ?? t("description")}
 			columns={columns}
 			data={places}
 			searchColumnId="name"
-			searchPlaceholder="Search places..."
+			searchPlaceholder={t("searchPlaceholder")}
 			filterConfigs={[
 				{
 					columnId: "status",
-					title: "Status",
+					title: t("columns.status"),
 					options: statusOptions
 				},
 				{
 					columnId: "place_type",
-					title: "Type",
+					title: t("columns.type"),
 					options: placeTypeOptions
 				}
 			]}
 			action={action}
 			pageSize={pageSize}
-			emptyMessage={emptyMessage}
+			emptyMessage={emptyMessage ?? t("emptyMessage")}
 			initialSorting={[{ id: "last_audited_at", desc: true }]}
 		/>
 	);

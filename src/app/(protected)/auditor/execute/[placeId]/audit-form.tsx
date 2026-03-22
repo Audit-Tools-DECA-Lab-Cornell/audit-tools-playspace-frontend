@@ -3,10 +3,11 @@
 import { useMutation, useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 import { CheckCircle2Icon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 
 import { playspaceApi, type AuditDraftPatch, type AuditSession } from "@/lib/api/playspace";
-import { BASE_PLAYSPACE_INSTRUMENT } from "@/lib/instrument";
+import { useLocalizedInstrument } from "@/lib/instrument-translations";
 import {
 	buildNextQuestionAnswers,
 	getInstrumentSectionLocalProgress,
@@ -16,7 +17,14 @@ import {
 } from "@/lib/audit/selectors";
 import { BackButton } from "@/components/dashboard/back-button";
 import { formatAuditCodeReference } from "@/components/dashboard/utils";
-import type { ExecutionMode, InstrumentQuestion, InstrumentSection, PreAuditQuestion } from "@/types/audit";
+import type {
+	AssignmentRole,
+	ExecutionMode,
+	InstrumentQuestion,
+	InstrumentSection,
+	PlayspaceInstrument,
+	PreAuditQuestion
+} from "@/types/audit";
 import { AuditQuestionCard } from "@/components/audit/question-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -44,6 +52,8 @@ interface SectionProgressRow {
 		readonly isComplete: boolean;
 	};
 }
+
+type ExecuteTranslator = (key: string, values?: Record<string, string | number>) => string;
 
 /**
  * Format a save timestamp for status messaging.
@@ -78,10 +88,13 @@ function readMultiValue(value: string | string[] | undefined): string[] {
 /**
  * Clone nested section response maps from one audit session.
  */
-function createSectionDrafts(auditSession: AuditSession): Record<string, SectionDraftState> {
+function createSectionDrafts(
+	auditSession: AuditSession,
+	instrument: PlayspaceInstrument
+): Record<string, SectionDraftState> {
 	const drafts: Record<string, SectionDraftState> = {};
 
-	for (const section of BASE_PLAYSPACE_INSTRUMENT.sections) {
+	for (const section of instrument.sections) {
 		const storedSection = auditSession.sections[section.section_key];
 		const responses = Object.fromEntries(
 			Object.entries(storedSection?.responses ?? {}).map(([questionKey, questionAnswers]) => [
@@ -97,6 +110,13 @@ function createSectionDrafts(auditSession: AuditSession): Record<string, Section
 	}
 
 	return drafts;
+}
+
+/**
+ * Format assignment roles with localized labels.
+ */
+function formatAssignmentRoleLabel(role: AssignmentRole, t: ExecuteTranslator): string {
+	return t(`roles.${role}`);
 }
 
 /**
@@ -132,7 +152,7 @@ function buildDraftPatchFromState(input: {
 /**
  * Format audit timestamps and computed auto fields for display.
  */
-function formatAutoValue(questionKey: string, auditSession: AuditSession): string {
+function formatAutoValue(questionKey: string, auditSession: AuditSession, t: ExecuteTranslator): string {
 	const startedAt = new Date(auditSession.started_at);
 	const submittedAt = auditSession.submitted_at ? new Date(auditSession.submitted_at) : null;
 
@@ -147,13 +167,13 @@ function formatAutoValue(questionKey: string, auditSession: AuditSession): strin
 	if (questionKey === "submitted_at") {
 		return submittedAt
 			? submittedAt.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })
-			: "Generated on submit";
+			: t("preAudit.auto.generatedOnSubmit");
 	}
 
 	if (questionKey === "total_minutes") {
 		return auditSession.total_minutes === null
-			? "Calculated on submit"
-			: `${String(auditSession.total_minutes)} minutes`;
+			? t("preAudit.auto.calculatedOnSubmit")
+			: t("preAudit.auto.minutes", { count: auditSession.total_minutes });
 	}
 
 	return "";
@@ -168,6 +188,8 @@ function getInitialActiveSectionKey(sectionRows: readonly SectionProgressRow[]):
 }
 
 export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
+	const t = useTranslations("auditor.execute");
+	const instrument = useLocalizedInstrument();
 	const [selectedMode, setSelectedMode] = React.useState<ExecutionModeSelection>("");
 	const [activeSectionKey, setActiveSectionKey] = React.useState<string | null>(null);
 	const [session, setSession] = React.useState<AuditSession | null>(null);
@@ -198,7 +220,7 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 			incomingSession.meta.execution_mode ??
 			(incomingSession.allowed_execution_modes.length === 1 ? incomingSession.allowed_execution_modes[0] : "");
 		const nextPreAuditValues = getPreAuditValues(incomingSession);
-		const nextSectionDrafts = createSectionDrafts(incomingSession);
+		const nextSectionDrafts = createSectionDrafts(incomingSession, instrument);
 
 		initializedAuditIdRef.current = incomingSession.audit_id;
 		lastQueuedJsonRef.current = JSON.stringify(
@@ -213,7 +235,7 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 		setPreAuditValues(nextPreAuditValues);
 		setSectionDrafts(nextSectionDrafts);
 		setSaveError(null);
-	}, [createOrResumeQuery.data]);
+	}, [createOrResumeQuery.data, instrument]);
 
 	const patchDraft = useMutation({
 		mutationFn: async (input: { auditId: string; patch: AuditDraftPatch }) =>
@@ -224,7 +246,7 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 			setSaveError(null);
 		},
 		onError: error => {
-			setSaveError(error instanceof Error ? error.message : "Auto-save failed.");
+			setSaveError(error instanceof Error ? error.message : t("errors.autoSaveFailed"));
 		}
 	});
 
@@ -236,7 +258,7 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 			setSaveError(null);
 		},
 		onError: error => {
-			setSaveError(error instanceof Error ? error.message : "Submit failed.");
+			setSaveError(error instanceof Error ? error.message : t("errors.submitFailed"));
 		}
 	});
 
@@ -273,8 +295,8 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 
 	const executionMode = selectedMode === "" ? null : selectedMode;
 	const visibleSections = React.useMemo(() => {
-		return getVisibleSections(BASE_PLAYSPACE_INSTRUMENT, executionMode);
-	}, [executionMode]);
+		return getVisibleSections(instrument, executionMode);
+	}, [executionMode, instrument]);
 
 	const sectionRows = React.useMemo<SectionProgressRow[]>(() => {
 		return visibleSections.map(section => ({
@@ -325,7 +347,7 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 			: null;
 
 	const requiredPreAuditComplete = isRequiredPreAuditComplete(
-		BASE_PLAYSPACE_INSTRUMENT.pre_audit_questions,
+		instrument.pre_audit_questions,
 		preAuditValues
 	);
 	const answeredVisibleQuestions = sectionRows.reduce((totalAnswered, sectionRow) => {
@@ -341,10 +363,10 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 	const isReadOnly = session?.status === "SUBMITTED";
 	const incompleteSectionCount = sectionRows.filter(sectionRow => !sectionRow.progress.isComplete).length;
 	const submissionBlockers = [
-		executionMode === null ? "Choose an execution mode." : null,
-		!requiredPreAuditComplete ? "Complete the required pre-audit questions." : null,
+		executionMode === null ? t("submission.blockers.chooseExecutionMode") : null,
+		!requiredPreAuditComplete ? t("submission.blockers.completePreAudit") : null,
 		incompleteSectionCount > 0
-			? `Finish ${String(incompleteSectionCount)} remaining section${incompleteSectionCount === 1 ? "" : "s"}.`
+			? t("submission.blockers.finishRemainingSections", { count: incompleteSectionCount })
 			: null
 	].filter((value): value is string => value !== null);
 
@@ -442,13 +464,11 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 		return (
 			<Card>
 				<CardHeader>
-					<CardTitle>Unable to open audit</CardTitle>
+					<CardTitle>{t("error.title")}</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-3">
-					<p className="text-sm text-muted-foreground">
-						Verify this place is assigned to your auditor account and try again.
-					</p>
-					<BackButton href="/auditor/places" label="Back to places" />
+					<p className="text-sm text-muted-foreground">{t("error.description")}</p>
+					<BackButton href="/auditor/places" label={t("actions.backToPlaces")} />
 				</CardContent>
 			</Card>
 		);
@@ -462,68 +482,75 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 		<div className="space-y-6">
 			<div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
 				<div className="space-y-2">
-					<h1 className="text-2xl font-semibold tracking-tight">Execute Audit</h1>
+					<h1 className="text-2xl font-semibold tracking-tight">{t("header.title")}</h1>
 					<p className="text-sm text-muted-foreground">
-						Place: <span className="font-medium text-foreground">{session.place_name}</span>
+						{t("header.place", { name: session.place_name })}
 					</p>
 				</div>
 
 				<div className="flex flex-wrap items-center gap-2">
 					<Badge variant="outline" className="font-medium">
-						{session.status.replaceAll("_", " ")}
+						{t(`status.${session.status.toLowerCase()}`)}
 					</Badge>
 					<Badge variant="secondary">
-						{`${String(answeredVisibleQuestions)} / ${String(totalVisibleQuestions)} questions answered`}
+						{t("header.questionsAnswered", {
+							answered: answeredVisibleQuestions,
+							total: totalVisibleQuestions
+						})}
 					</Badge>
 					{patchDraft.isPending ? (
-						<Badge variant="secondary">Saving…</Badge>
+						<Badge variant="secondary">{t("header.saving")}</Badge>
 					) : lastSavedAt ? (
-						<Badge variant="secondary">Saved {formatTime(lastSavedAt)}</Badge>
+						<Badge variant="secondary">{t("header.savedAt", { time: formatTime(lastSavedAt) })}</Badge>
 					) : (
-						<Badge variant="outline">No unsaved changes</Badge>
+						<Badge variant="outline">{t("header.noUnsavedChanges")}</Badge>
 					)}
-					<BackButton href="/auditor/places" label="Back to places" />
+					<BackButton href="/auditor/places" label={t("actions.backToPlaces")} />
 				</div>
 			</div>
 
 			<Card>
 				<CardHeader>
-					<CardTitle>Audit Overview</CardTitle>
+					<CardTitle>{t("overview.title")}</CardTitle>
 				</CardHeader>
 				<CardContent className="grid gap-4 lg:grid-cols-2">
 					<div className="space-y-2 text-sm text-muted-foreground">
 						<p>
-							Audit code:{" "}
+							{t("overview.auditCode")}{" "}
 							<code
 								title={session.audit_code}
 								className="rounded-md bg-muted/65 px-2 py-1 font-mono text-[11px] tracking-[0.04em] text-foreground/80">
 								{formatAuditCodeReference(session.audit_code)}
 							</code>
 						</p>
-						<p className="tabular-nums">Started: {new Date(session.started_at).toLocaleString()}</p>
+						<p className="tabular-nums">{t("overview.started", { value: new Date(session.started_at).toLocaleString() })}</p>
 						<p>
-							Assignment roles:{" "}
-							{session.assignment_roles.map(role => role.replaceAll("_", " ")).join(", ")}
+							{t("overview.assignmentRoles")}{" "}
+							{session.assignment_roles
+								.map(role => formatAssignmentRoleLabel(role, t))
+								.join(", ")}
 						</p>
 					</div>
 					<div className="space-y-2 text-sm text-muted-foreground">
 						<p>
-							Pre-audit:{" "}
+							{t("overview.preAudit")}{" "}
 							<span className={requiredPreAuditComplete ? "text-foreground" : "text-muted-foreground"}>
-								{requiredPreAuditComplete ? "Complete" : "Incomplete"}
+								{requiredPreAuditComplete ? t("common.complete") : t("common.incomplete")}
 							</span>
 						</p>
 						<p>
-							Sections:{" "}
+							{t("overview.sections")}{" "}
 							<span className={readyToSubmit ? "text-foreground" : "text-muted-foreground"}>
-								{sectionRows.filter(sectionRow => sectionRow.progress.isComplete).length}/
-								{sectionRows.length} complete
+								{t("overview.sectionsComplete", {
+									completed: sectionRows.filter(sectionRow => sectionRow.progress.isComplete).length,
+									total: sectionRows.length
+								})}
 							</span>
 						</p>
 						<p>
-							Ready to submit:{" "}
+							{t("overview.readyToSubmit")}{" "}
 							<span className={readyToSubmit ? "text-foreground" : "text-muted-foreground"}>
-								{readyToSubmit ? "Yes" : "Not yet"}
+								{readyToSubmit ? t("common.yes") : t("common.notYet")}
 							</span>
 						</p>
 					</div>
@@ -532,13 +559,13 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 
 			<Card>
 				<CardHeader>
-					<CardTitle>Submission readiness</CardTitle>
+					<CardTitle>{t("submission.title")}</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-3">
 					<p className="text-sm text-muted-foreground">
 						{readyToSubmit
-							? "Everything required for submission is complete. Review your notes, then submit when you are ready."
-							: "Complete the remaining checkpoints before submitting this audit."}
+							? t("submission.readyDescription")
+							: t("submission.incompleteDescription")}
 					</p>
 					{submissionBlockers.length > 0 ? (
 						<ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
@@ -549,18 +576,18 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 					) : null}
 					<Badge variant={readyToSubmit ? "secondary" : "outline"}>
 						{readyToSubmit
-							? "Ready to submit"
-							: `${String(submissionBlockers.length)} checkpoint${submissionBlockers.length === 1 ? "" : "s"} remaining`}
+							? t("submission.readyBadge")
+							: t("submission.remainingBadge", { count: submissionBlockers.length })}
 					</Badge>
 				</CardContent>
 			</Card>
 
 			<Card>
 				<CardHeader>
-					<CardTitle>Execution Mode</CardTitle>
+					<CardTitle>{t("executionMode.title")}</CardTitle>
 				</CardHeader>
 				<CardContent className="grid gap-3 lg:grid-cols-3">
-					{BASE_PLAYSPACE_INSTRUMENT.execution_modes
+					{instrument.execution_modes
 						.filter(mode => session.allowed_execution_modes.includes(mode.key as ExecutionMode))
 						.map(mode => {
 							const isSelected = selectedMode === mode.key;
@@ -585,7 +612,7 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 									</p>
 									<p className="mt-2 text-sm font-medium text-foreground">{mode.label}</p>
 									<p className="mt-2 text-sm text-muted-foreground">
-										{mode.description ?? "No description."}
+										{mode.description ?? t("executionMode.noDescription")}
 									</p>
 								</button>
 							);
@@ -595,16 +622,16 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 
 			<Card>
 				<CardHeader>
-					<CardTitle>Pre-Audit</CardTitle>
+					<CardTitle>{t("preAudit.title")}</CardTitle>
 				</CardHeader>
 				<CardContent className="grid gap-4 lg:grid-cols-2">
-					{BASE_PLAYSPACE_INSTRUMENT.pre_audit_questions.map(question => {
+					{instrument.pre_audit_questions.map(question => {
 						if (question.input_type === "auto_timestamp") {
 							return (
 								<AutoFieldCard
 									key={question.key}
 									question={question}
-									value={formatAutoValue(question.key, session)}
+									value={formatAutoValue(question.key, session, t)}
 								/>
 							);
 						}
@@ -630,25 +657,23 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 
 			<Card>
 				<CardHeader>
-					<CardTitle>Sections</CardTitle>
+					<CardTitle>{t("sections.title")}</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-4">
 					{executionMode === null ? (
-						<p className="text-sm text-muted-foreground">
-							Choose an execution mode to unlock the matching instrument sections.
-						</p>
+						<p className="text-sm text-muted-foreground">{t("sections.chooseMode")}</p>
 					) : (
 						<>
 							<div className="flex flex-wrap items-center justify-between gap-3">
 								<p className="text-sm text-muted-foreground">
 									{incompleteSectionCount > 0
-										? `${incompleteSectionCount} sections still need attention. Completed sections are grouped at the end for faster scanning.`
-										: "All sections are complete. Completed sections stay grouped together so you can review them quickly."}
+										? t("sections.incompleteSummary", { count: incompleteSectionCount })
+										: t("sections.completeSummary")}
 								</p>
 								<Badge variant={readyToSubmit ? "secondary" : "outline"}>
 									{readyToSubmit
-										? "Ready to submit"
-										: `${incompleteSectionCount} section${incompleteSectionCount === 1 ? "" : "s"} remaining`}
+										? t("submission.readyBadge")
+										: t("sections.remainingBadge", { count: incompleteSectionCount })}
 								</Badge>
 							</div>
 							<div className="grid gap-3 lg:grid-cols-2">
@@ -679,12 +704,15 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 														{sectionRow.section.title}
 													</p>
 													<p className="text-sm text-muted-foreground">
-														{`${String(sectionRow.progress.answeredQuestionCount)} / ${String(sectionRow.progress.visibleQuestionCount)} answered`}
+														{t("sections.answered", {
+															answered: sectionRow.progress.answeredQuestionCount,
+															total: sectionRow.progress.visibleQuestionCount
+														})}
 													</p>
 													<p className="text-xs text-muted-foreground">
 														{sectionRow.progress.isComplete
-															? "All required questions are complete."
-															: `${String(remainingQuestionCount)} question${remainingQuestionCount === 1 ? "" : "s"} remaining`}
+															? t("sections.allRequiredComplete")
+															: t("sections.questionsRemaining", { count: remainingQuestionCount })}
 													</p>
 												</div>
 												<Badge
@@ -692,10 +720,10 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 													{sectionRow.progress.isComplete ? (
 														<span className="inline-flex items-center gap-1.5">
 															<CheckCircle2Icon className="size-3.5" aria-hidden="true" />
-															<span>Complete</span>
+															<span>{t("common.complete")}</span>
 														</span>
 													) : (
-														`${String(remainingQuestionCount)} remaining`
+														t("sections.remainingShort", { count: remainingQuestionCount })
 													)}
 												</Badge>
 											</div>
@@ -743,10 +771,10 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 						</div>
 
 						<div className="space-y-2">
-							<Label htmlFor={`section-note-${activeSection.section.section_key}`}>Section notes</Label>
+							<Label htmlFor={`section-note-${activeSection.section.section_key}`}>{t("activeSection.notesLabel")}</Label>
 							<p className="text-sm text-muted-foreground">
 								{activeSection.section.notes_prompt ??
-									"Add observations or recommendations for this section."}
+									t("activeSection.notesFallback")}
 							</p>
 							<Textarea
 								id={`section-note-${activeSection.section.section_key}`}
@@ -756,7 +784,7 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 								onChange={event => {
 									handleSectionNoteChange(activeSection.section.section_key, event.target.value);
 								}}
-								placeholder="Record observations, missing features, or recommendations."
+								placeholder={t("activeSection.notesPlaceholder")}
 							/>
 						</div>
 
@@ -771,7 +799,7 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 											setActiveSectionKey(previousSection.section.section_key);
 										}
 									}}>
-									Previous section
+									{t("activeSection.previousSection")}
 								</Button>
 								<Button
 									type="button"
@@ -782,11 +810,14 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 											setActiveSectionKey(nextSection.section.section_key);
 										}
 									}}>
-									Next section
+									{t("activeSection.nextSection")}
 								</Button>
 							</div>
 							<Badge variant={activeSection.progress.isComplete ? "secondary" : "outline"}>
-								{`${String(activeSection.progress.answeredQuestionCount)} / ${String(activeSection.progress.visibleQuestionCount)} answered`}
+								{t("sections.answered", {
+									answered: activeSection.progress.answeredQuestionCount,
+									total: activeSection.progress.visibleQuestionCount
+								})}
 							</Badge>
 						</div>
 					</CardContent>
@@ -800,7 +831,7 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 					variant="outline"
 					onClick={handleSaveNow}
 					disabled={patchDraft.isPending || isReadOnly}>
-					Save now
+					{t("actions.saveNow")}
 				</Button>
 				<Button
 					type="button"
@@ -808,23 +839,20 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 					onClick={() => {
 						submitAudit.mutate(session.audit_id);
 					}}>
-					{submitAudit.isPending ? "Submitting…" : "Submit audit"}
+					{submitAudit.isPending ? t("actions.submitting") : t("actions.submitAudit")}
 				</Button>
 			</div>
 
 			{isReadOnly ? (
 				<Card>
 					<CardHeader>
-						<CardTitle>Audit submitted</CardTitle>
+						<CardTitle>{t("submittedCard.title")}</CardTitle>
 					</CardHeader>
 					<CardContent className="space-y-3">
-						<p className="text-sm text-muted-foreground">
-							This audit has been submitted and is now read-only. Open the report to review the final
-							record.
-						</p>
+						<p className="text-sm text-muted-foreground">{t("submittedCard.description")}</p>
 						<Button asChild variant="outline">
 							<Link href={`/auditor/reports/${encodeURIComponent(session.audit_id)}`}>
-								Open submitted report
+								{t("submittedCard.openReport")}
 							</Link>
 						</Button>
 					</CardContent>

@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import type { ColumnDef, ColumnFiltersState, FilterFn, SortingState, VisibilityState } from "@tanstack/react-table";
+import { useTranslations } from "next-intl";
 import {
 	flexRender,
 	getCoreRowModel,
@@ -61,10 +62,11 @@ export function DataTable<TData, TValue>({
 	searchPlaceholder,
 	filterConfigs = [],
 	action,
-	emptyMessage = "No results found.",
+	emptyMessage,
 	initialSorting = [],
 	pageSize = 10
 }: Readonly<DataTableProps<TData, TValue>>) {
+	const t = useTranslations("tables.shared");
 	const [sorting, setSorting] = React.useState<SortingState>(initialSorting);
 	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
 	const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
@@ -146,7 +148,7 @@ export function DataTable<TData, TValue>({
 								<TableCell
 									colSpan={Math.max(1, table.getVisibleLeafColumns().length)}
 									className="h-28 text-center text-sm text-muted-foreground">
-									{emptyMessage}
+									{emptyMessage ?? t("emptyMessage")}
 								</TableCell>
 							</TableRow>
 						)}

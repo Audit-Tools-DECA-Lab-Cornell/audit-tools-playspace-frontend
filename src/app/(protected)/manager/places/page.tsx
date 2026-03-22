@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
 import { FolderKanbanIcon, MapPinnedIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 
 import { playspaceApi, type PlaceSummary } from "@/lib/api/playspace";
@@ -29,15 +30,17 @@ interface ManagerPlaceRow extends PlaceSummary {
 	project_name: string;
 }
 
-function getErrorMessage(error: unknown): string {
+function getErrorMessage(error: unknown, fallbackMessage: string): string {
 	if (error instanceof Error) {
 		return error.message;
 	}
 
-	return "Unable to load manager places.";
+	return fallbackMessage;
 }
 
 export default function ManagerPlacesPage() {
+	const t = useTranslations("manager.places");
+	const formatT = useTranslations("common.format");
 	const session = useAuthSession();
 	const accountId = session?.role === "manager" ? session.accountId : null;
 
@@ -45,7 +48,7 @@ export default function ManagerPlacesPage() {
 		queryKey: ["playspace", "manager", "places", accountId],
 		queryFn: async (): Promise<ManagerPlaceRow[]> => {
 			if (!accountId) {
-				throw new Error("Manager account context is unavailable.");
+				throw new Error(t("errors.accountContextUnavailable"));
 			}
 
 			const projects = await playspaceApi.accounts.projects(accountId);
@@ -68,8 +71,8 @@ export default function ManagerPlacesPage() {
 		() => [
 			{
 				id: "place",
-				accessorFn: row => `${row.name} ${row.project_name} ${formatLocationLabel(row)}`,
-				header: ({ column }) => <DataTableColumnHeader column={column} title="Place" />,
+				accessorFn: row => `${row.name} ${row.project_name} ${formatLocationLabel(row, formatT)}`,
+				header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.place")} />,
 				cell: ({ row }) => (
 					<div className="min-w-[280px] space-y-1">
 						<Link
@@ -78,31 +81,31 @@ export default function ManagerPlacesPage() {
 							{row.original.name}
 						</Link>
 						<p className="text-sm text-muted-foreground">{row.original.project_name}</p>
-						<p className="text-sm text-muted-foreground">{formatLocationLabel(row.original)}</p>
+						<p className="text-sm text-muted-foreground">{formatLocationLabel(row.original, formatT)}</p>
 					</div>
 				),
 				enableHiding: false
 			},
 			{
 				accessorKey: "project_name",
-				header: ({ column }) => <DataTableColumnHeader column={column} title="Project" />,
+				header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.project")} />,
 				filterFn: getMultiValueFilterFn<ManagerPlaceRow>(),
 				cell: ({ row }) => <span className="text-sm text-muted-foreground">{row.original.project_name}</span>
 			},
 			{
 				accessorKey: "place_type",
-				header: ({ column }) => <DataTableColumnHeader column={column} title="Type" />,
+				header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.type")} />,
 				filterFn: getMultiValueFilterFn<ManagerPlaceRow>(),
 				cell: ({ row }) =>
 					row.original.place_type ? (
 						<Badge variant="secondary">{row.original.place_type}</Badge>
 					) : (
-						<span className="text-sm text-muted-foreground">Type pending</span>
+						<span className="text-sm text-muted-foreground">{t("table.typePending")}</span>
 					)
 			},
 			{
 				accessorKey: "status",
-				header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
+				header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.status")} />,
 				filterFn: getMultiValueFilterFn<ManagerPlaceRow>(),
 				cell: ({ row }) => (
 					<Badge
@@ -111,32 +114,32 @@ export default function ManagerPlacesPage() {
 							getPlaceStatusClassName(row.original.status),
 							"font-medium tracking-[0.14em] uppercase"
 						)}>
-						{row.original.status.replaceAll("_", " ")}
+						{t(`table.status.${row.original.status}`)}
 					</Badge>
 				)
 			},
 			{
 				accessorKey: "audits_completed",
-				header: ({ column }) => <DataTableColumnHeader column={column} title="Audits" align="end" />,
+				header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.audits")} align="end" />,
 				cell: ({ row }) => (
 					<span className="block text-right font-mono tabular-nums">{row.original.audits_completed}</span>
 				)
 			},
 			{
 				accessorKey: "average_score",
-				header: ({ column }) => <DataTableColumnHeader column={column} title="Mean Score" align="end" />,
+				header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.meanScore")} align="end" />,
 				cell: ({ row }) => (
 					<span className="block text-right font-mono text-foreground tabular-nums">
-						{formatScoreLabel(row.original.average_score)}
+						{formatScoreLabel(row.original.average_score, formatT)}
 					</span>
 				)
 			},
 			{
 				accessorKey: "last_audited_at",
-				header: ({ column }) => <DataTableColumnHeader column={column} title="Last Audited" align="end" />,
+				header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.lastAudited")} align="end" />,
 				cell: ({ row }) => (
 					<span className="block text-right text-sm text-muted-foreground tabular-nums">
-						{formatDateTimeLabel(row.original.last_audited_at)}
+						{formatDateTimeLabel(row.original.last_audited_at, formatT)}
 					</span>
 				)
 			},
@@ -148,12 +151,12 @@ export default function ManagerPlacesPage() {
 					<EntityRowActions
 						actions={[
 							{
-								label: "Open place",
+								label: t("table.actions.openPlace"),
 								href: `/manager/places/${encodeURIComponent(row.original.id)}`,
 								icon: MapPinnedIcon
 							},
 							{
-								label: "Open project",
+								label: t("table.actions.openProject"),
 								href: `/manager/projects/${encodeURIComponent(row.original.project_id)}`,
 								icon: FolderKanbanIcon
 							}
@@ -162,22 +165,25 @@ export default function ManagerPlacesPage() {
 				)
 			}
 		],
-		[]
+		[formatT, t]
 	);
 
 	if (!accountId) {
 		return (
 			<div className="space-y-6">
 				<DashboardHeader
-					eyebrow="Manager Workspace"
-					title="Places"
-					description="Operational visibility into every place across your account."
-					breadcrumbs={[{ label: "Dashboard", href: "/manager/dashboard" }, { label: "Places" }]}
+					eyebrow={t("header.eyebrow")}
+					title={t("header.title")}
+					description={t("header.loadingDescription")}
+					breadcrumbs={[
+						{ label: t("breadcrumbs.dashboard"), href: "/manager/dashboard" },
+						{ label: t("breadcrumbs.places") }
+					]}
 				/>
 				<Card>
 					<CardContent className="py-8">
 						<p className="text-sm text-muted-foreground">
-							Manager account context is missing from the current session.
+							{t("missingAccount")}
 						</p>
 					</CardContent>
 				</Card>
@@ -189,10 +195,13 @@ export default function ManagerPlacesPage() {
 		return (
 			<div className="space-y-6">
 				<DashboardHeader
-					eyebrow="Manager Workspace"
-					title="Places"
-					description="Operational visibility into every place across your account."
-					breadcrumbs={[{ label: "Dashboard", href: "/manager/dashboard" }, { label: "Places" }]}
+					eyebrow={t("header.eyebrow")}
+					title={t("header.title")}
+					description={t("header.loadingDescription")}
+					breadcrumbs={[
+						{ label: t("breadcrumbs.dashboard"), href: "/manager/dashboard" },
+						{ label: t("breadcrumbs.places") }
+					]}
 				/>
 				<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
 					{Array.from({ length: 4 }).map((_, index) => (
@@ -210,11 +219,11 @@ export default function ManagerPlacesPage() {
 	if (placesQuery.isError || !placesQuery.data) {
 		return (
 			<EmptyState
-				title="Places unavailable"
-				description={getErrorMessage(placesQuery.error)}
+				title={t("error.title")}
+				description={getErrorMessage(placesQuery.error, t("error.description"))}
 				action={
 					<Button type="button" onClick={() => globalThis.location.reload()}>
-						Try again
+						{t("actions.tryAgain")}
 					</Button>
 				}
 			/>
@@ -230,57 +239,60 @@ export default function ManagerPlacesPage() {
 	const meanScore =
 		scoredPlaces.length > 0
 			? `${Math.round((scoredPlaces.reduce((runningTotal, place) => runningTotal + place.average_score, 0) / scoredPlaces.length) * 10) / 10}`
-			: "Pending";
+			: formatT("pending");
 
 	return (
 		<div className="space-y-6">
 			<DashboardHeader
-				eyebrow="Manager Workspace"
-				title="Places"
-				description="Operational visibility into every place across your account. Add new places from a project workspace."
-				breadcrumbs={[{ label: "Dashboard", href: "/manager/dashboard" }, { label: "Places" }]}
+				eyebrow={t("header.eyebrow")}
+				title={t("header.title")}
+				description={t("header.description")}
+				breadcrumbs={[
+					{ label: t("breadcrumbs.dashboard"), href: "/manager/dashboard" },
+					{ label: t("breadcrumbs.places") }
+				]}
 				actions={
 					<Button asChild variant="outline">
-						<Link href="/manager/projects">Open projects to add place</Link>
+						<Link href="/manager/projects">{t("header.openProjects")}</Link>
 					</Button>
 				}
 			/>
 			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
 				<StatCard
-					title="Total Places"
+					title={t("stats.totalPlaces.title")}
 					value={String(places.length)}
-					helper="All places currently linked to your projects."
+					helper={t("stats.totalPlaces.helper")}
 				/>
 				<StatCard
-					title="Submitted"
+					title={t("stats.submitted.title")}
 					value={String(submittedPlaces)}
-					helper="Places with completed audit activity."
+					helper={t("stats.submitted.helper")}
 					tone="success"
 				/>
 				<StatCard
-					title="In Progress"
+					title={t("stats.inProgress.title")}
 					value={String(inProgressPlaces)}
-					helper="Places with active draft audit work."
+					helper={t("stats.inProgress.helper")}
 					tone="warning"
 				/>
 				<StatCard
-					title="Mean Score"
+					title={t("stats.meanScore.title")}
 					value={meanScore}
-					helper="Average across places with submitted scoring."
+					helper={t("stats.meanScore.helper")}
 					tone="violet"
 				/>
 			</div>
 			<DataTable
-				title="Place Operations"
-				description="Search, sort, and drill into every place from one account-wide table."
+				title={t("table.title")}
+				description={t("table.description")}
 				columns={columns}
 				data={places}
 				searchColumnId="place"
-				searchPlaceholder="Search places..."
+				searchPlaceholder={t("table.searchPlaceholder")}
 				filterConfigs={[
 					{
 						columnId: "project_name",
-						title: "Project",
+						title: t("table.columns.project"),
 						options: Array.from(new Set(places.map(place => place.project_name)))
 							.sort((left, right) => left.localeCompare(right))
 							.map(projectName => ({
@@ -290,7 +302,7 @@ export default function ManagerPlacesPage() {
 					},
 					{
 						columnId: "place_type",
-						title: "Type",
+						title: t("table.columns.type"),
 						options: Array.from(
 							new Set(
 								places.map(place => place.place_type).filter((value): value is string => Boolean(value))
@@ -304,17 +316,17 @@ export default function ManagerPlacesPage() {
 					},
 					{
 						columnId: "status",
-						title: "Status",
+						title: t("table.columns.status"),
 						options: Array.from(new Set(places.map(place => place.status))).map(status => ({
-							label: status.replaceAll("_", " "),
+							label: t(`table.status.${status}`),
 							value: status
 						}))
 					}
 				]}
 				emptyMessage={
 					places.length === 0
-						? "No places yet. Add places from a project workspace to start audit operations."
-						: "No places match the current filters."
+						? t("table.emptyState.noPlaces")
+						: t("table.emptyState.noMatches")
 				}
 				initialSorting={[{ id: "last_audited_at", desc: true }]}
 			/>

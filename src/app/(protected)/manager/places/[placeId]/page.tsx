@@ -2,6 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 
 import { playspaceApi } from "@/lib/api/playspace";
 import { AuditsTable } from "@/components/dashboard/audits-table";
@@ -12,6 +13,8 @@ import { StatCard } from "@/components/dashboard/stat-card";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function ManagerPlaceDetailPage() {
+	const t = useTranslations("manager.placeDetail");
+	const formatT = useTranslations("common.format");
 	const params = useParams<{ placeId: string }>();
 	const placeId = params.placeId;
 
@@ -30,13 +33,11 @@ export default function ManagerPlaceDetailPage() {
 		return (
 			<Card>
 				<CardHeader>
-					<CardTitle>Unable to load place history</CardTitle>
+					<CardTitle>{t("error.title")}</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-3">
-					<p className="text-sm text-muted-foreground">
-						Try refreshing this page. If needed, return to places and open this location again.
-					</p>
-					<BackButton href="/manager/places" label="Back to places" />
+					<p className="text-sm text-muted-foreground">{t("error.description")}</p>
+					<BackButton href="/manager/places" label={t("actions.backToPlaces")} />
 				</CardContent>
 			</Card>
 		);
@@ -56,54 +57,54 @@ export default function ManagerPlaceDetailPage() {
 	return (
 		<div className="space-y-6">
 			<DashboardHeader
-				eyebrow="Place Activity"
+				eyebrow={t("header.eyebrow")}
 				title={history.place_name}
-				description="Audit history, submission recency, and score trends for this place."
+				description={t("header.description")}
 				breadcrumbs={[
-					{ label: "Dashboard", href: "/manager/dashboard" },
-					{ label: "Places", href: "/manager/places" },
+					{ label: t("breadcrumbs.dashboard"), href: "/manager/dashboard" },
+					{ label: t("breadcrumbs.places"), href: "/manager/places" },
 					{ label: history.place_name }
 				]}
-				actions={<BackButton href="/manager/places" label="Back to places" />}
+				actions={<BackButton href="/manager/places" label={t("actions.backToPlaces")} />}
 			/>
 			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
 				<StatCard
-					title="Total Audits"
+					title={t("stats.totalAudits.title")}
 					value={String(history.total_audits)}
-					helper="All draft and submitted audit sessions for this place."
+					helper={t("stats.totalAudits.helper")}
 				/>
 				<StatCard
-					title="Submitted"
+					title={t("stats.submitted.title")}
 					value={String(history.submitted_audits)}
-					helper="Completed audit sessions with final scoring."
+					helper={t("stats.submitted.helper")}
 					tone="success"
 				/>
 				<StatCard
-					title="In Progress"
+					title={t("stats.inProgress.title")}
 					value={String(history.in_progress_audits)}
-					helper="Sessions that still need completion."
+					helper={t("stats.inProgress.helper")}
 					tone="warning"
 				/>
 				<StatCard
-					title="Mean Score"
-					value={formatScoreLabel(history.average_submitted_score)}
-					helper="Average across submitted audits only."
+					title={t("stats.meanScore.title")}
+					value={formatScoreLabel(history.average_submitted_score, formatT)}
+					helper={t("stats.meanScore.helper")}
 					tone="violet"
 				/>
 				<StatCard
-					title="Latest Submitted"
-					value={history.latest_submitted_at ? formatDateTimeLabel(history.latest_submitted_at) : "Pending"}
+					title={t("stats.latestSubmitted.title")}
+					value={history.latest_submitted_at ? formatDateTimeLabel(history.latest_submitted_at, formatT) : formatT("pending")}
 					valueClassName="font-sans text-lg leading-snug md:text-xl"
-					helper="Most recent submission"
+					helper={t("stats.latestSubmitted.helper")}
 					tone="success"
 				/>
 			</div>
 			<AuditsTable
 				rows={auditRows}
-				title="Audit History"
-				description="Track every audit session for this place in a filterable activity table."
+				title={t("table.title")}
+				description={t("table.description")}
 				pageSize={8}
-				emptyMessage="No audits have been created for this place yet."
+				emptyMessage={t("table.emptyMessage")}
 			/>
 		</div>
 	);

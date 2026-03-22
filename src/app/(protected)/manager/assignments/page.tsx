@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { PlusIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 
 import { playspaceApi } from "@/lib/api/playspace";
@@ -50,19 +51,23 @@ interface PendingAssignmentDelete {
 	readonly scopeName: string;
 }
 
-function getErrorMessage(error: unknown): string {
+type AssignmentTranslator = (key: string, values?: Record<string, string | number>) => string;
+
+function getErrorMessage(error: unknown, fallbackMessage: string): string {
 	if (error instanceof Error && error.message.trim().length > 0) {
 		return error.message;
 	}
 
-	return "Unable to load assignments.";
+	return fallbackMessage;
 }
 
-function formatRoleLabel(role: "auditor" | "place_admin"): string {
-	return role === "place_admin" ? "place admin" : "auditor";
+function formatRoleLabel(role: "auditor" | "place_admin", t: AssignmentTranslator): string {
+	return t(`roles.${role}`);
 }
 
 export default function ManagerAssignmentsPage() {
+	const t = useTranslations("manager.assignments");
+	const formatT = useTranslations("common.format");
 	const searchParams = useSearchParams();
 	const router = useRouter();
 	const pathname = usePathname();
@@ -112,7 +117,7 @@ export default function ManagerAssignmentsPage() {
 		queryKey: ["playspace", "manager", "assignments", "auditors", accountId],
 		queryFn: async () => {
 			if (!accountId) {
-				throw new Error("Manager account context is unavailable.");
+				throw new Error(t("errors.accountContextUnavailable"));
 			}
 			return playspaceApi.accounts.auditors(accountId);
 		},
@@ -122,7 +127,7 @@ export default function ManagerAssignmentsPage() {
 		queryKey: ["playspace", "manager", "assignments", "projects", accountId],
 		queryFn: async () => {
 			if (!accountId) {
-				throw new Error("Manager account context is unavailable.");
+				throw new Error(t("errors.accountContextUnavailable"));
 			}
 			return playspaceApi.accounts.projects(accountId);
 		},
@@ -132,7 +137,7 @@ export default function ManagerAssignmentsPage() {
 		queryKey: ["playspace", "manager", "assignments", "places", accountId],
 		queryFn: async (): Promise<AssignmentPlaceOption[]> => {
 			if (!accountId) {
-				throw new Error("Manager account context is unavailable.");
+				throw new Error(t("errors.accountContextUnavailable"));
 			}
 
 			const projects = await playspaceApi.accounts.projects(accountId);
@@ -166,7 +171,7 @@ export default function ManagerAssignmentsPage() {
 	const createAssignment = useMutation({
 		mutationFn: async () => {
 			if (selectedAuditorId.trim().length === 0) {
-				throw new Error("Select an auditor before creating assignments.");
+				throw new Error(t("errors.selectAuditorBeforeCreate"));
 			}
 
 			const roles: Array<"auditor" | "place_admin"> = [];
@@ -206,14 +211,14 @@ export default function ManagerAssignmentsPage() {
 			setIsCreateSheetOpen(false);
 		},
 		onError: error => {
-			setFormError(error instanceof Error ? error.message : "Unable to create assignment.");
+			setFormError(error instanceof Error ? error.message : t("errors.unableToCreateAssignment"));
 		}
 	});
 
 	const deleteAssignment = useMutation({
 		mutationFn: async (assignmentId: string) => {
 			if (selectedAuditorId.trim().length === 0) {
-				throw new Error("Select an auditor before deleting assignments.");
+				throw new Error(t("errors.selectAuditorBeforeDelete"));
 			}
 			return playspaceApi.assignments.delete(selectedAuditorId, assignmentId);
 		},
@@ -225,7 +230,7 @@ export default function ManagerAssignmentsPage() {
 			});
 		},
 		onError: error => {
-			setListError(error instanceof Error ? error.message : "Unable to delete assignment.");
+			setListError(error instanceof Error ? error.message : t("errors.unableToDeleteAssignment"));
 		}
 	});
 
@@ -262,15 +267,18 @@ export default function ManagerAssignmentsPage() {
 		return (
 			<div className="space-y-6">
 				<DashboardHeader
-					eyebrow="Manager Workspace"
-					title="Assignment management"
-					description="Assign auditors by project or place scope and tune execution capabilities."
-					breadcrumbs={[{ label: "Dashboard", href: "/manager/dashboard" }, { label: "Assignments" }]}
+					eyebrow={t("header.eyebrow")}
+					title={t("header.title")}
+					description={t("header.description")}
+					breadcrumbs={[
+						{ label: t("breadcrumbs.dashboard"), href: "/manager/dashboard" },
+						{ label: t("breadcrumbs.assignments") }
+					]}
 				/>
 				<Card>
 					<CardContent className="py-8">
 						<p className="text-sm text-muted-foreground">
-							Manager account context is missing from the current session.
+							{t("missingAccount")}
 						</p>
 					</CardContent>
 				</Card>
@@ -282,10 +290,13 @@ export default function ManagerAssignmentsPage() {
 		return (
 			<div className="space-y-6">
 				<DashboardHeader
-					eyebrow="Manager Workspace"
-					title="Assignment management"
-					description="Assign auditors by project or place scope and tune execution capabilities."
-					breadcrumbs={[{ label: "Dashboard", href: "/manager/dashboard" }, { label: "Assignments" }]}
+					eyebrow={t("header.eyebrow")}
+					title={t("header.title")}
+					description={t("header.description")}
+					breadcrumbs={[
+						{ label: t("breadcrumbs.dashboard"), href: "/manager/dashboard" },
+						{ label: t("breadcrumbs.assignments") }
+					]}
 				/>
 				<div className="h-36 animate-pulse rounded-card border border-border bg-card" />
 				<div className="h-64 animate-pulse rounded-card border border-border bg-card" />
@@ -298,11 +309,11 @@ export default function ManagerAssignmentsPage() {
 
 		return (
 			<EmptyState
-				title="Assignments unavailable"
-				description={getErrorMessage(error)}
+				title={t("error.title")}
+				description={getErrorMessage(error, t("error.description"))}
 				action={
 					<Button type="button" onClick={() => globalThis.location.reload()}>
-						Try again
+						{t("actions.tryAgain")}
 					</Button>
 				}
 			/>
@@ -319,22 +330,22 @@ export default function ManagerAssignmentsPage() {
 	function handleCreateAssignment() {
 		const nextFieldErrors: AssignmentFieldErrors = {};
 		if (selectedAuditorId.trim().length === 0) {
-			nextFieldErrors.auditorId = "Select an auditor before creating an assignment.";
+			nextFieldErrors.auditorId = t("validation.auditorRequired");
 		}
 
 		if (selectedProjectId.trim().length === 0) {
 			nextFieldErrors.projectId =
 				scope === "place"
-					? "Select the parent project so you can choose one of its places."
-					: "Select the project this assignment should cover.";
+					? t("validation.projectRequiredForPlace")
+					: t("validation.projectRequired");
 		}
 
 		if (scope === "place" && selectedPlaceId.trim().length === 0) {
-			nextFieldErrors.placeId = "Select the place this assignment should cover.";
+			nextFieldErrors.placeId = t("validation.placeRequired");
 		}
 
 		if (!allowAudit && !allowSurvey) {
-			nextFieldErrors.roles = "Select at least one capability for this assignment.";
+			nextFieldErrors.roles = t("validation.rolesRequired");
 		}
 
 		setFieldErrors(nextFieldErrors);
@@ -350,10 +361,13 @@ export default function ManagerAssignmentsPage() {
 	return (
 		<div className="space-y-6">
 			<DashboardHeader
-				eyebrow="Manager Workspace"
-				title="Assignment management"
-				description="Assign auditors by project or place scope and tune execution capabilities."
-				breadcrumbs={[{ label: "Dashboard", href: "/manager/dashboard" }, { label: "Assignments" }]}
+				eyebrow={t("header.eyebrow")}
+				title={t("header.title")}
+				description={t("header.description")}
+				breadcrumbs={[
+					{ label: t("breadcrumbs.dashboard"), href: "/manager/dashboard" },
+					{ label: t("breadcrumbs.assignments") }
+				]}
 				actions={
 					<Button
 						type="button"
@@ -363,26 +377,25 @@ export default function ManagerAssignmentsPage() {
 							setIsCreateSheetOpen(true);
 						}}>
 						<PlusIcon className="size-4" />
-						<span>New assignment</span>
+						<span>{t("actions.newAssignment")}</span>
 					</Button>
 				}
 			/>
 
 			<Card>
 				<CardHeader>
-					<CardTitle>Auditor focus</CardTitle>
+					<CardTitle>{t("auditorFocus.title")}</CardTitle>
 				</CardHeader>
 				<CardContent className="grid gap-4 xl:grid-cols-[minmax(0,0.98fr)_minmax(0,1.02fr)]">
 					<div className="space-y-4 rounded-field border border-border bg-card/80 p-4">
 						<div className="space-y-1">
-							<p className="font-medium text-foreground">Choose an auditor</p>
+							<p className="font-medium text-foreground">{t("auditorFocus.chooseAuditorTitle")}</p>
 							<p className="text-sm text-muted-foreground">
-								Filter the roster, then load one auditor&apos;s current project and place access before
-								you make changes.
+								{t("auditorFocus.chooseAuditorDescription")}
 							</p>
 						</div>
 						<div className="grid gap-2">
-							<Label htmlFor="assignment_auditor_search">Search auditors</Label>
+							<Label htmlFor="assignment_auditor_search">{t("auditorFocus.searchLabel")}</Label>
 							<Input
 								id="assignment_auditor_search"
 								name="assignmentAuditorSearch"
@@ -392,15 +405,14 @@ export default function ManagerAssignmentsPage() {
 								onChange={event => {
 									setAuditorSearchQuery(event.target.value);
 								}}
-								placeholder="Search by code, name, or email."
+								placeholder={t("auditorFocus.searchPlaceholder")}
 							/>
 							<p className="text-sm text-muted-foreground">
-								{filteredAuditors.length} auditor{filteredAuditors.length === 1 ? "" : "s"} match the
-								current filter.
+								{t("auditorFocus.searchResults", { count: filteredAuditors.length })}
 							</p>
 						</div>
 						<div className="grid gap-2">
-							<Label>Auditor</Label>
+							<Label>{t("auditorFocus.auditorLabel")}</Label>
 							<div className="flex flex-col gap-2 sm:flex-row">
 								<div className="min-w-0 flex-1">
 									<Select
@@ -412,20 +424,20 @@ export default function ManagerAssignmentsPage() {
 										}}>
 										<SelectTrigger
 											id="assignment_auditor_filter"
-											aria-label="Auditor"
+											aria-label={t("auditorFocus.auditorLabel")}
 											aria-invalid={Boolean(fieldErrors.auditorId)}
 											disabled={auditors.length === 0 || filteredAuditors.length === 0}>
 											<SelectValue
 												placeholder={
 													filteredAuditors.length === 0
-														? "No matching auditors"
-														: "Select an auditor"
+														? t("auditorFocus.noMatchingAuditors")
+														: t("auditorFocus.selectAuditor")
 												}
 											/>
 										</SelectTrigger>
 										<SelectContent position="popper">
 											<SelectGroup>
-												<SelectLabel>Matching auditors</SelectLabel>
+												<SelectLabel>{t("auditorFocus.matchingAuditors")}</SelectLabel>
 												{filteredAuditors.map(auditor => (
 													<SelectItem key={auditor.id} value={auditor.id}>
 														{`${auditor.auditor_code} · ${auditor.full_name}`}
@@ -444,7 +456,7 @@ export default function ManagerAssignmentsPage() {
 											clearFieldError("auditorId");
 											setListError(null);
 										}}>
-										Clear
+										{t("actions.clear")}
 									</Button>
 								) : null}
 							</div>
@@ -452,16 +464,16 @@ export default function ManagerAssignmentsPage() {
 								<p className="text-sm text-destructive">{fieldErrors.auditorId}</p>
 							) : (
 								<p className="text-sm text-muted-foreground">
-									Choose an auditor to review assignment coverage or remove outdated access.
+									{t("auditorFocus.auditorHelp")}
 								</p>
 							)}
 						</div>
 						<div className="rounded-field border border-border/70 bg-muted/35 p-4">
-							<p className="font-medium text-foreground">How assignment review works</p>
+							<p className="font-medium text-foreground">{t("auditorFocus.reviewHowItWorksTitle")}</p>
 							<ol className="mt-3 grid gap-2 text-sm text-muted-foreground">
-								<li>1. Load one auditor to see current access across projects and places.</li>
-								<li>2. Review coverage before adding or removing assignments.</li>
-								<li>3. Use New assignment to grant access, then return here to verify it.</li>
+								<li>{t("auditorFocus.reviewSteps.step1")}</li>
+								<li>{t("auditorFocus.reviewSteps.step2")}</li>
+								<li>{t("auditorFocus.reviewSteps.step3")}</li>
 							</ol>
 						</div>
 					</div>
@@ -483,37 +495,35 @@ export default function ManagerAssignmentsPage() {
 										<Badge variant="secondary">{selectedAuditor.role}</Badge>
 									) : null}
 									<Badge variant="outline">
-										{`${assignments.length} loaded assignment${assignments.length === 1 ? "" : "s"}`}
+										{t("auditorSummary.loadedAssignments", { count: assignments.length })}
 									</Badge>
-									<Badge variant="outline">{`${selectedAuditor.completed_audits} completed audits`}</Badge>
+									<Badge variant="outline">{t("auditorSummary.completedAudits", { count: selectedAuditor.completed_audits })}</Badge>
 								</div>
 							</div>
 						) : (
 							<div className="space-y-4">
 								<div className="space-y-1">
-									<p className="font-medium text-foreground">Assignment preview</p>
+									<p className="font-medium text-foreground">{t("preview.title")}</p>
 									<p className="text-sm text-muted-foreground">
-										Select an auditor to reveal their current project and place coverage, recent
-										audit volume, and the management actions available on this page.
+										{t("preview.description")}
 									</p>
 								</div>
 								<div className="grid gap-3 sm:grid-cols-2">
 									<div className="rounded-field border border-border/70 bg-muted/35 p-4">
-										<p className="font-medium text-foreground">Project scope</p>
+										<p className="font-medium text-foreground">{t("preview.projectScopeTitle")}</p>
 										<p className="mt-2 text-sm text-muted-foreground">
-											Grant access across every place in a project when the auditor needs wider
-											coverage.
+											{t("preview.projectScopeDescription")}
 										</p>
 									</div>
 									<div className="rounded-field border border-border/70 bg-muted/35 p-4">
-										<p className="font-medium text-foreground">Place scope</p>
+										<p className="font-medium text-foreground">{t("preview.placeScopeTitle")}</p>
 										<p className="mt-2 text-sm text-muted-foreground">
-											Grant access to one location when you need tighter field control.
+											{t("preview.placeScopeDescription")}
 										</p>
 									</div>
 								</div>
 								<Button asChild variant="outline">
-									<Link href="/manager/auditors">Open auditors</Link>
+									<Link href="/manager/auditors">{t("preview.openAuditors")}</Link>
 								</Button>
 							</div>
 						)}
@@ -523,7 +533,7 @@ export default function ManagerAssignmentsPage() {
 
 			<Card>
 				<CardHeader>
-					<CardTitle>Assignment coverage</CardTitle>
+					<CardTitle>{t("coverage.title")}</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-3">
 					{listError ? (
@@ -534,46 +544,43 @@ export default function ManagerAssignmentsPage() {
 					{selectedAuditorId.trim().length === 0 ? (
 						<div className="grid gap-4 rounded-field border border-dashed border-border p-4 lg:grid-cols-[minmax(0,1fr)_minmax(260px,0.9fr)]">
 							<div className="space-y-2">
-								<p className="font-medium text-foreground">Select an auditor to load assignments</p>
+								<p className="font-medium text-foreground">{t("coverage.selectAuditorTitle")}</p>
 								<p className="text-sm text-muted-foreground">
-									This panel shows what the selected auditor can currently access, including project
-									scope, place scope, granted capabilities, and direct links back to the underlying
-									record.
+									{t("coverage.selectAuditorDescription")}
 								</p>
 							</div>
 							<div className="rounded-field border border-border/70 bg-muted/35 p-4">
-								<p className="font-medium text-foreground">What appears here</p>
+								<p className="font-medium text-foreground">{t("coverage.whatAppearsTitle")}</p>
 								<ul className="mt-2 grid gap-2 text-sm text-muted-foreground">
-									<li>Current project and place coverage</li>
-									<li>Capability badges for audit and place-admin access</li>
-									<li>Open and delete actions for each assignment</li>
+									<li>{t("coverage.whatAppears.projectAndPlaceCoverage")}</li>
+									<li>{t("coverage.whatAppears.capabilityBadges")}</li>
+									<li>{t("coverage.whatAppears.openAndDeleteActions")}</li>
 								</ul>
 							</div>
 						</div>
 					) : assignmentsQuery.isLoading ? (
-						<p className="text-sm text-muted-foreground">Loading assignments…</p>
+						<p className="text-sm text-muted-foreground">{t("coverage.loadingAssignments")}</p>
 					) : assignmentsQuery.isError ? (
 						<div className="rounded-field border border-dashed border-border p-4">
-							<p className="font-medium text-foreground">Assignments unavailable</p>
+							<p className="font-medium text-foreground">{t("coverage.errorTitle")}</p>
 							<p className="mt-2 text-sm text-muted-foreground">
-								{getErrorMessage(assignmentsQuery.error)}
+								{getErrorMessage(assignmentsQuery.error, t("coverage.errorDescription"))}
 							</p>
 						</div>
 					) : assignments.length === 0 ? (
 						<div className="grid gap-4 rounded-field border border-dashed border-border p-4 lg:grid-cols-[minmax(0,1fr)_minmax(260px,0.9fr)]">
 							<div className="space-y-2">
-								<p className="font-medium text-foreground">No assignments yet</p>
+								<p className="font-medium text-foreground">{t("coverage.emptyTitle")}</p>
 								<p className="text-sm text-muted-foreground">
 									{selectedAuditor
-										? `Use New assignment to grant ${selectedAuditor.full_name} access to a project or place.`
-										: "Use New assignment to grant project or place access."}
+										? t("coverage.emptyDescriptionWithAuditor", { name: selectedAuditor.full_name })
+										: t("coverage.emptyDescription")}
 								</p>
 							</div>
 							<div className="rounded-field border border-border/70 bg-muted/35 p-4">
-								<p className="font-medium text-foreground">Recommended next step</p>
+								<p className="font-medium text-foreground">{t("coverage.recommendedNextStepTitle")}</p>
 								<p className="mt-2 text-sm text-muted-foreground">
-									Start with project scope when the auditor needs wider coverage, then add place-only
-									access when you need tighter control.
+									{t("coverage.recommendedNextStepDescription")}
 								</p>
 							</div>
 						</div>
@@ -585,16 +592,16 @@ export default function ManagerAssignmentsPage() {
 							const assignedProjectName =
 								assignment.project_id !== null
 									? (projectNameById.get(assignment.project_id) ??
-										`Project ${assignment.project_id.slice(0, 8)}`)
-									: (assignedPlace?.projectName ?? "Project pending");
+										t("assignment.projectFallback", { id: assignment.project_id.slice(0, 8) }))
+									: (assignedPlace?.projectName ?? t("assignment.projectPending"));
 							const scopeName =
 								assignedPlace?.name ??
 								(assignment.project_id !== null
 									? (projectNameById.get(assignment.project_id) ??
-										`Project ${assignment.project_id.slice(0, 8)}`)
-									: `Assignment ${assignment.id.slice(0, 8)}`);
-							const scopeLabel = assignedPlace ? "Place scope" : "Project scope";
-							const deleteScopeLabel = assignedPlace ? "place" : "project";
+										t("assignment.projectFallback", { id: assignment.project_id.slice(0, 8) }))
+									: t("assignment.assignmentFallback", { id: assignment.id.slice(0, 8) }));
+							const scopeLabel = assignedPlace ? t("assignment.placeScope") : t("assignment.projectScope");
+							const deleteScopeLabel = assignedPlace ? t("assignment.place") : t("assignment.project");
 							const scopeHref =
 								assignment.place_id !== null
 									? `/manager/places/${encodeURIComponent(assignment.place_id)}`
@@ -612,7 +619,9 @@ export default function ManagerAssignmentsPage() {
 											{assignedPlace ? `${assignedProjectName} · ${scopeLabel}` : scopeLabel}
 										</p>
 										<p className="text-xs text-muted-foreground">
-											Assigned {formatDateTimeLabel(assignment.assigned_at)}
+											{t("assignment.assignedAt", {
+												value: formatDateTimeLabel(assignment.assigned_at, formatT)
+											})}
 										</p>
 									</div>
 									<div className="flex flex-wrap items-center gap-2">
@@ -621,13 +630,13 @@ export default function ManagerAssignmentsPage() {
 												key={`${assignment.id}_${role}`}
 												variant="outline"
 												className="font-medium">
-												{formatRoleLabel(role)}
+												{formatRoleLabel(role, t)}
 											</Badge>
 										))}
 										{scopeHref ? (
 											<Button asChild type="button" variant="outline">
 												<Link href={scopeHref}>
-													{assignedPlace ? "Open place" : "Open project"}
+													{assignedPlace ? t("assignment.openPlace") : t("assignment.openProject")}
 												</Link>
 											</Button>
 										) : null}
@@ -642,7 +651,7 @@ export default function ManagerAssignmentsPage() {
 													scopeName
 												});
 											}}>
-											Delete
+											{t("actions.delete")}
 										</Button>
 									</div>
 								</div>
@@ -654,14 +663,14 @@ export default function ManagerAssignmentsPage() {
 			<Sheet open={isCreateSheetOpen} onOpenChange={setIsCreateSheetOpen}>
 				<SheetContent side="right" className="w-full gap-0 sm:max-w-xl">
 					<SheetHeader className="border-b border-border/70 px-6 py-5">
-						<SheetTitle>Create assignment</SheetTitle>
+						<SheetTitle>{t("sheet.title")}</SheetTitle>
 						<SheetDescription>
-							Grant project or place access and choose what the auditor can do inside that scope.
+							{t("sheet.description")}
 						</SheetDescription>
 					</SheetHeader>
 					<div className="grid min-h-0 flex-1 gap-4 overflow-y-auto px-6 py-5 md:grid-cols-2">
 						<div className="grid gap-2">
-							<Label>Auditor</Label>
+							<Label>{t("sheet.auditorLabel")}</Label>
 							<Select
 								value={selectedAuditorId.trim().length > 0 ? selectedAuditorId : undefined}
 								onValueChange={nextValue => {
@@ -671,13 +680,13 @@ export default function ManagerAssignmentsPage() {
 								}}>
 								<SelectTrigger
 									id="auditor_select"
-									aria-label="Auditor"
+									aria-label={t("sheet.auditorLabel")}
 									aria-invalid={Boolean(fieldErrors.auditorId)}>
-									<SelectValue placeholder="Select auditor" />
+									<SelectValue placeholder={t("sheet.selectAuditor")} />
 								</SelectTrigger>
 								<SelectContent position="popper">
 									<SelectGroup>
-										<SelectLabel>Auditors</SelectLabel>
+										<SelectLabel>{t("sheet.auditors")}</SelectLabel>
 										{auditors.map(auditor => (
 											<SelectItem key={auditor.id} value={auditor.id}>
 												{`${auditor.auditor_code} · ${auditor.full_name}`}
@@ -689,11 +698,11 @@ export default function ManagerAssignmentsPage() {
 							{fieldErrors.auditorId ? (
 								<p className="text-sm text-destructive">{fieldErrors.auditorId}</p>
 							) : (
-								<p className="text-sm text-muted-foreground">Choose who should receive this access.</p>
+								<p className="text-sm text-muted-foreground">{t("sheet.auditorHelp")}</p>
 							)}
 						</div>
 						<div className="grid gap-2">
-							<Label>Scope</Label>
+							<Label>{t("sheet.scopeLabel")}</Label>
 							<Select
 								value={scope}
 								onValueChange={nextValue => {
@@ -703,25 +712,25 @@ export default function ManagerAssignmentsPage() {
 									clearFieldError("placeId");
 									setFormError(null);
 								}}>
-								<SelectTrigger id="scope_select" aria-label="Scope">
+								<SelectTrigger id="scope_select" aria-label={t("sheet.scopeLabel")}>
 									<SelectValue />
 								</SelectTrigger>
 								<SelectContent position="popper">
 									<SelectGroup>
-										<SelectLabel>Assignment scope</SelectLabel>
-										<SelectItem value="project">Project</SelectItem>
-										<SelectItem value="place">Place</SelectItem>
+										<SelectLabel>{t("sheet.assignmentScope")}</SelectLabel>
+										<SelectItem value="project">{t("sheet.project")}</SelectItem>
+										<SelectItem value="place">{t("sheet.place")}</SelectItem>
 									</SelectGroup>
 								</SelectContent>
 							</Select>
 							<p className="text-sm text-muted-foreground">
 								{scope === "project"
-									? "Project scope lets the auditor work across every place in one project."
-									: "Place scope grants access to a single location only."}
+									? t("sheet.projectScopeDescription")
+									: t("sheet.placeScopeDescription")}
 							</p>
 						</div>
 						<div className="grid gap-2">
-							<Label>Project</Label>
+							<Label>{t("sheet.projectLabel")}</Label>
 							<Select
 								value={selectedProjectId.trim().length > 0 ? selectedProjectId : undefined}
 								onValueChange={nextValue => {
@@ -733,13 +742,13 @@ export default function ManagerAssignmentsPage() {
 								}}>
 								<SelectTrigger
 									id="project_select"
-									aria-label="Project"
+									aria-label={t("sheet.projectLabel")}
 									aria-invalid={Boolean(fieldErrors.projectId)}>
-									<SelectValue placeholder="Select project" />
+									<SelectValue placeholder={t("sheet.selectProject")} />
 								</SelectTrigger>
 								<SelectContent position="popper">
 									<SelectGroup>
-										<SelectLabel>Projects</SelectLabel>
+										<SelectLabel>{t("sheet.projects")}</SelectLabel>
 										{projects.map(project => (
 											<SelectItem key={project.id} value={project.id}>
 												{project.name}
@@ -752,12 +761,12 @@ export default function ManagerAssignmentsPage() {
 								<p className="text-sm text-destructive">{fieldErrors.projectId}</p>
 							) : (
 								<p className="text-sm text-muted-foreground">
-									Choose the project this assignment should unlock.
+									{t("sheet.projectHelp")}
 								</p>
 							)}
 						</div>
 						<div className="grid gap-2">
-							<Label>Place</Label>
+							<Label>{t("sheet.placeLabel")}</Label>
 							<Select
 								value={selectedPlaceId.trim().length > 0 ? selectedPlaceId : undefined}
 								onValueChange={nextValue => {
@@ -768,16 +777,16 @@ export default function ManagerAssignmentsPage() {
 								disabled={scope !== "place" || selectedProjectId.trim().length === 0}>
 								<SelectTrigger
 									id="place_select"
-									aria-label="Place"
+									aria-label={t("sheet.placeLabel")}
 									aria-invalid={Boolean(fieldErrors.placeId)}>
-									<SelectValue placeholder="Select place" />
+									<SelectValue placeholder={t("sheet.selectPlace")} />
 								</SelectTrigger>
 								<SelectContent position="popper">
 									<SelectGroup>
 										<SelectLabel>
 											{selectedProjectId.trim().length === 0
-												? "Select a project first"
-												: "Places"}
+												? t("sheet.selectProjectFirst")
+												: t("sheet.places")}
 										</SelectLabel>
 										{places.map(place => (
 											<SelectItem key={place.id} value={place.id}>
@@ -793,16 +802,16 @@ export default function ManagerAssignmentsPage() {
 								<p className="text-sm text-muted-foreground">
 									{scope === "place"
 										? selectedProjectId.trim().length === 0
-											? "Select a project first to load its places."
-											: "Choose the one place this assignment should cover."
-										: "Place selection is only required for place scope."}
+											? t("sheet.selectProjectFirstHelp")
+											: t("sheet.placeHelp")
+										: t("sheet.placeOptionalHelp")}
 								</p>
 							)}
 						</div>
 						<fieldset className="grid gap-2 md:col-span-2">
-							<legend className="text-sm font-medium text-foreground">Capabilities</legend>
+							<legend className="text-sm font-medium text-foreground">{t("sheet.capabilitiesTitle")}</legend>
 							<p className="text-sm text-muted-foreground">
-								Choose what the auditor can do inside the selected scope.
+								{t("sheet.capabilitiesDescription")}
 							</p>
 							<div className="flex flex-wrap items-center gap-4">
 								<label className="flex items-center gap-2 text-sm">
@@ -814,7 +823,7 @@ export default function ManagerAssignmentsPage() {
 											clearFieldError("roles");
 										}}
 									/>
-									Audit capability
+									{t("sheet.auditCapability")}
 								</label>
 								<label className="flex items-center gap-2 text-sm">
 									<input
@@ -825,7 +834,7 @@ export default function ManagerAssignmentsPage() {
 											clearFieldError("roles");
 										}}
 									/>
-									Place admin capability
+									{t("sheet.placeAdminCapability")}
 								</label>
 							</div>
 							{fieldErrors.roles ? <p className="text-sm text-destructive">{fieldErrors.roles}</p> : null}
@@ -843,13 +852,13 @@ export default function ManagerAssignmentsPage() {
 								variant="outline"
 								onClick={() => setIsCreateSheetOpen(false)}
 								disabled={createAssignment.isPending}>
-								Cancel
+								{t("actions.cancel")}
 							</Button>
 							<Button
 								type="button"
 								disabled={createAssignment.isPending}
 								onClick={handleCreateAssignment}>
-								{createAssignment.isPending ? "Creating…" : "Create assignment"}
+								{createAssignment.isPending ? t("actions.creating") : t("actions.createAssignment")}
 							</Button>
 						</div>
 					</SheetFooter>
@@ -862,13 +871,16 @@ export default function ManagerAssignmentsPage() {
 						setAssignmentPendingDelete(null);
 					}
 				}}
-				title="Delete assignment"
+				title={t("confirmDelete.title")}
 				description={
 					assignmentPendingDelete
-						? `Remove ${assignmentPendingDelete.scopeLabel} access for "${assignmentPendingDelete.scopeName}"? The auditor will lose this access until you assign it again.`
-						: "Remove this assignment? The auditor will lose this access until you assign it again."
+						? t("confirmDelete.descriptionWithScope", {
+							scopeLabel: assignmentPendingDelete.scopeLabel,
+							scopeName: assignmentPendingDelete.scopeName
+						})
+						: t("confirmDelete.description")
 				}
-				confirmLabel="Delete assignment"
+				confirmLabel={t("confirmDelete.confirmLabel")}
 				isPending={deleteAssignment.isPending}
 				onConfirm={() => {
 					if (!assignmentPendingDelete) {

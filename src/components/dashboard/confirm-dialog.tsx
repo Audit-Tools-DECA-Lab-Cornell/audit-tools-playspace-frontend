@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -34,6 +36,8 @@ export function ConfirmDialog({
 	isPending = false,
 	confirmVariant = "destructive"
 }: Readonly<ConfirmDialogProps>) {
+	const t = useTranslations("shared.confirmDialog");
+
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
 			<DialogContent className="max-w-md">
@@ -43,7 +47,7 @@ export function ConfirmDialog({
 				</DialogHeader>
 				<DialogFooter>
 					<Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isPending}>
-						Cancel
+						{t("cancel")}
 					</Button>
 					<Button type="button" variant={confirmVariant} onClick={onConfirm} disabled={isPending}>
 						{confirmLabel}

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, JetBrains_Mono, Space_Grotesk } from "next/font/google";
+import { NextIntlClientProvider } from "next-intl";
+import { getMessages, getTranslations } from "next-intl/server";
 import "@fontsource/opendyslexic/400.css";
 import "@fontsource/opendyslexic/700.css";
 import "./globals.css";
@@ -21,20 +23,28 @@ const monoFont = JetBrains_Mono({
 	subsets: ["latin"]
 });
 
-export const metadata: Metadata = {
-	title: "Playspace Audit Tool",
-	description: "Playspace Play Value and Usability Audit Tool"
-};
+export async function generateMetadata(): Promise<Metadata> {
+	const t = await getTranslations("metadata");
 
-export default function RootLayout({
+	return {
+		title: t("title"),
+		description: t("description")
+	};
+}
+
+export default async function RootLayout({
 	children
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
+	const messages = await getMessages();
+
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body className={`${bodyFont.variable} ${headingFont.variable} ${monoFont.variable} antialiased`}>
-				<Providers>{children}</Providers>
+				<NextIntlClientProvider messages={messages}>
+					<Providers>{children}</Providers>
+				</NextIntlClientProvider>
 			</body>
 		</html>
 	);

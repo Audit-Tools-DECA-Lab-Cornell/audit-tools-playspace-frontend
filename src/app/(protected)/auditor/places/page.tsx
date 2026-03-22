@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 
 import { playspaceApi } from "@/lib/api/playspace";
@@ -19,18 +20,14 @@ function getStatusBadgeVariant(status: "IN_PROGRESS" | "PAUSED" | "SUBMITTED" | 
 	return "outline";
 }
 
-function getStatusLabel(status: "IN_PROGRESS" | "PAUSED" | "SUBMITTED" | null): string {
-	if (!status) return "not started";
-	return status.toLowerCase().replaceAll("_", " ");
-}
-
-function formatLocation(city: string | null, province: string | null, country: string | null): string {
+function formatLocation(city: string | null, province: string | null, country: string | null, pendingLabel: string): string {
 	const parts = [city, province, country].filter((part): part is string => Boolean(part && part.trim().length > 0));
-	if (parts.length === 0) return "Location pending";
+	if (parts.length === 0) return pendingLabel;
 	return parts.join(", ");
 }
 
 export default function AuditorPlacesPage() {
+	const t = useTranslations("auditor.places");
 	const [currentPage, setCurrentPage] = React.useState(1);
 	const placesQuery = useQuery({
 		queryKey: ["playspace", "auditor", "assignedPlaces", "placesPage"],
@@ -57,14 +54,12 @@ export default function AuditorPlacesPage() {
 		return (
 			<Card>
 				<CardHeader>
-					<CardTitle>Unable to load places</CardTitle>
+					<CardTitle>{t("error.title")}</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-3">
-					<p className="text-sm text-muted-foreground">
-						Try refreshing the page. If this continues, check your sign-in role and access scope.
-					</p>
+					<p className="text-sm text-muted-foreground">{t("error.description")}</p>
 					<Button type="button" onClick={() => globalThis.location.reload()}>
-						Refresh
+						{t("actions.refresh")}
 					</Button>
 				</CardContent>
 			</Card>
@@ -74,24 +69,21 @@ export default function AuditorPlacesPage() {
 	return (
 		<div className="space-y-6">
 			<DashboardHeader
-				eyebrow="Auditor Workspace"
-				title="Assigned places"
-				description="Review place context, status, and continue execution."
+				eyebrow={t("header.eyebrow")}
+				title={t("header.title")}
+				description={t("header.description")}
 				breadcrumbs={[
-					{ label: "Dashboard", href: "/auditor/dashboard" },
-					{ label: "Places" }
+					{ label: t("breadcrumbs.dashboard"), href: "/auditor/dashboard" },
+					{ label: t("breadcrumbs.places") }
 				]}
 			/>
 			<Card>
 				<CardHeader>
-					<CardTitle>Places</CardTitle>
+					<CardTitle>{t("list.title")}</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-3">
 					{places.length === 0 ? (
-						<p className="text-sm text-muted-foreground">
-							Assigned places will appear here after a manager grants access. Refresh if you were just
-							assigned.
-						</p>
+						<p className="text-sm text-muted-foreground">{t("list.empty")}</p>
 					) : null}
 					{paginatedPlaces.map(place => {
 						const executeHref = `/auditor/execute/${encodeURIComponent(place.place_id)}`;
@@ -100,7 +92,7 @@ export default function AuditorPlacesPage() {
 								? `/auditor/reports/${encodeURIComponent(place.audit_id)}`
 								: null;
 						const isResumeAction = place.audit_status === "IN_PROGRESS" || place.audit_status === "PAUSED";
-						const primaryActionLabel = isResumeAction ? "Resume audit" : "Start audit";
+						const primaryActionLabel = isResumeAction ? t("list.resumeAudit") : t("list.startAudit");
 						return (
 							<div
 								key={place.place_id}
@@ -109,19 +101,19 @@ export default function AuditorPlacesPage() {
 									<p className="font-medium text-foreground">{place.place_name}</p>
 									<p className="text-sm text-muted-foreground">{place.project_name}</p>
 									<p className="text-xs text-muted-foreground">
-										{formatLocation(place.city, place.province, place.country)}
+										{formatLocation(place.city, place.province, place.country, t("list.locationPending"))}
 									</p>
 								</div>
 								<div className="flex flex-wrap items-center gap-2">
 									<Badge variant={getStatusBadgeVariant(place.audit_status)} className="font-medium">
-										{getStatusLabel(place.audit_status)}
+										{place.audit_status ? t(`status.${place.audit_status.toLowerCase()}`) : t("status.not_started")}
 									</Badge>
 									<Button asChild size="sm" variant={isResumeAction ? "outline" : "default"}>
 										<Link href={executeHref}>{primaryActionLabel}</Link>
 									</Button>
 									{reportHref ? (
 										<Button asChild size="sm" variant="outline">
-											<Link href={reportHref}>Open report</Link>
+											<Link href={reportHref}>{t("list.openReport")}</Link>
 										</Button>
 									) : null}
 								</div>
@@ -133,7 +125,7 @@ export default function AuditorPlacesPage() {
 						pageCount={pageCount}
 						totalItems={places.length}
 						pageSize={AUDITOR_PLACES_PAGE_SIZE}
-						itemLabel="places"
+						itemLabel={t("pagination.itemLabel")}
 						onPageChange={setCurrentPage}
 					/>
 				</CardContent>

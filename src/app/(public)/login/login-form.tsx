@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 import { z } from "zod";
 
@@ -27,14 +28,9 @@ const managerLoginSchema = z.object({
 
 type ManagerLoginValues = z.infer<typeof managerLoginSchema>;
 
-const auditorLoginSchema = z.object({
-	// alpha numberic including - and _
-	auditorCode: z.string().regex(/^[a-zA-Z0-9-_]+$/, {
-		message: "Auditor code must be alphanumeric."
-	})
-});
-
-type AuditorLoginValues = z.infer<typeof auditorLoginSchema>;
+interface AuditorLoginValues {
+	auditorCode: string;
+}
 
 function isSafeInternalPath(value: string): boolean {
 	return value.startsWith("/") && !value.startsWith("//");
@@ -71,6 +67,7 @@ export interface LoginFormProps {
 
 export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 	const router = useRouter();
+	const t = useTranslations("login");
 	const [adminValues, setAdminValues] = React.useState<AdminLoginValues>({
 		email: "",
 		password: ""
@@ -85,6 +82,14 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 		auditorCode: ""
 	});
 	const [auditorErrors, setAuditorErrors] = React.useState<Partial<Record<keyof AuditorLoginValues, string>>>({});
+
+	const auditorLoginSchema = React.useMemo(() => {
+		return z.object({
+			auditorCode: z.string().regex(/^[a-zA-Z0-9-_]+$/, {
+				message: t("validation.auditorCodeAlphanumeric")
+			})
+		});
+	}, [t]);
 
 	const handleAdminSubmit: React.FormEventHandler<HTMLFormElement> = event => {
 		event.preventDefault();
@@ -154,7 +159,7 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 		if (!parsedValues.success) {
 			const auditorCodeIssue = parsedValues.error.issues.find(issue => issue.path[0] === "auditorCode");
 			setAuditorErrors({
-				auditorCode: auditorCodeIssue?.message ?? "Auditor code is invalid."
+				auditorCode: auditorCodeIssue?.message ?? t("validation.auditorCodeInvalid")
 			});
 			return;
 		}
@@ -176,20 +181,20 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 				<div className="grid w-full gap-6 lg:grid-cols-3">
 					<Card>
 						<CardHeader>
-							<CardTitle>Administrator sign in</CardTitle>
+							<CardTitle>{t("admin.title")}</CardTitle>
 							<CardDescription>
-								Global oversight across accounts, projects, places, and audit activity.
+								{t("admin.description")}
 							</CardDescription>
 						</CardHeader>
 						<CardContent>
 							<form className="grid gap-4" onSubmit={handleAdminSubmit}>
 								<div className="grid gap-2">
-									<Label htmlFor="admin_email">Email</Label>
+									<Label htmlFor="admin_email">{t("fields.email")}</Label>
 									<Input
 										id="admin_email"
 										type="email"
 										autoComplete="email"
-										placeholder="admin@company.com"
+										placeholder={t("admin.emailPlaceholder")}
 										value={adminValues.email}
 										onChange={event => {
 											const nextEmail = event.target.value;
@@ -209,7 +214,7 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 								</div>
 
 								<div className="grid gap-2">
-									<Label htmlFor="admin_password">Password</Label>
+									<Label htmlFor="admin_password">{t("fields.password")}</Label>
 									<Input
 										id="admin_password"
 										type="password"
@@ -232,9 +237,9 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 									) : null}
 								</div>
 
-								<Button type="submit">Sign in</Button>
+								<Button type="submit">{t("actions.signIn")}</Button>
 								<p className="text-xs text-muted-foreground">
-									Demo admin: <span className="font-mono">playspace.admin@example.org</span>
+									{t("admin.demoLabel")} <span className="font-mono">playspace.admin@example.org</span>
 								</p>
 							</form>
 						</CardContent>
@@ -242,20 +247,20 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 
 					<Card>
 						<CardHeader>
-							<CardTitle>Manager sign in</CardTitle>
+							<CardTitle>{t("manager.title")}</CardTitle>
 							<CardDescription>
-								Full-access dashboard: projects, places, auditors, and combined scores.
+								{t("manager.description")}
 							</CardDescription>
 						</CardHeader>
 						<CardContent>
 							<form className="grid gap-4" onSubmit={handleManagerSubmit}>
 								<div className="grid gap-2">
-									<Label htmlFor="manager_email">Email</Label>
+									<Label htmlFor="manager_email">{t("fields.email")}</Label>
 									<Input
 										id="manager_email"
 										type="email"
 										autoComplete="email"
-										placeholder="manager@company.com"
+										placeholder={t("manager.emailPlaceholder")}
 										value={managerValues.email}
 										onChange={event => {
 											const nextEmail = event.target.value;
@@ -275,7 +280,7 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 								</div>
 
 								<div className="grid gap-2">
-									<Label htmlFor="manager_password">Password</Label>
+									<Label htmlFor="manager_password">{t("fields.password")}</Label>
 									<Input
 										id="manager_password"
 										type="password"
@@ -298,9 +303,9 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 									) : null}
 								</div>
 
-								<Button type="submit">Sign in</Button>
+								<Button type="submit">{t("actions.signIn")}</Button>
 								<p className="text-xs text-muted-foreground">
-									Demo managers: <span className="font-mono">manager@example.org</span> or{" "}
+									{t("manager.demoLabel")} <span className="font-mono">manager@example.org</span> {t("manager.demoOr")}{" "}
 									<span className="font-mono">canterbury.manager@example.org</span>
 								</p>
 							</form>
@@ -309,19 +314,19 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 
 					<Card>
 						<CardHeader>
-							<CardTitle>Auditor sign in</CardTitle>
+							<CardTitle>{t("auditor.title")}</CardTitle>
 							<CardDescription>
-								Limited access: execute assigned audits using your auditor code.
+								{t("auditor.description")}
 							</CardDescription>
 						</CardHeader>
 						<CardContent>
 							<form className="grid gap-4" onSubmit={handleAuditorSubmit}>
 								<div className="grid gap-2">
-									<Label htmlFor="auditor_code">Auditor code</Label>
+									<Label htmlFor="auditor_code">{t("fields.auditorCode")}</Label>
 									<Input
 										id="auditor_code"
 										autoComplete="off"
-										placeholder="A1B2C3"
+										placeholder={t("auditor.codePlaceholder")}
 										value={auditorValues.auditorCode}
 										onChange={event => {
 											const nextAuditorCode = event.target.value;
@@ -334,16 +339,16 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 									) : null}
 								</div>
 
-								<Button type="submit">Continue</Button>
+								<Button type="submit">{t("actions.continue")}</Button>
 							</form>
 
 							<Separator className="my-6" />
 
 							<p className="text-sm text-muted-foreground">
-								Auditors are identified strictly by code. No real names are displayed in the UI.
+								{t("auditor.note")}
 							</p>
 							<p className="text-xs text-muted-foreground">
-								Try demo codes: <span className="font-mono">AKL-01</span>,{" "}
+								{t("auditor.demoLabel")} <span className="font-mono">AKL-01</span>,{" "}
 								<span className="font-mono">AKL-02</span>, or <span className="font-mono">CHC-01</span>
 							</p>
 						</CardContent>

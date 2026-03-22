@@ -1,4 +1,7 @@
+"use client";
+
 import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 
@@ -22,6 +25,8 @@ export function PaginationControls({
 	itemLabel,
 	onPageChange
 }: Readonly<PaginationControlsProps>) {
+	const t = useTranslations("shared.pagination");
+
 	if (pageCount <= 1) {
 		return null;
 	}
@@ -32,7 +37,7 @@ export function PaginationControls({
 	return (
 		<div className="flex flex-col gap-3 border-t border-border/70 pt-4 sm:flex-row sm:items-center sm:justify-between">
 			<p className="text-sm text-muted-foreground">
-				Showing {rangeStart}-{rangeEnd} of {totalItems} {itemLabel}
+				{t("showing", { start: rangeStart, end: rangeEnd, total: totalItems, itemLabel })}
 			</p>
 			<div className="flex items-center gap-2">
 				<Button
@@ -45,10 +50,10 @@ export function PaginationControls({
 						onPageChange(currentPage - 1);
 					}}>
 					<ChevronLeftIcon data-icon="inline-start" aria-hidden="true" />
-					Previous
+					{t("previous")}
 				</Button>
 				<p className="min-w-24 text-center text-sm text-muted-foreground tabular-nums">
-					Page {currentPage} of {pageCount}
+					{t("page", { current: currentPage, total: pageCount })}
 				</p>
 				<Button
 					type="button"
@@ -59,7 +64,7 @@ export function PaginationControls({
 					onClick={() => {
 						onPageChange(currentPage + 1);
 					}}>
-					Next
+					{t("next")}
 					<ChevronRightIcon data-icon="inline-end" aria-hidden="true" />
 				</Button>
 			</div>

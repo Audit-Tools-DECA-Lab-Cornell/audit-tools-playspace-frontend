@@ -3,29 +3,18 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 
 import { playspaceApi } from "@/lib/api/playspace";
-import { BASE_PLAYSPACE_INSTRUMENT } from "@/lib/instrument";
+import { useLocalizedInstrument } from "@/lib/instrument-translations";
 import { BackButton } from "@/components/dashboard/back-button";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { formatAuditCodeReference, formatDateTimeLabel, formatScoreLabel } from "@/components/dashboard/utils";
+import type { PreAuditQuestion } from "@/types/audit";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
-const sectionTitleByKey = Object.fromEntries(
-	BASE_PLAYSPACE_INSTRUMENT.sections.map(section => [section.section_key, section.title])
-);
-const preAuditQuestionByKey = Object.fromEntries(
-	BASE_PLAYSPACE_INSTRUMENT.pre_audit_questions.map(question => [question.key, question])
-);
-const executionModeSummaryByKey = {
-	both: "Onsite audit and survey",
-	survey: "Survey only",
-	audit: "Onsite audit only"
-} as const;
-
 /**
  * Fall back to a readable label when no instrument option exists.
  */
@@ -33,17 +22,22 @@ function humanizeToken(value: string): string {
 	return value
 		.replaceAll("_", " ")
 		.replaceAll("-", " ")
-		.replace(/\s+/g, " ")
+		.replaceAll(/\s+/g, " ")
 		.trim()
-		.replace(/\b\w/g, character => character.toUpperCase());
+		.replaceAll(/\b\w/g, character => character.toUpperCase());
 }
 
 /**
  * Resolve a stored option key into its display label from the instrument definition.
  */
-function formatPreAuditValue(questionKey: string, value: string | null): string {
+function formatPreAuditValue(
+	preAuditQuestionByKey: Readonly<Record<string, PreAuditQuestion>>,
+	questionKey: string,
+	value: string | null,
+	notProvidedLabel: string
+): string {
 	if (!value) {
-		return "Not provided";
+		return notProvidedLabel;
 	}
 
 	const question = preAuditQuestionByKey[questionKey];
@@ -54,15 +48,25 @@ function formatPreAuditValue(questionKey: string, value: string | null): string 
 /**
  * Resolve a stored multi-select answer array into readable labels.
  */
-function formatPreAuditValueList(questionKey: string, values: string[]): string {
+function formatPreAuditValueList(
+	preAuditQuestionByKey: Readonly<Record<string, PreAuditQuestion>>,
+	questionKey: string,
+	values: string[],
+	notProvidedLabel: string
+): string {
 	if (values.length === 0) {
-		return "Not provided";
+		return notProvidedLabel;
 	}
 
-	return values.map(value => formatPreAuditValue(questionKey, value)).join(", ");
+	return values
+		.map(value => formatPreAuditValue(preAuditQuestionByKey, questionKey, value, notProvidedLabel))
+		.join(", ");
 }
 
 export default function AuditorReportDetailPage() {
+	const t = useTranslations("auditor.reportDetail");
+	const formatT = useTranslations("common.format");
+	const instrument = useLocalizedInstrument();
 	const params = useParams<{ auditId: string }>();
 	const auditId = params.auditId;
 
@@ -72,6 +76,16 @@ export default function AuditorReportDetailPage() {
 		enabled: typeof auditId === "string" && auditId.length > 0
 	});
 	const audit = auditQuery.data ?? null;
+	const sectionTitleByKey = React.useMemo(() => {
+		return Object.fromEntries(
+			instrument.sections.map(section => [section.section_key, section.title])
+		) as Readonly<Record<string, string>>;
+	}, [instrument]);
+	const preAuditQuestionByKey = React.useMemo(() => {
+		return Object.fromEntries(
+			instrument.pre_audit_questions.map(question => [question.key, question])
+		) as Readonly<Record<string, PreAuditQuestion>>;
+	}, [instrument]);
 	const sectionRows = React.useMemo(() => {
 		return audit ? Object.values(audit.sections) : [];
 	}, [audit]);
@@ -113,13 +127,11 @@ export default function AuditorReportDetailPage() {
 		return (
 			<Card>
 				<CardHeader>
-					<CardTitle>Unable to load audit detail</CardTitle>
+					<CardTitle>{t("error.title")}</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-3">
-					<p className="text-sm text-muted-foreground">
-						Try refreshing the page or return to reports and re-open the audit.
-					</p>
-					<BackButton href="/auditor/reports" label="Back to reports" />
+					<p className="text-sm text-muted-foreground">{t("error.description")}</p>
+					<BackButton href="/auditor/reports" label={t("actions.backToReports")} />
 				</CardContent>
 			</Card>
 		);
@@ -128,35 +140,35 @@ export default function AuditorReportDetailPage() {
 	return (
 		<div className="space-y-6">
 			<DashboardHeader
-				eyebrow="Auditor Report Detail"
+				eyebrow={t("header.eyebrow")}
 				title={audit.place_name}
-				description={`Audit ${formatAuditCodeReference(audit.audit_code)} · ${humanizeToken(audit.status).toLowerCase()}`}
+				description={t("header.description", {
+					auditCode: formatAuditCodeReference(audit.audit_code),
+					status: t(`status.${audit.status.toLowerCase()}`)
+				})}
 				actions={
 					<div className="flex flex-wrap items-center gap-2">
 						{canResumeAudit ? (
 							<Button asChild variant="outline">
 								<Link href={`/auditor/execute/${encodeURIComponent(audit.place_id)}`}>
-									Resume audit
+									{t("actions.resumeAudit")}
 								</Link>
 							</Button>
 						) : null}
-						<BackButton href="/auditor/reports" label="Back to reports" />
+						<BackButton href="/auditor/reports" label={t("actions.backToReports")} />
 					</div>
 				}
 			/>
 			{canResumeAudit ? (
 				<Card>
 					<CardHeader>
-						<CardTitle>Audit still in progress</CardTitle>
+						<CardTitle>{t("inProgressCard.title")}</CardTitle>
 					</CardHeader>
 					<CardContent className="space-y-3">
-						<p className="text-sm text-muted-foreground">
-							Use the execution workspace to finish required questions before this session can be
-							submitted.
-						</p>
+						<p className="text-sm text-muted-foreground">{t("inProgressCard.description")}</p>
 						<Button asChild variant="outline">
 							<Link href={`/auditor/execute/${encodeURIComponent(audit.place_id)}`}>
-								Continue in execution workspace
+								{t("inProgressCard.continue")}
 							</Link>
 						</Button>
 					</CardContent>
@@ -165,72 +177,135 @@ export default function AuditorReportDetailPage() {
 			<div className="grid gap-4 xl:grid-cols-2">
 				<Card>
 					<CardHeader>
-						<CardTitle>Session metadata</CardTitle>
+						<CardTitle>{t("metadata.title")}</CardTitle>
 					</CardHeader>
 					<CardContent className="space-y-2 text-sm text-muted-foreground">
-						<p>Started: {formatDateTimeLabel(audit.started_at)}</p>
-						<p>Submitted: {formatDateTimeLabel(audit.submitted_at)}</p>
 						<p>
-							Execution mode:{" "}
-							{audit.meta.execution_mode
-								? executionModeSummaryByKey[audit.meta.execution_mode]
-								: "Not selected"}
+							{t("metadata.started", { value: formatDateTimeLabel(audit.started_at, formatT) })}
 						</p>
-						<p>Ready to submit: {audit.progress.ready_to_submit ? "Yes" : "No"}</p>
+						<p>{t("metadata.submitted", { value: formatDateTimeLabel(audit.submitted_at, formatT) })}</p>
+						<p>
+							{t("metadata.executionMode", {
+								value: audit.meta.execution_mode
+									? t(`executionMode.${audit.meta.execution_mode}`)
+									: t("metadata.notSelected")
+							})}
+						</p>
+						<p>{t("metadata.readyToSubmit", { value: audit.progress.ready_to_submit ? t("metadata.yes") : t("metadata.no") })}</p>
 					</CardContent>
 				</Card>
 				<Card>
 					<CardHeader>
-						<CardTitle>Scores</CardTitle>
+						<CardTitle>{t("scores.title")}</CardTitle>
 					</CardHeader>
 					<CardContent className="space-y-2 text-sm text-muted-foreground">
 						<p>
-							Summary:{" "}
-							{formatScoreLabel(
-								audit.scores.overall
-									? audit.scores.overall.play_value_total + audit.scores.overall.usability_total
-									: null
-							)}
+							{t("scores.summary", {
+								value: formatScoreLabel(
+									audit.scores.overall
+										? audit.scores.overall.play_value_total + audit.scores.overall.usability_total
+										: null,
+									formatT
+								)
+							})}
 						</p>
 						<p>
-							Play value:{" "}
-							{audit.scores.overall ? String(audit.scores.overall.play_value_total) : "Pending"}
+							{t("scores.playValue", {
+								value: audit.scores.overall ? String(audit.scores.overall.play_value_total) : formatT("pending")
+							})}
 						</p>
 						<p>
-							Usability: {audit.scores.overall ? String(audit.scores.overall.usability_total) : "Pending"}
+							{t("scores.usability", {
+								value: audit.scores.overall ? String(audit.scores.overall.usability_total) : formatT("pending")
+							})}
 						</p>
 						<p>
-							Sociability:{" "}
-							{audit.scores.overall ? String(audit.scores.overall.sociability_total) : "Pending"}
+							{t("scores.sociability", {
+								value: audit.scores.overall ? String(audit.scores.overall.sociability_total) : formatT("pending")
+							})}
 						</p>
 					</CardContent>
 				</Card>
 			</div>
 			<Card>
 				<CardHeader>
-					<CardTitle>Pre-audit answers</CardTitle>
+					<CardTitle>{t("preAudit.title")}</CardTitle>
 				</CardHeader>
 				<CardContent className="grid gap-2 text-sm text-muted-foreground md:grid-cols-2">
-					<p>Season: {formatPreAuditValue("season", audit.pre_audit.season)}</p>
-					<p>User count: {formatPreAuditValue("user_count", audit.pre_audit.user_count)}</p>
-					<p>Place size: {formatPreAuditValue("place_size", audit.pre_audit.place_size)}</p>
-					<p>Weather: {formatPreAuditValueList("weather_conditions", audit.pre_audit.weather_conditions)}</p>
-					<p>Users present: {formatPreAuditValueList("users_present", audit.pre_audit.users_present)}</p>
-					<p>Age groups: {formatPreAuditValueList("age_groups", audit.pre_audit.age_groups)}</p>
+					<p>
+						{t("preAudit.season", {
+							value: formatPreAuditValue(
+								preAuditQuestionByKey,
+								"season",
+								audit.pre_audit.season,
+								t("preAudit.notProvided")
+							)
+						})}
+					</p>
+					<p>
+						{t("preAudit.userCount", {
+							value: formatPreAuditValue(
+								preAuditQuestionByKey,
+								"user_count",
+								audit.pre_audit.user_count,
+								t("preAudit.notProvided")
+							)
+						})}
+					</p>
+					<p>
+						{t("preAudit.placeSize", {
+							value: formatPreAuditValue(
+								preAuditQuestionByKey,
+								"place_size",
+								audit.pre_audit.place_size,
+								t("preAudit.notProvided")
+							)
+						})}
+					</p>
+					<p>
+						{t("preAudit.weather", {
+							value: formatPreAuditValueList(
+								preAuditQuestionByKey,
+								"weather_conditions",
+								audit.pre_audit.weather_conditions,
+								t("preAudit.notProvided")
+							)
+						})}
+					</p>
+					<p>
+						{t("preAudit.usersPresent", {
+							value: formatPreAuditValueList(
+								preAuditQuestionByKey,
+								"users_present",
+								audit.pre_audit.users_present,
+								t("preAudit.notProvided")
+							)
+						})}
+					</p>
+					<p>
+						{t("preAudit.ageGroups", {
+							value: formatPreAuditValueList(
+								preAuditQuestionByKey,
+								"age_groups",
+								audit.pre_audit.age_groups,
+								t("preAudit.notProvided")
+							)
+						})}
+					</p>
 				</CardContent>
 			</Card>
 			<Card>
 				<CardHeader>
-					<CardTitle>Section notes</CardTitle>
+					<CardTitle>{t("sectionNotes.title")}</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-3">
 					{sectionRows.length === 0 ? (
-						<p className="text-sm text-muted-foreground">No section data available yet.</p>
+						<p className="text-sm text-muted-foreground">{t("sectionNotes.empty")}</p>
 					) : (
 						<>
 							<div className="flex flex-wrap items-center justify-between gap-3">
 								<p className="text-sm text-muted-foreground">
-									{notedSectionCount} of {sectionRows.length} sections include notes.
+									{t("sectionNotes.summary", { notedCount: notedSectionCount, totalCount: sectionRows.length })}
 								</p>
 								<div className="flex flex-wrap items-center gap-2">
 									{emptySectionCount > 0 ? (
@@ -242,8 +317,8 @@ export default function AuditorReportDetailPage() {
 												setShowEmptySections(currentValue => !currentValue);
 											}}>
 											{showEmptySections
-												? `Hide empty sections (${emptySectionCount})`
-												: `Show empty sections (${emptySectionCount})`}
+												? t("sectionNotes.hideEmptySections", { count: emptySectionCount })
+												: t("sectionNotes.showEmptySections", { count: emptySectionCount })}
 										</Button>
 									) : null}
 									<Button
@@ -253,17 +328,14 @@ export default function AuditorReportDetailPage() {
 										onClick={() => {
 											setShowSectionCodes(currentValue => !currentValue);
 										}}>
-										{showSectionCodes ? "Hide section codes" : "Show section codes"}
+										{showSectionCodes ? t("sectionNotes.hideSectionCodes") : t("sectionNotes.showSectionCodes")}
 									</Button>
 								</div>
 							</div>
 							{orderedSectionRows.length === 0 ? (
 								<div className="rounded-card border border-dashed border-border p-4">
-									<p className="font-medium text-foreground">No captured notes yet</p>
-									<p className="mt-2 text-sm text-muted-foreground">
-										Empty sections are currently hidden. Show them if you want to review the full
-										instrument structure.
-									</p>
+									<p className="font-medium text-foreground">{t("sectionNotes.noCapturedNotesTitle")}</p>
+									<p className="mt-2 text-sm text-muted-foreground">{t("sectionNotes.noCapturedNotesDescription")}</p>
 								</div>
 							) : (
 								<div className="grid gap-3 md:grid-cols-2">
@@ -290,11 +362,11 @@ export default function AuditorReportDetailPage() {
 													<Badge
 														variant={hasNote ? "secondary" : "outline"}
 														className="font-medium">
-														{hasNote ? "Captured note" : "Empty"}
+														{hasNote ? t("sectionNotes.capturedNote") : t("sectionNotes.emptyBadge")}
 													</Badge>
 												</div>
 												<p className="mt-3 text-sm text-muted-foreground">
-													{hasNote ? section.note : "No note captured."}
+													{hasNote ? section.note : t("sectionNotes.noNoteCaptured")}
 												</p>
 											</div>
 										);

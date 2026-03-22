@@ -1,5 +1,12 @@
 import type { PlaceSummary, ProjectSummary } from "@/lib/api/playspace";
 
+export type DashboardTextValues = Record<string, string | number | Date>;
+
+export type DashboardTranslator = (
+	key: string,
+	values?: DashboardTextValues
+) => string;
+
 /**
  * Resolve the current document language when available for locale formatting.
  */
@@ -15,9 +22,9 @@ function getCurrentLocale(): string | undefined {
 /**
  * Format a backend date string into a readable medium date.
  */
-export function formatDateLabel(value: string | null): string {
+export function formatDateLabel(value: string | null, t: DashboardTranslator): string {
 	if (!value) {
-		return "Not set";
+		return t("notSet");
 	}
 
 	const parsedDate = new Date(value);
@@ -35,9 +42,9 @@ export function formatDateLabel(value: string | null): string {
 /**
  * Format a backend datetime string into a compact label.
  */
-export function formatDateTimeLabel(value: string | null): string {
+export function formatDateTimeLabel(value: string | null, t: DashboardTranslator): string {
 	if (!value) {
-		return "No recent activity";
+		return t("noRecentActivity");
 	}
 
 	const parsedDate = new Date(value);
@@ -99,9 +106,9 @@ export function formatAuditCodeReference(auditCode: string): string {
 /**
  * Format a score consistently across cards and tables.
  */
-export function formatScoreLabel(value: number | null): string {
+export function formatScoreLabel(value: number | null, t: DashboardTranslator): string {
 	if (value === null) {
-		return "Pending";
+		return t("pending");
 	}
 
 	return `${Math.round(value * 10) / 10}`;
@@ -110,13 +117,16 @@ export function formatScoreLabel(value: number | null): string {
 /**
  * Build a location label from the place summary fields.
  */
-export function formatLocationLabel(place: Pick<PlaceSummary, "city" | "province" | "country">): string {
+export function formatLocationLabel(
+	place: Pick<PlaceSummary, "city" | "province" | "country">,
+	t: DashboardTranslator
+): string {
 	const parts = [place.city, place.province, place.country].filter((part): part is string =>
 		Boolean(part && part.trim().length > 0)
 	);
 
 	if (parts.length === 0) {
-		return "Location pending";
+		return t("locationPending");
 	}
 
 	return parts.join(", ");
@@ -125,20 +135,23 @@ export function formatLocationLabel(place: Pick<PlaceSummary, "city" | "province
 /**
  * Human-friendly date range text for project headers and tables.
  */
-export function formatProjectDateRange(project: Pick<ProjectSummary, "start_date" | "end_date">): string {
+export function formatProjectDateRange(
+	project: Pick<ProjectSummary, "start_date" | "end_date">,
+	t: DashboardTranslator
+): string {
 	if (!project.start_date && !project.end_date) {
-		return "Dates pending";
+		return t("datesPending");
 	}
 
 	if (project.start_date && project.end_date) {
-		return `${formatDateLabel(project.start_date)} - ${formatDateLabel(project.end_date)}`;
+		return `${formatDateLabel(project.start_date, t)} - ${formatDateLabel(project.end_date, t)}`;
 	}
 
 	if (project.start_date) {
-		return `Starts ${formatDateLabel(project.start_date)}`;
+		return t("starts", { date: formatDateLabel(project.start_date, t) });
 	}
 
-	return `Ends ${formatDateLabel(project.end_date)}`;
+	return t("ends", { date: formatDateLabel(project.end_date, t) });
 }
 
 /**

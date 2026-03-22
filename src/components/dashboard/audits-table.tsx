@@ -3,6 +3,7 @@
 import * as React from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { CheckIcon, CopyIcon } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -54,6 +55,7 @@ function AuditIdentityCell({
 	projectName,
 	accountName
 }: Readonly<AuditIdentityCellProps>) {
+	const t = useTranslations("tables.audits");
 	const [isCopied, setIsCopied] = React.useState(false);
 	const resetTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 	const primaryLabel = placeName ?? projectName ?? accountName ?? auditCode;
@@ -102,17 +104,17 @@ function AuditIdentityCell({
 					size="xs"
 					className="h-7 gap-1.5 px-2 text-xs"
 					onClick={handleCopyAuditCode}
-					aria-label={`Copy audit code ${auditCode}`}>
+					aria-label={t("copyAuditCode", { auditCode })}>
 					{isCopied ? (
 						<CheckIcon data-icon="inline-start" aria-hidden="true" />
 					) : (
 						<CopyIcon data-icon="inline-start" aria-hidden="true" />
 					)}
-					<span>{isCopied ? "Copied" : "Copy ID"}</span>
+					<span>{isCopied ? t("copied") : t("copyId")}</span>
 				</Button>
 			</div>
 			<p className="text-sm text-muted-foreground">
-				Auditor <span className="font-mono text-foreground tracking-[0.04em]">{auditorCode}</span>
+				{t("auditorLabel")} <span className="font-mono text-foreground tracking-[0.04em]">{auditorCode}</span>
 			</p>
 		</div>
 	);
@@ -123,13 +125,15 @@ function AuditIdentityCell({
  */
 export function AuditsTable({
 	rows,
-	title = "Audit activity",
-	description = "Review audit progress, lineage, recency, and score output.",
+	title,
+	description,
 	action,
 	pageSize = 10,
-	emptyMessage = "No audit activity matches the current filters.",
+	emptyMessage,
 	getRowActions
 }: Readonly<AuditsTableProps>) {
+	const t = useTranslations("tables.audits");
+	const formatT = useTranslations("common.format");
 	const columns = React.useMemo<ColumnDef<AuditActivityRow>[]>(
 		() => [
 			{
@@ -138,7 +142,7 @@ export function AuditsTable({
 					[row.auditCode, row.auditorCode, row.placeName, row.projectName, row.accountName]
 						.filter(Boolean)
 						.join(" "),
-				header: ({ column }) => <DataTableColumnHeader column={column} title="Audit" />,
+				header: ({ column }) => <DataTableColumnHeader column={column} title={t("columns.audit")} />,
 				cell: ({ row }) => (
 					<AuditIdentityCell
 						auditCode={row.original.auditCode}
@@ -152,40 +156,42 @@ export function AuditsTable({
 			},
 			{
 				accessorKey: "status",
-				header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
+				header: ({ column }) => <DataTableColumnHeader column={column} title={t("columns.status")} />,
 				filterFn: getMultiValueFilterFn<AuditActivityRow>(),
 				cell: ({ row }) => (
 					<Badge
 						variant={row.original.status === "SUBMITTED" ? "default" : "secondary"}
 						className="font-medium">
-						{row.original.status.toLowerCase().replaceAll("_", " ")}
+						{t(`status.${row.original.status.toLowerCase()}`)}
 					</Badge>
 				)
 			},
 			{
 				accessorKey: "startedAt",
-				header: ({ column }) => <DataTableColumnHeader column={column} title="Started" align="end" />,
+				header: ({ column }) => <DataTableColumnHeader column={column} title={t("columns.started")} align="end" />,
 				cell: ({ row }) => (
 					<span className="block text-right text-sm text-muted-foreground tabular-nums">
-						{formatDateTimeLabel(row.original.startedAt)}
+						{formatDateTimeLabel(row.original.startedAt, formatT)}
 					</span>
 				)
 			},
 			{
 				accessorKey: "submittedAt",
-				header: ({ column }) => <DataTableColumnHeader column={column} title="Submitted" align="end" />,
+				header: ({ column }) => (
+					<DataTableColumnHeader column={column} title={t("columns.submitted")} align="end" />
+				),
 				cell: ({ row }) => (
 					<span className="block text-right text-sm text-muted-foreground tabular-nums">
-						{formatDateTimeLabel(row.original.submittedAt)}
+						{formatDateTimeLabel(row.original.submittedAt, formatT)}
 					</span>
 				)
 			},
 			{
 				accessorKey: "score",
-				header: ({ column }) => <DataTableColumnHeader column={column} title="Score" align="end" />,
+				header: ({ column }) => <DataTableColumnHeader column={column} title={t("columns.score")} align="end" />,
 				cell: ({ row }) => (
 					<span className="block text-right font-mono text-foreground tabular-nums">
-						{formatScoreLabel(row.original.score)}
+						{formatScoreLabel(row.original.score, formatT)}
 					</span>
 				)
 			},
@@ -200,7 +206,7 @@ export function AuditsTable({
 				]
 				: [])
 		],
-		[getRowActions]
+		[formatT, getRowActions, t]
 	);
 
 	const statusOptions = React.useMemo(() => {
@@ -212,22 +218,22 @@ export function AuditsTable({
 
 	return (
 		<DataTable
-			title={title}
-			description={description}
+			title={title ?? t("title")}
+			description={description ?? t("description")}
 			columns={columns}
 			data={rows}
 			searchColumnId="search"
-			searchPlaceholder="Search audits..."
+			searchPlaceholder={t("searchPlaceholder")}
 			filterConfigs={[
 				{
 					columnId: "status",
-					title: "Status",
+					title: t("columns.status"),
 					options: statusOptions
 				}
 			]}
 			action={action}
 			pageSize={pageSize}
-			emptyMessage={emptyMessage}
+			emptyMessage={emptyMessage ?? t("emptyMessage")}
 			initialSorting={[{ id: "submittedAt", desc: true }]}
 		/>
 	);
