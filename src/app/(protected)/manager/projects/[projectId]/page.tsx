@@ -1,12 +1,12 @@
 "use client";
 
-import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ArrowLeftIcon, PencilLineIcon, PlusIcon, Trash2Icon } from "lucide-react";
+import { PencilLineIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import * as React from "react";
 import { use } from "react";
 
 import { playspaceApi } from "@/lib/api/playspace";
+import { BackButton } from "@/components/dashboard/back-button";
 import { ConfirmDialog } from "@/components/dashboard/confirm-dialog";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
@@ -125,11 +125,7 @@ export default function ManagerProjectDetailPage({ params }: Readonly<ManagerPro
 			<EmptyState
 				title="Project unavailable"
 				description={getErrorMessage(error)}
-				action={
-					<Button asChild>
-						<Link href="/manager/projects">Back to projects</Link>
-					</Button>
-				}
+				action={<BackButton href="/manager/projects" label="Back to projects" />}
 			/>
 		);
 	}
@@ -168,12 +164,7 @@ export default function ManagerProjectDetailPage({ params }: Readonly<ManagerPro
 				]}
 				actions={
 					<div className="flex flex-wrap items-center gap-2">
-						<Button asChild variant="outline">
-							<Link href="/manager/projects" className="gap-2">
-								<ArrowLeftIcon className="size-4" />
-								<span>Back to projects</span>
-							</Link>
-						</Button>
+						<BackButton href="/manager/projects" label="Back to projects" />
 						<Button
 							type="button"
 							variant="outline"

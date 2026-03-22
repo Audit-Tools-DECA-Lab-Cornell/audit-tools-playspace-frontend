@@ -8,7 +8,6 @@ import {
 	Accessibility,
 	Building2,
 	Globe,
-	LayoutDashboard,
 	LogOut,
 	Monitor,
 	Moon,
@@ -32,6 +31,7 @@ import {
 	type LanguagePreference,
 	type ThemeMode
 } from "@/components/app/preferences-provider";
+import { BackButton } from "@/components/dashboard/back-button";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { formatDateLabel } from "@/components/dashboard/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -227,7 +227,7 @@ function getAvatarFallbackLabel(value: string): string {
 function DetailItem({ label, value }: Readonly<{ label: string; value: string }>) {
 	return (
 		<div className="space-y-1">
-			<p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">{label}</p>
+			<p className="text-xs font-semibold tracking-[0.08em] text-foreground/70">{label}</p>
 			<p className="text-sm font-medium text-foreground">{value}</p>
 		</div>
 	);
@@ -246,7 +246,7 @@ function SettingsInlineSkeleton({ className }: Readonly<{ className: string }>) 
 function DetailItemSkeleton({ label }: Readonly<{ label: string }>) {
 	return (
 		<div className="space-y-1">
-			<p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">{label}</p>
+			<p className="text-xs font-semibold tracking-[0.08em] text-foreground/70">{label}</p>
 			<SettingsInlineSkeleton className="h-4 w-28" />
 		</div>
 	);
@@ -318,14 +318,7 @@ function SessionUnavailableState() {
  * Header action buttons for the role-aware settings page.
  */
 function SettingsActionBar({ dashboardHref }: Readonly<{ dashboardHref: string }>) {
-	return (
-		<Button asChild variant="outline">
-			<Link href={dashboardHref}>
-				<LayoutDashboard className="h-4 w-4" aria-hidden="true" />
-				Back to dashboard
-			</Link>
-		</Button>
-	);
+	return <BackButton href={dashboardHref} label="Back to dashboard" />;
 }
 
 /**
@@ -781,7 +774,7 @@ function ManagerWorkspaceSection({
 	};
 
 	return (
-		<div className="grid items-start gap-4 xl:grid-cols-2">
+		<div className="grid gap-4 xl:grid-cols-2">
 			<ManagerOrganizationCard
 				account={account}
 				accountIsLoading={accountIsLoading}
@@ -1001,28 +994,28 @@ function ManagerContactsCard({
 				{errorMessage
 					? null
 					: managerProfiles.map(profile => (
-							<div
-								key={profile.id}
-								className="flex items-start gap-3 rounded-card border border-border bg-card p-4">
-								<Avatar size="sm">
-									<AvatarFallback>{getAvatarFallbackLabel(profile.full_name)}</AvatarFallback>
-								</Avatar>
-								<div className="min-w-0 flex-1 space-y-1">
-									<div className="flex flex-wrap items-center gap-2">
-										<p className="font-medium text-foreground">{profile.full_name}</p>
-										{profile.is_primary ? (
-											<Badge>Primary contact</Badge>
-										) : (
-											<Badge variant="secondary">Manager</Badge>
-										)}
-									</div>
-									<p className="text-sm text-muted-foreground">
-										{profile.position ?? "Position pending"}
-									</p>
-									<p className="text-sm text-muted-foreground">{profile.email}</p>
+						<div
+							key={profile.id}
+							className="flex items-start gap-3 rounded-card border border-border bg-card p-4">
+							<Avatar size="sm">
+								<AvatarFallback>{getAvatarFallbackLabel(profile.full_name)}</AvatarFallback>
+							</Avatar>
+							<div className="min-w-0 flex-1 space-y-1">
+								<div className="flex flex-wrap items-center gap-2">
+									<p className="font-medium text-foreground">{profile.full_name}</p>
+									{profile.is_primary ? (
+										<Badge>Primary contact</Badge>
+									) : (
+										<Badge variant="secondary">Manager</Badge>
+									)}
 								</div>
+								<p className="text-sm text-muted-foreground">
+									{profile.position ?? "Position pending"}
+								</p>
+								<p className="text-sm text-muted-foreground">{profile.email}</p>
 							</div>
-						))}
+						</div>
+					))}
 			</CardContent>
 		</Card>
 	);
@@ -1116,10 +1109,14 @@ export default function SettingsPage() {
 				eyebrow="Workspace Settings"
 				title="Settings"
 				description="Manage your account summary, appearance, and accessibility preferences."
+				breadcrumbs={[
+					{ label: "Dashboard", href: getDashboardHref(session.role) },
+					{ label: "Settings" }
+				]}
 				actions={<SettingsActionBar dashboardHref={getDashboardHref(session.role)} />}
 			/>
 
-			<div className="grid items-start gap-4 xl:grid-cols-2">
+			<div className="grid gap-4 xl:grid-cols-2">
 				<ProfileSummaryCard
 					session={session}
 					managerAccount={managerAccount}
@@ -1134,7 +1131,7 @@ export default function SettingsPage() {
 				/>
 			</div>
 
-			<div className="grid items-start gap-4 xl:grid-cols-2">
+			<div className="grid gap-4 xl:grid-cols-2">
 				<AppearancePreferencesCard />
 				<AccessibilityPreferencesCard />
 			</div>

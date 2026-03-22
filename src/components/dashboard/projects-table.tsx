@@ -92,7 +92,7 @@ export function ProjectsTable({
 						variant="outline"
 						className={cn(
 							getProjectStatusClassName(row.original.status),
-							"font-medium tracking-[0.14em] uppercase"
+							"min-w-[110px] font-medium justify-center"
 						)}>
 						{row.original.status}
 					</Badge>
@@ -103,7 +103,7 @@ export function ProjectsTable({
 				accessorFn: project => `${project.start_date ?? ""}|${project.end_date ?? ""}`,
 				header: ({ column }) => <DataTableColumnHeader column={column} title="Dates" align="end" />,
 				cell: ({ row }) => (
-					<span className="block text-right text-sm text-muted-foreground tabular-nums">
+					<span className="block min-w-[150px] text-right text-sm text-muted-foreground tabular-nums">
 						{formatProjectDateRange(row.original)}
 					</span>
 				),
@@ -128,7 +128,7 @@ export function ProjectsTable({
 				accessorKey: "average_score",
 				header: ({ column }) => <DataTableColumnHeader column={column} title="Mean Score" align="end" />,
 				cell: ({ row }) => (
-					<span className="block text-right font-mono text-foreground tabular-nums">
+					<span className="block min-w-[110px] text-right font-mono text-foreground tabular-nums">
 						{formatScoreLabel(row.original.average_score)}
 					</span>
 				)

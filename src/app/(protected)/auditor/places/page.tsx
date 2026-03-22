@@ -77,6 +77,10 @@ export default function AuditorPlacesPage() {
 				eyebrow="Auditor Workspace"
 				title="Assigned places"
 				description="Review place context, status, and continue execution."
+				breadcrumbs={[
+					{ label: "Dashboard", href: "/auditor/dashboard" },
+					{ label: "Places" }
+				]}
 			/>
 			<Card>
 				<CardHeader>
@@ -95,10 +99,8 @@ export default function AuditorPlacesPage() {
 							place.audit_status === "SUBMITTED" && place.audit_id
 								? `/auditor/reports/${encodeURIComponent(place.audit_id)}`
 								: null;
-						const primaryActionLabel =
-							place.audit_status === "IN_PROGRESS" || place.audit_status === "PAUSED"
-								? "Resume audit"
-								: "Start audit";
+						const isResumeAction = place.audit_status === "IN_PROGRESS" || place.audit_status === "PAUSED";
+						const primaryActionLabel = isResumeAction ? "Resume audit" : "Start audit";
 						return (
 							<div
 								key={place.place_id}
@@ -111,12 +113,10 @@ export default function AuditorPlacesPage() {
 									</p>
 								</div>
 								<div className="flex flex-wrap items-center gap-2">
-									<Badge
-										variant={getStatusBadgeVariant(place.audit_status)}
-										className="font-medium tracking-[0.14em] uppercase">
+									<Badge variant={getStatusBadgeVariant(place.audit_status)} className="font-medium">
 										{getStatusLabel(place.audit_status)}
 									</Badge>
-									<Button asChild size="sm" variant="secondary">
+									<Button asChild size="sm" variant={isResumeAction ? "outline" : "default"}>
 										<Link href={executeHref}>{primaryActionLabel}</Link>
 									</Button>
 									{reportHref ? (

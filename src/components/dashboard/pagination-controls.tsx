@@ -1,3 +1,5 @@
+import { ChevronLeftIcon, ChevronRightIcon } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 
 export interface PaginationControlsProps {
@@ -37,10 +39,12 @@ export function PaginationControls({
 					type="button"
 					variant="outline"
 					size="sm"
+					className="gap-1.5 touch-manipulation"
 					disabled={currentPage <= 1}
 					onClick={() => {
 						onPageChange(currentPage - 1);
 					}}>
+					<ChevronLeftIcon data-icon="inline-start" aria-hidden="true" />
 					Previous
 				</Button>
 				<p className="min-w-24 text-center text-sm text-muted-foreground tabular-nums">
@@ -50,11 +54,13 @@ export function PaginationControls({
 					type="button"
 					variant="outline"
 					size="sm"
+					className="gap-1.5 touch-manipulation"
 					disabled={currentPage >= pageCount}
 					onClick={() => {
 						onPageChange(currentPage + 1);
 					}}>
 					Next
+					<ChevronRightIcon data-icon="inline-end" aria-hidden="true" />
 				</Button>
 			</div>
 		</div>

@@ -2,6 +2,7 @@
 
 import { useQuery } from "@tanstack/react-query";
 import type { ColumnDef } from "@tanstack/react-table";
+import { useTranslations } from 'next-intl';
 
 import { playspaceApi, type AdminAccountRow } from "@/lib/api/playspace";
 import { DataTable, getMultiValueFilterFn } from "@/components/dashboard/data-table";
@@ -13,6 +14,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
 export default function AdminAccountsPage() {
+	const t = useTranslations('admin.accounts');
 	const accountsQuery = useQuery({
 		queryKey: ["playspace", "admin", "accounts"],
 		queryFn: () => playspaceApi.admin.accounts()

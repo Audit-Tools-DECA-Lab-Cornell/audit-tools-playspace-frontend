@@ -7,7 +7,7 @@ import * as React from "react";
 import { playspaceApi } from "@/lib/api/playspace";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { PaginationControls } from "@/components/dashboard/pagination-controls";
-import { formatDateTimeLabel, formatScoreLabel } from "@/components/dashboard/utils";
+import { formatAuditCodeReference, formatDateTimeLabel, formatScoreLabel } from "@/components/dashboard/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -68,6 +68,7 @@ export default function AuditorReportsPage() {
 				eyebrow="Auditor Workspace"
 				title="Reports"
 				description="Review submitted and in-progress audit sessions."
+				breadcrumbs={[{ label: "Dashboard", href: "/auditor/dashboard" }, { label: "Reports" }]}
 			/>
 			<Card>
 				<CardHeader>
@@ -84,12 +85,7 @@ export default function AuditorReportsPage() {
 							audit.status === "SUBMITTED"
 								? `/auditor/reports/${encodeURIComponent(audit.audit_id)}`
 								: `/auditor/execute/${encodeURIComponent(audit.place_id)}`;
-						const detailLabel =
-							audit.status === "SUBMITTED"
-								? "Open report"
-								: audit.status === "PAUSED"
-									? "Resume audit"
-									: "Continue audit";
+						const detailLabel = audit.status === "SUBMITTED" ? "Open report" : "Resume audit";
 						const submissionLabel = audit.submitted_at
 							? `Submitted ${formatDateTimeLabel(audit.submitted_at)}`
 							: "Draft not submitted yet";
@@ -99,26 +95,29 @@ export default function AuditorReportsPage() {
 								className="flex flex-col gap-3 rounded-card border border-border/70 bg-card/60 p-4 lg:flex-row lg:items-center lg:justify-between">
 								<div className="min-w-0 space-y-1">
 									<p className="font-medium text-foreground">{audit.place_name}</p>
-									<p className="text-sm text-muted-foreground">
-										{audit.project_name} ·{" "}
-										<span className="font-mono uppercase tracking-[0.08em]">
-											{audit.audit_code}
-										</span>
-									</p>
+									<div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+										<span>{audit.project_name}</span>
+										<code
+											title={audit.audit_code}
+											className="rounded-md bg-muted/65 px-2 py-1 font-mono text-[11px] tracking-[0.04em] text-foreground/80">
+											{formatAuditCodeReference(audit.audit_code)}
+										</code>
+									</div>
 									<p className="text-xs text-muted-foreground">
 										Started {formatDateTimeLabel(audit.started_at)} · {submissionLabel}
 									</p>
 								</div>
 								<div className="flex flex-wrap items-center gap-2">
-									<Badge
-										variant={getStatusBadgeVariant(audit.status)}
-										className="font-medium tracking-[0.14em] uppercase">
+									<Badge variant={getStatusBadgeVariant(audit.status)} className="font-medium">
 										{audit.status.toLowerCase().replaceAll("_", " ")}
 									</Badge>
 									<Badge variant="outline" className="font-mono tabular-nums">
 										{formatScoreLabel(audit.summary_score)}
 									</Badge>
-									<Button asChild size="sm" variant="secondary">
+									<Button
+										asChild
+										size="sm"
+										variant={audit.status === "SUBMITTED" ? "secondary" : "outline"}>
 										<Link href={detailHref}>{detailLabel}</Link>
 									</Button>
 								</div>
@@ -137,9 +136,7 @@ export default function AuditorReportsPage() {
 			</Card>
 			<Card>
 				<CardHeader>
-					<CardTitle className="text-sm tracking-[0.16em] text-muted-foreground uppercase">
-						Submitted report count
-					</CardTitle>
+					<CardTitle className="text-base text-foreground/70">Submitted report count</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-2">
 					<p className="font-mono text-[2rem] font-semibold leading-none tabular-nums">

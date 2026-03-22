@@ -112,6 +112,7 @@ export function DataTable<TData, TValue>({
 				filterConfigs={filterConfigs}
 				action={action}
 			/>
+			{/* min height is the number of rows * the height of the row */}
 			<CardContent className="p-0">
 				<Table>
 					<TableHeader>

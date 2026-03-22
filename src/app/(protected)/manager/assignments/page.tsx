@@ -15,7 +15,17 @@ import { formatDateTimeLabel } from "@/components/dashboard/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+	Select,
+	SelectContent,
+	SelectGroup,
+	SelectItem,
+	SelectLabel,
+	SelectTrigger,
+	SelectValue
+} from "@/components/ui/select";
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 
 type AssignmentScope = "project" | "place";
@@ -63,6 +73,7 @@ export default function ManagerAssignmentsPage() {
 	const [scope, setScope] = React.useState<AssignmentScope>("project");
 	const [selectedProjectId, setSelectedProjectId] = React.useState("");
 	const [selectedPlaceId, setSelectedPlaceId] = React.useState("");
+	const [auditorSearchQuery, setAuditorSearchQuery] = React.useState("");
 	const [allowSurvey, setAllowSurvey] = React.useState(true);
 	const [allowAudit, setAllowAudit] = React.useState(true);
 	const [fieldErrors, setFieldErrors] = React.useState<AssignmentFieldErrors>({});
@@ -218,11 +229,24 @@ export default function ManagerAssignmentsPage() {
 		}
 	});
 
-	const auditors = auditorsQuery.data ?? [];
+	const auditors = React.useMemo(() => auditorsQuery.data ?? [], [auditorsQuery.data]);
 	const projects = projectsQuery.data ?? [];
 	const places = projectPlacesQuery.data ?? [];
 	const assignments = assignmentsQuery.data ?? [];
 	const selectedAuditor = auditors.find(auditor => auditor.id === selectedAuditorId) ?? null;
+	const filteredAuditors = React.useMemo(() => {
+		const normalizedQuery = auditorSearchQuery.trim().toLowerCase();
+		if (normalizedQuery.length === 0) {
+			return auditors;
+		}
+
+		return auditors.filter(auditor => {
+			const searchableText = [auditor.auditor_code, auditor.full_name, auditor.email ?? ""]
+				.join(" ")
+				.toLowerCase();
+			return searchableText.includes(normalizedQuery);
+		});
+	}, [auditorSearchQuery, auditors]);
 
 	const projectNameById = React.useMemo(() => {
 		const projectRows = projectsQuery.data ?? [];
@@ -348,36 +372,98 @@ export default function ManagerAssignmentsPage() {
 				<CardHeader>
 					<CardTitle>Auditor focus</CardTitle>
 				</CardHeader>
-				<CardContent className="grid gap-4 xl:grid-cols-[minmax(0,0.95fr)_minmax(0,1.05fr)]">
-					<div className="grid gap-2">
-						<Label htmlFor="assignment_auditor_filter">Auditor</Label>
-						<select
-							id="assignment_auditor_filter"
-							name="assignmentAuditorFilter"
-							value={selectedAuditorId}
-							onChange={event => {
-								setSelectedAuditorId(event.target.value);
-								clearFieldError("auditorId");
-								setListError(null);
-							}}
-							className="h-10 rounded-field border border-input bg-input px-4 py-2 text-sm"
-							aria-invalid={Boolean(fieldErrors.auditorId)}
-							autoComplete="off"
-							disabled={auditors.length === 0}>
-							<option value="">Select auditor</option>
-							{auditors.map(auditor => (
-								<option key={auditor.id} value={auditor.id}>
-									{`${auditor.auditor_code} · ${auditor.full_name}`}
-								</option>
-							))}
-						</select>
-						{fieldErrors.auditorId ? (
-							<p className="text-sm text-destructive">{fieldErrors.auditorId}</p>
-						) : (
+				<CardContent className="grid gap-4 xl:grid-cols-[minmax(0,0.98fr)_minmax(0,1.02fr)]">
+					<div className="space-y-4 rounded-field border border-border bg-card/80 p-4">
+						<div className="space-y-1">
+							<p className="font-medium text-foreground">Choose an auditor</p>
 							<p className="text-sm text-muted-foreground">
-								Choose an auditor to review assignment coverage or remove outdated access.
+								Filter the roster, then load one auditor&apos;s current project and place access before
+								you make changes.
 							</p>
-						)}
+						</div>
+						<div className="grid gap-2">
+							<Label htmlFor="assignment_auditor_search">Search auditors</Label>
+							<Input
+								id="assignment_auditor_search"
+								name="assignmentAuditorSearch"
+								autoComplete="off"
+								spellCheck={false}
+								value={auditorSearchQuery}
+								onChange={event => {
+									setAuditorSearchQuery(event.target.value);
+								}}
+								placeholder="Search by code, name, or email."
+							/>
+							<p className="text-sm text-muted-foreground">
+								{filteredAuditors.length} auditor{filteredAuditors.length === 1 ? "" : "s"} match the
+								current filter.
+							</p>
+						</div>
+						<div className="grid gap-2">
+							<Label>Auditor</Label>
+							<div className="flex flex-col gap-2 sm:flex-row">
+								<div className="min-w-0 flex-1">
+									<Select
+										value={selectedAuditorId.trim().length > 0 ? selectedAuditorId : undefined}
+										onValueChange={nextValue => {
+											setSelectedAuditorId(nextValue);
+											clearFieldError("auditorId");
+											setListError(null);
+										}}>
+										<SelectTrigger
+											id="assignment_auditor_filter"
+											aria-label="Auditor"
+											aria-invalid={Boolean(fieldErrors.auditorId)}
+											disabled={auditors.length === 0 || filteredAuditors.length === 0}>
+											<SelectValue
+												placeholder={
+													filteredAuditors.length === 0
+														? "No matching auditors"
+														: "Select an auditor"
+												}
+											/>
+										</SelectTrigger>
+										<SelectContent position="popper">
+											<SelectGroup>
+												<SelectLabel>Matching auditors</SelectLabel>
+												{filteredAuditors.map(auditor => (
+													<SelectItem key={auditor.id} value={auditor.id}>
+														{`${auditor.auditor_code} · ${auditor.full_name}`}
+													</SelectItem>
+												))}
+											</SelectGroup>
+										</SelectContent>
+									</Select>
+								</div>
+								{selectedAuditorId.trim().length > 0 ? (
+									<Button
+										type="button"
+										variant="ghost"
+										onClick={() => {
+											setSelectedAuditorId("");
+											clearFieldError("auditorId");
+											setListError(null);
+										}}>
+										Clear
+									</Button>
+								) : null}
+							</div>
+							{fieldErrors.auditorId ? (
+								<p className="text-sm text-destructive">{fieldErrors.auditorId}</p>
+							) : (
+								<p className="text-sm text-muted-foreground">
+									Choose an auditor to review assignment coverage or remove outdated access.
+								</p>
+							)}
+						</div>
+						<div className="rounded-field border border-border/70 bg-muted/35 p-4">
+							<p className="font-medium text-foreground">How assignment review works</p>
+							<ol className="mt-3 grid gap-2 text-sm text-muted-foreground">
+								<li>1. Load one auditor to see current access across projects and places.</li>
+								<li>2. Review coverage before adding or removing assignments.</li>
+								<li>3. Use New assignment to grant access, then return here to verify it.</li>
+							</ol>
+						</div>
 					</div>
 
 					<div className="rounded-field border border-border bg-card p-4">
@@ -385,12 +471,12 @@ export default function ManagerAssignmentsPage() {
 							<div className="space-y-3">
 								<div className="space-y-1">
 									<p className="font-medium text-foreground">{selectedAuditor.full_name}</p>
-									<p className="text-sm text-muted-foreground">
-										<span className="font-mono uppercase tracking-[0.08em]">
+									<div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+										<code className="rounded-md bg-muted/65 px-2 py-1 font-mono text-[11px] tracking-[0.04em] text-foreground/80">
 											{selectedAuditor.auditor_code}
-										</span>
-										{selectedAuditor.email ? ` · ${selectedAuditor.email}` : ""}
-									</p>
+										</code>
+										{selectedAuditor.email ? <span>{selectedAuditor.email}</span> : null}
+									</div>
 								</div>
 								<div className="flex flex-wrap gap-2">
 									{selectedAuditor.role ? (
@@ -403,11 +489,29 @@ export default function ManagerAssignmentsPage() {
 								</div>
 							</div>
 						) : (
-							<div className="space-y-3">
-								<p className="text-sm text-muted-foreground">
-									Select an auditor to review current access. If the roster is empty, create an
-									auditor first.
-								</p>
+							<div className="space-y-4">
+								<div className="space-y-1">
+									<p className="font-medium text-foreground">Assignment preview</p>
+									<p className="text-sm text-muted-foreground">
+										Select an auditor to reveal their current project and place coverage, recent
+										audit volume, and the management actions available on this page.
+									</p>
+								</div>
+								<div className="grid gap-3 sm:grid-cols-2">
+									<div className="rounded-field border border-border/70 bg-muted/35 p-4">
+										<p className="font-medium text-foreground">Project scope</p>
+										<p className="mt-2 text-sm text-muted-foreground">
+											Grant access across every place in a project when the auditor needs wider
+											coverage.
+										</p>
+									</div>
+									<div className="rounded-field border border-border/70 bg-muted/35 p-4">
+										<p className="font-medium text-foreground">Place scope</p>
+										<p className="mt-2 text-sm text-muted-foreground">
+											Grant access to one location when you need tighter field control.
+										</p>
+									</div>
+								</div>
 								<Button asChild variant="outline">
 									<Link href="/manager/auditors">Open auditors</Link>
 								</Button>
@@ -419,7 +523,7 @@ export default function ManagerAssignmentsPage() {
 
 			<Card>
 				<CardHeader>
-					<CardTitle>Assignment rows</CardTitle>
+					<CardTitle>Assignment coverage</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-3">
 					{listError ? (
@@ -428,11 +532,23 @@ export default function ManagerAssignmentsPage() {
 						</p>
 					) : null}
 					{selectedAuditorId.trim().length === 0 ? (
-						<div className="rounded-field border border-dashed border-border p-4">
-							<p className="font-medium text-foreground">Select an auditor</p>
-							<p className="mt-2 text-sm text-muted-foreground">
-								Choose an auditor above to review current project or place access before editing it.
-							</p>
+						<div className="grid gap-4 rounded-field border border-dashed border-border p-4 lg:grid-cols-[minmax(0,1fr)_minmax(260px,0.9fr)]">
+							<div className="space-y-2">
+								<p className="font-medium text-foreground">Select an auditor to load assignments</p>
+								<p className="text-sm text-muted-foreground">
+									This panel shows what the selected auditor can currently access, including project
+									scope, place scope, granted capabilities, and direct links back to the underlying
+									record.
+								</p>
+							</div>
+							<div className="rounded-field border border-border/70 bg-muted/35 p-4">
+								<p className="font-medium text-foreground">What appears here</p>
+								<ul className="mt-2 grid gap-2 text-sm text-muted-foreground">
+									<li>Current project and place coverage</li>
+									<li>Capability badges for audit and place-admin access</li>
+									<li>Open and delete actions for each assignment</li>
+								</ul>
+							</div>
 						</div>
 					) : assignmentsQuery.isLoading ? (
 						<p className="text-sm text-muted-foreground">Loading assignments…</p>
@@ -444,13 +560,22 @@ export default function ManagerAssignmentsPage() {
 							</p>
 						</div>
 					) : assignments.length === 0 ? (
-						<div className="rounded-field border border-dashed border-border p-4">
-							<p className="font-medium text-foreground">No assignments yet</p>
-							<p className="mt-2 text-sm text-muted-foreground">
-								{selectedAuditor
-									? `Use New assignment to grant ${selectedAuditor.full_name} access to a project or place.`
-									: "Use New assignment to grant project or place access."}
-							</p>
+						<div className="grid gap-4 rounded-field border border-dashed border-border p-4 lg:grid-cols-[minmax(0,1fr)_minmax(260px,0.9fr)]">
+							<div className="space-y-2">
+								<p className="font-medium text-foreground">No assignments yet</p>
+								<p className="text-sm text-muted-foreground">
+									{selectedAuditor
+										? `Use New assignment to grant ${selectedAuditor.full_name} access to a project or place.`
+										: "Use New assignment to grant project or place access."}
+								</p>
+							</div>
+							<div className="rounded-field border border-border/70 bg-muted/35 p-4">
+								<p className="font-medium text-foreground">Recommended next step</p>
+								<p className="mt-2 text-sm text-muted-foreground">
+									Start with project scope when the auditor needs wider coverage, then add place-only
+									access when you need tighter control.
+								</p>
+							</div>
 						</div>
 					) : (
 						assignments.map(assignment => {
@@ -495,7 +620,7 @@ export default function ManagerAssignmentsPage() {
 											<Badge
 												key={`${assignment.id}_${role}`}
 												variant="outline"
-												className="tracking-[0.14em] uppercase">
+												className="font-medium">
 												{formatRoleLabel(role)}
 											</Badge>
 										))}
@@ -536,26 +661,31 @@ export default function ManagerAssignmentsPage() {
 					</SheetHeader>
 					<div className="grid min-h-0 flex-1 gap-4 overflow-y-auto px-6 py-5 md:grid-cols-2">
 						<div className="grid gap-2">
-							<Label htmlFor="auditor_select">Auditor</Label>
-							<select
-								id="auditor_select"
-								name="auditor"
-								value={selectedAuditorId}
-								onChange={event => {
-									setSelectedAuditorId(event.target.value);
+							<Label>Auditor</Label>
+							<Select
+								value={selectedAuditorId.trim().length > 0 ? selectedAuditorId : undefined}
+								onValueChange={nextValue => {
+									setSelectedAuditorId(nextValue);
 									clearFieldError("auditorId");
 									setFormError(null);
-								}}
-								className="h-10 rounded-field border border-input bg-input px-4 py-2 text-sm"
-								aria-invalid={Boolean(fieldErrors.auditorId)}
-								autoComplete="off">
-								<option value="">Select auditor</option>
-								{auditors.map(auditor => (
-									<option key={auditor.id} value={auditor.id}>
-										{`${auditor.auditor_code} · ${auditor.full_name}`}
-									</option>
-								))}
-							</select>
+								}}>
+								<SelectTrigger
+									id="auditor_select"
+									aria-label="Auditor"
+									aria-invalid={Boolean(fieldErrors.auditorId)}>
+									<SelectValue placeholder="Select auditor" />
+								</SelectTrigger>
+								<SelectContent position="popper">
+									<SelectGroup>
+										<SelectLabel>Auditors</SelectLabel>
+										{auditors.map(auditor => (
+											<SelectItem key={auditor.id} value={auditor.id}>
+												{`${auditor.auditor_code} · ${auditor.full_name}`}
+											</SelectItem>
+										))}
+									</SelectGroup>
+								</SelectContent>
+							</Select>
 							{fieldErrors.auditorId ? (
 								<p className="text-sm text-destructive">{fieldErrors.auditorId}</p>
 							) : (
@@ -563,23 +693,27 @@ export default function ManagerAssignmentsPage() {
 							)}
 						</div>
 						<div className="grid gap-2">
-							<Label htmlFor="scope_select">Scope</Label>
-							<select
-								id="scope_select"
-								name="scope"
+							<Label>Scope</Label>
+							<Select
 								value={scope}
-								onChange={event => {
-									setScope(event.target.value as AssignmentScope);
+								onValueChange={nextValue => {
+									setScope(nextValue as AssignmentScope);
 									setSelectedPlaceId("");
 									clearFieldError("projectId");
 									clearFieldError("placeId");
 									setFormError(null);
-								}}
-								className="h-10 rounded-field border border-input bg-input px-4 py-2 text-sm"
-								autoComplete="off">
-								<option value="project">Project</option>
-								<option value="place">Place</option>
-							</select>
+								}}>
+								<SelectTrigger id="scope_select" aria-label="Scope">
+									<SelectValue />
+								</SelectTrigger>
+								<SelectContent position="popper">
+									<SelectGroup>
+										<SelectLabel>Assignment scope</SelectLabel>
+										<SelectItem value="project">Project</SelectItem>
+										<SelectItem value="place">Place</SelectItem>
+									</SelectGroup>
+								</SelectContent>
+							</Select>
 							<p className="text-sm text-muted-foreground">
 								{scope === "project"
 									? "Project scope lets the auditor work across every place in one project."
@@ -587,28 +721,33 @@ export default function ManagerAssignmentsPage() {
 							</p>
 						</div>
 						<div className="grid gap-2">
-							<Label htmlFor="project_select">Project</Label>
-							<select
-								id="project_select"
-								name="project"
-								value={selectedProjectId}
-								onChange={event => {
-									setSelectedProjectId(event.target.value);
+							<Label>Project</Label>
+							<Select
+								value={selectedProjectId.trim().length > 0 ? selectedProjectId : undefined}
+								onValueChange={nextValue => {
+									setSelectedProjectId(nextValue);
 									setSelectedPlaceId("");
 									clearFieldError("projectId");
 									clearFieldError("placeId");
 									setFormError(null);
-								}}
-								className="h-10 rounded-field border border-input bg-input px-4 py-2 text-sm"
-								aria-invalid={Boolean(fieldErrors.projectId)}
-								autoComplete="off">
-								<option value="">Select project</option>
-								{projects.map(project => (
-									<option key={project.id} value={project.id}>
-										{project.name}
-									</option>
-								))}
-							</select>
+								}}>
+								<SelectTrigger
+									id="project_select"
+									aria-label="Project"
+									aria-invalid={Boolean(fieldErrors.projectId)}>
+									<SelectValue placeholder="Select project" />
+								</SelectTrigger>
+								<SelectContent position="popper">
+									<SelectGroup>
+										<SelectLabel>Projects</SelectLabel>
+										{projects.map(project => (
+											<SelectItem key={project.id} value={project.id}>
+												{project.name}
+											</SelectItem>
+										))}
+									</SelectGroup>
+								</SelectContent>
+							</Select>
 							{fieldErrors.projectId ? (
 								<p className="text-sm text-destructive">{fieldErrors.projectId}</p>
 							) : (
@@ -618,27 +757,36 @@ export default function ManagerAssignmentsPage() {
 							)}
 						</div>
 						<div className="grid gap-2">
-							<Label htmlFor="place_select">Place</Label>
-							<select
-								id="place_select"
-								name="place"
-								value={selectedPlaceId}
-								onChange={event => {
-									setSelectedPlaceId(event.target.value);
+							<Label>Place</Label>
+							<Select
+								value={selectedPlaceId.trim().length > 0 ? selectedPlaceId : undefined}
+								onValueChange={nextValue => {
+									setSelectedPlaceId(nextValue);
 									clearFieldError("placeId");
 									setFormError(null);
 								}}
-								className="h-10 rounded-field border border-input bg-input px-4 py-2 text-sm"
-								disabled={scope !== "place" || selectedProjectId.trim().length === 0}
-								aria-invalid={Boolean(fieldErrors.placeId)}
-								autoComplete="off">
-								<option value="">Select place</option>
-								{places.map(place => (
-									<option key={place.id} value={place.id}>
-										{place.name}
-									</option>
-								))}
-							</select>
+								disabled={scope !== "place" || selectedProjectId.trim().length === 0}>
+								<SelectTrigger
+									id="place_select"
+									aria-label="Place"
+									aria-invalid={Boolean(fieldErrors.placeId)}>
+									<SelectValue placeholder="Select place" />
+								</SelectTrigger>
+								<SelectContent position="popper">
+									<SelectGroup>
+										<SelectLabel>
+											{selectedProjectId.trim().length === 0
+												? "Select a project first"
+												: "Places"}
+										</SelectLabel>
+										{places.map(place => (
+											<SelectItem key={place.id} value={place.id}>
+												{place.name}
+											</SelectItem>
+										))}
+									</SelectGroup>
+								</SelectContent>
+							</Select>
 							{fieldErrors.placeId ? (
 								<p className="text-sm text-destructive">{fieldErrors.placeId}</p>
 							) : (

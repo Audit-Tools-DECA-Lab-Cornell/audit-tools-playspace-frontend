@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 import Link from "next/link";
+import { CheckCircle2Icon } from "lucide-react";
 import * as React from "react";
 
 import { playspaceApi, type AuditDraftPatch, type AuditSession } from "@/lib/api/playspace";
@@ -13,6 +14,8 @@ import {
 	getVisibleSections,
 	isRequiredPreAuditComplete
 } from "@/lib/audit/selectors";
+import { BackButton } from "@/components/dashboard/back-button";
+import { formatAuditCodeReference } from "@/components/dashboard/utils";
 import type { ExecutionMode, InstrumentQuestion, InstrumentSection, PreAuditQuestion } from "@/types/audit";
 import { AuditQuestionCard } from "@/components/audit/question-card";
 import { Badge } from "@/components/ui/badge";
@@ -279,29 +282,46 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 			progress: getInstrumentSectionLocalProgress(section, sectionDrafts[section.section_key]?.responses ?? {})
 		}));
 	}, [sectionDrafts, visibleSections]);
+	const orderedSectionRows = React.useMemo<SectionProgressRow[]>(() => {
+		const incompleteSections: SectionProgressRow[] = [];
+		const completedSections: SectionProgressRow[] = [];
+
+		for (const sectionRow of sectionRows) {
+			if (sectionRow.progress.isComplete) {
+				completedSections.push(sectionRow);
+				continue;
+			}
+
+			incompleteSections.push(sectionRow);
+		}
+
+		return [...incompleteSections, ...completedSections];
+	}, [sectionRows]);
 
 	React.useEffect(() => {
-		if (sectionRows.length === 0) {
+		if (orderedSectionRows.length === 0) {
 			setActiveSectionKey(null);
 			return;
 		}
 
-		const currentSectionStillVisible = sectionRows.some(
+		const currentSectionStillVisible = orderedSectionRows.some(
 			sectionRow => sectionRow.section.section_key === activeSectionKey
 		);
 		if (currentSectionStillVisible) {
 			return;
 		}
 
-		setActiveSectionKey(getInitialActiveSectionKey(sectionRows));
-	}, [activeSectionKey, sectionRows]);
+		setActiveSectionKey(getInitialActiveSectionKey(orderedSectionRows));
+	}, [activeSectionKey, orderedSectionRows]);
 
-	const activeSectionIndex = sectionRows.findIndex(sectionRow => sectionRow.section.section_key === activeSectionKey);
-	const activeSection = activeSectionIndex >= 0 ? sectionRows[activeSectionIndex] : null;
-	const previousSection = activeSectionIndex > 0 ? sectionRows[activeSectionIndex - 1] : null;
+	const activeSectionIndex = orderedSectionRows.findIndex(
+		sectionRow => sectionRow.section.section_key === activeSectionKey
+	);
+	const activeSection = activeSectionIndex >= 0 ? orderedSectionRows[activeSectionIndex] : null;
+	const previousSection = activeSectionIndex > 0 ? orderedSectionRows[activeSectionIndex - 1] : null;
 	const nextSection =
-		activeSectionIndex >= 0 && activeSectionIndex < sectionRows.length - 1
-			? sectionRows[activeSectionIndex + 1]
+		activeSectionIndex >= 0 && activeSectionIndex < orderedSectionRows.length - 1
+			? orderedSectionRows[activeSectionIndex + 1]
 			: null;
 
 	const requiredPreAuditComplete = isRequiredPreAuditComplete(
@@ -428,9 +448,7 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 					<p className="text-sm text-muted-foreground">
 						Verify this place is assigned to your auditor account and try again.
 					</p>
-					<Button asChild variant="secondary">
-						<Link href="/auditor/places">Back to places</Link>
-					</Button>
+					<BackButton href="/auditor/places" label="Back to places" />
 				</CardContent>
 			</Card>
 		);
@@ -451,7 +469,7 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 				</div>
 
 				<div className="flex flex-wrap items-center gap-2">
-					<Badge variant="outline" className="tracking-[0.14em] uppercase">
+					<Badge variant="outline" className="font-medium">
 						{session.status.replaceAll("_", " ")}
 					</Badge>
 					<Badge variant="secondary">
@@ -464,9 +482,7 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 					) : (
 						<Badge variant="outline">No unsaved changes</Badge>
 					)}
-					<Button asChild variant="outline">
-						<Link href="/auditor/places">Back to places</Link>
-					</Button>
+					<BackButton href="/auditor/places" label="Back to places" />
 				</div>
 			</div>
 
@@ -478,9 +494,11 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 					<div className="space-y-2 text-sm text-muted-foreground">
 						<p>
 							Audit code:{" "}
-							<span className="font-mono text-foreground uppercase tracking-[0.08em]">
-								{session.audit_code}
-							</span>
+							<code
+								title={session.audit_code}
+								className="rounded-md bg-muted/65 px-2 py-1 font-mono text-[11px] tracking-[0.04em] text-foreground/80">
+								{formatAuditCodeReference(session.audit_code)}
+							</code>
 						</p>
 						<p className="tabular-nums">Started: {new Date(session.started_at).toLocaleString()}</p>
 						<p>
@@ -562,7 +580,7 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 											: "border-border bg-card hover:bg-secondary/50",
 										isReadOnly && "cursor-not-allowed opacity-70"
 									)}>
-									<p className="text-sm font-semibold uppercase tracking-[0.16em] text-primary">
+									<p className="text-xs font-semibold tracking-[0.08em] text-foreground/70">
 										{mode.key}
 									</p>
 									<p className="mt-2 text-sm font-medium text-foreground">{mode.label}</p>
@@ -620,40 +638,72 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 							Choose an execution mode to unlock the matching instrument sections.
 						</p>
 					) : (
-						<div className="grid gap-3 lg:grid-cols-2">
-							{sectionRows.map(sectionRow => {
-								const isActive = sectionRow.section.section_key === activeSectionKey;
+						<>
+							<div className="flex flex-wrap items-center justify-between gap-3">
+								<p className="text-sm text-muted-foreground">
+									{incompleteSectionCount > 0
+										? `${incompleteSectionCount} sections still need attention. Completed sections are grouped at the end for faster scanning.`
+										: "All sections are complete. Completed sections stay grouped together so you can review them quickly."}
+								</p>
+								<Badge variant={readyToSubmit ? "secondary" : "outline"}>
+									{readyToSubmit
+										? "Ready to submit"
+										: `${incompleteSectionCount} section${incompleteSectionCount === 1 ? "" : "s"} remaining`}
+								</Badge>
+							</div>
+							<div className="grid gap-3 lg:grid-cols-2">
+								{orderedSectionRows.map(sectionRow => {
+									const remainingQuestionCount =
+										sectionRow.progress.visibleQuestionCount -
+										sectionRow.progress.answeredQuestionCount;
+									const isActive = sectionRow.section.section_key === activeSectionKey;
 
-								return (
-									<button
-										key={sectionRow.section.section_key}
-										type="button"
-										onClick={() => {
-											setActiveSectionKey(sectionRow.section.section_key);
-										}}
-										className={cn(
-											"rounded-card border p-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60",
-											isActive
-												? "border-primary bg-primary/10"
-												: "border-border bg-card hover:bg-secondary/50"
-										)}>
-										<div className="flex items-start justify-between gap-3">
-											<div className="space-y-1">
-												<p className="font-medium text-foreground">
-													{sectionRow.section.title}
-												</p>
-												<p className="text-sm text-muted-foreground">
-													{`${String(sectionRow.progress.answeredQuestionCount)} / ${String(sectionRow.progress.visibleQuestionCount)} answered`}
-												</p>
+									return (
+										<button
+											key={sectionRow.section.section_key}
+											type="button"
+											onClick={() => {
+												setActiveSectionKey(sectionRow.section.section_key);
+											}}
+											className={cn(
+												"rounded-card border p-4 text-left transition-colors touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60",
+												isActive
+													? "border-primary bg-primary/10"
+													: sectionRow.progress.isComplete
+														? "border-border/70 bg-muted/35 opacity-90 hover:bg-muted/50"
+														: "border-border bg-card hover:bg-secondary/50"
+											)}>
+											<div className="flex items-start justify-between gap-3">
+												<div className="space-y-1">
+													<p className="font-medium text-foreground">
+														{sectionRow.section.title}
+													</p>
+													<p className="text-sm text-muted-foreground">
+														{`${String(sectionRow.progress.answeredQuestionCount)} / ${String(sectionRow.progress.visibleQuestionCount)} answered`}
+													</p>
+													<p className="text-xs text-muted-foreground">
+														{sectionRow.progress.isComplete
+															? "All required questions are complete."
+															: `${String(remainingQuestionCount)} question${remainingQuestionCount === 1 ? "" : "s"} remaining`}
+													</p>
+												</div>
+												<Badge
+													variant={sectionRow.progress.isComplete ? "secondary" : "outline"}>
+													{sectionRow.progress.isComplete ? (
+														<span className="inline-flex items-center gap-1.5">
+															<CheckCircle2Icon className="size-3.5" aria-hidden="true" />
+															<span>Complete</span>
+														</span>
+													) : (
+														`${String(remainingQuestionCount)} remaining`
+													)}
+												</Badge>
 											</div>
-											<Badge variant={sectionRow.progress.isComplete ? "secondary" : "outline"}>
-												{sectionRow.progress.isComplete ? "Complete" : "In Progress"}
-											</Badge>
-										</div>
-									</button>
-								);
-							})}
-						</div>
+										</button>
+									);
+								})}
+							</div>
+						</>
 					)}
 				</CardContent>
 			</Card>
@@ -675,7 +725,7 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 									question={question}
 									selectedAnswers={
 										sectionDrafts[activeSection.section.section_key]?.responses[
-											question.question_key
+										question.question_key
 										] ?? {}
 									}
 									disabled={isReadOnly}

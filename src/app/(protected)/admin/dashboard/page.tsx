@@ -7,6 +7,8 @@ import { playspaceApi } from "@/lib/api/playspace";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
 import { StatCard } from "@/components/dashboard/stat-card";
+import { formatAuditCodeReference } from "@/components/dashboard/utils";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
@@ -58,7 +60,7 @@ export default function AdminDashboardPage() {
 					</div>
 				}
 			/>
-			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-7">
+			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-7">
 				<StatCard
 					title="Accounts"
 					value={String(overview.total_accounts)}
@@ -114,19 +116,29 @@ export default function AdminDashboardPage() {
 								key={audit.audit_id}
 								className="flex flex-col gap-3 rounded-card border border-border/70 bg-card/60 p-4 lg:flex-row lg:items-center lg:justify-between">
 								<div className="space-y-1">
-									<p className="font-mono text-sm font-semibold tracking-[0.08em] text-foreground uppercase">
-										{audit.audit_code}
-									</p>
+									<p className="font-medium text-foreground">{audit.place_name}</p>
 									<p className="text-sm text-muted-foreground">
-										{audit.account_name} · {audit.project_name} · {audit.place_name}
+										{audit.account_name} · {audit.project_name}
 									</p>
+									<div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+										<code
+											title={audit.audit_code}
+											className="rounded-md bg-muted/65 px-2 py-1 font-mono text-[11px] tracking-[0.04em] text-foreground/80">
+											{formatAuditCodeReference(audit.audit_code)}
+										</code>
+										<span>
+											Auditor{" "}
+											<span className="font-mono text-foreground tracking-[0.04em]">
+												{audit.auditor_code}
+											</span>
+										</span>
+									</div>
 								</div>
-								<p className="text-sm text-muted-foreground">
-									Auditor:{" "}
-									<span className="font-mono uppercase tracking-[0.08em] text-foreground">
-										{audit.auditor_code}
-									</span>
-								</p>
+								<Badge
+									variant={audit.status === "SUBMITTED" ? "default" : "secondary"}
+									className="font-medium">
+									{audit.status.toLowerCase().replaceAll("_", " ")}
+								</Badge>
 							</div>
 						))
 					)}

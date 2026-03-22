@@ -2,14 +2,16 @@
 
 import * as React from "react";
 import type { ColumnDef } from "@tanstack/react-table";
+import { CheckIcon, CopyIcon } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 
 import { DataTable, getMultiValueFilterFn } from "./data-table";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import type { EntityRowAction } from "./entity-row-actions";
 import { EntityRowActions } from "./entity-row-actions";
-import { formatDateTimeLabel, formatScoreLabel } from "./utils";
+import { formatAuditCodeReference, formatDateTimeLabel, formatScoreLabel } from "./utils";
 
 export interface AuditActivityRow {
 	id: string;
@@ -34,6 +36,88 @@ export interface AuditsTableProps {
 	getRowActions?: (row: AuditActivityRow) => EntityRowAction[];
 }
 
+interface AuditIdentityCellProps {
+	auditCode: string;
+	auditorCode: string;
+	placeName?: string | null;
+	projectName?: string | null;
+	accountName?: string | null;
+}
+
+/**
+ * Human-first audit row heading with a machine-code reference and copy affordance.
+ */
+function AuditIdentityCell({
+	auditCode,
+	auditorCode,
+	placeName,
+	projectName,
+	accountName
+}: Readonly<AuditIdentityCellProps>) {
+	const [isCopied, setIsCopied] = React.useState(false);
+	const resetTimeoutRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+	const primaryLabel = placeName ?? projectName ?? accountName ?? auditCode;
+	const lineage = [accountName, projectName]
+		.filter((value): value is string => Boolean(value && value.trim().length > 0))
+		.join(" · ");
+
+	React.useEffect(() => {
+		return () => {
+			if (resetTimeoutRef.current !== null) {
+				globalThis.clearTimeout(resetTimeoutRef.current);
+			}
+		};
+	}, []);
+
+	async function handleCopyAuditCode() {
+		try {
+			await navigator.clipboard.writeText(auditCode);
+			setIsCopied(true);
+			if (resetTimeoutRef.current !== null) {
+				globalThis.clearTimeout(resetTimeoutRef.current);
+			}
+			resetTimeoutRef.current = globalThis.setTimeout(() => {
+				setIsCopied(false);
+			}, 1600);
+		} catch {
+			setIsCopied(false);
+		}
+	}
+
+	return (
+		<div className="min-w-[320px] space-y-2">
+			<div className="space-y-1">
+				<p className="font-medium text-foreground">{primaryLabel}</p>
+				{lineage.length > 0 ? <p className="text-sm text-muted-foreground">{lineage}</p> : null}
+			</div>
+			<div className="flex flex-wrap items-center gap-2">
+				<code
+					title={auditCode}
+					className="rounded-sm bg-secondary px-2 py-1 font-mono text-[11px] tracking-[0.04em] text-foreground">
+					{formatAuditCodeReference(auditCode)}
+				</code>
+				<Button
+					type="button"
+					variant="ghost"
+					size="xs"
+					className="h-7 gap-1.5 px-2 text-xs"
+					onClick={handleCopyAuditCode}
+					aria-label={`Copy audit code ${auditCode}`}>
+					{isCopied ? (
+						<CheckIcon data-icon="inline-start" aria-hidden="true" />
+					) : (
+						<CopyIcon data-icon="inline-start" aria-hidden="true" />
+					)}
+					<span>{isCopied ? "Copied" : "Copy ID"}</span>
+				</Button>
+			</div>
+			<p className="text-sm text-muted-foreground">
+				Auditor <span className="font-mono text-foreground tracking-[0.04em]">{auditorCode}</span>
+			</p>
+		</div>
+	);
+}
+
 /**
  * Shared audit activity table used by manager and admin monitoring views.
  */
@@ -55,26 +139,15 @@ export function AuditsTable({
 						.filter(Boolean)
 						.join(" "),
 				header: ({ column }) => <DataTableColumnHeader column={column} title="Audit" />,
-				cell: ({ row }) => {
-					const lineage = [row.original.accountName, row.original.projectName, row.original.placeName]
-						.filter((value): value is string => Boolean(value))
-						.join(" · ");
-
-					return (
-						<div className="min-w-[280px] space-y-1">
-							<p className="font-mono text-sm font-semibold tracking-[0.08em] text-foreground uppercase">
-								{row.original.auditCode}
-							</p>
-							{lineage.length > 0 ? <p className="text-sm text-muted-foreground">{lineage}</p> : null}
-							<p className="text-sm text-muted-foreground">
-								Auditor{" "}
-								<span className="font-mono text-foreground uppercase tracking-[0.08em]">
-									{row.original.auditorCode}
-								</span>
-							</p>
-						</div>
-					);
-				},
+				cell: ({ row }) => (
+					<AuditIdentityCell
+						auditCode={row.original.auditCode}
+						auditorCode={row.original.auditorCode}
+						placeName={row.original.placeName}
+						projectName={row.original.projectName}
+						accountName={row.original.accountName}
+					/>
+				),
 				enableHiding: false
 			},
 			{
@@ -84,7 +157,7 @@ export function AuditsTable({
 				cell: ({ row }) => (
 					<Badge
 						variant={row.original.status === "SUBMITTED" ? "default" : "secondary"}
-						className="font-medium tracking-[0.14em] uppercase">
+						className="font-medium">
 						{row.original.status.toLowerCase().replaceAll("_", " ")}
 					</Badge>
 				)
@@ -118,13 +191,13 @@ export function AuditsTable({
 			},
 			...(getRowActions
 				? [
-						{
-							id: "actions",
-							enableSorting: false,
-							enableHiding: false,
-							cell: ({ row }) => <EntityRowActions actions={getRowActions(row.original)} />
-						} satisfies ColumnDef<AuditActivityRow>
-					]
+					{
+						id: "actions",
+						enableSorting: false,
+						enableHiding: false,
+						cell: ({ row }) => <EntityRowActions actions={getRowActions(row.original)} />
+					} satisfies ColumnDef<AuditActivityRow>
+				]
 				: [])
 		],
 		[getRowActions]

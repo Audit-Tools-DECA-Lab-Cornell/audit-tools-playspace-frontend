@@ -48,7 +48,7 @@ export function DataTableColumnHeader<TData, TValue>({
 				variant="ghost"
 				size="sm"
 				className={cn(
-					"h-8 rounded-md text-xs font-semibold tracking-[0.14em] text-muted-foreground uppercase hover:text-foreground",
+					"h-8 rounded-md text-xs font-semibold tracking-[0.08em] text-foreground/70 hover:text-foreground",
 					align === "end" ? "ml-auto justify-end px-0 text-right" : "-ml-3 px-3"
 				)}
 				onClick={() => column.toggleSorting(sortedState === "asc")}>

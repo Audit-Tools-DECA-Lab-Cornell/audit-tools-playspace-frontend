@@ -36,7 +36,7 @@ export function DashboardHeader({
 			{breadcrumbs.length > 0 ? (
 				<div className="px-1">
 					<Breadcrumb>
-						<BreadcrumbList className="text-xs font-medium tracking-[0.12em] uppercase">
+						<BreadcrumbList className="text-sm font-medium leading-5">
 							{breadcrumbs.map((item, index) => {
 								const isLastItem = index === breadcrumbs.length - 1;
 
@@ -56,12 +56,12 @@ export function DashboardHeader({
 						</BreadcrumbList>
 					</Breadcrumb>
 				</div>
-			) : null}
+			) : <div className="h-5" />}
 			<div className="flex flex-col gap-4 rounded-card border border-border/70 bg-card/70 p-6 shadow-card md:p-7">
 				<div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
 					<div className="space-y-2">
 						{eyebrow ? (
-							<p className="text-xs font-semibold tracking-[0.18em] text-muted-foreground uppercase">
+							<p className="text-[12px] font-semibold tracking-[0.12em] text-foreground/70 uppercase">
 								{eyebrow}
 							</p>
 						) : null}

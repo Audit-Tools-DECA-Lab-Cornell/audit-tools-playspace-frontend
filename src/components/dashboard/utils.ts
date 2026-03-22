@@ -54,6 +54,49 @@ export function formatDateTimeLabel(value: string | null): string {
 }
 
 /**
+ * Format the date segment embedded in an audit code into a shorter label.
+ */
+function formatAuditCodeDateSegment(value: string): string | null {
+	const match = /^(\d{4})(\d{2})(\d{2})/.exec(value);
+	if (!match) {
+		return null;
+	}
+
+	const [, year, month, day] = match;
+	const parsedDate = new Date(Number(year), Number(month) - 1, Number(day));
+	if (Number.isNaN(parsedDate.getTime())) {
+		return null;
+	}
+
+	return parsedDate.toLocaleDateString(getCurrentLocale(), {
+		month: "short",
+		day: "numeric"
+	});
+}
+
+/**
+ * Compress one verbose audit code into a lighter human-readable reference label.
+ */
+export function formatAuditCodeReference(auditCode: string): string {
+	const segments = auditCode
+		.split("-")
+		.map(segment => segment.trim())
+		.filter(segment => segment.length > 0);
+
+	if (segments.length < 4) {
+		return auditCode;
+	}
+
+	const [scope, areaCode, sequenceCode, dateSegment] = segments;
+	const compactAreaCode = [areaCode, sequenceCode].join("-");
+	const compactDateLabel = formatAuditCodeDateSegment(dateSegment);
+
+	return compactDateLabel
+		? [scope, compactAreaCode, compactDateLabel].join(" · ")
+		: [scope, compactAreaCode].join(" · ");
+}
+
+/**
  * Format a score consistently across cards and tables.
  */
 export function formatScoreLabel(value: number | null): string {

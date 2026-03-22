@@ -101,58 +101,63 @@ export function DataTableToolbar<TData>({
 	const hasActiveFilters = table.getState().columnFilters.length > 0;
 
 	return (
-		<div className="flex flex-col gap-4 border-b border-border/70 px-6 py-5 lg:flex-row lg:items-center lg:justify-between">
-			<div className="flex flex-1 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-				{searchColumn ? (
-					<Input
-						value={searchValue}
-						onChange={event => searchColumn.setFilterValue(event.target.value)}
-						placeholder={searchPlaceholder}
-						className="h-10 w-full sm:max-w-88"
-						aria-label={searchPlaceholder}
-					/>
-				) : null}
-				{filterConfigs.map(config => (
-					<DataTableFilterMenu key={config.columnId} table={table} config={config} />
-				))}
-				{hasActiveFilters ? (
-					<Button
-						type="button"
-						variant="ghost"
-						size="sm"
-						className="gap-2"
-						onClick={() => table.resetColumnFilters()}>
-						<XIcon className="size-4" />
-						<span>Reset</span>
-					</Button>
-				) : null}
-			</div>
-			<div className="flex flex-wrap items-center justify-end gap-2 sm:flex-nowrap">
-				{action}
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<Button type="button" variant="outline" size="sm" className="h-9 gap-2 px-3.5">
-							<Settings2Icon className="size-4" />
-							<span>Columns</span>
+		<div className="flex flex-col gap-4 border-b border-border/70 px-6 pb-5 lg:justify-between">
+			{searchColumn ? (
+				<Input
+					value={searchValue}
+					onChange={event => searchColumn.setFilterValue(event.target.value)}
+					placeholder={searchPlaceholder}
+					className="h-10 w-full"
+					aria-label={searchPlaceholder}
+				/>
+			) : null}
+			<div className="flex flex-1 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start justify-between">
+				<div className="flex flex-col items-start justify-start gap-2">
+					<div className="flex flex-wrap flex-row items-center justify-between gap-2 sm:flex-nowrap">
+						{filterConfigs.map(config => (
+							<DataTableFilterMenu key={config.columnId} table={table} config={config} />
+						))}
+					</div>
+					{hasActiveFilters ? (
+						<Button
+							type="button"
+							variant="ghost"
+							size="sm"
+							className="gap-2"
+							onClick={() => table.resetColumnFilters()}>
+							<XIcon className="size-4" />
+							<span>Reset</span>
 						</Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end" className="w-52">
-						<DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
-						<DropdownMenuSeparator />
-						{table
-							.getAllColumns()
-							.filter(column => column.getCanHide())
-							.map(column => (
-								<DropdownMenuCheckboxItem
-									key={column.id}
-									checked={column.getIsVisible()}
-									onCheckedChange={checked => column.toggleVisibility(Boolean(checked))}>
-									{column.id.replaceAll("_", " ")}
-								</DropdownMenuCheckboxItem>
-							))}
-					</DropdownMenuContent>
-				</DropdownMenu>
+					) : null}
+				</div>
+				<div className="flex flex-wrap items-center justify-end gap-2 sm:flex-nowrap">
+					{action}
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<Button type="button" variant="outline" size="sm" className="h-9 gap-2 px-3.5">
+								<Settings2Icon className="size-4" />
+								<span>Columns</span>
+							</Button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent align="end" className="w-52">
+							<DropdownMenuLabel>Toggle columns</DropdownMenuLabel>
+							<DropdownMenuSeparator />
+							{table
+								.getAllColumns()
+								.filter(column => column.getCanHide())
+								.map(column => (
+									<DropdownMenuCheckboxItem
+										key={column.id}
+										checked={column.getIsVisible()}
+										onCheckedChange={checked => column.toggleVisibility(Boolean(checked))}>
+										{column.id.replaceAll("_", " ")}
+									</DropdownMenuCheckboxItem>
+								))}
+						</DropdownMenuContent>
+					</DropdownMenu>
+				</div>
 			</div>
+
 		</div>
 	);
 }

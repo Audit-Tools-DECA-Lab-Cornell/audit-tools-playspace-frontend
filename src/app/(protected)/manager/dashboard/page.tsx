@@ -10,11 +10,14 @@ import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
 import { ProjectsTable } from "@/components/dashboard/projects-table";
 import { StatCard } from "@/components/dashboard/stat-card";
-import { formatDateTimeLabel, formatScoreLabel } from "@/components/dashboard/utils";
+import { formatAuditCodeReference, formatDateTimeLabel, formatScoreLabel } from "@/components/dashboard/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+const LOADING_STAT_CARD_IDS = ["projects", "places", "auditors", "audits"] as const;
 
 function getErrorMessage(error: unknown): string {
 	if (error instanceof Error) {
@@ -28,9 +31,9 @@ function LoadingState() {
 	return (
 		<div className="space-y-6">
 			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-				{Array.from({ length: 4 }).map((_, index) => {
+				{LOADING_STAT_CARD_IDS.map((cardId, index) => {
 					return (
-						<Card key={`pulse-${index}`}>
+						<Card key={cardId}>
 							<CardContent className="space-y-3 py-6">
 								<Skeleton className={index % 2 === 0 ? "h-3.5 w-24" : "h-3.5 w-20"} />
 								<Skeleton className={index === 2 ? "h-9 w-24" : "h-9 w-20"} />
@@ -201,7 +204,7 @@ export default function ManagerDashboardPage() {
 				title="Dashboard unavailable"
 				description={getErrorMessage(error)}
 				action={
-					<Button type="button" onClick={() => window.location.reload()}>
+					<Button type="button" onClick={() => globalThis.location.reload()}>
 						Try again
 					</Button>
 				}
@@ -217,6 +220,7 @@ export default function ManagerDashboardPage() {
 	const managerProfiles = managerProfilesQuery.data;
 	const projects = projectsQuery.data;
 	const auditors = auditorsQuery.data;
+	const recentActivity = account.recent_activity.slice(0, 5);
 
 	return (
 		<div className="space-y-6">
@@ -259,66 +263,114 @@ export default function ManagerDashboardPage() {
 
 			<OverviewPanels account={account} managerProfiles={managerProfiles} auditors={auditors} />
 
-			{projects.length > 0 ? (
-				<ProjectsTable projects={projects} title="Project overview" />
-			) : (
-				<EmptyState
-					title="No projects yet"
-					description="Projects will appear here once the team starts creating audit workstreams."
-					action={
-						<Button asChild variant="outline">
-							<Link href="/manager/projects">Open projects</Link>
-						</Button>
-					}
-				/>
-			)}
-
-			{auditors.length > 0 ? (
-				<AuditorsTable auditors={auditors} title="Assigned auditors" />
-			) : (
-				<EmptyState
-					title="No auditors assigned"
-					description="Invite or assign auditors to see role, workload, and activity here."
-					action={
-						<Button asChild variant="outline">
-							<Link href="/manager/auditors">Open auditors</Link>
-						</Button>
-					}
-				/>
-			)}
-
-			<Card>
-				<CardHeader>
-					<CardTitle>Recent activity</CardTitle>
-				</CardHeader>
-				<CardContent className="space-y-3">
-					{account.recent_activity.length > 0 ? (
-						account.recent_activity.map(activity => {
-							return (
-								<div
-									key={activity.audit_id}
-									className="flex flex-col gap-3 rounded-card border border-border/70 bg-card/60 p-4 lg:flex-row lg:items-center lg:justify-between">
-									<div className="space-y-1">
-										<p className="font-medium text-foreground">{activity.place_name}</p>
-										<p className="text-sm text-muted-foreground">
-											{activity.project_name} ·{" "}
-											<span className="font-mono uppercase tracking-[0.08em]">
-												{activity.audit_code}
-											</span>
-										</p>
-										<p className="text-sm text-muted-foreground">
-											{formatDateTimeLabel(activity.completed_at)}
-										</p>
+			<div className="flex flex-col gap-6">
+				<Tabs defaultValue={projects.length > 0 ? "projects" : "auditors"} className="gap-4">
+					<div className="flex flex-wrap items-center justify-between gap-3">
+						<TabsList>
+							<TabsTrigger value="projects">Projects</TabsTrigger>
+							<TabsTrigger value="auditors">Auditors</TabsTrigger>
+						</TabsList>
+						<p className="text-sm text-muted-foreground">
+							Focus on the highest-signal rows here, then open the full worklists when you need more
+							detail.
+						</p>
+					</div>
+					<TabsContent value="projects">
+						{projects.length > 0 ? (
+							<ProjectsTable
+								projects={projects}
+								title="Project overview"
+								description="Highest-signal projects for daily monitoring."
+								pageSize={5}
+								action={
+									<Button asChild size="sm" variant="outline" className="h-9 gap-2 px-3.5">
+										<Link href="/manager/projects">View all projects</Link>
+									</Button>
+								}
+							/>
+						) : (
+							<EmptyState
+								title="No projects yet"
+								description="Projects will appear here once the team starts creating audit workstreams."
+								action={
+									<Button asChild variant="outline">
+										<Link href="/manager/projects">Open projects</Link>
+									</Button>
+								}
+							/>
+						)}
+					</TabsContent>
+					<TabsContent value="auditors">
+						{auditors.length > 0 ? (
+							<AuditorsTable
+								auditors={auditors}
+								title="Assigned auditors"
+								description="Current roster activity and assignment load."
+								pageSize={5}
+								action={
+									<Button asChild size="sm" variant="outline">
+										<Link href="/manager/auditors">View all auditors</Link>
+									</Button>
+								}
+							/>
+						) : (
+							<EmptyState
+								title="No auditors assigned"
+								description="Invite or assign auditors to see role, workload, and activity here."
+								action={
+									<Button asChild variant="outline">
+										<Link href="/manager/auditors">Open auditors</Link>
+									</Button>
+								}
+							/>
+						)}
+					</TabsContent>
+				</Tabs>
+				<Card>
+					<CardHeader>
+						<CardTitle>Recent activity</CardTitle>
+						<CardAction>
+							<Button asChild size="sm" variant="outline">
+								<Link href="/manager/audits">View all audits</Link>
+							</Button>
+						</CardAction>
+					</CardHeader>
+					<CardContent className="space-y-3">
+						{recentActivity.length > 0 ? (
+							recentActivity.map(activity => {
+								return (
+									<div
+										key={activity.audit_id}
+										className="flex flex-col gap-3 rounded-card border border-border/70 bg-card/60 p-4">
+										<div className="space-y-1">
+											<p className="font-medium text-foreground">{activity.place_name}</p>
+											<p className="text-sm text-muted-foreground">{activity.project_name}</p>
+											<div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+												<code
+													title={activity.audit_code}
+													className="rounded-md bg-muted/65 px-2 py-1 font-mono text-[11px] tracking-[0.04em] text-foreground/80">
+													{formatAuditCodeReference(activity.audit_code)}
+												</code>
+												<span>{formatDateTimeLabel(activity.completed_at)}</span>
+											</div>
+										</div>
+										<div className="flex items-center justify-between gap-2">
+											<Badge variant="secondary" className="font-medium">
+												Submitted
+											</Badge>
+											<Badge className="font-mono tabular-nums">
+												{formatScoreLabel(activity.score)}
+											</Badge>
+										</div>
 									</div>
-									<Badge className="font-mono tabular-nums">{formatScoreLabel(activity.score)}</Badge>
-								</div>
-							);
-						})
-					) : (
-						<p className="text-sm text-muted-foreground">No submitted audits yet.</p>
-					)}
-				</CardContent>
-			</Card>
+								);
+							})
+						) : (
+							<p className="text-sm text-muted-foreground">No submitted audits yet.</p>
+						)}
+					</CardContent>
+				</Card>
+			</div>
 		</div>
 	);
 }

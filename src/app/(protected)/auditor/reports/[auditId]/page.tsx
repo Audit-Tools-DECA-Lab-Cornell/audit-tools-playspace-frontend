@@ -3,21 +3,63 @@
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
+import * as React from "react";
 
 import { playspaceApi } from "@/lib/api/playspace";
 import { BASE_PLAYSPACE_INSTRUMENT } from "@/lib/instrument";
+import { BackButton } from "@/components/dashboard/back-button";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
-import { formatDateTimeLabel, formatScoreLabel } from "@/components/dashboard/utils";
+import { formatAuditCodeReference, formatDateTimeLabel, formatScoreLabel } from "@/components/dashboard/utils";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const sectionTitleByKey = Object.fromEntries(
 	BASE_PLAYSPACE_INSTRUMENT.sections.map(section => [section.section_key, section.title])
 );
+const preAuditQuestionByKey = Object.fromEntries(
+	BASE_PLAYSPACE_INSTRUMENT.pre_audit_questions.map(question => [question.key, question])
+);
+const executionModeSummaryByKey = {
+	both: "Onsite audit and survey",
+	survey: "Survey only",
+	audit: "Onsite audit only"
+} as const;
 
-function formatStringArray(values: string[]): string {
-	if (values.length === 0) return "Not provided";
-	return values.join(", ");
+/**
+ * Fall back to a readable label when no instrument option exists.
+ */
+function humanizeToken(value: string): string {
+	return value
+		.replaceAll("_", " ")
+		.replaceAll("-", " ")
+		.replace(/\s+/g, " ")
+		.trim()
+		.replace(/\b\w/g, character => character.toUpperCase());
+}
+
+/**
+ * Resolve a stored option key into its display label from the instrument definition.
+ */
+function formatPreAuditValue(questionKey: string, value: string | null): string {
+	if (!value) {
+		return "Not provided";
+	}
+
+	const question = preAuditQuestionByKey[questionKey];
+	const matchingOption = question?.options.find(option => option.key === value);
+	return matchingOption?.label ?? humanizeToken(value);
+}
+
+/**
+ * Resolve a stored multi-select answer array into readable labels.
+ */
+function formatPreAuditValueList(questionKey: string, values: string[]): string {
+	if (values.length === 0) {
+		return "Not provided";
+	}
+
+	return values.map(value => formatPreAuditValue(questionKey, value)).join(", ");
 }
 
 export default function AuditorReportDetailPage() {
@@ -29,12 +71,45 @@ export default function AuditorReportDetailPage() {
 		queryFn: () => playspaceApi.auditor.getAudit(auditId),
 		enabled: typeof auditId === "string" && auditId.length > 0
 	});
+	const audit = auditQuery.data ?? null;
+	const sectionRows = React.useMemo(() => {
+		return audit ? Object.values(audit.sections) : [];
+	}, [audit]);
+	const canResumeAudit = audit ? audit.status !== "SUBMITTED" : false;
+	const notedSectionCount = sectionRows.filter(section => {
+		return typeof section.note === "string" && section.note.trim().length > 0;
+	}).length;
+	const emptySectionCount = sectionRows.length - notedSectionCount;
+	const [showEmptySections, setShowEmptySections] = React.useState(false);
+	const [showSectionCodes, setShowSectionCodes] = React.useState(false);
+
+	React.useEffect(() => {
+		if (notedSectionCount === 0) {
+			setShowEmptySections(true);
+		}
+	}, [notedSectionCount]);
+
+	const orderedSectionRows = React.useMemo(() => {
+		const sectionsWithNotes: typeof sectionRows = [];
+		const sectionsWithoutNotes: typeof sectionRows = [];
+
+		for (const section of sectionRows) {
+			if (typeof section.note === "string" && section.note.trim().length > 0) {
+				sectionsWithNotes.push(section);
+				continue;
+			}
+
+			sectionsWithoutNotes.push(section);
+		}
+
+		return showEmptySections ? [...sectionsWithNotes, ...sectionsWithoutNotes] : sectionsWithNotes;
+	}, [sectionRows, showEmptySections]);
 
 	if (auditQuery.isLoading || !auditId) {
 		return <div className="h-64 animate-pulse rounded-card border border-border bg-card" />;
 	}
 
-	if (auditQuery.isError || !auditQuery.data) {
+	if (auditQuery.isError || !audit) {
 		return (
 			<Card>
 				<CardHeader>
@@ -44,36 +119,28 @@ export default function AuditorReportDetailPage() {
 					<p className="text-sm text-muted-foreground">
 						Try refreshing the page or return to reports and re-open the audit.
 					</p>
-					<Button asChild>
-						<Link href="/auditor/reports">Back to reports</Link>
-					</Button>
+					<BackButton href="/auditor/reports" label="Back to reports" />
 				</CardContent>
 			</Card>
 		);
 	}
-
-	const audit = auditQuery.data;
-	const sectionRows = Object.values(audit.sections);
-	const canResumeAudit = audit.status !== "SUBMITTED";
 
 	return (
 		<div className="space-y-6">
 			<DashboardHeader
 				eyebrow="Auditor Report Detail"
 				title={audit.place_name}
-				description={`${audit.audit_code} · ${audit.status.toLowerCase().replaceAll("_", " ")}`}
+				description={`Audit ${formatAuditCodeReference(audit.audit_code)} · ${humanizeToken(audit.status).toLowerCase()}`}
 				actions={
 					<div className="flex flex-wrap items-center gap-2">
 						{canResumeAudit ? (
-							<Button asChild>
+							<Button asChild variant="outline">
 								<Link href={`/auditor/execute/${encodeURIComponent(audit.place_id)}`}>
 									Resume audit
 								</Link>
 							</Button>
 						) : null}
-						<Button asChild variant="secondary">
-							<Link href="/auditor/reports">Back to reports</Link>
-						</Button>
+						<BackButton href="/auditor/reports" label="Back to reports" />
 					</div>
 				}
 			/>
@@ -103,7 +170,12 @@ export default function AuditorReportDetailPage() {
 					<CardContent className="space-y-2 text-sm text-muted-foreground">
 						<p>Started: {formatDateTimeLabel(audit.started_at)}</p>
 						<p>Submitted: {formatDateTimeLabel(audit.submitted_at)}</p>
-						<p>Execution mode: {audit.meta.execution_mode ?? "Not selected"}</p>
+						<p>
+							Execution mode:{" "}
+							{audit.meta.execution_mode
+								? executionModeSummaryByKey[audit.meta.execution_mode]
+								: "Not selected"}
+						</p>
 						<p>Ready to submit: {audit.progress.ready_to_submit ? "Yes" : "No"}</p>
 					</CardContent>
 				</Card>
@@ -139,12 +211,12 @@ export default function AuditorReportDetailPage() {
 					<CardTitle>Pre-audit answers</CardTitle>
 				</CardHeader>
 				<CardContent className="grid gap-2 text-sm text-muted-foreground md:grid-cols-2">
-					<p>Season: {audit.pre_audit.season ?? "Not provided"}</p>
-					<p>User count: {audit.pre_audit.user_count ?? "Not provided"}</p>
-					<p>Place size: {audit.pre_audit.place_size ?? "Not provided"}</p>
-					<p>Weather: {formatStringArray(audit.pre_audit.weather_conditions)}</p>
-					<p>Users present: {formatStringArray(audit.pre_audit.users_present)}</p>
-					<p>Age groups: {formatStringArray(audit.pre_audit.age_groups)}</p>
+					<p>Season: {formatPreAuditValue("season", audit.pre_audit.season)}</p>
+					<p>User count: {formatPreAuditValue("user_count", audit.pre_audit.user_count)}</p>
+					<p>Place size: {formatPreAuditValue("place_size", audit.pre_audit.place_size)}</p>
+					<p>Weather: {formatPreAuditValueList("weather_conditions", audit.pre_audit.weather_conditions)}</p>
+					<p>Users present: {formatPreAuditValueList("users_present", audit.pre_audit.users_present)}</p>
+					<p>Age groups: {formatPreAuditValueList("age_groups", audit.pre_audit.age_groups)}</p>
 				</CardContent>
 			</Card>
 			<Card>
@@ -154,18 +226,83 @@ export default function AuditorReportDetailPage() {
 				<CardContent className="space-y-3">
 					{sectionRows.length === 0 ? (
 						<p className="text-sm text-muted-foreground">No section data available yet.</p>
-					) : null}
-					{sectionRows.map(section => (
-						<div key={section.section_key} className="rounded-field border border-border p-3">
-							<p className="font-medium text-foreground">
-								{sectionTitleByKey[section.section_key] ?? section.section_key}
-							</p>
-							<p className="mt-1 text-xs uppercase tracking-[0.16em] text-muted-foreground">
-								{section.section_key}
-							</p>
-							<p className="mt-1 text-sm text-muted-foreground">{section.note ?? "No note captured."}</p>
-						</div>
-					))}
+					) : (
+						<>
+							<div className="flex flex-wrap items-center justify-between gap-3">
+								<p className="text-sm text-muted-foreground">
+									{notedSectionCount} of {sectionRows.length} sections include notes.
+								</p>
+								<div className="flex flex-wrap items-center gap-2">
+									{emptySectionCount > 0 ? (
+										<Button
+											type="button"
+											size="sm"
+											variant="outline"
+											onClick={() => {
+												setShowEmptySections(currentValue => !currentValue);
+											}}>
+											{showEmptySections
+												? `Hide empty sections (${emptySectionCount})`
+												: `Show empty sections (${emptySectionCount})`}
+										</Button>
+									) : null}
+									<Button
+										type="button"
+										size="sm"
+										variant="ghost"
+										onClick={() => {
+											setShowSectionCodes(currentValue => !currentValue);
+										}}>
+										{showSectionCodes ? "Hide section codes" : "Show section codes"}
+									</Button>
+								</div>
+							</div>
+							{orderedSectionRows.length === 0 ? (
+								<div className="rounded-card border border-dashed border-border p-4">
+									<p className="font-medium text-foreground">No captured notes yet</p>
+									<p className="mt-2 text-sm text-muted-foreground">
+										Empty sections are currently hidden. Show them if you want to review the full
+										instrument structure.
+									</p>
+								</div>
+							) : (
+								<div className="grid gap-3 md:grid-cols-2">
+									{orderedSectionRows.map(section => {
+										const hasNote =
+											typeof section.note === "string" && section.note.trim().length > 0;
+
+										return (
+											<div
+												key={section.section_key}
+												className="rounded-card border border-border/70 bg-card/60 p-4">
+												<div className="flex flex-wrap items-start justify-between gap-3">
+													<div className="space-y-1">
+														<p className="font-medium text-foreground">
+															{sectionTitleByKey[section.section_key] ??
+																section.section_key}
+														</p>
+														{showSectionCodes ? (
+															<code className="inline-flex rounded-md bg-muted/65 px-2 py-1 font-mono text-[11px] tracking-[0.04em] text-foreground/80">
+																{section.section_key}
+															</code>
+														) : null}
+													</div>
+													<Badge
+														variant={hasNote ? "secondary" : "outline"}
+														className="font-medium">
+														{hasNote ? "Captured note" : "Empty"}
+													</Badge>
+												</div>
+												<p className="mt-3 text-sm text-muted-foreground">
+													{hasNote ? section.note : "No note captured."}
+												</p>
+											</div>
+										);
+									})}
+								</div>
+							)}
+						</>
+					)}
 				</CardContent>
 			</Card>
 		</div>

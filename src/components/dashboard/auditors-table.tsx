@@ -44,7 +44,7 @@ export function AuditorsTable({
 				cell: ({ row }) => (
 					<div className="min-w-[240px] space-y-1">
 						<div className="flex flex-wrap items-center gap-2">
-							<Badge variant="outline" className="font-mono text-primary uppercase tracking-[0.14em]">
+							<Badge variant="outline" className="font-mono text-primary">
 								{row.original.auditor_code}
 							</Badge>
 							{row.original.role ? <Badge variant="secondary">{row.original.role}</Badge> : null}

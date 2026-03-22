@@ -1,16 +1,14 @@
 "use client";
 
-import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeftIcon } from "lucide-react";
 
 import { playspaceApi } from "@/lib/api/playspace";
 import { AuditsTable } from "@/components/dashboard/audits-table";
+import { BackButton } from "@/components/dashboard/back-button";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { formatDateTimeLabel, formatScoreLabel } from "@/components/dashboard/utils";
 import { StatCard } from "@/components/dashboard/stat-card";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function ManagerPlaceDetailPage() {
@@ -38,9 +36,7 @@ export default function ManagerPlaceDetailPage() {
 					<p className="text-sm text-muted-foreground">
 						Try refreshing this page. If needed, return to places and open this location again.
 					</p>
-					<Button asChild>
-						<Link href="/manager/places">Back to places</Link>
-					</Button>
+					<BackButton href="/manager/places" label="Back to places" />
 				</CardContent>
 			</Card>
 		);
@@ -68,14 +64,7 @@ export default function ManagerPlaceDetailPage() {
 					{ label: "Places", href: "/manager/places" },
 					{ label: history.place_name }
 				]}
-				actions={
-					<Button asChild variant="outline">
-						<Link href="/manager/places" className="gap-2">
-							<ArrowLeftIcon className="size-4" />
-							<span>Back to places</span>
-						</Link>
-					</Button>
-				}
+				actions={<BackButton href="/manager/places" label="Back to places" />}
 			/>
 			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
 				<StatCard
@@ -101,19 +90,13 @@ export default function ManagerPlaceDetailPage() {
 					helper="Average across submitted audits only."
 					tone="violet"
 				/>
-				<Card>
-					<CardHeader>
-						<CardTitle className="text-[11px] tracking-[0.16em] text-muted-foreground uppercase">
-							Latest submitted
-						</CardTitle>
-					</CardHeader>
-					<CardContent className="space-y-2">
-						<p className="text-sm font-medium text-foreground tabular-nums">
-							{history.latest_submitted_at ? formatDateTimeLabel(history.latest_submitted_at) : "Pending"}
-						</p>
-						<p className="text-sm text-muted-foreground">Most recent completed submission timestamp.</p>
-					</CardContent>
-				</Card>
+				<StatCard
+					title="Latest Submitted"
+					value={history.latest_submitted_at ? formatDateTimeLabel(history.latest_submitted_at) : "Pending"}
+					valueClassName="font-sans text-lg leading-snug md:text-xl"
+					helper="Most recent submission"
+					tone="success"
+				/>
 			</div>
 			<AuditsTable
 				rows={auditRows}

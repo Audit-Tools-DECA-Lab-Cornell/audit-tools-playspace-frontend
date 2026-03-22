@@ -2,6 +2,7 @@
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import * as React from "react";
+import { NextIntlClientProvider } from "next-intl";
 
 import { PreferencesProvider } from "@/components/app/preferences-provider";
 
@@ -12,7 +13,7 @@ export interface ProvidersProps {
 /**
  * App-wide client providers (React Query, etc.).
  */
-export function Providers({ children }: ProvidersProps) {
+export function Providers({ children }: Readonly<ProvidersProps>) {
 	const [queryClient] = React.useState(() => {
 		return new QueryClient({
 			defaultOptions: {
@@ -29,8 +30,10 @@ export function Providers({ children }: ProvidersProps) {
 	});
 
 	return (
-		<PreferencesProvider>
-			<QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
-		</PreferencesProvider>
+		<NextIntlClientProvider locale="en">
+			<PreferencesProvider>
+				<QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+			</PreferencesProvider>
+		</NextIntlClientProvider>
 	);
 }

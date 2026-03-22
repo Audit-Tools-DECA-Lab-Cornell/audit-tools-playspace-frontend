@@ -77,10 +77,7 @@ export function PlacesTable({
 				cell: ({ row }) => (
 					<Badge
 						variant="outline"
-						className={cn(
-							getPlaceStatusClassName(row.original.status),
-							"font-medium tracking-[0.14em] uppercase"
-						)}>
+						className={cn(getPlaceStatusClassName(row.original.status), "font-medium")}>
 						{row.original.status.replaceAll("_", " ")}
 					</Badge>
 				)

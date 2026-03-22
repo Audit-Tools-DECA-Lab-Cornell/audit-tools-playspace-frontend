@@ -40,7 +40,7 @@ export function EntityRowActions({ label = "Actions", actions }: Readonly<Entity
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
-				<Button type="button" variant="ghost" size="icon-sm" aria-label={label}>
+				<Button type="button" variant="ghost" size="icon" className="touch-manipulation" aria-label={label}>
 					<MoreHorizontalIcon className="size-4" />
 				</Button>
 			</DropdownMenuTrigger>
