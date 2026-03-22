@@ -8,5 +8,8 @@ export default async function HomePage() {
 	if (!session) {
 		redirect("/login");
 	}
+	if (session.role === "admin") {
+		redirect("/admin/dashboard");
+	}
 	redirect(session.role === "manager" ? "/manager/dashboard" : "/auditor/dashboard");
 }

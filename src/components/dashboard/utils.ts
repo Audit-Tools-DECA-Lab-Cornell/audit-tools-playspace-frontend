@@ -1,6 +1,18 @@
 import type { PlaceSummary, ProjectSummary } from "@/lib/api/playspace";
 
 /**
+ * Resolve the current document language when available for locale formatting.
+ */
+function getCurrentLocale(): string | undefined {
+	if (globalThis.document === undefined) {
+		return undefined;
+	}
+
+	const currentLanguage = globalThis.document.documentElement.lang.trim();
+	return currentLanguage.length > 0 ? currentLanguage : undefined;
+}
+
+/**
  * Format a backend date string into a readable medium date.
  */
 export function formatDateLabel(value: string | null): string {
@@ -13,7 +25,7 @@ export function formatDateLabel(value: string | null): string {
 		return value;
 	}
 
-	return parsedDate.toLocaleDateString(undefined, {
+	return parsedDate.toLocaleDateString(getCurrentLocale(), {
 		month: "short",
 		day: "numeric",
 		year: "numeric"
@@ -33,7 +45,7 @@ export function formatDateTimeLabel(value: string | null): string {
 		return value;
 	}
 
-	return parsedDate.toLocaleString(undefined, {
+	return parsedDate.toLocaleString(getCurrentLocale(), {
 		month: "short",
 		day: "numeric",
 		hour: "numeric",
@@ -49,15 +61,15 @@ export function formatScoreLabel(value: number | null): string {
 		return "Pending";
 	}
 
-	return `${Math.round(value * 10) / 10}%`;
+	return `${Math.round(value * 10) / 10}`;
 }
 
 /**
  * Build a location label from the place summary fields.
  */
 export function formatLocationLabel(place: Pick<PlaceSummary, "city" | "province" | "country">): string {
-	const parts = [place.city, place.province, place.country].filter(
-		(part): part is string => Boolean(part && part.trim().length > 0)
+	const parts = [place.city, place.province, place.country].filter((part): part is string =>
+		Boolean(part && part.trim().length > 0)
 	);
 
 	if (parts.length === 0) {

@@ -3,187 +3,207 @@
 import Link from "next/link";
 import * as React from "react";
 import { useRouter } from "next/navigation";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
+	Accessibility,
+	Building2,
+	Globe,
 	LayoutDashboard,
 	LogOut,
+	Monitor,
+	Moon,
 	Palette,
 	ShieldCheck,
-	Sparkles,
-	UserRound
+	Sun,
+	Type,
+	UserRound,
+	type LucideIcon
 } from "lucide-react";
-import { z } from "zod";
 
+import { playspaceApi, type AccountDetail, type ManagerProfile } from "@/lib/api/playspace";
+import { clearBrowserAuthSession } from "@/lib/auth/browser-session";
+import type { AuthSession } from "@/lib/auth/session";
+import { useAuthSession } from "@/components/app/auth-session-provider";
 import {
-	PLAYSPACE_DEMO_ACCOUNT_ID,
-	playspaceApi,
-	type AccountDetail,
-	type ManagerProfile
-} from "@/lib/api/playspace";
-import {
-	clearBrowserAuthSession,
-	getBrowserAuthSession,
-	type BrowserAuthSession
-} from "@/lib/auth/browser-session";
-import type { UserRole } from "@/lib/auth/role";
+	usePreferences,
+	WEB_LANGUAGE_OPTIONS,
+	WEB_MAX_FONT_SCALE,
+	WEB_MIN_FONT_SCALE,
+	type LanguagePreference,
+	type ThemeMode
+} from "@/components/app/preferences-provider";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { formatDateLabel } from "@/components/dashboard/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
+import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
-const SETTINGS_STORAGE_KEY = "playspace_settings_page_preferences";
-const SETTINGS_SKELETON_CARD_IDS = ["role", "stats", "session", "preferences"] as const;
-
-const localSettingsSchema = z.object({
-	density: z.enum(["comfortable", "compact"]),
-	notifications: z.enum(["important", "daily", "off"]),
-	scoreDisplay: z.enum(["highlighted", "standard"]),
-	guidance: z.enum(["visible", "minimal"]),
-	workspaceNote: z.string().max(280)
-});
-
-type LocalSettingsState = z.infer<typeof localSettingsSchema>;
+const SETTINGS_SKELETON_CARD_IDS = ["profile", "security", "appearance", "accessibility"] as const;
+const MANAGER_CONTACT_SKELETON_IDS = ["primary", "secondary"] as const;
 
 interface ChoiceOption<TValue extends string> {
 	value: TValue;
 	label: string;
 	description: string;
+	icon: LucideIcon;
 }
 
-const DEFAULT_LOCAL_SETTINGS: LocalSettingsState = {
-	density: "comfortable",
-	notifications: "important",
-	scoreDisplay: "highlighted",
-	guidance: "visible",
-	workspaceNote: ""
+const THEME_OPTIONS: readonly ChoiceOption<ThemeMode>[] = [
+	{
+		value: "system",
+		label: "System",
+		description: "Follow your device setting.",
+		icon: Monitor
+	},
+	{
+		value: "light",
+		label: "Light",
+		description: "Use the brighter workspace palette.",
+		icon: Sun
+	},
+	{
+		value: "dark",
+		label: "Dark",
+		description: "Use the lower-glare workspace palette.",
+		icon: Moon
+	}
+] as const;
+
+const LANGUAGE_LABELS: Record<LanguagePreference, string> = {
+	system: "System default",
+	en: "English",
+	de: "German",
+	fr: "French",
+	ja: "Japanese",
+	hi: "Hindi"
 };
 
-const DENSITY_OPTIONS: ChoiceOption<LocalSettingsState["density"]>[] = [
-	{
-		value: "comfortable",
-		label: "Comfortable",
-		description: "Larger spacing and calmer scanning for long review sessions."
-	},
-	{
-		value: "compact",
-		label: "Compact",
-		description: "Denser rows and tighter cards when you want more information visible."
-	}
-];
-
-const NOTIFICATION_OPTIONS: ChoiceOption<LocalSettingsState["notifications"]>[] = [
-	{
-		value: "important",
-		label: "Important only",
-		description: "Keep settings focused on blockers, submissions, and auth changes."
-	},
-	{
-		value: "daily",
-		label: "Daily digest",
-		description: "Bundle updates into a lower-noise summary for regular check-ins."
-	},
-	{
-		value: "off",
-		label: "Muted",
-		description: "Hide non-critical nudges while the workflow is still being built."
-	}
-];
-
-const SCORE_DISPLAY_OPTIONS: ChoiceOption<LocalSettingsState["scoreDisplay"]>[] = [
-	{
-		value: "highlighted",
-		label: "Highlight scores",
-		description: "Emphasize metrics and performance values throughout the dashboard."
-	},
-	{
-		value: "standard",
-		label: "Balanced view",
-		description: "Keep scores visible without letting them dominate each panel."
-	}
-];
-
-const GUIDANCE_OPTIONS: ChoiceOption<LocalSettingsState["guidance"]>[] = [
-	{
-		value: "visible",
-		label: "Guided",
-		description: "Show explanatory helper text while the platform is still evolving."
-	},
-	{
-		value: "minimal",
-		label: "Minimal",
-		description: "Reduce helper text once you are comfortable with the flow."
-	}
-];
+const LANGUAGE_OPTIONS: readonly ChoiceOption<LanguagePreference>[] = WEB_LANGUAGE_OPTIONS.map(language => ({
+	value: language,
+	label: LANGUAGE_LABELS[language],
+	description:
+		language === "system"
+			? "Follow your browser locale."
+			: `Use ${LANGUAGE_LABELS[language]} for locale formatting.`,
+	icon: Globe
+}));
 
 /**
- * Convert unknown errors into readable settings-page copy.
+ * Format a stored role into a user-facing label.
  */
-function getSettingsErrorMessage(error: unknown, fallbackMessage: string): string {
-	if (error instanceof Error && error.message.trim().length > 0) {
-		return error.message;
+function formatRoleLabel(role: AuthSession["role"]): string {
+	if (role === "admin") {
+		return "Administrator";
 	}
 
-	return fallbackMessage;
-}
-
-/**
- * Format a stored role into a UI-friendly label.
- */
-function formatRoleLabel(role: UserRole | null | undefined): string {
 	if (role === "manager") {
 		return "Manager";
 	}
 
-	if (role === "auditor") {
-		return "Auditor";
+	return "Auditor";
+}
+
+/**
+ * Resolve the dashboard path for the signed-in role.
+ */
+function getDashboardHref(role: AuthSession["role"]): string {
+	if (role === "admin") {
+		return "/admin/dashboard";
 	}
 
-	return "Unknown";
-}
-
-/**
- * Convert the stored density preference into its UI label.
- */
-function getDensityLabel(density: LocalSettingsState["density"]): string {
-	return density === "comfortable" ? "Comfortable" : "Compact";
-}
-
-/**
- * Convert the stored notification preference into its UI label.
- */
-function getNotificationLabel(notifications: LocalSettingsState["notifications"]): string {
-	if (notifications === "important") {
-		return "Important only";
+	if (role === "manager") {
+		return "/manager/dashboard";
 	}
 
-	if (notifications === "daily") {
-		return "Daily digest";
+	return "/auditor/dashboard";
+}
+
+/**
+ * Resolve a user-facing workspace label from the current role.
+ */
+function getWorkspaceLabel(role: AuthSession["role"]): string {
+	if (role === "admin") {
+		return "Administrator workspace";
 	}
 
-	return "Muted";
+	if (role === "manager") {
+		return "Manager workspace";
+	}
+
+	return "Auditor workspace";
 }
 
 /**
- * Convert the stored score display preference into its UI label.
+ * Resolve a user-facing display name from the current session.
  */
-function getScoreDisplayLabel(scoreDisplay: LocalSettingsState["scoreDisplay"]): string {
-	return scoreDisplay === "highlighted" ? "Highlight scores" : "Balanced view";
+function getSessionDisplayName(session: AuthSession, managerAccount: AccountDetail | null): string {
+	if (session.role === "manager") {
+		return managerAccount?.primary_manager?.full_name ?? managerAccount?.name ?? "Manager";
+	}
+
+	if (session.role === "admin") {
+		return "Playspace Administrator";
+	}
+
+	return session.auditorCode ? `Auditor ${session.auditorCode}` : "Auditor";
 }
 
 /**
- * Convert the stored guidance preference into its UI label.
+ * Resolve a subtitle line for the signed-in user.
  */
-function getGuidanceLabel(guidance: LocalSettingsState["guidance"]): string {
-	return guidance === "visible" ? "Guided" : "Minimal";
+function getProfileSubtitle(session: AuthSession, managerAccount: AccountDetail | null): string {
+	if (session.role === "manager") {
+		return managerAccount?.name ?? "Manager workspace";
+	}
+
+	if (session.role === "admin") {
+		return "Global platform oversight";
+	}
+
+	return session.auditorCode ? `Auditor code ${session.auditorCode}` : "Field audit workspace";
 }
 
 /**
- * Resolve initials for avatar fallbacks without exposing full identifiers.
+ * Resolve the most appropriate account email visible in settings.
+ */
+function getProfileEmail(session: AuthSession, managerAccount: AccountDetail | null): string {
+	if (session.role === "manager" && managerAccount) {
+		return managerAccount.email;
+	}
+
+	return "Available after full sign-in rollout";
+}
+
+/**
+ * Read a display-safe error message for independently hydrated settings sections.
+ */
+function getErrorMessageFromUnknown(error: unknown): string | null {
+	if (error instanceof Error && error.message.trim().length > 0) {
+		return error.message;
+	}
+
+	return null;
+}
+
+/**
+ * Resolve the best primary manager profile for one manager account.
+ */
+function getPrimaryManagerProfile(account: AccountDetail, managerProfiles: ManagerProfile[]): ManagerProfile | null {
+	const explicitPrimaryProfile = managerProfiles.find(profile => profile.is_primary);
+	if (explicitPrimaryProfile) {
+		return explicitPrimaryProfile;
+	}
+
+	return account.primary_manager ?? managerProfiles[0] ?? null;
+}
+
+/**
+ * Resolve initials for avatar fallbacks without exposing raw identifiers.
  */
 function getAvatarFallbackLabel(value: string): string {
 	const trimmedValue = value.trim();
@@ -202,119 +222,6 @@ function getAvatarFallbackLabel(value: string): string {
 }
 
 /**
- * Read locally stored settings with runtime validation.
- */
-function readStoredLocalSettings(): LocalSettingsState {
-	if (globalThis.window === undefined) {
-		return DEFAULT_LOCAL_SETTINGS;
-	}
-
-	try {
-		const rawValue = globalThis.window.localStorage.getItem(SETTINGS_STORAGE_KEY);
-		if (!rawValue) {
-			return DEFAULT_LOCAL_SETTINGS;
-		}
-
-		const parsedValue: unknown = JSON.parse(rawValue);
-		const result = localSettingsSchema.safeParse(parsedValue);
-		return result.success ? result.data : DEFAULT_LOCAL_SETTINGS;
-	} catch {
-		return DEFAULT_LOCAL_SETTINGS;
-	}
-}
-
-/**
- * Persist settings locally for this device.
- */
-function writeStoredLocalSettings(settings: LocalSettingsState): void {
-	if (globalThis.window === undefined) {
-		return;
-	}
-
-	try {
-		globalThis.window.localStorage.setItem(SETTINGS_STORAGE_KEY, JSON.stringify(settings));
-	} catch {
-		// Ignore storage failures so the rest of the settings page remains usable.
-	}
-}
-
-/**
- * Build a session-aware display name for the profile summary card.
- */
-function getSessionDisplayName(session: BrowserAuthSession | null, account: AccountDetail | null): string {
-	if (session?.role === "manager") {
-		return account?.primary_manager?.full_name ?? account?.name ?? "Manager";
-	}
-
-	if (session?.role === "auditor") {
-		return session.auditorCode ? `Auditor ${session.auditorCode}` : "Auditor";
-	}
-
-	return "Playspace User";
-}
-
-/**
- * Build the subtitle shown under the main profile name.
- */
-function getProfileSubtitle(session: BrowserAuthSession, account: AccountDetail | null): string {
-	if (session.role === "manager") {
-		return account?.name ?? "Manager workspace";
-	}
-
-	if (session.auditorCode) {
-		return `Auditor code ${session.auditorCode}`;
-	}
-
-	return "Auditor workspace";
-}
-
-/**
- * Resolve a user-facing workspace label from the current role.
- */
-function getWorkspaceLabel(role: UserRole): string {
-	return role === "manager" ? "Manager workspace" : "Auditor workspace";
-}
-
-/**
- * Resolve the best manager settings error message from the active queries.
- */
-function getManagerSettingsErrorMessage(input: Readonly<{
-	isManager: boolean;
-	accountError: unknown;
-	managerProfilesError: unknown;
-}>): string | null {
-	if (!input.isManager) {
-		return null;
-	}
-
-	if (input.accountError) {
-		return getSettingsErrorMessage(input.accountError, "Unable to load account settings.");
-	}
-
-	if (input.managerProfilesError) {
-		return getSettingsErrorMessage(input.managerProfilesError, "Unable to load manager profiles.");
-	}
-
-	return null;
-}
-
-/**
- * Resolve the best primary manager to show for account settings.
- */
-function getPrimaryManagerProfile(account: AccountDetail, managerProfiles: ManagerProfile[]): ManagerProfile | null {
-	const explicitPrimaryProfile = managerProfiles.find(profile => profile.is_primary);
-	if (explicitPrimaryProfile) {
-		return explicitPrimaryProfile;
-	}
-
-	if (account.primary_manager) {
-		return account.primary_manager;
-	}
-
-	return managerProfiles[0] ?? null;
-}
-
-/**
  * Reusable key-value row for settings detail panels.
  */
 function DetailItem({ label, value }: Readonly<{ label: string; value: string }>) {
@@ -327,89 +234,56 @@ function DetailItem({ label, value }: Readonly<{ label: string; value: string }>
 }
 
 /**
- * Multi-option selector used for settings controls.
+ * Compact skeleton line used for progressive loading inside settings cards.
  */
-function ChoiceGroup<TValue extends string>({
-	label,
-	helper,
-	value,
-	options,
-	onChange,
-	columnsClassName
-}: Readonly<{
-	label: string;
-	helper: string;
-	value: TValue;
-	options: ChoiceOption<TValue>[];
-	onChange: (nextValue: TValue) => void;
-	columnsClassName?: string;
-}>) {
-	return (
-		<div className="space-y-3">
-			<div className="space-y-1">
-				<Label>{label}</Label>
-				<p className="text-sm text-muted-foreground">{helper}</p>
-			</div>
-			<div className={cn("grid gap-3 md:grid-cols-2", columnsClassName)}>
-				{options.map(option => {
-					const isSelected = option.value === value;
+function SettingsInlineSkeleton({ className }: Readonly<{ className: string }>) {
+	return <Skeleton className={cn("rounded-md", className)} />;
+}
 
-					return (
-						<button
-							key={option.value}
-							type="button"
-							onClick={() => onChange(option.value)}
-							className={cn(
-								"flex min-h-24 flex-col items-start justify-start rounded-field border p-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60",
-								isSelected
-									? "border-primary/30 bg-primary/10 text-foreground shadow-field"
-									: "border-border bg-secondary/50 text-foreground hover:bg-secondary"
-							)}>
-							<span className="font-medium">{option.label}</span>
-							<span className="mt-2 text-xs leading-5 text-muted-foreground">{option.description}</span>
-						</button>
-					);
-				})}
-			</div>
+/**
+ * Skeleton version of a detail item used while account-specific values are loading.
+ */
+function DetailItemSkeleton({ label }: Readonly<{ label: string }>) {
+	return (
+		<div className="space-y-1">
+			<p className="text-xs font-semibold uppercase tracking-[0.18em] text-muted-foreground">{label}</p>
+			<SettingsInlineSkeleton className="h-4 w-28" />
 		</div>
 	);
 }
 
 /**
- * Lightweight loading shell used while settings state hydrates.
+ * Shared loading shell shown before preferences hydrate.
  */
 function SettingsPageSkeleton() {
 	return (
 		<div className="space-y-6">
 			<div className="space-y-3">
-				<div className="h-4 w-32 animate-pulse rounded bg-secondary" />
-				<div className="h-8 w-56 animate-pulse rounded bg-secondary" />
-				<div className="h-4 w-80 animate-pulse rounded bg-secondary" />
+				<Skeleton className="h-3.5 w-32" />
+				<Skeleton className="h-10 w-40" />
+				<Skeleton className="h-4 w-full max-w-md" />
 			</div>
-			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-				{SETTINGS_SKELETON_CARD_IDS.map(cardId => {
-					return (
-						<Card key={cardId} className="animate-pulse">
-							<CardContent className="space-y-3 py-6">
-								<div className="h-4 w-24 rounded bg-secondary" />
-								<div className="h-8 w-24 rounded bg-secondary" />
-								<div className="h-4 w-40 rounded bg-secondary" />
-							</CardContent>
-						</Card>
-					);
-				})}
+			<div className="grid items-start gap-4 md:grid-cols-2">
+				{SETTINGS_SKELETON_CARD_IDS.map(cardId => (
+					<Card key={cardId}>
+						<CardHeader>
+							<Skeleton className={cn("h-5", cardId === "appearance" ? "w-28" : "w-24")} />
+							<Skeleton className={cn("h-4", cardId === "accessibility" ? "w-64" : "w-56")} />
+						</CardHeader>
+						<CardContent className="space-y-4 pb-5">
+							<Skeleton className={cn("h-10 rounded-full", cardId === "profile" ? "w-36" : "w-28")} />
+							<Skeleton className={cn("h-10", cardId === "security" ? "w-full" : "w-5/6")} />
+							<Skeleton className={cn("h-10", cardId === "appearance" ? "w-4/5" : "w-full")} />
+						</CardContent>
+					</Card>
+				))}
 			</div>
-			<Card className="animate-pulse">
-				<CardContent className="py-12">
-					<div className="h-48 rounded bg-secondary" />
-				</CardContent>
-			</Card>
 		</div>
 	);
 }
 
 /**
- * Session-missing state used when the protected page cannot find sign-in context.
+ * Empty state shown when a protected screen has no auth session.
  */
 function SessionUnavailableState() {
 	return (
@@ -417,9 +291,9 @@ function SessionUnavailableState() {
 			<DashboardHeader
 				eyebrow="Workspace Settings"
 				title="Settings"
-				description="Sign in to view account details, security information, and display preferences."
+				description="Sign in to manage display preferences, accessibility, and workspace details."
 				actions={
-					<Button asChild>
+					<Button asChild variant="outline">
 						<Link href="/login">Go to login</Link>
 					</Button>
 				}
@@ -428,15 +302,12 @@ function SessionUnavailableState() {
 			<Card>
 				<CardHeader>
 					<CardTitle>Sign-in required</CardTitle>
-					<CardDescription>You need to sign in before you can open settings.</CardDescription>
+					<CardDescription>You need to sign in before opening settings.</CardDescription>
 				</CardHeader>
-				<CardContent className="space-y-4">
+				<CardContent>
 					<p className="text-sm text-muted-foreground">
 						Sign in again to review your account details and update how the workspace looks on this device.
 					</p>
-					<Button asChild variant="outline">
-						<Link href="/login">Go to login</Link>
-					</Button>
 				</CardContent>
 			</Card>
 		</div>
@@ -457,55 +328,188 @@ function SettingsActionBar({ dashboardHref }: Readonly<{ dashboardHref: string }
 	);
 }
 
+/**
+ * Compact segmented control used for theme and language preferences.
+ */
+function ChoiceCardGroup<TValue extends string>({
+	title,
+	description,
+	value,
+	options,
+	onChange
+}: Readonly<{
+	title: string;
+	description: string;
+	value: TValue;
+	options: readonly ChoiceOption<TValue>[];
+	onChange: (nextValue: TValue) => void;
+}>) {
+	const selectedOption = options.find(option => option.value === value) ?? options[0];
+
+	return (
+		<div className="space-y-3">
+			<div className="space-y-1">
+				<p className="text-sm font-semibold text-foreground">{title}</p>
+				<p className="text-sm text-muted-foreground">{description}</p>
+			</div>
+			<div className="flex flex-wrap gap-2">
+				{options.map(option => {
+					const isSelected = option.value === value;
+					const Icon = option.icon;
+
+					return (
+						<button
+							key={option.value}
+							type="button"
+							aria-pressed={isSelected}
+							onClick={() => {
+								onChange(option.value);
+							}}
+							className={cn(
+								"inline-flex min-h-10 items-center gap-2 rounded-pill border px-4 py-2.5 text-left text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60",
+								isSelected
+									? "border-primary bg-primary/10 shadow-field"
+									: "border-border bg-card text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
+							)}>
+							<Icon
+								className={cn(
+									"h-4 w-4 shrink-0",
+									isSelected ? "text-primary" : "text-muted-foreground"
+								)}
+								aria-hidden="true"
+							/>
+							<span className={cn("leading-none", isSelected ? "text-foreground" : "text-inherit")}>
+								{option.label}
+							</span>
+						</button>
+					);
+				})}
+			</div>
+			{selectedOption ? (
+				<p className="text-xs leading-5 text-muted-foreground">{selectedOption.description}</p>
+			) : null}
+		</div>
+	);
+}
 
 /**
- * Session profile summary card shared across both roles.
+ * Toggle row for boolean accessibility preferences.
  */
-function ProfileAccessCard({
+function PreferenceToggleRow({
+	icon: Icon,
+	title,
+	description,
+	enabled,
+	onToggle
+}: Readonly<{
+	icon: LucideIcon;
+	title: string;
+	description: string;
+	enabled: boolean;
+	onToggle: (enabled: boolean) => void;
+}>) {
+	return (
+		<div className="flex flex-col gap-4 rounded-card border border-border/70 bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
+			<div className="flex items-start gap-3">
+				<div className="rounded-pill bg-secondary p-2">
+					<Icon className="h-4 w-4 text-primary" aria-hidden="true" />
+				</div>
+				<div className="space-y-1">
+					<p className="font-medium text-foreground">{title}</p>
+					<p className="text-sm text-muted-foreground">{description}</p>
+				</div>
+			</div>
+			<Button
+				type="button"
+				size="sm"
+				variant={enabled ? "default" : "outline"}
+				onClick={() => {
+					onToggle(!enabled);
+				}}>
+				{enabled ? "On" : "Off"}
+			</Button>
+		</div>
+	);
+}
+
+/**
+ * Top-level account summary shared across roles.
+ */
+function ProfileSummaryCard({
 	session,
 	managerAccount,
-	resolvedDisplayName,
-	profileSubtitle
+	isLoading
 }: Readonly<{
-	session: BrowserAuthSession;
+	session: AuthSession;
 	managerAccount: AccountDetail | null;
-	resolvedDisplayName: string;
-	profileSubtitle: string;
+	isLoading: boolean;
 }>) {
+	const isManagerIdentityLoading = session.role === "manager" && isLoading && managerAccount === null;
+	const resolvedDisplayName = getSessionDisplayName(session, managerAccount);
+	const profileSubtitle = getProfileSubtitle(session, managerAccount);
+
 	return (
 		<Card>
 			<CardHeader>
 				<CardTitle>Your account</CardTitle>
-				<CardDescription>Review the name, role, and contact details shown in this workspace.</CardDescription>
+				<CardDescription>Review the identity and role shown in this workspace.</CardDescription>
 				<CardAction>
 					<UserRound className="h-4 w-4 text-primary" aria-hidden="true" />
 				</CardAction>
 			</CardHeader>
 			<CardContent className="space-y-5">
 				<div className="flex items-start gap-4">
-					<Avatar size="lg">
-						<AvatarFallback>{getAvatarFallbackLabel(resolvedDisplayName)}</AvatarFallback>
-					</Avatar>
+					{isManagerIdentityLoading ? (
+						<SettingsInlineSkeleton className="size-10 rounded-full" />
+					) : (
+						<Avatar size="lg">
+							<AvatarFallback>{getAvatarFallbackLabel(resolvedDisplayName)}</AvatarFallback>
+						</Avatar>
+					)}
 					<div className="space-y-2">
 						<div className="flex flex-wrap items-center gap-2">
-							<p className="text-lg font-medium text-foreground">{resolvedDisplayName}</p>
-							<Badge>{formatRoleLabel(session.role)}</Badge>
+							{isManagerIdentityLoading ? (
+								<SettingsInlineSkeleton className="h-6 w-40" />
+							) : (
+								<p className="text-lg font-medium text-foreground">{resolvedDisplayName}</p>
+							)}
+							{isManagerIdentityLoading ? (
+								<SettingsInlineSkeleton className="h-6 w-20 rounded-full" />
+							) : (
+								<Badge>{formatRoleLabel(session.role)}</Badge>
+							)}
 						</div>
-						<p className="text-sm text-muted-foreground">{profileSubtitle}</p>
+						{isManagerIdentityLoading ? (
+							<SettingsInlineSkeleton className="h-4 w-32" />
+						) : (
+							<p className="text-sm text-muted-foreground">{profileSubtitle}</p>
+						)}
 					</div>
 				</div>
 
 				<div className="grid gap-4 sm:grid-cols-2">
-					<DetailItem label="Role" value={formatRoleLabel(session.role)} />
-					<DetailItem label="Workspace" value={getWorkspaceLabel(session.role)} />
-					<DetailItem
-						label="Account email"
-						value={managerAccount?.email ?? "Not available"}
-					/>
-					<DetailItem
-						label="Member since"
-						value={managerAccount ? formatDateLabel(managerAccount.created_at) : "Not available"}
-					/>
+					{isManagerIdentityLoading ? (
+						<>
+							<DetailItemSkeleton label="Role" />
+							<DetailItemSkeleton label="Workspace" />
+							<DetailItemSkeleton label="Email" />
+							<DetailItemSkeleton label="Member since" />
+						</>
+					) : (
+						<>
+							<DetailItem label="Role" value={formatRoleLabel(session.role)} />
+							<DetailItem label="Workspace" value={getWorkspaceLabel(session.role)} />
+							<DetailItem label="Email" value={getProfileEmail(session, managerAccount)} />
+							<DetailItem
+								label="Member since"
+								value={
+									managerAccount
+										? formatDateLabel(managerAccount.created_at)
+										: "Available after account setup"
+								}
+							/>
+						</>
+					)}
 				</div>
 			</CardContent>
 		</Card>
@@ -513,20 +517,20 @@ function ProfileAccessCard({
 }
 
 /**
- * Security/session card with masked token display and sign-out action.
+ * Session and sign-out controls.
  */
-function SecuritySessionCard({
+function SecurityCard({
 	session,
 	onSignOut
 }: Readonly<{
-	session: BrowserAuthSession;
+	session: AuthSession;
 	onSignOut: () => void;
 }>) {
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle>Sign-in and security</CardTitle>
-				<CardDescription>Review your current sign-in and sign out when you are done.</CardDescription>
+				<CardTitle>Security</CardTitle>
+				<CardDescription>Review your current session and sign out when you are done.</CardDescription>
 				<CardAction>
 					<ShieldCheck className="h-4 w-4 text-primary" aria-hidden="true" />
 				</CardAction>
@@ -534,15 +538,12 @@ function SecuritySessionCard({
 			<CardContent className="space-y-5">
 				<div className="grid gap-4 sm:grid-cols-2">
 					<DetailItem label="Status" value="Signed in" />
-					<DetailItem label="Access" value={getWorkspaceLabel(session.role)} />
-					<DetailItem
-						label="Auditor code"
-						value={session.auditorCode ?? "Not applicable"}
-					/>
-					<DetailItem label="This device" value="Active session" />
+					<DetailItem label="Current access" value={formatRoleLabel(session.role)} />
+					<DetailItem label="Auditor code" value={session.auditorCode ?? "Not applicable"} />
+					<DetailItem label="Device" value="Current browser session" />
 				</div>
 
-				<div className="rounded-field border border-border bg-secondary/40 p-4">
+				<div className="rounded-card border border-border bg-secondary/40 p-4">
 					<p className="text-sm font-medium text-foreground">Using a shared device?</p>
 					<p className="mt-2 text-sm text-muted-foreground">
 						Sign out before you leave to keep your account secure.
@@ -559,124 +560,108 @@ function SecuritySessionCard({
 }
 
 /**
- * Frontend-only preference controls persisted to browser storage.
+ * Theme and language settings backed by the global preference provider.
  */
-function LocalPreferencesCard({
-	localSettings,
-	setLocalSettings
-}: Readonly<{
-	localSettings: LocalSettingsState;
-	setLocalSettings: React.Dispatch<React.SetStateAction<LocalSettingsState>>;
-}>) {
+function AppearancePreferencesCard() {
+	const preferences = usePreferences();
+
 	return (
 		<Card>
 			<CardHeader>
-				<CardTitle>Display preferences</CardTitle>
-				<CardDescription>Choose how the workspace looks and feels while you work.</CardDescription>
+				<CardTitle>Appearance</CardTitle>
+				<CardDescription>
+					Choose the theme and language preference used across the web workspace.
+				</CardDescription>
 				<CardAction>
-					<Badge variant="outline">Saved on this device</Badge>
+					<Palette className="h-4 w-4 text-primary" aria-hidden="true" />
 				</CardAction>
 			</CardHeader>
-			<CardContent className="grid gap-6 xl:grid-cols-[1.2fr_0.8fr]">
-				<div className="space-y-6">
-					<ChoiceGroup
-						label="Dashboard density"
-						helper="Choose how spacious or compact the workspace feels."
-						value={localSettings.density}
-						options={DENSITY_OPTIONS}
-						onChange={nextValue => {
-							setLocalSettings(currentValue => ({
-								...currentValue,
-								density: nextValue
-							}));
-						}}
+			<CardContent className="space-y-5">
+				<div className="grid gap-6 xl:grid-cols-2">
+					<ChoiceCardGroup
+						title="Theme"
+						description={`Current theme: ${preferences.resolvedTheme === "dark" ? "Dark" : "Light"}`}
+						value={preferences.themeMode}
+						options={THEME_OPTIONS}
+						onChange={preferences.setThemeMode}
 					/>
 
-					<ChoiceGroup
-						label="Notifications"
-						helper="Choose how much guidance and reminder text you want to see."
-						value={localSettings.notifications}
-						options={NOTIFICATION_OPTIONS}
-						onChange={nextValue => {
-							setLocalSettings(currentValue => ({
-								...currentValue,
-								notifications: nextValue
-							}));
-						}}
-						columnsClassName="md:grid-cols-3"
+					<ChoiceCardGroup
+						title="Language"
+						description={`Current locale: ${LANGUAGE_LABELS[preferences.resolvedLanguage]}`}
+						value={preferences.languagePreference}
+						options={LANGUAGE_OPTIONS}
+						onChange={preferences.setLanguagePreference}
 					/>
+				</div>
+			</CardContent>
+		</Card>
+	);
+}
 
-					<ChoiceGroup
-						label="Score presentation"
-						helper="Choose how strongly scores stand out across the workspace."
-						value={localSettings.scoreDisplay}
-						options={SCORE_DISPLAY_OPTIONS}
-						onChange={nextValue => {
-							setLocalSettings(currentValue => ({
-								...currentValue,
-								scoreDisplay: nextValue
-							}));
-						}}
-					/>
+/**
+ * Accessibility preferences backed by the global preference provider.
+ */
+function AccessibilityPreferencesCard() {
+	const preferences = usePreferences();
+	const fontScalePercent = Math.round(preferences.fontScale * 100);
 
-					<ChoiceGroup
-						label="Guidance density"
-						helper="Choose how much explanatory text you want while moving through the app."
-						value={localSettings.guidance}
-						options={GUIDANCE_OPTIONS}
-						onChange={nextValue => {
-							setLocalSettings(currentValue => ({
-								...currentValue,
-								guidance: nextValue
-							}));
-						}}
-					/>
+	return (
+		<Card>
+			<CardHeader>
+				<CardTitle>Accessibility</CardTitle>
+				<CardDescription>Adjust readability and contrast for longer review and audit sessions.</CardDescription>
+				<CardAction>
+					<Accessibility className="h-4 w-4 text-primary" aria-hidden="true" />
+				</CardAction>
+			</CardHeader>
+			<CardContent className="space-y-4">
+				<PreferenceToggleRow
+					icon={Accessibility}
+					title="High contrast"
+					description="Increase contrast across text, borders, and status colors."
+					enabled={preferences.highContrast}
+					onToggle={preferences.setHighContrast}
+				/>
+				<PreferenceToggleRow
+					icon={Type}
+					title="Dyslexic font"
+					description="Switch body and heading text to OpenDyslexic across the app."
+					enabled={preferences.dyslexicFont}
+					onToggle={preferences.setDyslexicFont}
+				/>
 
-					<div className="space-y-3">
-						<div className="flex items-center justify-between gap-3">
-							<div className="space-y-1">
-								<Label htmlFor="workspace-note">Workspace note</Label>
-								<p className="text-sm text-muted-foreground">Add a short note for yourself.</p>
-							</div>
-							<Badge variant="secondary">{localSettings.workspaceNote.length}/280</Badge>
+				<div className="rounded-card border border-border bg-card p-4">
+					<div className="flex items-center justify-between gap-3">
+						<div className="space-y-1">
+							<p className="font-medium text-foreground">Font size</p>
+							<p id="font_scale_description" className="text-sm text-muted-foreground">
+								Scale all rem-based typography and spacing from {Math.round(WEB_MIN_FONT_SCALE * 100)}%
+								to {Math.round(WEB_MAX_FONT_SCALE * 100)}%.
+							</p>
 						</div>
-						<Textarea
-							id="workspace-note"
-							value={localSettings.workspaceNote}
-							maxLength={280}
-							placeholder="Example: Keep the layout compact and score highlights subtle while reviewing results."
-							onChange={event => {
-								setLocalSettings(currentValue => ({
-									...currentValue,
-									workspaceNote: event.target.value
-								}));
-							}}
-						/>
+						<Badge variant="secondary">{fontScalePercent}%</Badge>
 					</div>
+					<input
+						id="font_scale"
+						name="fontScale"
+						type="range"
+						min={String(WEB_MIN_FONT_SCALE)}
+						max={String(WEB_MAX_FONT_SCALE)}
+						step="0.05"
+						value={String(preferences.fontScale)}
+						aria-label="Font size"
+						aria-describedby="font_scale_description"
+						onChange={event => {
+							preferences.setFontScale(Number(event.target.value));
+						}}
+						className="mt-4 w-full accent-primary"
+					/>
 				</div>
 
-				<div className="space-y-4 rounded-field border border-border bg-secondary/40 p-5">
-					<div className="flex items-center gap-2">
-						<Palette className="h-4 w-4 text-primary" aria-hidden="true" />
-						<p className="font-medium text-foreground">Preference summary</p>
-					</div>
-					<p className="text-sm text-muted-foreground">
-						These choices change how the workspace feels while you use it.
-					</p>
-					<div className="space-y-4">
-						<DetailItem label="Density" value={getDensityLabel(localSettings.density)} />
-						<DetailItem label="Notifications" value={getNotificationLabel(localSettings.notifications)} />
-						<DetailItem label="Score display" value={getScoreDisplayLabel(localSettings.scoreDisplay)} />
-						<DetailItem label="Guidance" value={getGuidanceLabel(localSettings.guidance)} />
-					</div>
-					<Button
-						type="button"
-						variant="outline"
-						onClick={() => {
-							setLocalSettings(DEFAULT_LOCAL_SETTINGS);
-						}}>
-						<Sparkles className="h-4 w-4" aria-hidden="true" />
-						Reset local defaults
+				<div className="flex justify-end">
+					<Button type="button" size="sm" variant="outline" onClick={preferences.resetPreferences}>
+						Reset accessibility defaults
 					</Button>
 				</div>
 			</CardContent>
@@ -685,287 +670,437 @@ function LocalPreferencesCard({
 }
 
 /**
- * Manager-only settings panels powered by the shared account endpoints.
+ * Manager-only account and organization settings.
  */
-function ManagerSettingsSection({
+function ManagerWorkspaceSection({
 	account,
 	managerProfiles,
-	isLoading,
-	errorMessage
+	accountIsLoading,
+	managerProfilesIsLoading,
+	accountErrorMessage,
+	managerProfilesErrorMessage
 }: Readonly<{
 	account: AccountDetail | null;
 	managerProfiles: ManagerProfile[];
-	isLoading: boolean;
-	errorMessage: string | null;
+	accountIsLoading: boolean;
+	managerProfilesIsLoading: boolean;
+	accountErrorMessage: string | null;
+	managerProfilesErrorMessage: string | null;
 }>) {
-	if (isLoading) {
-		return (
-			<div className="grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
-				<Card className="animate-pulse">
-					<CardContent className="py-12">
-						<div className="h-48 rounded bg-secondary" />
-					</CardContent>
-				</Card>
-				<Card className="animate-pulse">
-					<CardContent className="py-12">
-						<div className="h-48 rounded bg-secondary" />
-					</CardContent>
-				</Card>
-			</div>
-		);
-	}
+	const queryClient = useQueryClient();
+	const [isEditingOrganization, setIsEditingOrganization] = React.useState(false);
+	const [accountNameInput, setAccountNameInput] = React.useState(account?.name ?? "");
+	const [accountEmailInput, setAccountEmailInput] = React.useState(account?.email ?? "");
+	const [saveError, setSaveError] = React.useState<string | null>(null);
+	const [saveSuccess, setSaveSuccess] = React.useState<string | null>(null);
 
-	if (!account) {
-		return (
-			<Card>
-				<CardHeader>
-					<CardTitle>Organization account</CardTitle>
-					<CardDescription>Organization details will appear here when they are available.</CardDescription>
-				</CardHeader>
-				<CardContent className="space-y-4">
-					<p className="text-sm text-muted-foreground">{errorMessage ?? "We could not load your organization details right now."}</p>
-					<Button asChild variant="outline">
-						<Link href="/manager/dashboard">Return to dashboard</Link>
-					</Button>
-				</CardContent>
-			</Card>
-		);
-	}
+	React.useEffect(() => {
+		setAccountNameInput(account?.name ?? "");
+		setAccountEmailInput(account?.email ?? "");
+		setIsEditingOrganization(false);
+	}, [account?.id, account?.name, account?.email]);
 
-	const primaryManagerProfile = getPrimaryManagerProfile(account, managerProfiles);
-	const additionalManagerProfiles = managerProfiles.filter(profile => {
-		if (!primaryManagerProfile) {
-			return true;
+	const updateAccountMutation = useMutation({
+		mutationFn: async () => {
+			if (!account) {
+				throw new Error("Organization details are unavailable.");
+			}
+
+			return playspaceApi.management.accounts.update(account.id, {
+				name: accountNameInput.trim(),
+				email: accountEmailInput.trim()
+			});
+		},
+		onSuccess: async () => {
+			if (!account) {
+				return;
+			}
+
+			setSaveError(null);
+			setSaveSuccess("Organization details saved.");
+			setIsEditingOrganization(false);
+			await Promise.all([
+				queryClient.invalidateQueries({
+					queryKey: ["playspace", "settings", "account", account.id]
+				}),
+				queryClient.invalidateQueries({
+					queryKey: ["playspace", "account", account.id]
+				})
+			]);
+		},
+		onError: error => {
+			setSaveSuccess(null);
+			setSaveError(error instanceof Error ? error.message : "Unable to update organization details.");
 		}
-
-		return profile.id !== primaryManagerProfile.id;
 	});
 
+	const primaryManagerProfile = account ? getPrimaryManagerProfile(account, managerProfiles) : null;
+	const clearSaveMessages = () => {
+		setSaveError(null);
+		setSaveSuccess(null);
+	};
+
+	const handleToggleEditing = () => {
+		setIsEditingOrganization(currentValue => !currentValue);
+		clearSaveMessages();
+	};
+
+	const handleAccountNameChange = (value: string) => {
+		setAccountNameInput(value);
+		clearSaveMessages();
+	};
+
+	const handleAccountEmailChange = (value: string) => {
+		setAccountEmailInput(value);
+		clearSaveMessages();
+	};
+
+	const handleSave = () => {
+		if (accountNameInput.trim().length === 0) {
+			setSaveError("Organization name is required.");
+			return;
+		}
+
+		if (accountEmailInput.trim().length === 0) {
+			setSaveError("Account email is required.");
+			return;
+		}
+
+		updateAccountMutation.mutate();
+	};
+
+	const handleCancelEditing = () => {
+		if (!account) {
+			return;
+		}
+
+		setAccountNameInput(account.name);
+		setAccountEmailInput(account.email);
+		clearSaveMessages();
+		setIsEditingOrganization(false);
+	};
+
 	return (
-		<div className="grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
-			<Card>
-				<CardHeader>
-					<CardTitle>Organization account</CardTitle>
-					<CardDescription>Review the organization and main contact attached to this workspace.</CardDescription>
-				</CardHeader>
-				<CardContent className="space-y-5">
-					<div className="grid gap-4 sm:grid-cols-2">
-						<DetailItem label="Organization" value={account.name} />
-						<DetailItem label="Account email" value={account.email} />
-						<DetailItem label="Primary contact" value={primaryManagerProfile?.full_name ?? "Pending"} />
-						<DetailItem label="Member since" value={formatDateLabel(account.created_at)} />
-					</div>
-
-					<div className="rounded-field border border-border bg-secondary/40 p-4">
-						<p className="text-sm font-medium text-foreground">Primary contact</p>
-						{primaryManagerProfile ? (
-							<div className="mt-3 space-y-1">
-								<p className="text-sm text-foreground">{primaryManagerProfile.full_name}</p>
-								<p className="text-sm text-muted-foreground">
-									{primaryManagerProfile.position ?? "Position pending"}
-								</p>
-								<p className="text-sm text-muted-foreground">{primaryManagerProfile.email}</p>
-								<p className="text-sm text-muted-foreground">
-									{primaryManagerProfile.phone ?? "Phone pending"}
-								</p>
-							</div>
-						) : (
-							<p className="mt-3 text-sm text-muted-foreground">
-								Primary contact information will appear here once the account owner is configured.
-							</p>
-						)}
-					</div>
-
-					<div className="rounded-field border border-border bg-secondary/40 p-4">
-						<p className="text-sm font-medium text-foreground">Organization details</p>
-						<p className="mt-2 text-sm text-muted-foreground">
-							Use this section to confirm that the organization name, contact email, and primary owner are
-							correct.
-						</p>
-					</div>
-				</CardContent>
-			</Card>
-
-			<Card>
-				<CardHeader>
-					<CardTitle>Access contacts</CardTitle>
-					<CardDescription>People with manager access to this workspace.</CardDescription>
-					<CardAction>
-						<Badge variant="secondary">{`${managerProfiles.length} contact${managerProfiles.length === 1 ? "" : "s"}`}</Badge>
-					</CardAction>
-				</CardHeader>
-				<CardContent className="space-y-5">
-					<div className="grid gap-4 sm:grid-cols-2">
-						<DetailItem label="Primary contact" value={primaryManagerProfile?.full_name ?? "Pending"} />
-						<DetailItem label="Other contacts" value={String(additionalManagerProfiles.length)} />
-						<DetailItem label="Access level" value="Manager" />
-						<DetailItem label="Contact list" value="Shown below" />
-					</div>
-
-					{managerProfiles.length === 0 ? (
-						<p className="text-sm text-muted-foreground">
-							Manager contact information will appear here once the account roster is configured.
-						</p>
-					) : null}
-
-					<div className="space-y-3">
-						{managerProfiles.map(profile => {
-							return (
-								<div
-									key={profile.id}
-									className="flex items-start gap-3 rounded-field border border-border bg-secondary/40 p-4">
-									<Avatar size="sm">
-										<AvatarFallback>{getAvatarFallbackLabel(profile.full_name)}</AvatarFallback>
-									</Avatar>
-									<div className="min-w-0 flex-1 space-y-1">
-										<div className="flex flex-wrap items-center gap-2">
-											<p className="font-medium text-foreground">{profile.full_name}</p>
-											{profile.is_primary ? (
-												<Badge>Primary contact</Badge>
-											) : (
-												<Badge variant="secondary">Admin contact</Badge>
-											)}
-										</div>
-										<p className="text-sm text-muted-foreground">
-											{profile.position ?? "Position pending"}
-										</p>
-										<p className="text-sm text-muted-foreground">{profile.email}</p>
-									</div>
-								</div>
-							);
-						})}
-					</div>
-				</CardContent>
-			</Card>
+		<div className="grid items-start gap-4 xl:grid-cols-2">
+			<ManagerOrganizationCard
+				account={account}
+				accountIsLoading={accountIsLoading}
+				primaryManagerProfile={primaryManagerProfile}
+				errorMessage={accountErrorMessage}
+				isEditingOrganization={isEditingOrganization}
+				accountNameInput={accountNameInput}
+				accountEmailInput={accountEmailInput}
+				saveError={saveError}
+				saveSuccess={saveSuccess}
+				isPending={updateAccountMutation.isPending}
+				onToggleEditing={handleToggleEditing}
+				onAccountNameChange={handleAccountNameChange}
+				onAccountEmailChange={handleAccountEmailChange}
+				onSave={handleSave}
+				onCancelEditing={handleCancelEditing}
+			/>
+			<ManagerContactsCard
+				managerProfiles={managerProfiles}
+				isLoading={managerProfilesIsLoading}
+				errorMessage={managerProfilesErrorMessage}
+			/>
 		</div>
 	);
 }
 
-/**
- * Auditor-facing placeholder panel until dedicated auditor settings endpoints land.
- */
-function AuditorSettingsSection({ session }: Readonly<{ session: BrowserAuthSession }>) {
+function ManagerOrganizationCard({
+	account,
+	accountIsLoading,
+	primaryManagerProfile,
+	errorMessage,
+	isEditingOrganization,
+	accountNameInput,
+	accountEmailInput,
+	saveError,
+	saveSuccess,
+	isPending,
+	onToggleEditing,
+	onAccountNameChange,
+	onAccountEmailChange,
+	onSave,
+	onCancelEditing
+}: Readonly<{
+	account: AccountDetail | null;
+	accountIsLoading: boolean;
+	primaryManagerProfile: ManagerProfile | null;
+	errorMessage: string | null;
+	isEditingOrganization: boolean;
+	accountNameInput: string;
+	accountEmailInput: string;
+	saveError: string | null;
+	saveSuccess: string | null;
+	isPending: boolean;
+	onToggleEditing: () => void;
+	onAccountNameChange: (value: string) => void;
+	onAccountEmailChange: (value: string) => void;
+	onSave: () => void;
+	onCancelEditing: () => void;
+}>) {
 	return (
-		<div className="grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
-			<Card>
-				<CardHeader>
-					<CardTitle>Your access</CardTitle>
-					<CardDescription>Review the details tied to your auditor sign-in.</CardDescription>
-				</CardHeader>
-				<CardContent className="space-y-5">
-					<div className="grid gap-4 sm:grid-cols-2">
-						<DetailItem label="Role" value="Auditor" />
-						<DetailItem label="Auditor code" value={session.auditorCode ?? "Code pending"} />
-						<DetailItem label="Access level" value="Auditor" />
-						<DetailItem label="Workspace" value="Field audits" />
-					</div>
-
-					<div className="rounded-field border border-border bg-secondary/40 p-4">
-						<p className="text-sm font-medium text-foreground">Need to switch accounts?</p>
-						<p className="mt-2 text-sm text-muted-foreground">
-							Sign out and sign back in if your auditor code or access looks incorrect.
-						</p>
-					</div>
-
-					<Button asChild variant="outline">
-						<Link href="/auditor/dashboard">
-							<LayoutDashboard className="h-4 w-4" aria-hidden="true" />
-							Open auditor dashboard
-						</Link>
+		<Card>
+			<CardHeader>
+				<CardTitle>Organization profile</CardTitle>
+				<CardDescription>Review or update the organization attached to this manager workspace.</CardDescription>
+				<CardAction>
+					<Button
+						type="button"
+						variant="outline"
+						size="sm"
+						disabled={accountIsLoading || !account}
+						onClick={onToggleEditing}>
+						{isEditingOrganization ? "Cancel" : "Edit"}
 					</Button>
-				</CardContent>
-			</Card>
+				</CardAction>
+			</CardHeader>
+			<CardContent className="space-y-5">
+				{accountIsLoading && !account ? (
+					<>
+						<div className="grid gap-4 sm:grid-cols-2">
+							<DetailItemSkeleton label="Organization" />
+							<DetailItemSkeleton label="Account email" />
+							<DetailItemSkeleton label="Primary contact" />
+							<DetailItemSkeleton label="Member since" />
+						</div>
+						<div className="rounded-card border border-border bg-secondary/40 p-4">
+							<SettingsInlineSkeleton className="h-4 w-28" />
+							<SettingsInlineSkeleton className="mt-3 h-4 w-40" />
+							<SettingsInlineSkeleton className="mt-2 h-4 w-52" />
+						</div>
+					</>
+				) : account === null ? (
+					<p className="text-sm text-muted-foreground">
+						{errorMessage ?? "We could not load your organization details right now."}
+					</p>
+				) : (
+					<>
+						<div className="grid gap-4 sm:grid-cols-2">
+							<DetailItem label="Organization" value={account.name} />
+							<DetailItem label="Account email" value={account.email} />
+							<DetailItem label="Primary contact" value={primaryManagerProfile?.full_name ?? "Pending"} />
+							<DetailItem label="Member since" value={formatDateLabel(account.created_at)} />
+						</div>
 
-			<Card>
-				<CardHeader>
-					<CardTitle>Workspace tips</CardTitle>
-					<CardDescription>Helpful reminders while you work through audits.</CardDescription>
-				</CardHeader>
-				<CardContent className="space-y-3">
-					<div className="rounded-field border border-border bg-secondary/40 p-4">
-						<div className="flex items-center gap-2">
-							<Badge>Signed in</Badge>
-							<p className="font-medium text-foreground">Your access is active</p>
-						</div>
-						<p className="mt-2 text-sm text-muted-foreground">
-							You can use this page to review your details and return to the audit workspace.
-						</p>
-					</div>
-					<div className="rounded-field border border-border bg-secondary/40 p-4">
-						<div className="flex items-center gap-2">
-							<Badge variant="secondary">Preferences</Badge>
-							<p className="font-medium text-foreground">Saved on this device</p>
-						</div>
-						<p className="mt-2 text-sm text-muted-foreground">
-							Display preferences on this page apply to this device.
-						</p>
-					</div>
-					<div className="rounded-field border border-border bg-secondary/40 p-4">
-						<div className="flex items-center gap-2">
-							<Badge variant="outline">Tip</Badge>
-							<p className="font-medium text-foreground">Check your code before starting</p>
-						</div>
-						<p className="mt-2 text-sm text-muted-foreground">
-							If your auditor code is missing, sign out and sign back in before beginning an audit.
-						</p>
-					</div>
-				</CardContent>
-			</Card>
-		</div>
+						{isEditingOrganization ? (
+							<div className="space-y-4 rounded-card border border-border bg-secondary/40 p-4">
+								<div className="grid gap-2">
+									<Label htmlFor="organization_name">Organization name</Label>
+									<Input
+										id="organization_name"
+										name="organizationName"
+										autoComplete="organization"
+										value={accountNameInput}
+										onChange={event => onAccountNameChange(event.target.value)}
+									/>
+								</div>
+								<div className="grid gap-2">
+									<Label htmlFor="organization_email">Account email</Label>
+									<Input
+										id="organization_email"
+										name="organizationEmail"
+										type="email"
+										autoComplete="email"
+										spellCheck={false}
+										value={accountEmailInput}
+										onChange={event => onAccountEmailChange(event.target.value)}
+									/>
+								</div>
+								{saveError ? (
+									<p aria-live="polite" className="text-sm text-destructive">
+										{saveError}
+									</p>
+								) : null}
+								{saveSuccess ? (
+									<p aria-live="polite" className="text-sm text-green-600 dark:text-green-400">
+										{saveSuccess}
+									</p>
+								) : null}
+								<div className="flex flex-wrap gap-2">
+									<Button type="button" disabled={isPending} onClick={onSave}>
+										Save changes
+									</Button>
+									<Button type="button" variant="outline" onClick={onCancelEditing}>
+										Cancel
+									</Button>
+								</div>
+							</div>
+						) : (
+							<div className="rounded-card border border-border bg-secondary/40 p-4">
+								<p className="text-sm font-medium text-foreground">Primary contact</p>
+								{primaryManagerProfile ? (
+									<div className="mt-3 space-y-1">
+										<p className="text-sm text-foreground">{primaryManagerProfile.full_name}</p>
+										<p className="text-sm text-muted-foreground">
+											{primaryManagerProfile.position ?? "Position pending"}
+										</p>
+										<p className="text-sm text-muted-foreground">{primaryManagerProfile.email}</p>
+										<p className="text-sm text-muted-foreground">
+											{primaryManagerProfile.phone ?? "Phone pending"}
+										</p>
+									</div>
+								) : (
+									<p className="mt-3 text-sm text-muted-foreground">
+										Primary contact information will appear here once the account owner is
+										configured.
+									</p>
+								)}
+							</div>
+						)}
+					</>
+				)}
+			</CardContent>
+		</Card>
+	);
+}
+
+function ManagerContactsCard({
+	managerProfiles,
+	isLoading,
+	errorMessage
+}: Readonly<{
+	managerProfiles: ManagerProfile[];
+	isLoading: boolean;
+	errorMessage: string | null;
+}>) {
+	return (
+		<Card>
+			<CardHeader>
+				<CardTitle>Manager contacts</CardTitle>
+				<CardDescription>People with manager access to this workspace.</CardDescription>
+				<CardAction>
+					<Building2 className="h-4 w-4 text-primary" aria-hidden="true" />
+				</CardAction>
+			</CardHeader>
+			<CardContent className="space-y-3">
+				{isLoading ? (
+					<>
+						{MANAGER_CONTACT_SKELETON_IDS.map(skeletonId => (
+							<div
+								key={`manager-profile-skeleton-${skeletonId}`}
+								className="flex items-start gap-3 rounded-card border border-border bg-card p-4">
+								<SettingsInlineSkeleton className="size-6 rounded-full" />
+								<div className="min-w-0 flex-1 space-y-2">
+									<SettingsInlineSkeleton className="h-4 w-32" />
+									<SettingsInlineSkeleton className="h-4 w-28" />
+									<SettingsInlineSkeleton className="h-4 w-44" />
+								</div>
+							</div>
+						))}
+					</>
+				) : errorMessage ? (
+					<p className="text-sm text-muted-foreground">{errorMessage}</p>
+				) : managerProfiles.length === 0 ? (
+					<p className="text-sm text-muted-foreground">
+						Manager contact information will appear here once the account roster is configured.
+					</p>
+				) : null}
+				{errorMessage
+					? null
+					: managerProfiles.map(profile => (
+							<div
+								key={profile.id}
+								className="flex items-start gap-3 rounded-card border border-border bg-card p-4">
+								<Avatar size="sm">
+									<AvatarFallback>{getAvatarFallbackLabel(profile.full_name)}</AvatarFallback>
+								</Avatar>
+								<div className="min-w-0 flex-1 space-y-1">
+									<div className="flex flex-wrap items-center gap-2">
+										<p className="font-medium text-foreground">{profile.full_name}</p>
+										{profile.is_primary ? (
+											<Badge>Primary contact</Badge>
+										) : (
+											<Badge variant="secondary">Manager</Badge>
+										)}
+									</div>
+									<p className="text-sm text-muted-foreground">
+										{profile.position ?? "Position pending"}
+									</p>
+									<p className="text-sm text-muted-foreground">{profile.email}</p>
+								</div>
+							</div>
+						))}
+			</CardContent>
+		</Card>
+	);
+}
+
+/**
+ * Administrator-only workspace summary.
+ */
+function AdminWorkspaceCard() {
+	return (
+		<Card>
+			<CardHeader>
+				<CardTitle>Administrator access</CardTitle>
+				<CardDescription>Global oversight across all accounts, places, and audits.</CardDescription>
+			</CardHeader>
+			<CardContent className="grid gap-4 sm:grid-cols-2">
+				<DetailItem label="Role" value="Administrator" />
+				<DetailItem label="Scope" value="Platform-wide" />
+				<DetailItem label="Email visibility" value="Manager emails only" />
+				<DetailItem label="Auditor identity" value="Auditor code first" />
+			</CardContent>
+		</Card>
+	);
+}
+
+/**
+ * Auditor-only workspace summary.
+ */
+function AuditorWorkspaceCard({ session }: Readonly<{ session: AuthSession }>) {
+	return (
+		<Card>
+			<CardHeader>
+				<CardTitle>Auditor access</CardTitle>
+				<CardDescription>Review the audit access tied to your current sign-in.</CardDescription>
+			</CardHeader>
+			<CardContent className="grid gap-4 sm:grid-cols-2">
+				<DetailItem label="Role" value="Auditor" />
+				<DetailItem label="Auditor code" value={session.auditorCode ?? "Code pending"} />
+				<DetailItem label="Workspace" value="Field audits" />
+				<DetailItem label="Access type" value="Assignment-based" />
+			</CardContent>
+		</Card>
 	);
 }
 
 export default function SettingsPage() {
 	const router = useRouter();
-	const [isSessionReady, setIsSessionReady] = React.useState(false);
-	const [session, setSession] = React.useState<BrowserAuthSession | null>(null);
-	const [localSettings, setLocalSettings] = React.useState<LocalSettingsState>(DEFAULT_LOCAL_SETTINGS);
-
-	/**
-	 * Hydrate browser-only session and settings state after mount.
-	 */
-	React.useEffect(() => {
-		setSession(getBrowserAuthSession());
-		setLocalSettings(readStoredLocalSettings());
-		setIsSessionReady(true);
-	}, []);
-
-	/**
-	 * Persist local-only preview settings after hydration.
-	 */
-	React.useEffect(() => {
-		if (!isSessionReady) {
-			return;
-		}
-
-		writeStoredLocalSettings(localSettings);
-	}, [isSessionReady, localSettings]);
+	const session = useAuthSession();
+	const preferences = usePreferences();
 
 	const isManager = session?.role === "manager";
-	const dashboardHref = isManager ? "/manager/dashboard" : "/auditor/dashboard";
+	const managerAccountId = isManager ? session.accountId : null;
 
 	const accountQuery = useQuery({
-		queryKey: ["playspace", "settings", "account", PLAYSPACE_DEMO_ACCOUNT_ID],
-		queryFn: () => playspaceApi.accounts.get(PLAYSPACE_DEMO_ACCOUNT_ID),
-		enabled: isSessionReady && isManager
+		queryKey: ["playspace", "settings", "account", managerAccountId],
+		queryFn: async () => {
+			if (!managerAccountId) {
+				throw new Error("Manager account context is unavailable.");
+			}
+
+			return playspaceApi.accounts.get(managerAccountId);
+		},
+		enabled: preferences.isHydrated && managerAccountId !== null
 	});
 
 	const managerProfilesQuery = useQuery({
-		queryKey: ["playspace", "settings", "account", PLAYSPACE_DEMO_ACCOUNT_ID, "managerProfiles"],
-		queryFn: () => playspaceApi.accounts.managerProfiles(PLAYSPACE_DEMO_ACCOUNT_ID),
-		enabled: isSessionReady && isManager
+		queryKey: ["playspace", "settings", "account", managerAccountId, "managerProfiles"],
+		queryFn: async () => {
+			if (!managerAccountId) {
+				throw new Error("Manager account context is unavailable.");
+			}
+
+			return playspaceApi.accounts.managerProfiles(managerAccountId);
+		},
+		enabled: preferences.isHydrated && managerAccountId !== null
 	});
 
-	const managerAccount = accountQuery.data ?? null;
-	const managerProfiles = managerProfilesQuery.data ?? [];
-	const resolvedDisplayName = getSessionDisplayName(session, managerAccount);
-	const managerSettingsErrorMessage = getManagerSettingsErrorMessage({
-		isManager,
-		accountError: accountQuery.error,
-		managerProfilesError: managerProfilesQuery.error
-	});
-
-	if (!isSessionReady) {
+	if (!preferences.isHydrated) {
 		return <SettingsPageSkeleton />;
 	}
 
@@ -973,25 +1108,24 @@ export default function SettingsPage() {
 		return <SessionUnavailableState />;
 	}
 
-	const profileSubtitle = getProfileSubtitle(session, managerAccount);
-
+	const managerAccount = accountQuery.data ?? null;
+	const managerProfiles = managerProfilesQuery.data ?? [];
 	return (
 		<div className="space-y-6">
 			<DashboardHeader
 				eyebrow="Workspace Settings"
 				title="Settings"
-				description="Manage account details, sign-in information, and display preferences."
-				actions={<SettingsActionBar dashboardHref={dashboardHref} />}
+				description="Manage your account summary, appearance, and accessibility preferences."
+				actions={<SettingsActionBar dashboardHref={getDashboardHref(session.role)} />}
 			/>
 
-			<div className="grid gap-4 xl:grid-cols-[1.05fr_0.95fr]">
-				<ProfileAccessCard
+			<div className="grid items-start gap-4 xl:grid-cols-2">
+				<ProfileSummaryCard
 					session={session}
 					managerAccount={managerAccount}
-					resolvedDisplayName={resolvedDisplayName}
-					profileSubtitle={profileSubtitle}
+					isLoading={session.role === "manager" && accountQuery.isLoading}
 				/>
-				<SecuritySessionCard
+				<SecurityCard
 					session={session}
 					onSignOut={() => {
 						clearBrowserAuthSession();
@@ -1000,17 +1134,24 @@ export default function SettingsPage() {
 				/>
 			</div>
 
-			<LocalPreferencesCard localSettings={localSettings} setLocalSettings={setLocalSettings} />
+			<div className="grid items-start gap-4 xl:grid-cols-2">
+				<AppearancePreferencesCard />
+				<AccessibilityPreferencesCard />
+			</div>
 
-			{isManager ? (
-				<ManagerSettingsSection
+			{session.role === "manager" ? (
+				<ManagerWorkspaceSection
 					account={managerAccount}
 					managerProfiles={managerProfiles}
-					isLoading={accountQuery.isLoading || managerProfilesQuery.isLoading}
-					errorMessage={managerSettingsErrorMessage}
+					accountIsLoading={accountQuery.isLoading}
+					managerProfilesIsLoading={managerProfilesQuery.isLoading}
+					accountErrorMessage={getErrorMessageFromUnknown(accountQuery.error)}
+					managerProfilesErrorMessage={getErrorMessageFromUnknown(managerProfilesQuery.error)}
 				/>
+			) : session.role === "admin" ? (
+				<AdminWorkspaceCard />
 			) : (
-				<AuditorSettingsSection session={session} />
+				<AuditorWorkspaceCard session={session} />
 			)}
 		</div>
 	);

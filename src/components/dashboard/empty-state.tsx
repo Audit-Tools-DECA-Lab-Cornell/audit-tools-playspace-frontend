@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export interface EmptyStateProps {
 	title: string;
@@ -13,14 +13,12 @@ export interface EmptyStateProps {
  */
 export function EmptyState({ title, description, action }: Readonly<EmptyStateProps>) {
 	return (
-		<Card className="border-dashed">
-			<CardHeader className="gap-1">
-				<CardTitle>{title}</CardTitle>
+		<Card className="border-dashed bg-card/70">
+			<CardHeader className="gap-1.5">
+				<CardTitle className="text-xl md:text-2xl">{title}</CardTitle>
+				<CardDescription className="max-w-2xl">{description}</CardDescription>
 			</CardHeader>
-			<CardContent className="space-y-4">
-				<p className="max-w-2xl text-sm text-muted-foreground">{description}</p>
-				{action}
-			</CardContent>
+			<CardContent className="space-y-4">{action}</CardContent>
 		</Card>
 	);
 }

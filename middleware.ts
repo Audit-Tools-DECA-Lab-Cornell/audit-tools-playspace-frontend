@@ -28,14 +28,29 @@ export function middleware(request: NextRequest) {
 
 	if (pathname.startsWith("/login")) {
 		if (!auth.isAuthenticated || !auth.role) return NextResponse.next();
-		const dashboardPath = auth.role === "manager" ? "/manager/dashboard" : "/auditor/dashboard";
+		const dashboardPath =
+			auth.role === "admin"
+				? "/admin/dashboard"
+				: auth.role === "manager"
+					? "/manager/dashboard"
+					: "/auditor/dashboard";
 		return NextResponse.redirect(new URL(dashboardPath, request.url));
+	}
+
+	if (pathname.startsWith("/admin")) {
+		if (!auth.isAuthenticated) return redirectToLogin(request);
+		if (auth.role !== "admin") {
+			const fallbackPath = auth.role === "manager" ? "/manager/dashboard" : "/auditor/dashboard";
+			return NextResponse.redirect(new URL(fallbackPath, request.url));
+		}
+		return NextResponse.next();
 	}
 
 	if (pathname.startsWith("/manager")) {
 		if (!auth.isAuthenticated) return redirectToLogin(request);
 		if (auth.role !== "manager") {
-			return NextResponse.redirect(new URL("/auditor/dashboard", request.url));
+			const fallbackPath = auth.role === "admin" ? "/admin/dashboard" : "/auditor/dashboard";
+			return NextResponse.redirect(new URL(fallbackPath, request.url));
 		}
 		return NextResponse.next();
 	}
@@ -43,7 +58,8 @@ export function middleware(request: NextRequest) {
 	if (pathname.startsWith("/auditor")) {
 		if (!auth.isAuthenticated) return redirectToLogin(request);
 		if (auth.role !== "auditor") {
-			return NextResponse.redirect(new URL("/manager/dashboard", request.url));
+			const fallbackPath = auth.role === "admin" ? "/admin/dashboard" : "/manager/dashboard";
+			return NextResponse.redirect(new URL(fallbackPath, request.url));
 		}
 		return NextResponse.next();
 	}
@@ -57,5 +73,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-	matcher: ["/login", "/manager/:path*", "/auditor/:path*", "/settings/:path*"]
+	matcher: ["/login", "/admin/:path*", "/manager/:path*", "/auditor/:path*", "/settings/:path*"]
 };

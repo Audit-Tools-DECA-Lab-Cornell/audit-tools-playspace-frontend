@@ -1,68 +1,139 @@
+"use client";
+
+import * as React from "react";
+import type { ColumnDef } from "@tanstack/react-table";
+
 import type { AuditorSummary } from "@/lib/api/playspace";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+
+import { DataTable, getMultiValueFilterFn } from "./data-table";
+import { DataTableColumnHeader } from "./data-table-column-header";
+import type { EntityRowAction } from "./entity-row-actions";
+import { EntityRowActions } from "./entity-row-actions";
 
 import { formatDateTimeLabel } from "./utils";
 
 export interface AuditorsTableProps {
 	auditors: AuditorSummary[];
 	title?: string;
+	description?: string;
+	action?: React.ReactNode;
+	getRowActions?: (auditor: AuditorSummary) => EntityRowAction[];
+	pageSize?: number;
+	emptyMessage?: string;
 }
 
 /**
- * Manager-facing auditor list for account dashboard screens.
+ * Manager-facing auditor roster with sortable workload and recency columns.
  */
-export function AuditorsTable({ auditors, title = "Auditors" }: Readonly<AuditorsTableProps>) {
+export function AuditorsTable({
+	auditors,
+	title = "Auditors",
+	description = "Review roster identity, assignment load, and recent activity.",
+	action,
+	getRowActions,
+	pageSize = 10,
+	emptyMessage = "No auditors match the current filters."
+}: Readonly<AuditorsTableProps>) {
+	const columns = React.useMemo<ColumnDef<AuditorSummary>[]>(
+		() => [
+			{
+				id: "identity",
+				accessorFn: auditor => `${auditor.auditor_code} ${auditor.full_name} ${auditor.email ?? ""}`,
+				header: ({ column }) => <DataTableColumnHeader column={column} title="Auditor" />,
+				cell: ({ row }) => (
+					<div className="min-w-[240px] space-y-1">
+						<div className="flex flex-wrap items-center gap-2">
+							<Badge variant="outline" className="font-mono text-primary uppercase tracking-[0.14em]">
+								{row.original.auditor_code}
+							</Badge>
+							{row.original.role ? <Badge variant="secondary">{row.original.role}</Badge> : null}
+						</div>
+						<p className="font-medium text-foreground">{row.original.full_name}</p>
+						<p className="text-sm text-muted-foreground">{row.original.email ?? "Email pending"}</p>
+					</div>
+				),
+				enableHiding: false
+			},
+			{
+				accessorKey: "role",
+				header: ({ column }) => <DataTableColumnHeader column={column} title="Role" />,
+				filterFn: getMultiValueFilterFn<AuditorSummary>(),
+				cell: ({ row }) => (
+					<span className="text-sm text-muted-foreground">{row.original.role ?? "Role pending"}</span>
+				)
+			},
+			{
+				accessorKey: "assignments_count",
+				header: ({ column }) => <DataTableColumnHeader column={column} title="Assignments" align="end" />,
+				cell: ({ row }) => (
+					<span className="block text-right font-mono text-foreground tabular-nums">
+						{row.original.assignments_count}
+					</span>
+				)
+			},
+			{
+				accessorKey: "completed_audits",
+				header: ({ column }) => <DataTableColumnHeader column={column} title="Completed" align="end" />,
+				cell: ({ row }) => (
+					<span className="block text-right font-mono text-foreground tabular-nums">
+						{row.original.completed_audits}
+					</span>
+				)
+			},
+			{
+				accessorKey: "last_active_at",
+				header: ({ column }) => <DataTableColumnHeader column={column} title="Last Active" align="end" />,
+				cell: ({ row }) => (
+					<span className="block text-right text-sm text-muted-foreground tabular-nums">
+						{formatDateTimeLabel(row.original.last_active_at)}
+					</span>
+				)
+			},
+			...(getRowActions
+				? [
+						{
+							id: "actions",
+							enableSorting: false,
+							enableHiding: false,
+							cell: ({ row }) => <EntityRowActions actions={getRowActions(row.original)} />
+						} satisfies ColumnDef<AuditorSummary>
+					]
+				: [])
+		],
+		[getRowActions]
+	);
+
+	const roleOptions = React.useMemo(() => {
+		return Array.from(
+			new Set(auditors.map(auditor => auditor.role).filter((value): value is string => Boolean(value)))
+		)
+			.sort((left, right) => left.localeCompare(right))
+			.map(role => ({
+				label: role,
+				value: role
+			}));
+	}, [auditors]);
+
 	return (
-		<Card>
-			<CardHeader>
-				<CardTitle>{title}</CardTitle>
-			</CardHeader>
-			<CardContent className="overflow-hidden">
-				<div className="overflow-x-auto">
-					<table className="min-w-full text-sm">
-						<thead className="text-left text-xs uppercase tracking-[0.16em] text-muted-foreground">
-							<tr className="border-b border-border">
-								<th className="px-0 py-3 font-medium">Auditor</th>
-								<th className="px-4 py-3 font-medium">Role</th>
-								<th className="px-4 py-3 font-medium">Assignments</th>
-								<th className="px-4 py-3 font-medium">Completed</th>
-								<th className="px-4 py-3 font-medium">Last Active</th>
-							</tr>
-						</thead>
-						<tbody>
-							{auditors.map(auditor => {
-								return (
-									<tr key={auditor.id} className="border-b border-border/70 last:border-b-0">
-										<td className="px-0 py-4 align-top">
-											<div className="space-y-1">
-												<div className="flex flex-wrap items-center gap-2">
-													<p className="font-medium text-foreground">{auditor.full_name}</p>
-													<span className="font-mono text-xs text-primary">{auditor.auditor_code}</span>
-												</div>
-												<p className="text-muted-foreground">
-													{auditor.email ?? "Email pending"}
-												</p>
-											</div>
-										</td>
-										<td className="px-4 py-4 align-top text-muted-foreground">
-											{auditor.role ?? "Role pending"}
-										</td>
-										<td className="px-4 py-4 align-top font-mono text-foreground">
-											{auditor.assignments_count}
-										</td>
-										<td className="px-4 py-4 align-top font-mono text-foreground">
-											{auditor.completed_audits}
-										</td>
-										<td className="px-4 py-4 align-top text-muted-foreground">
-											{formatDateTimeLabel(auditor.last_active_at)}
-										</td>
-									</tr>
-								);
-							})}
-						</tbody>
-					</table>
-				</div>
-			</CardContent>
-		</Card>
+		<DataTable
+			title={title}
+			description={description}
+			columns={columns}
+			data={auditors}
+			searchColumnId="identity"
+			searchPlaceholder="Search auditors..."
+			filterConfigs={[
+				{
+					columnId: "role",
+					title: "Role",
+					options: roleOptions
+				}
+			]}
+			action={action}
+			pageSize={pageSize}
+			emptyMessage={emptyMessage}
+			initialSorting={[{ id: "last_active_at", desc: true }]}
+		/>
 	);
 }

@@ -43,25 +43,37 @@ function getDefaultBaseUrl(): string {
 
 function attachAuthToken(config: InternalAxiosRequestConfig) {
 	const accessToken = getCookieValue(AUTH_COOKIE_NAMES.accessToken);
-	if (!accessToken) return config;
-
 	const headers = config.headers instanceof AxiosHeaders ? config.headers : new AxiosHeaders(config.headers);
 
-	headers.set("Authorization", `Bearer ${accessToken}`);
+	if (accessToken) {
+		headers.set("Authorization", `Bearer ${accessToken}`);
+	}
+	const role = getCookieValue(AUTH_COOKIE_NAMES.role);
+	if (role) {
+		headers.set("x-demo-role", role);
+	}
+	const accountId = getCookieValue(AUTH_COOKIE_NAMES.accountId);
+	if (accountId) {
+		headers.set("x-demo-account-id", accountId);
+	}
+	const auditorCode = getCookieValue(AUTH_COOKIE_NAMES.auditorCode);
+	if (auditorCode) {
+		headers.set("x-demo-auditor-code", auditorCode);
+	}
 	config.headers = headers;
-
 	return config;
 }
 
 function handleUnauthorized(error: AxiosError) {
-	if (typeof window === "undefined") return;
+	if (globalThis.window === undefined) return;
 	if (error.response?.status !== 401) return;
 
 	clearCookie(AUTH_COOKIE_NAMES.role);
 	clearCookie(AUTH_COOKIE_NAMES.accessToken);
+	clearCookie(AUTH_COOKIE_NAMES.accountId);
 	clearCookie(AUTH_COOKIE_NAMES.auditorCode);
 
-	window.location.assign("/login");
+	globalThis.window.location.assign("/login");
 }
 
 export function createApiClient(options: ApiClientOptions = {}): AxiosInstance {

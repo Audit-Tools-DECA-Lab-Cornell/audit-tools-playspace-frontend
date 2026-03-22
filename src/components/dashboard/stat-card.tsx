@@ -22,13 +22,17 @@ export interface StatCardProps {
  */
 export function StatCard({ title, value, helper, tone = "primary" }: Readonly<StatCardProps>) {
 	return (
-		<Card className={cn("gap-3 py-5", toneClassesByTone[tone])}>
-			<CardHeader className="gap-1">
-				<CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
+		<Card className={cn("gap-0 overflow-hidden", toneClassesByTone[tone])}>
+			<CardHeader className="gap-2 border-border/50">
+				<CardTitle className="text-[11px] font-semibold tracking-[0.16em] text-muted-foreground uppercase">
+					{title}
+				</CardTitle>
 			</CardHeader>
-			<CardContent className="space-y-1">
-				<div className="font-mono text-3xl font-semibold text-foreground">{value}</div>
-				<p className="text-sm text-muted-foreground">{helper}</p>
+			<CardContent className="space-y-2 pb-5">
+				<div className="font-mono text-[2rem] font-semibold leading-none tracking-tight text-foreground tabular-nums md:text-[2.3rem]">
+					{value}
+				</div>
+				<p className="text-sm leading-5 text-muted-foreground">{helper}</p>
 			</CardContent>
 		</Card>
 	);

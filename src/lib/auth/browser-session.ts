@@ -1,12 +1,9 @@
 "use client";
 
 import { AUTH_COOKIE_NAMES, parseUserRole, type UserRole } from "./role";
+import type { AuthSession } from "./session";
 
-export interface BrowserAuthSession {
-	role: UserRole;
-	accessToken: string;
-	auditorCode: string | null;
-}
+export type BrowserAuthSession = AuthSession;
 
 function getCookieValue(name: string): string | null {
 	if (typeof document === "undefined") return null;
@@ -47,17 +44,28 @@ export function getBrowserAuthSession(): BrowserAuthSession | null {
 	const accessToken = getCookieValue(AUTH_COOKIE_NAMES.accessToken);
 	if (!role || !accessToken) return null;
 
+	const accountId = getCookieValue(AUTH_COOKIE_NAMES.accountId);
 	const auditorCode = role === "auditor" ? getCookieValue(AUTH_COOKIE_NAMES.auditorCode) || null : null;
 
-	return { role, accessToken, auditorCode };
+	return { role, accessToken, accountId, auditorCode };
 }
 
-export function setBrowserAuthSession(input: { role: UserRole; accessToken: string; auditorCode?: string }) {
+export function setBrowserAuthSession(input: {
+	role: UserRole;
+	accessToken: string;
+	accountId?: string | null;
+	auditorCode?: string;
+}) {
 	// 8 hours
 	const maxAgeSeconds = 60 * 60 * 8;
 
 	setCookieValue(AUTH_COOKIE_NAMES.role, input.role, maxAgeSeconds);
 	setCookieValue(AUTH_COOKIE_NAMES.accessToken, input.accessToken, maxAgeSeconds);
+	if (input.accountId && input.accountId.trim().length > 0) {
+		setCookieValue(AUTH_COOKIE_NAMES.accountId, input.accountId, maxAgeSeconds);
+	} else {
+		clearCookie(AUTH_COOKIE_NAMES.accountId);
+	}
 
 	if (input.role === "auditor") {
 		if (input.auditorCode && input.auditorCode.trim().length > 0) {
@@ -73,5 +81,6 @@ export function setBrowserAuthSession(input: { role: UserRole; accessToken: stri
 export function clearBrowserAuthSession() {
 	clearCookie(AUTH_COOKIE_NAMES.role);
 	clearCookie(AUTH_COOKIE_NAMES.accessToken);
+	clearCookie(AUTH_COOKIE_NAMES.accountId);
 	clearCookie(AUTH_COOKIE_NAMES.auditorCode);
 }

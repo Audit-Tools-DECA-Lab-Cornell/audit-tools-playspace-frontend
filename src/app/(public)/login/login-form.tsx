@@ -5,12 +5,20 @@ import * as React from "react";
 import { z } from "zod";
 
 import { setBrowserAuthSession } from "@/lib/auth/browser-session";
+import { resolveAdminAccountId, resolveManagerAccountId } from "@/lib/auth/demo-identities";
 import type { UserRole } from "@/lib/auth/role";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
+
+const adminLoginSchema = z.object({
+	email: z.email(),
+	password: z.string().min(8)
+});
+
+type AdminLoginValues = z.infer<typeof adminLoginSchema>;
 
 const managerLoginSchema = z.object({
 	email: z.email(),
@@ -20,7 +28,8 @@ const managerLoginSchema = z.object({
 type ManagerLoginValues = z.infer<typeof managerLoginSchema>;
 
 const auditorLoginSchema = z.object({
-	auditorCode: z.string().regex(/^[A-Za-z0-9]+$/, {
+	// alpha numberic including - and _
+	auditorCode: z.string().regex(/^[a-zA-Z0-9-_]+$/, {
 		message: "Auditor code must be alphanumeric."
 	})
 });
@@ -32,12 +41,14 @@ function isSafeInternalPath(value: string): boolean {
 }
 
 function getDefaultDashboard(role: UserRole): string {
+	if (role === "admin") return "/admin/dashboard";
 	return role === "manager" ? "/manager/dashboard" : "/auditor/dashboard";
 }
 
 function isAllowedNextPath(role: UserRole, nextPath: string): boolean {
 	if (!isSafeInternalPath(nextPath)) return false;
 	if (nextPath.startsWith("/settings")) return true;
+	if (role === "admin") return nextPath.startsWith("/admin");
 	if (role === "manager") return nextPath.startsWith("/manager");
 	return nextPath.startsWith("/auditor");
 }
@@ -60,6 +71,11 @@ export interface LoginFormProps {
 
 export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 	const router = useRouter();
+	const [adminValues, setAdminValues] = React.useState<AdminLoginValues>({
+		email: "",
+		password: ""
+	});
+	const [adminErrors, setAdminErrors] = React.useState<Partial<Record<keyof AdminLoginValues, string>>>({});
 	const [managerValues, setManagerValues] = React.useState<ManagerLoginValues>({
 		email: "",
 		password: ""
@@ -69,6 +85,36 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 		auditorCode: ""
 	});
 	const [auditorErrors, setAuditorErrors] = React.useState<Partial<Record<keyof AuditorLoginValues, string>>>({});
+
+	const handleAdminSubmit: React.FormEventHandler<HTMLFormElement> = event => {
+		event.preventDefault();
+
+		const parsedValues = adminLoginSchema.safeParse(adminValues);
+		if (!parsedValues.success) {
+			const nextErrors: Partial<Record<keyof AdminLoginValues, string>> = {};
+			const emailIssue = parsedValues.error.issues.find(issue => issue.path[0] === "email");
+			const passwordIssue = parsedValues.error.issues.find(issue => issue.path[0] === "password");
+
+			if (emailIssue?.message) {
+				nextErrors.email = emailIssue.message;
+			}
+			if (passwordIssue?.message) {
+				nextErrors.password = passwordIssue.message;
+			}
+			setAdminErrors(nextErrors);
+			return;
+		}
+
+		setAdminErrors({});
+		setBrowserAuthSession({
+			role: "admin",
+			accessToken: createDemoAccessToken(),
+			accountId: resolveAdminAccountId()
+		});
+
+		const redirectPath = getRedirectAfterLogin("admin", nextParam);
+		router.push(redirectPath);
+	};
 
 	const handleManagerSubmit: React.FormEventHandler<HTMLFormElement> = event => {
 		event.preventDefault();
@@ -93,7 +139,8 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 		setManagerErrors({});
 		setBrowserAuthSession({
 			role: "manager",
-			accessToken: createDemoAccessToken()
+			accessToken: createDemoAccessToken(),
+			accountId: resolveManagerAccountId(parsedValues.data.email)
 		});
 
 		const redirectPath = getRedirectAfterLogin("manager", nextParam);
@@ -126,7 +173,73 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 	return (
 		<div className="min-h-dvh bg-background">
 			<div className="mx-auto flex min-h-dvh w-full max-w-5xl items-center px-4 py-10">
-				<div className="grid w-full gap-6 lg:grid-cols-2">
+				<div className="grid w-full gap-6 lg:grid-cols-3">
+					<Card>
+						<CardHeader>
+							<CardTitle>Administrator sign in</CardTitle>
+							<CardDescription>
+								Global oversight across accounts, projects, places, and audit activity.
+							</CardDescription>
+						</CardHeader>
+						<CardContent>
+							<form className="grid gap-4" onSubmit={handleAdminSubmit}>
+								<div className="grid gap-2">
+									<Label htmlFor="admin_email">Email</Label>
+									<Input
+										id="admin_email"
+										type="email"
+										autoComplete="email"
+										placeholder="admin@company.com"
+										value={adminValues.email}
+										onChange={event => {
+											const nextEmail = event.target.value;
+											setAdminValues(currentValues => ({
+												...currentValues,
+												email: nextEmail
+											}));
+											setAdminErrors(currentErrors => ({
+												...currentErrors,
+												email: undefined
+											}));
+										}}
+									/>
+									{adminErrors.email ? (
+										<p className="text-sm text-destructive">{adminErrors.email}</p>
+									) : null}
+								</div>
+
+								<div className="grid gap-2">
+									<Label htmlFor="admin_password">Password</Label>
+									<Input
+										id="admin_password"
+										type="password"
+										autoComplete="current-password"
+										value={adminValues.password}
+										onChange={event => {
+											const nextPassword = event.target.value;
+											setAdminValues(currentValues => ({
+												...currentValues,
+												password: nextPassword
+											}));
+											setAdminErrors(currentErrors => ({
+												...currentErrors,
+												password: undefined
+											}));
+										}}
+									/>
+									{adminErrors.password ? (
+										<p className="text-sm text-destructive">{adminErrors.password}</p>
+									) : null}
+								</div>
+
+								<Button type="submit">Sign in</Button>
+								<p className="text-xs text-muted-foreground">
+									Demo admin: <span className="font-mono">playspace.admin@example.org</span>
+								</p>
+							</form>
+						</CardContent>
+					</Card>
+
 					<Card>
 						<CardHeader>
 							<CardTitle>Manager sign in</CardTitle>
@@ -157,9 +270,7 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 										}}
 									/>
 									{managerErrors.email ? (
-										<p className="text-sm text-destructive">
-											{managerErrors.email}
-										</p>
+										<p className="text-sm text-destructive">{managerErrors.email}</p>
 									) : null}
 								</div>
 
@@ -183,13 +294,15 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 										}}
 									/>
 									{managerErrors.password ? (
-										<p className="text-sm text-destructive">
-											{managerErrors.password}
-										</p>
+										<p className="text-sm text-destructive">{managerErrors.password}</p>
 									) : null}
 								</div>
 
 								<Button type="submit">Sign in</Button>
+								<p className="text-xs text-muted-foreground">
+									Demo managers: <span className="font-mono">manager@example.org</span> or{" "}
+									<span className="font-mono">canterbury.manager@example.org</span>
+								</p>
 							</form>
 						</CardContent>
 					</Card>
@@ -217,9 +330,7 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 										}}
 									/>
 									{auditorErrors.auditorCode ? (
-										<p className="text-sm text-destructive">
-											{auditorErrors.auditorCode}
-										</p>
+										<p className="text-sm text-destructive">{auditorErrors.auditorCode}</p>
 									) : null}
 								</div>
 
@@ -230,6 +341,10 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 
 							<p className="text-sm text-muted-foreground">
 								Auditors are identified strictly by code. No real names are displayed in the UI.
+							</p>
+							<p className="text-xs text-muted-foreground">
+								Try demo codes: <span className="font-mono">AKL-01</span>,{" "}
+								<span className="font-mono">AKL-02</span>, or <span className="font-mono">CHC-01</span>
 							</p>
 						</CardContent>
 					</Card>

@@ -39,3 +39,13 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Cursor/local tooling (project-specific)
+skills-lock.json
+.agents/
+
+.DS_Store
+
+# screenshots scripts
+screenshots/llm.md
+screenshots/capture_routes.py

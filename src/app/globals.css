@@ -54,20 +54,25 @@
 	--color-popover: var(--popover);
 	--color-card-foreground: var(--card-foreground);
 	--color-card: var(--card);
-	--font-sans: var(--font-body);
-	--font-mono: var(--font-code);
-	--radius-sm: 8px;
-	--radius-md: 12px;
-	--radius-lg: 16px;
-	--radius-xl: 20px;
-	--radius-2xl: 24px;
-	--radius-3xl: 28px;
-	--radius-4xl: 32px;
+	--font-sans: var(--font-body-active);
+	--font-mono: var(--font-code-active);
+	--radius-sm: 6px;
+	--radius-md: 10px;
+	--radius-lg: 14px;
+	--radius-xl: 18px;
+	--radius-2xl: 22px;
+	--radius-3xl: 26px;
+	--radius-4xl: 30px;
 }
 
 :root {
 	/** Step 3: Warm light fallback values in the same family as the mobile theme. */
-	--radius: 12px;
+	--radius: 10px;
+	--app-font-scale: 1;
+	--font-body-active: var(--font-body);
+	--font-heading-active: var(--font-heading);
+	--font-code-active: var(--font-code);
+	--font-dyslexic: "OpenDyslexic", var(--font-body), sans-serif;
 	--canvas: #f7f1eb;
 	--surface: #fff9f4;
 	--surface-raised: #ffffff;
@@ -114,6 +119,7 @@
 	--sidebar-accent-foreground: var(--ink);
 	--sidebar-border: var(--border);
 	--sidebar-ring: var(--focus);
+	color-scheme: light;
 }
 
 .dark {
@@ -164,6 +170,49 @@
 	--sidebar-accent-foreground: var(--ink);
 	--sidebar-border: var(--border);
 	--sidebar-ring: var(--focus);
+	color-scheme: dark;
+}
+
+html[data-dyslexic-font="true"] {
+	--font-body-active: var(--font-dyslexic);
+	--font-heading-active: var(--font-dyslexic);
+	--font-code-active: var(--font-dyslexic);
+}
+
+html[data-contrast="high"] {
+	--canvas: #ffffff;
+	--surface: #ffffff;
+	--surface-raised: #ffffff;
+	--surface-sunken: #f3f3f3;
+	--ink: #111111;
+	--ink-muted: #39332e;
+	--edge: #57504a;
+	--focus: #8a4a1b;
+	--accent-terracotta: #8a4a1b;
+	--accent-moss: #1f5b33;
+	--accent-slate: #163a70;
+	--accent-violet: #4d3a70;
+	--status-success: #1f5b33;
+	--status-warning: #6f5600;
+	--status-danger: #8e231a;
+}
+
+html.dark[data-contrast="high"] {
+	--canvas: #000000;
+	--surface: #0f0f0f;
+	--surface-raised: #141414;
+	--surface-sunken: #050505;
+	--ink: #ffffff;
+	--ink-muted: #e7e7e7;
+	--edge: #8e8e8e;
+	--focus: #ffd0a8;
+	--accent-terracotta: #ffd0a8;
+	--accent-moss: #91d4a7;
+	--accent-slate: #a8c2f5;
+	--accent-violet: #d0b8f4;
+	--status-success: #91d4a7;
+	--status-warning: #f1cf6a;
+	--status-danger: #f2a392;
 }
 
 @layer base {
@@ -172,8 +221,10 @@
 	}
 	html {
 		@apply bg-background;
+		font-size: calc(16px * var(--app-font-scale));
 	}
 	body {
+		font-family: var(--font-body-active);
 		@apply bg-background text-foreground font-sans leading-relaxed antialiased;
 	}
 	::selection {
@@ -184,7 +235,7 @@
 	h2,
 	h3,
 	h4 {
-		font-family: var(--font-heading);
+		font-family: var(--font-heading-active);
 		@apply text-foreground font-semibold tracking-tight;
 	}
 	label {
@@ -194,6 +245,13 @@
 	textarea,
 	select {
 		@apply w-full rounded-field border border-border bg-input text-foreground shadow-field transition-colors duration-200 ease-field;
+	}
+	select {
+		@apply px-4 py-2 pr-10;
+	}
+	option {
+		background-color: var(--popover);
+		color: var(--popover-foreground);
 	}
 	input:not([type="checkbox"]):not([type="radio"]):focus-visible,
 	textarea:focus-visible,
