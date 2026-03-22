@@ -1,7 +1,15 @@
 "use client";
 
 import * as React from "react";
-import type { ColumnDef, ColumnFiltersState, FilterFn, SortingState, VisibilityState } from "@tanstack/react-table";
+import type {
+	ColumnDef,
+	ColumnFiltersState,
+	FilterFn,
+	PaginationState,
+	SortingState,
+	Updater,
+	VisibilityState
+} from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
 import {
 	flexRender,
@@ -48,6 +56,17 @@ export interface DataTableProps<TData, TValue> {
 	emptyMessage?: string;
 	initialSorting?: SortingState;
 	pageSize?: number;
+	sortingState?: SortingState;
+	onSortingStateChange?: (nextState: SortingState) => void;
+	columnFiltersState?: ColumnFiltersState;
+	onColumnFiltersStateChange?: (nextState: ColumnFiltersState) => void;
+	paginationState?: PaginationState;
+	onPaginationStateChange?: (nextState: PaginationState) => void;
+	manualPagination?: boolean;
+	manualSorting?: boolean;
+	manualFiltering?: boolean;
+	rowCount?: number;
+	pageCount?: number;
 }
 
 /**
@@ -64,16 +83,64 @@ export function DataTable<TData, TValue>({
 	action,
 	emptyMessage,
 	initialSorting = [],
-	pageSize = 10
+	pageSize = 10,
+	sortingState,
+	onSortingStateChange,
+	columnFiltersState,
+	onColumnFiltersStateChange,
+	paginationState,
+	onPaginationStateChange,
+	manualPagination = false,
+	manualSorting = false,
+	manualFiltering = false,
+	rowCount,
+	pageCount
 }: Readonly<DataTableProps<TData, TValue>>) {
 	const t = useTranslations("tables.shared");
-	const [sorting, setSorting] = React.useState<SortingState>(initialSorting);
-	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+	const [internalSorting, setInternalSorting] = React.useState<SortingState>(initialSorting);
+	const [internalColumnFilters, setInternalColumnFilters] = React.useState<ColumnFiltersState>([]);
 	const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
-	const [pagination, setPagination] = React.useState({
+	const [internalPagination, setInternalPagination] = React.useState<PaginationState>({
 		pageIndex: 0,
 		pageSize
 	});
+	const sorting = sortingState ?? internalSorting;
+	const columnFilters = columnFiltersState ?? internalColumnFilters;
+	const pagination = paginationState ?? internalPagination;
+
+	const handleSortingChange = React.useCallback(
+		(updater: Updater<SortingState>) => {
+			const nextState = typeof updater === "function" ? updater(sorting) : updater;
+			if (onSortingStateChange) {
+				onSortingStateChange(nextState);
+				return;
+			}
+			setInternalSorting(nextState);
+		},
+		[onSortingStateChange, sorting]
+	);
+	const handleColumnFiltersChange = React.useCallback(
+		(updater: Updater<ColumnFiltersState>) => {
+			const nextState = typeof updater === "function" ? updater(columnFilters) : updater;
+			if (onColumnFiltersStateChange) {
+				onColumnFiltersStateChange(nextState);
+				return;
+			}
+			setInternalColumnFilters(nextState);
+		},
+		[columnFilters, onColumnFiltersStateChange]
+	);
+	const handlePaginationChange = React.useCallback(
+		(updater: Updater<PaginationState>) => {
+			const nextState = typeof updater === "function" ? updater(pagination) : updater;
+			if (onPaginationStateChange) {
+				onPaginationStateChange(nextState);
+				return;
+			}
+			setInternalPagination(nextState);
+		},
+		[onPaginationStateChange, pagination]
+	);
 
 	// TanStack Table returns stable instance methods that the React compiler plugin currently flags incorrectly.
 	// eslint-disable-next-line react-hooks/incompatible-library
@@ -89,14 +156,19 @@ export function DataTable<TData, TValue>({
 			columnVisibility,
 			pagination
 		},
-		onSortingChange: setSorting,
-		onColumnFiltersChange: setColumnFilters,
+		onSortingChange: handleSortingChange,
+		onColumnFiltersChange: handleColumnFiltersChange,
 		onColumnVisibilityChange: setColumnVisibility,
-		onPaginationChange: setPagination,
+		onPaginationChange: handlePaginationChange,
+		manualPagination,
+		manualSorting,
+		manualFiltering,
+		rowCount,
+		pageCount,
 		getCoreRowModel: getCoreRowModel(),
-		getFilteredRowModel: getFilteredRowModel(),
-		getSortedRowModel: getSortedRowModel(),
-		getPaginationRowModel: getPaginationRowModel()
+		getFilteredRowModel: manualFiltering ? undefined : getFilteredRowModel(),
+		getSortedRowModel: manualSorting ? undefined : getSortedRowModel(),
+		getPaginationRowModel: manualPagination ? undefined : getPaginationRowModel()
 	});
 
 	return (

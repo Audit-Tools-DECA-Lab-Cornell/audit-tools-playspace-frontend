@@ -151,11 +151,77 @@ const placeHistorySchema = z.object({
 	audits: z.array(placeAuditHistoryItemSchema)
 });
 
+const managerPlacesSummarySchema = z.object({
+	total_places: z.number().int().nonnegative(),
+	submitted_places: z.number().int().nonnegative(),
+	in_progress_places: z.number().int().nonnegative(),
+	average_score: z.number().nullable()
+});
+
+const managerPlaceRowSchema = z.object({
+	id: z.string().uuid(),
+	project_id: z.string().uuid(),
+	project_name: z.string(),
+	name: z.string(),
+	city: z.string().nullable(),
+	province: z.string().nullable(),
+	country: z.string().nullable(),
+	place_type: z.string().nullable(),
+	status: placeStatusSchema,
+	audits_completed: z.number().int().nonnegative(),
+	average_score: z.number().nullable(),
+	last_audited_at: z.string().datetime().nullable()
+});
+
+const managerPlacesListSchema = z.object({
+	items: z.array(managerPlaceRowSchema),
+	total_count: z.number().int().nonnegative(),
+	page: z.number().int().positive(),
+	page_size: z.number().int().positive(),
+	total_pages: z.number().int().positive(),
+	summary: managerPlacesSummarySchema
+});
+
+const managerAuditsSummarySchema = z.object({
+	total_audits: z.number().int().nonnegative(),
+	submitted_audits: z.number().int().nonnegative(),
+	in_progress_audits: z.number().int().nonnegative(),
+	average_score: z.number().nullable()
+});
+
+const managerAuditRowSchema = z.object({
+	audit_id: z.string().uuid(),
+	audit_code: z.string(),
+	status: auditStatusSchema,
+	auditor_code: z.string(),
+	project_id: z.string().uuid(),
+	project_name: z.string(),
+	place_id: z.string().uuid(),
+	place_name: z.string(),
+	started_at: z.string().datetime(),
+	submitted_at: z.string().datetime().nullable(),
+	summary_score: z.number().nullable()
+});
+
+const managerAuditsListSchema = z.object({
+	items: z.array(managerAuditRowSchema),
+	total_count: z.number().int().nonnegative(),
+	page: z.number().int().positive(),
+	page_size: z.number().int().positive(),
+	total_pages: z.number().int().positive(),
+	summary: managerAuditsSummarySchema
+});
+
 const assignmentSchema = z.object({
 	id: z.string().uuid(),
 	auditor_profile_id: z.string().uuid(),
 	project_id: z.string().uuid().nullable(),
 	place_id: z.string().uuid().nullable(),
+	scope_type: z.enum(["project", "place"]),
+	scope_id: z.string().uuid(),
+	scope_name: z.string(),
+	project_name: z.string(),
+	place_name: z.string().nullable(),
 	audit_roles: z.array(assignmentRoleSchema),
 	assigned_at: z.string().datetime()
 });
@@ -418,6 +484,13 @@ const auditDraftPatchSchema = z.object({
 		.default({})
 });
 
+const auditDraftSaveSchema = z.object({
+	audit_id: z.string().uuid(),
+	status: auditStatusSchema,
+	draft_progress_percent: z.number().nullable(),
+	saved_at: z.string().datetime()
+});
+
 const adminOverviewSchema = z.object({
 	total_accounts: z.number().int().nonnegative(),
 	total_projects: z.number().int().nonnegative(),
@@ -500,6 +573,16 @@ const adminSystemSchema = z.object({
 	generated_at: z.string().datetime()
 });
 
+function paginatedResponseSchema<TItem extends z.ZodTypeAny>(itemSchema: TItem) {
+	return z.object({
+		items: z.array(itemSchema),
+		total_count: z.number().int().nonnegative(),
+		page: z.number().int().positive(),
+		page_size: z.number().int().positive(),
+		total_pages: z.number().int().positive()
+	});
+}
+
 export type ManagerProfile = z.infer<typeof managerProfileSchema>;
 export type AccountDetail = z.infer<typeof accountDetailSchema>;
 export type ProjectSummary = z.infer<typeof projectSummarySchema>;
@@ -509,6 +592,12 @@ export type AuditorSummary = z.infer<typeof auditorSummarySchema>;
 export type PlaceSummary = z.infer<typeof placeSummarySchema>;
 export type PlaceAuditHistoryItem = z.infer<typeof placeAuditHistoryItemSchema>;
 export type PlaceHistory = z.infer<typeof placeHistorySchema>;
+export type ManagerPlacesSummary = z.infer<typeof managerPlacesSummarySchema>;
+export type ManagerPlaceRow = z.infer<typeof managerPlaceRowSchema>;
+export type ManagerPlacesList = z.infer<typeof managerPlacesListSchema>;
+export type ManagerAuditsSummary = z.infer<typeof managerAuditsSummarySchema>;
+export type ManagerAuditRow = z.infer<typeof managerAuditRowSchema>;
+export type ManagerAuditsList = z.infer<typeof managerAuditsListSchema>;
 export type Assignment = z.infer<typeof assignmentSchema>;
 export type AssignmentWrite = z.infer<typeof assignmentWriteSchema>;
 export type PlaceDetail = z.infer<typeof placeDetailSchema>;
@@ -519,6 +608,7 @@ export type AuditorAuditSummary = z.infer<typeof auditorAuditSummarySchema>;
 export type AuditorDashboardSummary = z.infer<typeof auditorDashboardSummarySchema>;
 export type AuditSession = z.infer<typeof auditSessionSchema>;
 export type AuditDraftPatch = z.infer<typeof auditDraftPatchSchema>;
+export type AuditDraftSave = z.infer<typeof auditDraftSaveSchema>;
 export type AdminOverview = z.infer<typeof adminOverviewSchema>;
 export type AdminAccountRow = z.infer<typeof adminAccountRowSchema>;
 export type AdminProjectRow = z.infer<typeof adminProjectRowSchema>;
@@ -526,6 +616,54 @@ export type AdminPlaceRow = z.infer<typeof adminPlaceRowSchema>;
 export type AdminAuditorRow = z.infer<typeof adminAuditorRowSchema>;
 export type AdminAuditRow = z.infer<typeof adminAuditRowSchema>;
 export type AdminSystem = z.infer<typeof adminSystemSchema>;
+export type PaginatedResponse<TItem> = {
+	items: TItem[];
+	total_count: number;
+	page: number;
+	page_size: number;
+	total_pages: number;
+};
+
+export interface ManagerPlacesQuery {
+	page?: number;
+	pageSize?: number;
+	search?: string;
+	sort?: string;
+	projectIds?: readonly string[];
+	statuses?: Array<"not_started" | "in_progress" | "submitted">;
+}
+
+export interface ManagerAuditsQuery {
+	page?: number;
+	pageSize?: number;
+	search?: string;
+	sort?: string;
+	projectIds?: readonly string[];
+	statuses?: Array<"IN_PROGRESS" | "PAUSED" | "SUBMITTED">;
+}
+
+export interface PaginatedListQuery {
+	page?: number;
+	pageSize?: number;
+	search?: string;
+	sort?: string;
+}
+
+export interface AuditorPlacesQuery extends PaginatedListQuery {
+	statuses?: Array<"IN_PROGRESS" | "PAUSED" | "SUBMITTED" | "not_started">;
+}
+
+export interface AuditorAuditsQuery extends PaginatedListQuery {
+	statuses?: Array<"submitted" | "in_progress" | "paused">;
+}
+
+export interface AdminAccountsQuery extends PaginatedListQuery {
+	accountTypes?: Array<"ADMIN" | "MANAGER" | "AUDITOR">;
+}
+
+export interface AdminAuditsQuery extends PaginatedListQuery {
+	statuses?: Array<"IN_PROGRESS" | "PAUSED" | "SUBMITTED">;
+}
 
 /**
  * Structured error for API failures and validation issues.
@@ -660,6 +798,44 @@ async function fetchNoContent(path: string, init: RequestInit): Promise<void> {
 	}
 }
 
+type QueryValue = number | string | readonly string[] | undefined | null;
+
+/**
+ * Build a stable query string for list endpoints with repeated filter params.
+ */
+function buildQueryString(params: Readonly<Record<string, QueryValue>>): string {
+	const searchParams = new URLSearchParams();
+
+	for (const [key, rawValue] of Object.entries(params)) {
+		if (rawValue == null) {
+			continue;
+		}
+
+		if (Array.isArray(rawValue)) {
+			for (const value of rawValue) {
+				const normalizedValue = value.trim();
+				if (normalizedValue.length > 0) {
+					searchParams.append(key, normalizedValue);
+				}
+			}
+			continue;
+		}
+
+		if (typeof rawValue === "number") {
+			searchParams.set(key, String(rawValue));
+			continue;
+		}
+
+		const normalizedValue = typeof rawValue === "string" ? rawValue.trim() : rawValue;
+		if (typeof normalizedValue === "string" && normalizedValue.length > 0) {
+			searchParams.set(key, normalizedValue);
+		}
+	}
+
+	const query = searchParams.toString();
+	return query.length > 0 ? `?${query}` : "";
+}
+
 /**
  * Playspace dashboard API surface used by the web app.
  */
@@ -681,6 +857,30 @@ export const playspaceApi = {
 			fetchValidatedJson(
 				`/playspace/accounts/${encodeURIComponent(accountId)}/auditors`,
 				z.array(auditorSummarySchema)
+			),
+		places: async (accountId: string, query: ManagerPlacesQuery = {}): Promise<ManagerPlacesList> =>
+			fetchValidatedJson(
+				`/playspace/accounts/${encodeURIComponent(accountId)}/places${buildQueryString({
+					page: query.page,
+					page_size: query.pageSize,
+					search: query.search,
+					sort: query.sort,
+					project_id: query.projectIds,
+					status: query.statuses
+				})}`,
+				managerPlacesListSchema
+			),
+		audits: async (accountId: string, query: ManagerAuditsQuery = {}): Promise<ManagerAuditsList> =>
+			fetchValidatedJson(
+				`/playspace/accounts/${encodeURIComponent(accountId)}/audits${buildQueryString({
+					page: query.page,
+					page_size: query.pageSize,
+					search: query.search,
+					sort: query.sort,
+					project_id: query.projectIds,
+					status: query.statuses
+				})}`,
+				managerAuditsListSchema
 			)
 	},
 	projects: {
@@ -744,12 +944,28 @@ export const playspaceApi = {
 			)
 	},
 	auditor: {
-		assignedPlaces: async (): Promise<AuditorPlace[]> =>
-			fetchValidatedJson("/playspace/auditor/me/places", z.array(auditorPlaceSchema)),
-		audits: async (statusFilter?: "submitted" | "in_progress" | "paused"): Promise<AuditorAuditSummary[]> => {
-			const querySuffix = statusFilter ? `?status=${encodeURIComponent(statusFilter)}` : "";
-			return fetchValidatedJson(`/playspace/auditor/me/audits${querySuffix}`, z.array(auditorAuditSummarySchema));
-		},
+		assignedPlaces: async (query: AuditorPlacesQuery = {}): Promise<PaginatedResponse<AuditorPlace>> =>
+			fetchValidatedJson(
+				`/playspace/auditor/me/places${buildQueryString({
+					page: query.page,
+					page_size: query.pageSize,
+					search: query.search,
+					sort: query.sort,
+					status: query.statuses
+				})}`,
+				paginatedResponseSchema(auditorPlaceSchema)
+			),
+		audits: async (query: AuditorAuditsQuery = {}): Promise<PaginatedResponse<AuditorAuditSummary>> =>
+			fetchValidatedJson(
+				`/playspace/auditor/me/audits${buildQueryString({
+					page: query.page,
+					page_size: query.pageSize,
+					search: query.search,
+					sort: query.sort,
+					status: query.statuses
+				})}`,
+				paginatedResponseSchema(auditorAuditSummarySchema)
+			),
 		dashboardSummary: async (): Promise<AuditorDashboardSummary> =>
 			fetchValidatedJson("/playspace/auditor/me/dashboard-summary", auditorDashboardSummarySchema),
 		createOrResumeAudit: async (
@@ -764,9 +980,9 @@ export const playspaceApi = {
 			}),
 		getAudit: async (auditId: string): Promise<AuditSession> =>
 			fetchValidatedJson(`/playspace/audits/${encodeURIComponent(auditId)}`, auditSessionSchema),
-		patchAuditDraft: async (auditId: string, patch: AuditDraftPatch): Promise<AuditSession> => {
+		patchAuditDraft: async (auditId: string, patch: AuditDraftPatch): Promise<AuditDraftSave> => {
 			const parsedPatch = auditDraftPatchSchema.parse(patch);
-			return fetchValidatedJson(`/playspace/audits/${encodeURIComponent(auditId)}/draft`, auditSessionSchema, {
+			return fetchValidatedJson(`/playspace/audits/${encodeURIComponent(auditId)}/draft`, auditDraftSaveSchema, {
 				method: "PATCH",
 				body: JSON.stringify(parsedPatch)
 			});
@@ -871,16 +1087,60 @@ export const playspaceApi = {
 	admin: {
 		overview: async (): Promise<AdminOverview> =>
 			fetchValidatedJson("/playspace/admin/overview", adminOverviewSchema),
-		accounts: async (): Promise<AdminAccountRow[]> =>
-			fetchValidatedJson("/playspace/admin/accounts", z.array(adminAccountRowSchema)),
-		projects: async (): Promise<AdminProjectRow[]> =>
-			fetchValidatedJson("/playspace/admin/projects", z.array(adminProjectRowSchema)),
-		places: async (): Promise<AdminPlaceRow[]> =>
-			fetchValidatedJson("/playspace/admin/places", z.array(adminPlaceRowSchema)),
-		auditors: async (): Promise<AdminAuditorRow[]> =>
-			fetchValidatedJson("/playspace/admin/auditors", z.array(adminAuditorRowSchema)),
-		audits: async (): Promise<AdminAuditRow[]> =>
-			fetchValidatedJson("/playspace/admin/audits", z.array(adminAuditRowSchema)),
+		accounts: async (
+			query: AdminAccountsQuery = {}
+		): Promise<PaginatedResponse<AdminAccountRow>> =>
+			fetchValidatedJson(
+				`/playspace/admin/accounts${buildQueryString({
+					page: query.page,
+					page_size: query.pageSize,
+					search: query.search,
+					sort: query.sort,
+					account_type: query.accountTypes
+				})}`,
+				paginatedResponseSchema(adminAccountRowSchema)
+			),
+		projects: async (query: PaginatedListQuery = {}): Promise<PaginatedResponse<AdminProjectRow>> =>
+			fetchValidatedJson(
+				`/playspace/admin/projects${buildQueryString({
+					page: query.page,
+					page_size: query.pageSize,
+					search: query.search,
+					sort: query.sort
+				})}`,
+				paginatedResponseSchema(adminProjectRowSchema)
+			),
+		places: async (query: PaginatedListQuery = {}): Promise<PaginatedResponse<AdminPlaceRow>> =>
+			fetchValidatedJson(
+				`/playspace/admin/places${buildQueryString({
+					page: query.page,
+					page_size: query.pageSize,
+					search: query.search,
+					sort: query.sort
+				})}`,
+				paginatedResponseSchema(adminPlaceRowSchema)
+			),
+		auditors: async (query: PaginatedListQuery = {}): Promise<PaginatedResponse<AdminAuditorRow>> =>
+			fetchValidatedJson(
+				`/playspace/admin/auditors${buildQueryString({
+					page: query.page,
+					page_size: query.pageSize,
+					search: query.search,
+					sort: query.sort
+				})}`,
+				paginatedResponseSchema(adminAuditorRowSchema)
+			),
+		audits: async (query: AdminAuditsQuery = {}): Promise<PaginatedResponse<AdminAuditRow>> =>
+			fetchValidatedJson(
+				`/playspace/admin/audits${buildQueryString({
+					page: query.page,
+					page_size: query.pageSize,
+					search: query.search,
+					sort: query.sort,
+					status: query.statuses
+				})}`,
+				paginatedResponseSchema(adminAuditRowSchema)
+			),
 		system: async (): Promise<AdminSystem> => fetchValidatedJson("/playspace/admin/system", adminSystemSchema)
 	}
 };

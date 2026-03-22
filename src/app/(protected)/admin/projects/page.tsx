@@ -1,24 +1,68 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import type { ColumnDef } from "@tanstack/react-table";
+import type { ColumnDef, ColumnFiltersState, PaginationState, SortingState } from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
+import * as React from "react";
 
 import { playspaceApi, type AdminProjectRow } from "@/lib/api/playspace";
 import { DataTable } from "@/components/dashboard/data-table";
 import { DataTableColumnHeader } from "@/components/dashboard/data-table-column-header";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
+import { getTextColumnFilterValue, toBackendSortParam } from "@/components/dashboard/server-table-utils";
 import { formatProjectDateRange, formatScoreLabel } from "@/components/dashboard/utils";
 import { Button } from "@/components/ui/button";
 
 export default function AdminProjectsPage() {
 	const t = useTranslations("admin.projects");
 	const formatT = useTranslations("common.format");
-	const projectsQuery = useQuery({
-		queryKey: ["playspace", "admin", "projects"],
-		queryFn: () => playspaceApi.admin.projects()
+	const [sorting, setSorting] = React.useState<SortingState>([{ id: "date_range", desc: true }]);
+	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+	const [pagination, setPagination] = React.useState<PaginationState>({
+		pageIndex: 0,
+		pageSize: 10
 	});
+	const searchValue = getTextColumnFilterValue(columnFilters, "project");
+	const sortParam = toBackendSortParam(sorting);
+
+	React.useEffect(() => {
+		setPagination(currentValue => {
+			return currentValue.pageIndex === 0
+				? currentValue
+				: {
+						...currentValue,
+						pageIndex: 0
+					};
+		});
+	}, [searchValue, sortParam]);
+
+	const projectsQuery = useQuery({
+		queryKey: ["playspace", "admin", "projects", pagination.pageIndex, pagination.pageSize, searchValue, sortParam],
+		queryFn: () =>
+			playspaceApi.admin.projects({
+				page: pagination.pageIndex + 1,
+				pageSize: pagination.pageSize,
+				search: searchValue,
+				sort: sortParam
+			})
+	});
+
+	React.useEffect(() => {
+		if (!projectsQuery.data) {
+			return;
+		}
+
+		const maxPageIndex = Math.max(projectsQuery.data.total_pages - 1, 0);
+		if (pagination.pageIndex <= maxPageIndex) {
+			return;
+		}
+
+		setPagination(currentValue => ({
+			...currentValue,
+			pageIndex: maxPageIndex
+		}));
+	}, [pagination.pageIndex, projectsQuery.data]);
 
 	if (projectsQuery.isLoading) {
 		return <div className="h-64 animate-pulse rounded-card border border-border bg-card" />;
@@ -123,11 +167,22 @@ export default function AdminProjectsPage() {
 				title={t("table.title")}
 				description={t("table.description")}
 				columns={columns}
-				data={projectsQuery.data}
+				data={projectsQuery.data.items}
 				searchColumnId="project"
 				searchPlaceholder={t("table.searchPlaceholder")}
 				emptyMessage={t("table.emptyMessage")}
 				initialSorting={[{ id: "date_range", desc: true }]}
+				sortingState={sorting}
+				onSortingStateChange={setSorting}
+				columnFiltersState={columnFilters}
+				onColumnFiltersStateChange={setColumnFilters}
+				paginationState={pagination}
+				onPaginationStateChange={setPagination}
+				manualFiltering
+				manualSorting
+				manualPagination
+				rowCount={projectsQuery.data.total_count}
+				pageCount={projectsQuery.data.total_pages}
 			/>
 		</div>
 	);

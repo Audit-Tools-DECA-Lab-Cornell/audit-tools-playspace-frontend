@@ -20,7 +20,10 @@ export function DataTablePagination<TData>({
 	pageSizeOptions = [5, 10, 20, 50, 100]
 }: Readonly<DataTablePaginationProps<TData>>) {
 	const t = useTranslations("tables.shared.pagination");
-	const totalFilteredRows = table.getFilteredRowModel().rows.length;
+	const totalFilteredRows =
+		table.options.manualFiltering || table.options.manualPagination
+			? table.getRowCount()
+			: table.getFilteredRowModel().rows.length;
 	const { pageIndex, pageSize } = table.getState().pagination;
 	const startRow = totalFilteredRows === 0 ? 0 : pageIndex * pageSize + 1;
 	const endRow = totalFilteredRows === 0 ? 0 : Math.min((pageIndex + 1) * pageSize, totalFilteredRows);

@@ -60,7 +60,7 @@ interface PreferencesState {
 }
 
 const DEFAULT_PREFERENCES: PreferencesState = {
-	themeMode: "dark",
+	themeMode: "system",
 	languagePreference: "system",
 	fontScale: 1,
 	highContrast: false,
@@ -179,6 +179,7 @@ function applyPreferencesToDocument(input: {
 	root.dataset.dyslexicFont = input.dyslexicFont ? "true" : "false";
 	root.lang = input.resolvedLanguage;
 	root.style.setProperty("--app-font-scale", String(clampFontScale(input.fontScale)));
+	// root.style.setProperty("--font-body", input.dyslexicFont ? "OpenDyslexic, var(--font-body), sans-serif" : "var(--font-body), sans-serif");
 }
 
 /**

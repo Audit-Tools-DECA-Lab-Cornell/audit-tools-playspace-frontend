@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
+import type { ColumnFiltersState, PaginationState, SortingState } from "@tanstack/react-table";
 import { ClipboardListIcon, MapPinnedIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 
@@ -10,9 +11,15 @@ import { useAuthSession } from "@/components/app/auth-session-provider";
 import { AuditsTable, type AuditActivityRow } from "@/components/dashboard/audits-table";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
+import {
+	getMultiValueColumnFilter,
+	getTextColumnFilterValue,
+	toBackendSortParam
+} from "@/components/dashboard/server-table-utils";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import React from "react";
 
 function getErrorMessage(error: unknown): string {
 	if (error instanceof Error) {
@@ -27,49 +34,74 @@ export default function ManagerAuditsPage() {
 	const formatT = useTranslations("common.format");
 	const session = useAuthSession();
 	const accountId = session?.role === "manager" ? session.accountId : null;
+	const [sorting, setSorting] = React.useState<SortingState>([{ id: "submitted_at", desc: true }]);
+	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+	const [pagination, setPagination] = React.useState<PaginationState>({
+		pageIndex: 0,
+		pageSize: 10
+	});
+	const searchValue = getTextColumnFilterValue(columnFilters, "search");
+	const selectedStatuses = getMultiValueColumnFilter(columnFilters, "status").filter(
+		(value): value is "IN_PROGRESS" | "PAUSED" | "SUBMITTED" =>
+			value === "IN_PROGRESS" || value === "PAUSED" || value === "SUBMITTED"
+	);
+	const selectedStatusesKey = selectedStatuses.join("|");
+	const sortParam = toBackendSortParam(sorting);
+
+	React.useEffect(() => {
+		setPagination(currentValue => {
+			return currentValue.pageIndex === 0
+				? currentValue
+				: {
+						...currentValue,
+						pageIndex: 0
+					};
+		});
+	}, [searchValue, selectedStatusesKey, sortParam]);
 
 	const auditsQuery = useQuery({
-		queryKey: ["playspace", "manager", "audits", accountId],
-		queryFn: async (): Promise<AuditActivityRow[]> => {
+		queryKey: [
+			"playspace",
+			"manager",
+			"audits",
+			accountId,
+			pagination.pageIndex,
+			pagination.pageSize,
+			searchValue,
+			sortParam,
+			selectedStatuses
+		],
+		queryFn: async () => {
 			if (!accountId) {
 				throw new Error("Manager account context is unavailable.");
 			}
 
-			const projects = await playspaceApi.accounts.projects(accountId);
-			const placesByProject = await Promise.all(
-				projects.map(async project => {
-					const places = await playspaceApi.projects.places(project.id);
-					return places.map(place => ({
-						id: place.id,
-						name: place.name,
-						project_id: project.id,
-						project_name: project.name
-					}));
-				})
-			);
-
-			const places = placesByProject.flat();
-			const histories = await Promise.all(
-				places.map(async place => {
-					const history = await playspaceApi.places.history(place.id);
-					return history.audits.map(audit => ({
-						id: audit.audit_id,
-						auditCode: audit.audit_code,
-						status: audit.status,
-						auditorCode: audit.auditor_code,
-						projectName: place.project_name,
-						placeName: place.name,
-						startedAt: audit.started_at,
-						submittedAt: audit.submitted_at,
-						score: audit.summary_score
-					}));
-				})
-			);
-
-			return histories.flat();
+			return playspaceApi.accounts.audits(accountId, {
+				page: pagination.pageIndex + 1,
+				pageSize: pagination.pageSize,
+				search: searchValue,
+				sort: sortParam,
+				statuses: selectedStatuses
+			});
 		},
 		enabled: accountId !== null
 	});
+
+	React.useEffect(() => {
+		if (!auditsQuery.data) {
+			return;
+		}
+
+		const maxPageIndex = Math.max(auditsQuery.data.total_pages - 1, 0);
+		if (pagination.pageIndex <= maxPageIndex) {
+			return;
+		}
+
+		setPagination(currentValue => ({
+			...currentValue,
+			pageIndex: maxPageIndex
+		}));
+	}, [auditsQuery.data, pagination.pageIndex]);
 
 	if (!accountId) {
 		return (
@@ -131,14 +163,19 @@ export default function ManagerAuditsPage() {
 		);
 	}
 
-	const audits = auditsQuery.data;
-	const submittedAudits = audits.filter(audit => audit.status === "SUBMITTED").length;
-	const inProgressAudits = audits.filter(audit => audit.status === "IN_PROGRESS" || audit.status === "PAUSED").length;
-	const scoredAudits = audits.filter((audit): audit is AuditActivityRow & { score: number } => audit.score !== null);
+	const audits = auditsQuery.data.items.map<AuditActivityRow>(audit => ({
+		id: audit.audit_id,
+		auditCode: audit.audit_code,
+		status: audit.status,
+		auditorCode: audit.auditor_code,
+		projectName: audit.project_name,
+		placeName: audit.place_name,
+		startedAt: audit.started_at,
+		submittedAt: audit.submitted_at,
+		score: audit.summary_score
+	}));
 	const meanScore =
-		scoredAudits.length > 0
-			? `${Math.round((scoredAudits.reduce((runningTotal, audit) => runningTotal + audit.score, 0) / scoredAudits.length) * 10) / 10}`
-			: formatT("pending");
+		auditsQuery.data.summary.average_score !== null ? `${auditsQuery.data.summary.average_score}` : formatT("pending");
 
 	return (
 		<div className="space-y-6">
@@ -170,18 +207,18 @@ export default function ManagerAuditsPage() {
 			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
 				<StatCard
 					title={t("stats.totalAudits.title")}
-					value={String(audits.length)}
+					value={String(auditsQuery.data.summary.total_audits)}
 					helper={t("stats.totalAudits.helper")}
 				/>
 				<StatCard
 					title={t("stats.submitted.title")}
-					value={String(submittedAudits)}
+					value={String(auditsQuery.data.summary.submitted_audits)}
 					helper={t("stats.submitted.helper")}
 					tone="success"
 				/>
 				<StatCard
 					title={t("stats.inProgress.title")}
-					value={String(inProgressAudits)}
+					value={String(auditsQuery.data.summary.in_progress_audits)}
 					helper={t("stats.inProgress.helper")}
 					tone="warning"
 				/>
@@ -196,7 +233,20 @@ export default function ManagerAuditsPage() {
 				rows={audits}
 				title={t("table.title")}
 				description={t("table.description")}
-				emptyMessage={audits.length === 0 ? t("table.emptyState.noAudits") : t("table.emptyState.noMatches")}
+				emptyMessage={
+					auditsQuery.data.total_count === 0 ? t("table.emptyState.noAudits") : t("table.emptyState.noMatches")
+				}
+				sortingState={sorting}
+				onSortingStateChange={setSorting}
+				columnFiltersState={columnFilters}
+				onColumnFiltersStateChange={setColumnFilters}
+				paginationState={pagination}
+				onPaginationStateChange={setPagination}
+				manualFiltering
+				manualSorting
+				manualPagination
+				rowCount={auditsQuery.data.total_count}
+				pageCount={auditsQuery.data.total_pages}
 			/>
 		</div>
 	);

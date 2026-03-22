@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import type { ColumnDef } from "@tanstack/react-table";
+import type { ColumnDef, ColumnFiltersState, PaginationState, SortingState } from "@tanstack/react-table";
 import { CheckIcon, CopyIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 
@@ -35,6 +35,17 @@ export interface AuditsTableProps {
 	pageSize?: number;
 	emptyMessage?: string;
 	getRowActions?: (row: AuditActivityRow) => EntityRowAction[];
+	sortingState?: SortingState;
+	onSortingStateChange?: (nextState: SortingState) => void;
+	columnFiltersState?: ColumnFiltersState;
+	onColumnFiltersStateChange?: (nextState: ColumnFiltersState) => void;
+	paginationState?: PaginationState;
+	onPaginationStateChange?: (nextState: PaginationState) => void;
+	manualPagination?: boolean;
+	manualSorting?: boolean;
+	manualFiltering?: boolean;
+	rowCount?: number;
+	pageCount?: number;
 }
 
 interface AuditIdentityCellProps {
@@ -130,7 +141,18 @@ export function AuditsTable({
 	action,
 	pageSize = 10,
 	emptyMessage,
-	getRowActions
+	getRowActions,
+	sortingState,
+	onSortingStateChange,
+	columnFiltersState,
+	onColumnFiltersStateChange,
+	paginationState,
+	onPaginationStateChange,
+	manualPagination = false,
+	manualSorting = false,
+	manualFiltering = false,
+	rowCount,
+	pageCount
 }: Readonly<AuditsTableProps>) {
 	const t = useTranslations("tables.audits");
 	const formatT = useTranslations("common.format");
@@ -167,7 +189,8 @@ export function AuditsTable({
 				)
 			},
 			{
-				accessorKey: "startedAt",
+				id: "started_at",
+				accessorFn: row => row.startedAt ?? "",
 				header: ({ column }) => (
 					<DataTableColumnHeader column={column} title={t("columns.started")} align="end" />
 				),
@@ -178,7 +201,8 @@ export function AuditsTable({
 				)
 			},
 			{
-				accessorKey: "submittedAt",
+				id: "submitted_at",
+				accessorFn: row => row.submittedAt ?? "",
 				header: ({ column }) => (
 					<DataTableColumnHeader column={column} title={t("columns.submitted")} align="end" />
 				),
@@ -189,7 +213,8 @@ export function AuditsTable({
 				)
 			},
 			{
-				accessorKey: "score",
+				id: "summary_score",
+				accessorFn: row => row.score ?? null,
 				header: ({ column }) => (
 					<DataTableColumnHeader column={column} title={t("columns.score")} align="end" />
 				),
@@ -214,11 +239,11 @@ export function AuditsTable({
 	);
 
 	const statusOptions = React.useMemo(() => {
-		return Array.from(new Set(rows.map(row => row.status))).map(status => ({
+		return (["IN_PROGRESS", "PAUSED", "SUBMITTED"] as const).map(status => ({
 			label: status.toLowerCase().replaceAll("_", " "),
 			value: status
 		}));
-	}, [rows]);
+	}, []);
 
 	return (
 		<DataTable
@@ -238,7 +263,18 @@ export function AuditsTable({
 			action={action}
 			pageSize={pageSize}
 			emptyMessage={emptyMessage ?? t("emptyMessage")}
-			initialSorting={[{ id: "submittedAt", desc: true }]}
+			initialSorting={[{ id: "submitted_at", desc: true }]}
+			sortingState={sortingState}
+			onSortingStateChange={onSortingStateChange}
+			columnFiltersState={columnFiltersState}
+			onColumnFiltersStateChange={onColumnFiltersStateChange}
+			paginationState={paginationState}
+			onPaginationStateChange={onPaginationStateChange}
+			manualPagination={manualPagination}
+			manualSorting={manualSorting}
+			manualFiltering={manualFiltering}
+			rowCount={rowCount}
+			pageCount={pageCount}
 		/>
 	);
 }

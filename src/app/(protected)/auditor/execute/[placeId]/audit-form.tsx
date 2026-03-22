@@ -150,6 +150,33 @@ function buildDraftPatchFromState(input: {
 }
 
 /**
+ * Build the smallest patch needed to move the last-saved draft state to the current local state.
+ */
+function buildIncrementalDraftPatch(previous: AuditDraftPatch, current: AuditDraftPatch): AuditDraftPatch {
+	const changedSections = Object.fromEntries(
+		Object.entries(current.sections).filter(([sectionKey, sectionPatch]) => {
+			return JSON.stringify(sectionPatch) !== JSON.stringify(previous.sections[sectionKey]);
+		})
+	);
+	const metaChanged = JSON.stringify(current.meta ?? null) !== JSON.stringify(previous.meta ?? null);
+	const preAuditChanged =
+		JSON.stringify(current.pre_audit ?? null) !== JSON.stringify(previous.pre_audit ?? null);
+
+	return {
+		meta: metaChanged ? current.meta ?? null : undefined,
+		pre_audit: preAuditChanged ? current.pre_audit ?? null : undefined,
+		sections: changedSections
+	};
+}
+
+/**
+ * Check whether an incremental draft patch contains any actual work for the backend.
+ */
+function isEmptyIncrementalPatch(patch: AuditDraftPatch): boolean {
+	return patch.meta === undefined && patch.pre_audit === undefined && Object.keys(patch.sections).length === 0;
+}
+
+/**
  * Format audit timestamps and computed auto fields for display.
  */
 function formatAutoValue(questionKey: string, auditSession: AuditSession, t: ExecuteTranslator): string {
@@ -199,6 +226,8 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 	const [sectionDrafts, setSectionDrafts] = React.useState<Record<string, SectionDraftState>>({});
 	const initializedAuditIdRef = React.useRef<string | null>(null);
 	const lastQueuedJsonRef = React.useRef<string | null>(null);
+	const lastSavedJsonRef = React.useRef<string | null>(null);
+	const lastSavedPatchRef = React.useRef<AuditDraftPatch | null>(null);
 
 	const createOrResumeQuery = useQuery({
 		queryKey: ["playspace", "auditor", "execute", placeId],
@@ -223,13 +252,15 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 		const nextSectionDrafts = createSectionDrafts(incomingSession, instrument);
 
 		initializedAuditIdRef.current = incomingSession.audit_id;
-		lastQueuedJsonRef.current = JSON.stringify(
-			buildDraftPatchFromState({
-				selectedMode: nextSelectedMode,
-				preAuditValues: nextPreAuditValues,
-				sectionDrafts: nextSectionDrafts
-			})
-		);
+		const initialPatch = buildDraftPatchFromState({
+			selectedMode: nextSelectedMode,
+			preAuditValues: nextPreAuditValues,
+			sectionDrafts: nextSectionDrafts
+		});
+		const initialPatchJson = JSON.stringify(initialPatch);
+		lastQueuedJsonRef.current = initialPatchJson;
+		lastSavedJsonRef.current = initialPatchJson;
+		lastSavedPatchRef.current = initialPatch;
 		setSession(incomingSession);
 		setSelectedMode(nextSelectedMode);
 		setPreAuditValues(nextPreAuditValues);
@@ -238,14 +269,22 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 	}, [createOrResumeQuery.data, instrument]);
 
 	const patchDraft = useMutation({
-		mutationFn: async (input: { auditId: string; patch: AuditDraftPatch }) =>
+		mutationFn: async (input: {
+			auditId: string;
+			patch: AuditDraftPatch;
+			fullPatch: AuditDraftPatch;
+		}) =>
 			playspaceApi.auditor.patchAuditDraft(input.auditId, input.patch),
-		onSuccess: updatedSession => {
-			setSession(updatedSession);
-			setLastSavedAt(new Date());
+		onSuccess: (saveResult, variables) => {
+			const syncedPatchJson = JSON.stringify(variables.fullPatch);
+			lastQueuedJsonRef.current = syncedPatchJson;
+			lastSavedJsonRef.current = syncedPatchJson;
+			lastSavedPatchRef.current = variables.fullPatch;
+			setLastSavedAt(new Date(saveResult.saved_at));
 			setSaveError(null);
 		},
 		onError: error => {
+			lastQueuedJsonRef.current = lastSavedJsonRef.current;
 			setSaveError(error instanceof Error ? error.message : t("errors.autoSaveFailed"));
 		}
 	});
@@ -276,16 +315,31 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 		}
 
 		const patch = buildDraftPatch();
-		const serializedPatch = JSON.stringify(patch);
-		if (serializedPatch === lastQueuedJsonRef.current) {
+		const serializedFullPatch = JSON.stringify(patch);
+		if (serializedFullPatch === lastQueuedJsonRef.current) {
 			return;
 		}
 
-		lastQueuedJsonRef.current = serializedPatch;
+		const lastSavedPatch = lastSavedPatchRef.current;
+		if (!lastSavedPatch) {
+			return;
+		}
+
+		const incrementalPatch = buildIncrementalDraftPatch(lastSavedPatch, patch);
+		if (isEmptyIncrementalPatch(incrementalPatch)) {
+			lastQueuedJsonRef.current = serializedFullPatch;
+			return;
+		}
+
+		lastQueuedJsonRef.current = serializedFullPatch;
 		setSaveError(null);
 
 		const timeoutHandle = globalThis.setTimeout(() => {
-			patchDraft.mutate({ auditId: session.audit_id, patch });
+			patchDraft.mutate({
+				auditId: session.audit_id,
+				patch: incrementalPatch,
+				fullPatch: patch
+			});
 		}, 900);
 
 		return () => {
@@ -372,9 +426,23 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 			return;
 		}
 
-		const patch = buildDraftPatch();
-		lastQueuedJsonRef.current = JSON.stringify(patch);
-		patchDraft.mutate({ auditId: session.audit_id, patch });
+		const fullPatch = buildDraftPatch();
+		const lastSavedPatch = lastSavedPatchRef.current;
+		if (!lastSavedPatch) {
+			return;
+		}
+
+		const incrementalPatch = buildIncrementalDraftPatch(lastSavedPatch, fullPatch);
+		if (isEmptyIncrementalPatch(incrementalPatch)) {
+			return;
+		}
+
+		lastQueuedJsonRef.current = JSON.stringify(fullPatch);
+		patchDraft.mutate({
+			auditId: session.audit_id,
+			patch: incrementalPatch,
+			fullPatch
+		});
 	}
 
 	function handlePreAuditSingleSelect(questionKey: string, optionKey: string) {

@@ -35,15 +35,16 @@ export default function AuditorPlacesPage() {
 	const t = useTranslations("auditor.places");
 	const [currentPage, setCurrentPage] = React.useState(1);
 	const placesQuery = useQuery({
-		queryKey: ["playspace", "auditor", "assignedPlaces", "placesPage"],
-		queryFn: () => playspaceApi.auditor.assignedPlaces()
+		queryKey: ["playspace", "auditor", "assignedPlaces", "placesPage", currentPage],
+		queryFn: () =>
+			playspaceApi.auditor.assignedPlaces({
+				page: currentPage,
+				pageSize: AUDITOR_PLACES_PAGE_SIZE,
+				sort: "place_name"
+			})
 	});
-	const places = placesQuery.data ?? [];
-	const pageCount = Math.max(1, Math.ceil(places.length / AUDITOR_PLACES_PAGE_SIZE));
-	const paginatedPlaces = places.slice(
-		(currentPage - 1) * AUDITOR_PLACES_PAGE_SIZE,
-		currentPage * AUDITOR_PLACES_PAGE_SIZE
-	);
+	const places = placesQuery.data?.items ?? [];
+	const pageCount = placesQuery.data?.total_pages ?? 1;
 
 	React.useEffect(() => {
 		if (currentPage > pageCount) {
@@ -88,7 +89,7 @@ export default function AuditorPlacesPage() {
 				</CardHeader>
 				<CardContent className="space-y-3">
 					{places.length === 0 ? <p className="text-sm text-muted-foreground">{t("list.empty")}</p> : null}
-					{paginatedPlaces.map(place => {
+					{places.map(place => {
 						const executeHref = `/auditor/execute/${encodeURIComponent(place.place_id)}`;
 						const reportHref =
 							place.audit_status === "SUBMITTED" && place.audit_id
@@ -133,7 +134,7 @@ export default function AuditorPlacesPage() {
 					<PaginationControls
 						currentPage={currentPage}
 						pageCount={pageCount}
-						totalItems={places.length}
+						totalItems={placesQuery.data.total_count}
 						pageSize={AUDITOR_PLACES_PAGE_SIZE}
 						itemLabel={t("pagination.itemLabel")}
 						onPageChange={setCurrentPage}

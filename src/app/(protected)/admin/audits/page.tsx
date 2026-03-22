@@ -1,20 +1,84 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
+import type { ColumnFiltersState, PaginationState, SortingState } from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
+import * as React from "react";
 
 import { playspaceApi } from "@/lib/api/playspace";
 import { AuditsTable } from "@/components/dashboard/audits-table";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
+import {
+	getMultiValueColumnFilter,
+	getTextColumnFilterValue,
+	toBackendSortParam
+} from "@/components/dashboard/server-table-utils";
 import { Button } from "@/components/ui/button";
 
 export default function AdminAuditsPage() {
 	const t = useTranslations("admin.audits");
-	const auditsQuery = useQuery({
-		queryKey: ["playspace", "admin", "audits"],
-		queryFn: () => playspaceApi.admin.audits()
+	const [sorting, setSorting] = React.useState<SortingState>([{ id: "submitted_at", desc: true }]);
+	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+	const [pagination, setPagination] = React.useState<PaginationState>({
+		pageIndex: 0,
+		pageSize: 10
 	});
+	const searchValue = getTextColumnFilterValue(columnFilters, "search");
+	const selectedStatuses = getMultiValueColumnFilter(columnFilters, "status").filter(
+		(value): value is "IN_PROGRESS" | "PAUSED" | "SUBMITTED" =>
+			value === "IN_PROGRESS" || value === "PAUSED" || value === "SUBMITTED"
+	);
+	const selectedStatusesKey = selectedStatuses.join("|");
+	const sortParam = toBackendSortParam(sorting);
+
+	React.useEffect(() => {
+		setPagination(currentValue => {
+			return currentValue.pageIndex === 0
+				? currentValue
+				: {
+						...currentValue,
+						pageIndex: 0
+					};
+		});
+	}, [searchValue, selectedStatusesKey, sortParam]);
+
+	const auditsQuery = useQuery({
+		queryKey: [
+			"playspace",
+			"admin",
+			"audits",
+			pagination.pageIndex,
+			pagination.pageSize,
+			searchValue,
+			sortParam,
+			selectedStatuses
+		],
+		queryFn: () =>
+			playspaceApi.admin.audits({
+				page: pagination.pageIndex + 1,
+				pageSize: pagination.pageSize,
+				search: searchValue,
+				sort: sortParam,
+				statuses: selectedStatuses
+			})
+	});
+
+	React.useEffect(() => {
+		if (!auditsQuery.data) {
+			return;
+		}
+
+		const maxPageIndex = Math.max(auditsQuery.data.total_pages - 1, 0);
+		if (pagination.pageIndex <= maxPageIndex) {
+			return;
+		}
+
+		setPagination(currentValue => ({
+			...currentValue,
+			pageIndex: maxPageIndex
+		}));
+	}, [auditsQuery.data, pagination.pageIndex]);
 
 	if (auditsQuery.isLoading) {
 		return <div className="h-64 animate-pulse rounded-card border border-border bg-card" />;
@@ -46,7 +110,7 @@ export default function AdminAuditsPage() {
 				]}
 			/>
 			<AuditsTable
-				rows={auditsQuery.data.map(audit => ({
+				rows={auditsQuery.data.items.map(audit => ({
 					id: audit.audit_id,
 					auditCode: audit.audit_code,
 					status: audit.status,
@@ -61,6 +125,17 @@ export default function AdminAuditsPage() {
 				title={t("table.title")}
 				description={t("table.description")}
 				emptyMessage={t("table.emptyMessage")}
+				sortingState={sorting}
+				onSortingStateChange={setSorting}
+				columnFiltersState={columnFilters}
+				onColumnFiltersStateChange={setColumnFilters}
+				paginationState={pagination}
+				onPaginationStateChange={setPagination}
+				manualFiltering
+				manualSorting
+				manualPagination
+				rowCount={auditsQuery.data.total_count}
+				pageCount={auditsQuery.data.total_pages}
 			/>
 		</div>
 	);

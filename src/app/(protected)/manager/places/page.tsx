@@ -2,18 +2,23 @@
 
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
-import type { ColumnDef } from "@tanstack/react-table";
+import type { ColumnDef, ColumnFiltersState, PaginationState, SortingState } from "@tanstack/react-table";
 import { FolderKanbanIcon, MapPinnedIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 
-import { playspaceApi, type PlaceSummary } from "@/lib/api/playspace";
+import { playspaceApi, type ManagerPlaceRow } from "@/lib/api/playspace";
 import { useAuthSession } from "@/components/app/auth-session-provider";
 import { DataTable, getMultiValueFilterFn } from "@/components/dashboard/data-table";
 import { DataTableColumnHeader } from "@/components/dashboard/data-table-column-header";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
 import { EntityRowActions } from "@/components/dashboard/entity-row-actions";
+import {
+	getMultiValueColumnFilter,
+	getTextColumnFilterValue,
+	toBackendSortParam
+} from "@/components/dashboard/server-table-utils";
 import { StatCard } from "@/components/dashboard/stat-card";
 import {
 	formatDateTimeLabel,
@@ -26,10 +31,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { cn } from "@/lib/utils";
 
-interface ManagerPlaceRow extends PlaceSummary {
-	project_name: string;
-}
-
 function getErrorMessage(error: unknown, fallbackMessage: string): string {
 	if (error instanceof Error) {
 		return error.message;
@@ -38,39 +39,101 @@ function getErrorMessage(error: unknown, fallbackMessage: string): string {
 	return fallbackMessage;
 }
 
+function isManagerPlaceStatus(value: string): value is ManagerPlaceRow["status"] {
+	return value === "not_started" || value === "in_progress" || value === "submitted";
+}
+
 export default function ManagerPlacesPage() {
 	const t = useTranslations("manager.places");
 	const formatT = useTranslations("common.format");
 	const session = useAuthSession();
 	const accountId = session?.role === "manager" ? session.accountId : null;
+	const [sorting, setSorting] = React.useState<SortingState>([{ id: "last_audited_at", desc: true }]);
+	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+	const [pagination, setPagination] = React.useState<PaginationState>({
+		pageIndex: 0,
+		pageSize: 10
+	});
+	const searchValue = getTextColumnFilterValue(columnFilters, "search");
+	const selectedProjectIds = getMultiValueColumnFilter(columnFilters, "project_id");
+	const selectedStatuses = getMultiValueColumnFilter(columnFilters, "status").filter(isManagerPlaceStatus);
+	const selectedProjectIdsKey = selectedProjectIds.join("|");
+	const selectedStatusesKey = selectedStatuses.join("|");
+	const sortParam = toBackendSortParam(sorting);
 
-	const placesQuery = useQuery({
-		queryKey: ["playspace", "manager", "places", accountId],
-		queryFn: async (): Promise<ManagerPlaceRow[]> => {
+	React.useEffect(() => {
+		setPagination(currentValue => {
+			return currentValue.pageIndex === 0
+				? currentValue
+				: {
+						...currentValue,
+						pageIndex: 0
+					};
+		});
+	}, [searchValue, selectedProjectIdsKey, selectedStatusesKey, sortParam]);
+
+	const projectsQuery = useQuery({
+		queryKey: ["playspace", "manager", "places", "projects", accountId],
+		queryFn: async () => {
 			if (!accountId) {
 				throw new Error(t("errors.accountContextUnavailable"));
 			}
 
-			const projects = await playspaceApi.accounts.projects(accountId);
-			const placesByProject = await Promise.all(
-				projects.map(async project => {
-					const places = await playspaceApi.projects.places(project.id);
-					return places.map(place => ({
-						...place,
-						project_name: project.name
-					}));
-				})
-			);
-
-			return placesByProject.flat();
+			return playspaceApi.accounts.projects(accountId);
 		},
 		enabled: accountId !== null
 	});
 
+	const placesQuery = useQuery({
+		queryKey: [
+			"playspace",
+			"manager",
+			"places",
+			accountId,
+			pagination.pageIndex,
+			pagination.pageSize,
+			searchValue,
+			sortParam,
+			selectedProjectIds,
+			selectedStatuses
+		],
+		queryFn: async () => {
+			if (!accountId) {
+				throw new Error(t("errors.accountContextUnavailable"));
+			}
+
+			return playspaceApi.accounts.places(accountId, {
+				page: pagination.pageIndex + 1,
+				pageSize: pagination.pageSize,
+				search: searchValue,
+				sort: sortParam,
+				projectIds: selectedProjectIds,
+				statuses: selectedStatuses
+			});
+		},
+		enabled: accountId !== null
+	});
+
+	React.useEffect(() => {
+		if (!placesQuery.data) {
+			return;
+		}
+
+		const maxPageIndex = Math.max(placesQuery.data.total_pages - 1, 0);
+		if (pagination.pageIndex <= maxPageIndex) {
+			return;
+		}
+
+		setPagination(currentValue => ({
+			...currentValue,
+			pageIndex: maxPageIndex
+		}));
+	}, [pagination.pageIndex, placesQuery.data]);
+
 	const columns = React.useMemo<ColumnDef<ManagerPlaceRow>[]>(
 		() => [
 			{
-				id: "place",
+				id: "search",
 				accessorFn: row => `${row.name} ${row.project_name} ${formatLocationLabel(row, formatT)}`,
 				header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.place")} />,
 				cell: ({ row }) => (
@@ -87,21 +150,11 @@ export default function ManagerPlacesPage() {
 				enableHiding: false
 			},
 			{
-				accessorKey: "project_name",
+				id: "project_id",
+				accessorFn: row => row.project_id,
 				header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.project")} />,
 				filterFn: getMultiValueFilterFn<ManagerPlaceRow>(),
 				cell: ({ row }) => <span className="text-sm text-muted-foreground">{row.original.project_name}</span>
-			},
-			{
-				accessorKey: "place_type",
-				header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.type")} />,
-				filterFn: getMultiValueFilterFn<ManagerPlaceRow>(),
-				cell: ({ row }) =>
-					row.original.place_type ? (
-						<Badge variant="secondary">{row.original.place_type}</Badge>
-					) : (
-						<span className="text-sm text-muted-foreground">{t("table.typePending")}</span>
-					)
 			},
 			{
 				accessorKey: "status",
@@ -195,7 +248,7 @@ export default function ManagerPlacesPage() {
 		);
 	}
 
-	if (placesQuery.isLoading) {
+	if (projectsQuery.isLoading || placesQuery.isLoading) {
 		return (
 			<div className="space-y-6">
 				<DashboardHeader
@@ -220,11 +273,11 @@ export default function ManagerPlacesPage() {
 		);
 	}
 
-	if (placesQuery.isError || !placesQuery.data) {
+	if (projectsQuery.isError || placesQuery.isError || !placesQuery.data || !projectsQuery.data) {
 		return (
 			<EmptyState
 				title={t("error.title")}
-				description={getErrorMessage(placesQuery.error, t("error.description"))}
+				description={getErrorMessage(projectsQuery.error ?? placesQuery.error, t("error.description"))}
 				action={
 					<Button type="button" onClick={() => globalThis.location.reload()}>
 						{t("actions.tryAgain")}
@@ -234,15 +287,11 @@ export default function ManagerPlacesPage() {
 		);
 	}
 
-	const places = placesQuery.data;
-	const submittedPlaces = places.filter(place => place.status === "submitted").length;
-	const inProgressPlaces = places.filter(place => place.status === "in_progress").length;
-	const scoredPlaces = places.filter(
-		(place): place is ManagerPlaceRow & { average_score: number } => place.average_score !== null
-	);
+	const places = placesQuery.data.items;
+	const projects = projectsQuery.data;
 	const meanScore =
-		scoredPlaces.length > 0
-			? `${Math.round((scoredPlaces.reduce((runningTotal, place) => runningTotal + place.average_score, 0) / scoredPlaces.length) * 10) / 10}`
+		placesQuery.data.summary.average_score !== null
+			? `${placesQuery.data.summary.average_score}`
 			: formatT("pending");
 
 	return (
@@ -264,18 +313,18 @@ export default function ManagerPlacesPage() {
 			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
 				<StatCard
 					title={t("stats.totalPlaces.title")}
-					value={String(places.length)}
+					value={String(placesQuery.data.summary.total_places)}
 					helper={t("stats.totalPlaces.helper")}
 				/>
 				<StatCard
 					title={t("stats.submitted.title")}
-					value={String(submittedPlaces)}
+					value={String(placesQuery.data.summary.submitted_places)}
 					helper={t("stats.submitted.helper")}
 					tone="success"
 				/>
 				<StatCard
 					title={t("stats.inProgress.title")}
-					value={String(inProgressPlaces)}
+					value={String(placesQuery.data.summary.in_progress_places)}
 					helper={t("stats.inProgress.helper")}
 					tone="warning"
 				/>
@@ -291,44 +340,44 @@ export default function ManagerPlacesPage() {
 				description={t("table.description")}
 				columns={columns}
 				data={places}
-				searchColumnId="place"
+				searchColumnId="search"
 				searchPlaceholder={t("table.searchPlaceholder")}
 				filterConfigs={[
 					{
-						columnId: "project_name",
+						columnId: "project_id",
 						title: t("table.columns.project"),
-						options: Array.from(new Set(places.map(place => place.project_name)))
-							.sort((left, right) => left.localeCompare(right))
-							.map(projectName => ({
-								label: projectName,
-								value: projectName
-							}))
-					},
-					{
-						columnId: "place_type",
-						title: t("table.columns.type"),
-						options: Array.from(
-							new Set(
-								places.map(place => place.place_type).filter((value): value is string => Boolean(value))
-							)
-						)
-							.sort((left, right) => left.localeCompare(right))
-							.map(placeType => ({
-								label: placeType,
-								value: placeType
+						options: projects
+							.slice()
+							.sort((left, right) => left.name.localeCompare(right.name))
+							.map(project => ({
+								label: project.name,
+								value: project.id
 							}))
 					},
 					{
 						columnId: "status",
 						title: t("table.columns.status"),
-						options: Array.from(new Set(places.map(place => place.status))).map(status => ({
+						options: (["not_started", "in_progress", "submitted"] as const).map(status => ({
 							label: t(`table.status.${status}`),
 							value: status
 						}))
 					}
 				]}
-				emptyMessage={places.length === 0 ? t("table.emptyState.noPlaces") : t("table.emptyState.noMatches")}
+				emptyMessage={
+					placesQuery.data.total_count === 0 ? t("table.emptyState.noPlaces") : t("table.emptyState.noMatches")
+				}
 				initialSorting={[{ id: "last_audited_at", desc: true }]}
+				sortingState={sorting}
+				onSortingStateChange={setSorting}
+				columnFiltersState={columnFilters}
+				onColumnFiltersStateChange={setColumnFilters}
+				paginationState={pagination}
+				onPaginationStateChange={setPagination}
+				manualFiltering
+				manualSorting
+				manualPagination
+				rowCount={placesQuery.data.total_count}
+				pageCount={placesQuery.data.total_pages}
 			/>
 		</div>
 	);

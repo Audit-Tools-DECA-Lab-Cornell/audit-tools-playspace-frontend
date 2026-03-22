@@ -1,14 +1,16 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import type { ColumnDef } from "@tanstack/react-table";
+import type { ColumnDef, ColumnFiltersState, PaginationState, SortingState } from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
+import * as React from "react";
 
 import { playspaceApi, type AdminAuditorRow } from "@/lib/api/playspace";
 import { DataTable } from "@/components/dashboard/data-table";
 import { DataTableColumnHeader } from "@/components/dashboard/data-table-column-header";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
+import { getTextColumnFilterValue, toBackendSortParam } from "@/components/dashboard/server-table-utils";
 import { formatDateTimeLabel } from "@/components/dashboard/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,10 +18,52 @@ import { Button } from "@/components/ui/button";
 export default function AdminAuditorsPage() {
 	const t = useTranslations("admin.auditors");
 	const formatT = useTranslations("common.format");
-	const auditorsQuery = useQuery({
-		queryKey: ["playspace", "admin", "auditors"],
-		queryFn: () => playspaceApi.admin.auditors()
+	const [sorting, setSorting] = React.useState<SortingState>([{ id: "last_active_at", desc: true }]);
+	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+	const [pagination, setPagination] = React.useState<PaginationState>({
+		pageIndex: 0,
+		pageSize: 10
 	});
+	const searchValue = getTextColumnFilterValue(columnFilters, "auditor");
+	const sortParam = toBackendSortParam(sorting);
+
+	React.useEffect(() => {
+		setPagination(currentValue => {
+			return currentValue.pageIndex === 0
+				? currentValue
+				: {
+						...currentValue,
+						pageIndex: 0
+					};
+		});
+	}, [searchValue, sortParam]);
+
+	const auditorsQuery = useQuery({
+		queryKey: ["playspace", "admin", "auditors", pagination.pageIndex, pagination.pageSize, searchValue, sortParam],
+		queryFn: () =>
+			playspaceApi.admin.auditors({
+				page: pagination.pageIndex + 1,
+				pageSize: pagination.pageSize,
+				search: searchValue,
+				sort: sortParam
+			})
+	});
+
+	React.useEffect(() => {
+		if (!auditorsQuery.data) {
+			return;
+		}
+
+		const maxPageIndex = Math.max(auditorsQuery.data.total_pages - 1, 0);
+		if (pagination.pageIndex <= maxPageIndex) {
+			return;
+		}
+
+		setPagination(currentValue => ({
+			...currentValue,
+			pageIndex: maxPageIndex
+		}));
+	}, [auditorsQuery.data, pagination.pageIndex]);
 
 	if (auditorsQuery.isLoading) {
 		return <div className="h-64 animate-pulse rounded-card border border-border bg-card" />;
@@ -102,11 +146,22 @@ export default function AdminAuditorsPage() {
 				title={t("table.title")}
 				description={t("table.description")}
 				columns={columns}
-				data={auditorsQuery.data}
+				data={auditorsQuery.data.items}
 				searchColumnId="auditor"
 				searchPlaceholder={t("table.searchPlaceholder")}
 				emptyMessage={t("table.emptyMessage")}
 				initialSorting={[{ id: "last_active_at", desc: true }]}
+				sortingState={sorting}
+				onSortingStateChange={setSorting}
+				columnFiltersState={columnFilters}
+				onColumnFiltersStateChange={setColumnFilters}
+				paginationState={pagination}
+				onPaginationStateChange={setPagination}
+				manualFiltering
+				manualSorting
+				manualPagination
+				rowCount={auditorsQuery.data.total_count}
+				pageCount={auditorsQuery.data.total_pages}
 			/>
 		</div>
 	);

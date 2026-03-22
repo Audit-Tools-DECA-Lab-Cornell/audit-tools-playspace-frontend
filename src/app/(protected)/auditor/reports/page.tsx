@@ -26,16 +26,20 @@ export default function AuditorReportsPage() {
 	const formatT = useTranslations("common.format");
 	const [currentPage, setCurrentPage] = React.useState(1);
 	const auditsQuery = useQuery({
-		queryKey: ["playspace", "auditor", "audits", "reports"],
-		queryFn: () => playspaceApi.auditor.audits()
+		queryKey: ["playspace", "auditor", "audits", "reports", currentPage],
+		queryFn: () =>
+			playspaceApi.auditor.audits({
+				page: currentPage,
+				pageSize: AUDITOR_REPORTS_PAGE_SIZE,
+				sort: "-started_at"
+			})
 	});
-	const audits = auditsQuery.data ?? [];
-	const submittedAudits = audits.filter(audit => audit.status === "SUBMITTED");
-	const pageCount = Math.max(1, Math.ceil(audits.length / AUDITOR_REPORTS_PAGE_SIZE));
-	const paginatedAudits = audits.slice(
-		(currentPage - 1) * AUDITOR_REPORTS_PAGE_SIZE,
-		currentPage * AUDITOR_REPORTS_PAGE_SIZE
-	);
+	const summaryQuery = useQuery({
+		queryKey: ["playspace", "auditor", "dashboardSummary", "reportsPage"],
+		queryFn: () => playspaceApi.auditor.dashboardSummary()
+	});
+	const audits = auditsQuery.data?.items ?? [];
+	const pageCount = auditsQuery.data?.total_pages ?? 1;
 
 	React.useEffect(() => {
 		if (currentPage > pageCount) {
@@ -43,11 +47,11 @@ export default function AuditorReportsPage() {
 		}
 	}, [currentPage, pageCount]);
 
-	if (auditsQuery.isLoading) {
+	if (auditsQuery.isLoading || summaryQuery.isLoading) {
 		return <div className="h-64 animate-pulse rounded-card border border-border bg-card" />;
 	}
 
-	if (auditsQuery.isError || !auditsQuery.data) {
+	if (auditsQuery.isError || summaryQuery.isError || !auditsQuery.data || !summaryQuery.data) {
 		return (
 			<Card>
 				<CardHeader>
@@ -80,7 +84,7 @@ export default function AuditorReportsPage() {
 				</CardHeader>
 				<CardContent className="space-y-3">
 					{audits.length === 0 ? <p className="text-sm text-muted-foreground">{t("list.empty")}</p> : null}
-					{paginatedAudits.map(audit => {
+					{audits.map(audit => {
 						const detailHref =
 							audit.status === "SUBMITTED"
 								? `/auditor/reports/${encodeURIComponent(audit.audit_id)}`
@@ -128,7 +132,7 @@ export default function AuditorReportsPage() {
 					<PaginationControls
 						currentPage={currentPage}
 						pageCount={pageCount}
-						totalItems={audits.length}
+						totalItems={auditsQuery.data.total_count}
 						pageSize={AUDITOR_REPORTS_PAGE_SIZE}
 						itemLabel={t("pagination.itemLabel")}
 						onPageChange={setCurrentPage}
@@ -141,7 +145,7 @@ export default function AuditorReportsPage() {
 				</CardHeader>
 				<CardContent className="space-y-2">
 					<p className="font-mono text-[2rem] font-semibold leading-none tabular-nums">
-						{submittedAudits.length}
+						{summaryQuery.data.submitted_audits}
 					</p>
 					<p className="text-sm text-muted-foreground">{t("summary.description")}</p>
 				</CardContent>

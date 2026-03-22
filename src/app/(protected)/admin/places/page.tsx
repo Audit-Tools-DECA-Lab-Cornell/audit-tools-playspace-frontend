@@ -1,14 +1,16 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import type { ColumnDef } from "@tanstack/react-table";
+import type { ColumnDef, ColumnFiltersState, PaginationState, SortingState } from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
+import * as React from "react";
 
 import { playspaceApi, type AdminPlaceRow } from "@/lib/api/playspace";
 import { DataTable } from "@/components/dashboard/data-table";
 import { DataTableColumnHeader } from "@/components/dashboard/data-table-column-header";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
+import { getTextColumnFilterValue, toBackendSortParam } from "@/components/dashboard/server-table-utils";
 import { formatDateTimeLabel, formatScoreLabel } from "@/components/dashboard/utils";
 import { Button } from "@/components/ui/button";
 
@@ -25,10 +27,52 @@ function formatLocation(
 export default function AdminPlacesPage() {
 	const t = useTranslations("admin.places");
 	const formatT = useTranslations("common.format");
-	const placesQuery = useQuery({
-		queryKey: ["playspace", "admin", "places"],
-		queryFn: () => playspaceApi.admin.places()
+	const [sorting, setSorting] = React.useState<SortingState>([{ id: "last_audited_at", desc: true }]);
+	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+	const [pagination, setPagination] = React.useState<PaginationState>({
+		pageIndex: 0,
+		pageSize: 10
 	});
+	const searchValue = getTextColumnFilterValue(columnFilters, "place");
+	const sortParam = toBackendSortParam(sorting);
+
+	React.useEffect(() => {
+		setPagination(currentValue => {
+			return currentValue.pageIndex === 0
+				? currentValue
+				: {
+						...currentValue,
+						pageIndex: 0
+					};
+		});
+	}, [searchValue, sortParam]);
+
+	const placesQuery = useQuery({
+		queryKey: ["playspace", "admin", "places", pagination.pageIndex, pagination.pageSize, searchValue, sortParam],
+		queryFn: () =>
+			playspaceApi.admin.places({
+				page: pagination.pageIndex + 1,
+				pageSize: pagination.pageSize,
+				search: searchValue,
+				sort: sortParam
+			})
+	});
+
+	React.useEffect(() => {
+		if (!placesQuery.data) {
+			return;
+		}
+
+		const maxPageIndex = Math.max(placesQuery.data.total_pages - 1, 0);
+		if (pagination.pageIndex <= maxPageIndex) {
+			return;
+		}
+
+		setPagination(currentValue => ({
+			...currentValue,
+			pageIndex: maxPageIndex
+		}));
+	}, [pagination.pageIndex, placesQuery.data]);
 
 	if (placesQuery.isLoading) {
 		return <div className="h-64 animate-pulse rounded-card border border-border bg-card" />;
@@ -120,11 +164,22 @@ export default function AdminPlacesPage() {
 				title={t("table.title")}
 				description={t("table.description")}
 				columns={columns}
-				data={placesQuery.data}
+				data={placesQuery.data.items}
 				searchColumnId="place"
 				searchPlaceholder={t("table.searchPlaceholder")}
 				emptyMessage={t("table.emptyMessage")}
 				initialSorting={[{ id: "last_audited_at", desc: true }]}
+				sortingState={sorting}
+				onSortingStateChange={setSorting}
+				columnFiltersState={columnFilters}
+				onColumnFiltersStateChange={setColumnFilters}
+				paginationState={pagination}
+				onPaginationStateChange={setPagination}
+				manualFiltering
+				manualSorting
+				manualPagination
+				rowCount={placesQuery.data.total_count}
+				pageCount={placesQuery.data.total_pages}
 			/>
 		</div>
 	);

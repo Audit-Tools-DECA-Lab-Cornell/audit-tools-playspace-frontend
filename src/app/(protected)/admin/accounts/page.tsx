@@ -1,14 +1,20 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import type { ColumnDef } from "@tanstack/react-table";
+import type { ColumnDef, ColumnFiltersState, PaginationState, SortingState } from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
+import * as React from "react";
 
 import { playspaceApi, type AdminAccountRow } from "@/lib/api/playspace";
 import { DataTable, getMultiValueFilterFn } from "@/components/dashboard/data-table";
 import { DataTableColumnHeader } from "@/components/dashboard/data-table-column-header";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
+import {
+	getMultiValueColumnFilter,
+	getTextColumnFilterValue,
+	toBackendSortParam
+} from "@/components/dashboard/server-table-utils";
 import { formatDateTimeLabel } from "@/components/dashboard/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -16,10 +22,67 @@ import { Button } from "@/components/ui/button";
 export default function AdminAccountsPage() {
 	const t = useTranslations("admin.accounts");
 	const formatT = useTranslations("common.format");
-	const accountsQuery = useQuery({
-		queryKey: ["playspace", "admin", "accounts"],
-		queryFn: () => playspaceApi.admin.accounts()
+	const [sorting, setSorting] = React.useState<SortingState>([{ id: "created_at", desc: true }]);
+	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+	const [pagination, setPagination] = React.useState<PaginationState>({
+		pageIndex: 0,
+		pageSize: 10
 	});
+	const searchValue = getTextColumnFilterValue(columnFilters, "name");
+	const selectedAccountTypes = getMultiValueColumnFilter(columnFilters, "account_type").filter(
+		(value): value is "ADMIN" | "MANAGER" | "AUDITOR" =>
+			value === "ADMIN" || value === "MANAGER" || value === "AUDITOR"
+	);
+	const selectedAccountTypesKey = selectedAccountTypes.join("|");
+	const sortParam = toBackendSortParam(sorting);
+
+	React.useEffect(() => {
+		setPagination(currentValue => {
+			return currentValue.pageIndex === 0
+				? currentValue
+				: {
+						...currentValue,
+						pageIndex: 0
+					};
+		});
+	}, [searchValue, selectedAccountTypesKey, sortParam]);
+
+	const accountsQuery = useQuery({
+		queryKey: [
+			"playspace",
+			"admin",
+			"accounts",
+			pagination.pageIndex,
+			pagination.pageSize,
+			searchValue,
+			sortParam,
+			selectedAccountTypes
+		],
+		queryFn: () =>
+			playspaceApi.admin.accounts({
+				page: pagination.pageIndex + 1,
+				pageSize: pagination.pageSize,
+				search: searchValue,
+				sort: sortParam,
+				accountTypes: selectedAccountTypes
+			})
+	});
+
+	React.useEffect(() => {
+		if (!accountsQuery.data) {
+			return;
+		}
+
+		const maxPageIndex = Math.max(accountsQuery.data.total_pages - 1, 0);
+		if (pagination.pageIndex <= maxPageIndex) {
+			return;
+		}
+
+		setPagination(currentValue => ({
+			...currentValue,
+			pageIndex: maxPageIndex
+		}));
+	}, [accountsQuery.data, pagination.pageIndex]);
 
 	if (accountsQuery.isLoading) {
 		return <div className="h-64 animate-pulse rounded-card border border-border bg-card" />;
@@ -117,23 +180,36 @@ export default function AdminAccountsPage() {
 				title={t("table.title")}
 				description={t("table.description")}
 				columns={columns}
-				data={accountsQuery.data}
+				data={accountsQuery.data.items}
 				searchColumnId="name"
 				searchPlaceholder={t("table.searchPlaceholder")}
 				filterConfigs={[
 					{
 						columnId: "account_type",
 						title: t("table.columns.type"),
-						options: Array.from(new Set(accountsQuery.data.map(account => account.account_type))).map(
-							accountType => ({
-								label: accountType,
-								value: accountType
-							})
-						)
+						options: (["ADMIN", "MANAGER", "AUDITOR"] as const).map(accountType => ({
+							label: accountType,
+							value: accountType
+						}))
 					}
 				]}
-				emptyMessage={t("table.emptyMessage")}
+				emptyMessage={
+					accountsQuery.data.total_count === 0 && columnFilters.length === 0
+						? t("table.emptyMessage")
+						: t("table.emptyMessage")
+				}
 				initialSorting={[{ id: "created_at", desc: true }]}
+				sortingState={sorting}
+				onSortingStateChange={setSorting}
+				columnFiltersState={columnFilters}
+				onColumnFiltersStateChange={setColumnFilters}
+				paginationState={pagination}
+				onPaginationStateChange={setPagination}
+				manualFiltering
+				manualSorting
+				manualPagination
+				rowCount={accountsQuery.data.total_count}
+				pageCount={accountsQuery.data.total_pages}
 			/>
 		</div>
 	);

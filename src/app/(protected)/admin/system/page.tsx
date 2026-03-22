@@ -4,7 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
 import { playspaceApi } from "@/lib/api/playspace";
-import { useLocalizedInstrument } from "@/lib/instrument-translations";
+import { useInstrumentSystemMetadata } from "@/lib/instrument-system-metadata";
 import { BackButton } from "@/components/dashboard/back-button";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
@@ -17,7 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 export default function AdminSystemPage() {
 	const t = useTranslations("admin.system");
 	const formatT = useTranslations("common.format");
-	const instrument = useLocalizedInstrument();
+	const instrumentMetadata = useInstrumentSystemMetadata();
 	const systemQuery = useQuery({
 		queryKey: ["playspace", "admin", "system"],
 		queryFn: () => playspaceApi.admin.system()
@@ -42,12 +42,6 @@ export default function AdminSystemPage() {
 	}
 
 	const system = systemQuery.data;
-	const totalSectionCount = instrument.sections.length;
-	const totalPreAuditQuestionCount = instrument.pre_audit_questions.length;
-	const totalSectionQuestionCount = instrument.sections.reduce((questionTotal, section) => {
-		return questionTotal + section.questions.length;
-	}, 0);
-	const totalQuestionCount = totalPreAuditQuestionCount + totalSectionQuestionCount;
 
 	return (
 		<div className="space-y-6">
@@ -70,22 +64,22 @@ export default function AdminSystemPage() {
 				/>
 				<StatCard
 					title={t("stats.auditSections.title")}
-					value={String(totalSectionCount)}
+					value={String(instrumentMetadata.totalSectionCount)}
 					helper={t("stats.auditSections.helper")}
 					tone="violet"
 				/>
 				<StatCard
 					title={t("stats.questionCount.title")}
-					value={String(totalQuestionCount)}
+					value={String(instrumentMetadata.totalQuestionCount)}
 					helper={t("stats.questionCount.helper", {
-						preAuditCount: totalPreAuditQuestionCount,
-						sectionCount: totalSectionQuestionCount
+						preAuditCount: instrumentMetadata.totalPreAuditQuestionCount,
+						sectionCount: instrumentMetadata.totalSectionQuestionCount
 					})}
 					tone="warning"
 				/>
 				<StatCard
 					title={t("stats.executionModes.title")}
-					value={String(instrument.execution_modes.length)}
+					value={String(instrumentMetadata.executionModes.length)}
 					helper={t("stats.executionModes.helper")}
 					tone="success"
 				/>
@@ -106,13 +100,13 @@ export default function AdminSystemPage() {
 							<p className="text-xs font-semibold tracking-[0.08em] text-foreground/70">
 								{t("instrumentMetadata.name")}
 							</p>
-							<p className="text-sm font-medium text-foreground">{instrument.instrument_name}</p>
+							<p className="text-sm font-medium text-foreground">{instrumentMetadata.instrumentName}</p>
 						</div>
 						<div className="space-y-1">
 							<p className="text-xs font-semibold tracking-[0.08em] text-foreground/70">
 								{t("instrumentMetadata.currentSheet")}
 							</p>
-							<p className="text-sm text-foreground">{instrument.current_sheet}</p>
+							<p className="text-sm text-foreground">{instrumentMetadata.currentSheet}</p>
 						</div>
 						<div className="space-y-1">
 							<p className="text-xs font-semibold tracking-[0.08em] text-foreground/70">
@@ -131,14 +125,14 @@ export default function AdminSystemPage() {
 					<CardContent className="space-y-4 pb-5">
 						<p className="text-sm text-muted-foreground">{t("executionCoverage.description")}</p>
 						<div className="flex flex-wrap gap-2">
-							{instrument.execution_modes.map(mode => (
+							{instrumentMetadata.executionModes.map(mode => (
 								<Badge key={mode.key} variant="outline">
 									{mode.key}
 								</Badge>
 							))}
 						</div>
 						<div className="space-y-3">
-							{instrument.execution_modes.map(mode => (
+							{instrumentMetadata.executionModes.map(mode => (
 								<div key={mode.key} className="rounded-card border border-border/70 bg-card/60 p-4">
 									<p className="font-medium text-foreground">{mode.label}</p>
 									<p className="mt-1 text-sm text-muted-foreground">{mode.description}</p>

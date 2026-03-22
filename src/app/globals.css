@@ -72,7 +72,7 @@
 	--font-body-active: var(--font-body);
 	--font-heading-active: var(--font-heading);
 	--font-code-active: var(--font-code);
-	--font-dyslexic: "OpenDyslexic", var(--font-body), sans-serif;
+	--font-dyslexic: "OpenDyslexic";
 	--canvas: #f7f1eb;
 	--surface: #fff9f4;
 	--surface-raised: #ffffff;

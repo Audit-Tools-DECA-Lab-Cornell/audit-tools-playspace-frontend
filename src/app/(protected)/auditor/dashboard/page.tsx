@@ -22,15 +22,19 @@ export default function AuditorDashboardPage() {
 	const t = useTranslations("auditor.dashboard");
 	const formatT = useTranslations("common.format");
 	const placesQuery = useQuery({
-		queryKey: ["playspace", "auditor", "assignedPlaces"],
-		queryFn: () => playspaceApi.auditor.assignedPlaces()
+		queryKey: ["playspace", "auditor", "assignedPlaces", "dashboardPreview"],
+		queryFn: () =>
+			playspaceApi.auditor.assignedPlaces({
+				page: 1,
+				pageSize: 5,
+				sort: "place_name"
+			})
 	});
 	const summaryQuery = useQuery({
 		queryKey: ["playspace", "auditor", "dashboardSummary"],
 		queryFn: () => playspaceApi.auditor.dashboardSummary()
 	});
-	const places = placesQuery.data ?? [];
-	const featuredPlaces = places.slice(0, 5);
+	const places = placesQuery.data?.items ?? [];
 
 	if (placesQuery.isLoading || summaryQuery.isLoading) {
 		return (
@@ -113,7 +117,7 @@ export default function AuditorDashboardPage() {
 					{places.length === 0 ? (
 						<p className="text-sm text-muted-foreground">{t("assignedPlaces.empty")}</p>
 					) : null}
-					{featuredPlaces.map(place => {
+					{places.map(place => {
 						const actionHref = `/auditor/execute/${encodeURIComponent(place.place_id)}`;
 						const reportHref =
 							place.audit_id !== null
@@ -152,7 +156,7 @@ export default function AuditorDashboardPage() {
 							</div>
 						);
 					})}
-					{places.length > featuredPlaces.length ? (
+					{placesQuery.data.total_count > places.length ? (
 						<div className="border-t border-border pt-4">
 							<Button asChild variant="outline">
 								<Link href="/auditor/places">{t("assignedPlaces.viewAll")}</Link>

@@ -38,13 +38,6 @@ interface AssignmentFieldErrors {
 	roles?: string;
 }
 
-interface AssignmentPlaceOption {
-	readonly id: string;
-	readonly name: string;
-	readonly projectId: string;
-	readonly projectName: string;
-}
-
 interface PendingAssignmentDelete {
 	readonly id: string;
 	readonly scopeLabel: string;
@@ -130,30 +123,6 @@ export default function ManagerAssignmentsPage() {
 				throw new Error(t("errors.accountContextUnavailable"));
 			}
 			return playspaceApi.accounts.projects(accountId);
-		},
-		enabled: accountId !== null
-	});
-	const allPlacesQuery = useQuery({
-		queryKey: ["playspace", "manager", "assignments", "places", accountId],
-		queryFn: async (): Promise<AssignmentPlaceOption[]> => {
-			if (!accountId) {
-				throw new Error(t("errors.accountContextUnavailable"));
-			}
-
-			const projects = await playspaceApi.accounts.projects(accountId);
-			const placesByProject = await Promise.all(
-				projects.map(async project => {
-					const places = await playspaceApi.projects.places(project.id);
-					return places.map(place => ({
-						id: place.id,
-						name: place.name,
-						projectId: project.id,
-						projectName: project.name
-					}));
-				})
-			);
-
-			return placesByProject.flat();
 		},
 		enabled: accountId !== null
 	});
@@ -253,16 +222,6 @@ export default function ManagerAssignmentsPage() {
 		});
 	}, [auditorSearchQuery, auditors]);
 
-	const projectNameById = React.useMemo(() => {
-		const projectRows = projectsQuery.data ?? [];
-		return new Map(projectRows.map(project => [project.id, project.name]));
-	}, [projectsQuery.data]);
-
-	const placeById = React.useMemo(() => {
-		const placeRows = allPlacesQuery.data ?? [];
-		return new Map(placeRows.map(place => [place.id, place]));
-	}, [allPlacesQuery.data]);
-
 	if (!accountId) {
 		return (
 			<div className="space-y-6">
@@ -284,7 +243,7 @@ export default function ManagerAssignmentsPage() {
 		);
 	}
 
-	if (auditorsQuery.isLoading || projectsQuery.isLoading || allPlacesQuery.isLoading) {
+	if (auditorsQuery.isLoading || projectsQuery.isLoading) {
 		return (
 			<div className="space-y-6">
 				<DashboardHeader
@@ -302,8 +261,8 @@ export default function ManagerAssignmentsPage() {
 		);
 	}
 
-	if (auditorsQuery.isError || projectsQuery.isError || allPlacesQuery.isError) {
-		const error = auditorsQuery.error ?? projectsQuery.error ?? allPlacesQuery.error;
+	if (auditorsQuery.isError || projectsQuery.isError) {
+		const error = auditorsQuery.error ?? projectsQuery.error;
 
 		return (
 			<EmptyState
@@ -582,24 +541,13 @@ export default function ManagerAssignmentsPage() {
 						</div>
 					) : (
 						assignments.map(assignment => {
-							const assignedPlace = assignment.place_id
-								? (placeById.get(assignment.place_id) ?? null)
-								: null;
-							const assignedProjectName =
-								assignment.project_id !== null
-									? (projectNameById.get(assignment.project_id) ??
-										t("assignment.projectFallback", { id: assignment.project_id.slice(0, 8) }))
-									: (assignedPlace?.projectName ?? t("assignment.projectPending"));
-							const scopeName =
-								assignedPlace?.name ??
-								(assignment.project_id !== null
-									? (projectNameById.get(assignment.project_id) ??
-										t("assignment.projectFallback", { id: assignment.project_id.slice(0, 8) }))
-									: t("assignment.assignmentFallback", { id: assignment.id.slice(0, 8) }));
-							const scopeLabel = assignedPlace
-								? t("assignment.placeScope")
-								: t("assignment.projectScope");
-							const deleteScopeLabel = assignedPlace ? t("assignment.place") : t("assignment.project");
+							const scopeName = assignment.scope_name;
+							const scopeLabel =
+								assignment.scope_type === "place"
+									? t("assignment.placeScope")
+									: t("assignment.projectScope");
+							const deleteScopeLabel =
+								assignment.scope_type === "place" ? t("assignment.place") : t("assignment.project");
 							const scopeHref =
 								assignment.place_id !== null
 									? `/manager/places/${encodeURIComponent(assignment.place_id)}`
@@ -614,7 +562,9 @@ export default function ManagerAssignmentsPage() {
 									<div className="space-y-1">
 										<p className="font-medium text-foreground">{scopeName}</p>
 										<p className="text-xs text-muted-foreground">
-											{assignedPlace ? `${assignedProjectName} · ${scopeLabel}` : scopeLabel}
+											{assignment.scope_type === "place"
+												? `${assignment.project_name} · ${scopeLabel}`
+												: scopeLabel}
 										</p>
 										<p className="text-xs text-muted-foreground">
 											{t("assignment.assignedAt", {
@@ -634,7 +584,7 @@ export default function ManagerAssignmentsPage() {
 										{scopeHref ? (
 											<Button asChild type="button" variant="outline">
 												<Link href={scopeHref}>
-													{assignedPlace
+													{assignment.scope_type === "place"
 														? t("assignment.openPlace")
 														: t("assignment.openProject")}
 												</Link>
