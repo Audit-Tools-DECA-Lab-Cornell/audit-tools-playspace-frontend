@@ -364,7 +364,9 @@ export default function ManagerPlacesPage() {
 					}
 				]}
 				emptyMessage={
-					placesQuery.data.total_count === 0 ? t("table.emptyState.noPlaces") : t("table.emptyState.noMatches")
+					placesQuery.data.total_count === 0
+						? t("table.emptyState.noPlaces")
+						: t("table.emptyState.noMatches")
 				}
 				initialSorting={[{ id: "last_audited_at", desc: true }]}
 				sortingState={sorting}

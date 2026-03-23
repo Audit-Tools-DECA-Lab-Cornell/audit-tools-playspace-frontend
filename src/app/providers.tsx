@@ -15,11 +15,7 @@ export interface ProvidersProps {
 /**
  * App-wide client providers (React Query, etc.).
  */
-export function Providers({
-	children,
-	initialLanguagePreference,
-	initialResolvedLanguage
-}: Readonly<ProvidersProps>) {
+export function Providers({ children, initialLanguagePreference, initialResolvedLanguage }: Readonly<ProvidersProps>) {
 	const [queryClient] = React.useState(() => {
 		return new QueryClient({
 			defaultOptions: {

@@ -36,7 +36,9 @@ function OverviewPanels({
 					{account.primary_manager ? (
 						<>
 							<div className="space-y-1">
-								<p className="text-lg font-medium text-foreground">{account.primary_manager.full_name}</p>
+								<p className="text-lg font-medium text-foreground">
+									{account.primary_manager.full_name}
+								</p>
 								<p className="text-sm text-muted-foreground">
 									{account.primary_manager.position ?? t("primaryManager.positionPending")}
 								</p>

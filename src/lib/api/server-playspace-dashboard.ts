@@ -137,10 +137,7 @@ function getErrorMessage(payload: unknown, fallbackMessage: string): string {
 	return fallbackMessage;
 }
 
-async function fetchServerValidatedJson<TValue>(
-	path: string,
-	schema: z.ZodType<TValue>
-): Promise<TValue> {
+async function fetchServerValidatedJson<TValue>(path: string, schema: z.ZodType<TValue>): Promise<TValue> {
 	const session = await getServerAuthSession();
 	if (!session) {
 		throw new Error("Authenticated session required.");
@@ -182,9 +179,7 @@ export type ServerAdminDashboardData = Readonly<{
 /**
  * Fetch the manager dashboard payloads on the server so the page can render without a client-side request waterfall.
  */
-export async function getServerManagerDashboardData(
-	accountId: string
-): Promise<ServerManagerDashboardData> {
+export async function getServerManagerDashboardData(accountId: string): Promise<ServerManagerDashboardData> {
 	const [account, managerProfiles, projects, auditors] = await Promise.all([
 		fetchServerValidatedJson(`/playspace/accounts/${encodeURIComponent(accountId)}`, accountDetailSchema),
 		fetchServerValidatedJson(

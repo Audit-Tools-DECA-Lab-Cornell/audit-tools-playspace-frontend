@@ -175,7 +175,9 @@ export default function ManagerAuditsPage() {
 		score: audit.summary_score
 	}));
 	const meanScore =
-		auditsQuery.data.summary.average_score !== null ? `${auditsQuery.data.summary.average_score}` : formatT("pending");
+		auditsQuery.data.summary.average_score !== null
+			? `${auditsQuery.data.summary.average_score}`
+			: formatT("pending");
 
 	return (
 		<div className="space-y-6">
@@ -234,7 +236,9 @@ export default function ManagerAuditsPage() {
 				title={t("table.title")}
 				description={t("table.description")}
 				emptyMessage={
-					auditsQuery.data.total_count === 0 ? t("table.emptyState.noAudits") : t("table.emptyState.noMatches")
+					auditsQuery.data.total_count === 0
+						? t("table.emptyState.noAudits")
+						: t("table.emptyState.noMatches")
 				}
 				sortingState={sorting}
 				onSortingStateChange={setSorting}

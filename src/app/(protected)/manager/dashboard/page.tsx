@@ -9,9 +9,7 @@ export default async function ManagerDashboardPage() {
 		return <ManagerDashboardClient errorMessage="Manager account context is unavailable." />;
 	}
 
-	let dashboardData:
-		| Awaited<ReturnType<typeof getServerManagerDashboardData>>
-		| null = null;
+	let dashboardData: Awaited<ReturnType<typeof getServerManagerDashboardData>> | null = null;
 	let errorMessage: string | null = null;
 	try {
 		dashboardData = await getServerManagerDashboardData(session.accountId);

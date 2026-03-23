@@ -44,9 +44,7 @@ export default async function RootLayout({
 		<html lang={locale} suppressHydrationWarning>
 			<body className={`${bodyFont.variable} ${headingFont.variable} ${monoFont.variable} antialiased`}>
 				<NextIntlClientProvider locale={locale} messages={messages}>
-					<Providers
-						initialLanguagePreference={preference}
-						initialResolvedLanguage={locale}>
+					<Providers initialLanguagePreference={preference} initialResolvedLanguage={locale}>
 						{children}
 					</Providers>
 				</NextIntlClientProvider>

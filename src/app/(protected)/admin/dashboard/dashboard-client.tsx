@@ -18,11 +18,7 @@ export interface AdminDashboardClientProps {
 	errorMessage?: string | null;
 }
 
-export function AdminDashboardClient({
-	overview,
-	latestAudits,
-	errorMessage
-}: Readonly<AdminDashboardClientProps>) {
+export function AdminDashboardClient({ overview, latestAudits, errorMessage }: Readonly<AdminDashboardClientProps>) {
 	const t = useTranslations("admin.dashboard");
 
 	if (!overview || !latestAudits) {

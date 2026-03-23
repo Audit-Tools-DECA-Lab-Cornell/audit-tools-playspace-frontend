@@ -28,10 +28,7 @@ export async function getRequestLanguageState(): Promise<RequestLanguageState> {
 	const headerStore = await headers();
 	const rawPreference = cookieStore.get(LOCALE_PREFERENCE_COOKIE_NAME)?.value ?? "system";
 	const languagePreference = isLanguagePreference(rawPreference) ? rawPreference : "system";
-	const locale = resolveLanguagePreference(
-		languagePreference,
-		headerStore.get("accept-language")
-	);
+	const locale = resolveLanguagePreference(languagePreference, headerStore.get("accept-language"));
 
 	return {
 		locale,

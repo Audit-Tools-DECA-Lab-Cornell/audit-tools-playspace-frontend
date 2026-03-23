@@ -118,12 +118,12 @@ function readStoredPreferences(fallbackPreferences: PreferencesState): Preferenc
 		const result = preferencesSchema.safeParse(parsedValue);
 		return result.success
 			? {
-				themeMode: result.data.themeMode,
-				languagePreference: result.data.languagePreference,
-				fontScale: clampFontScale(result.data.fontScale),
-				highContrast: result.data.highContrast,
-				dyslexicFont: result.data.dyslexicFont
-			}
+					themeMode: result.data.themeMode,
+					languagePreference: result.data.languagePreference,
+					fontScale: clampFontScale(result.data.fontScale),
+					highContrast: result.data.highContrast,
+					dyslexicFont: result.data.dyslexicFont
+				}
 			: fallbackPreferences;
 	} catch {
 		return fallbackPreferences;
@@ -209,9 +209,7 @@ export function PreferencesProvider({
 	React.useEffect(() => {
 		const nextSystemTheme = getSystemTheme();
 		setSystemTheme(nextSystemTheme);
-		setSystemLanguage(
-			resolveSupportedLanguage(globalThis.window?.navigator.language ?? initialResolvedLanguage)
-		);
+		setSystemLanguage(resolveSupportedLanguage(globalThis.window?.navigator.language ?? initialResolvedLanguage));
 		setPreferences(readStoredPreferences(initialPreferences));
 		setIsHydrated(true);
 

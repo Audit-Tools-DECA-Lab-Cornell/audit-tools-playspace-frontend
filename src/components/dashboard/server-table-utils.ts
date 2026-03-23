@@ -5,10 +5,7 @@ import type { ColumnFiltersState, SortingState } from "@tanstack/react-table";
 /**
  * Read a text filter value from TanStack column filter state.
  */
-export function getTextColumnFilterValue(
-	columnFilters: Readonly<ColumnFiltersState>,
-	columnId: string
-): string {
+export function getTextColumnFilterValue(columnFilters: Readonly<ColumnFiltersState>, columnId: string): string {
 	const matchedFilter = columnFilters.find(filter => filter.id === columnId);
 	return typeof matchedFilter?.value === "string" ? matchedFilter.value : "";
 }
@@ -16,10 +13,7 @@ export function getTextColumnFilterValue(
 /**
  * Read a multi-select filter value from TanStack column filter state.
  */
-export function getMultiValueColumnFilter(
-	columnFilters: Readonly<ColumnFiltersState>,
-	columnId: string
-): string[] {
+export function getMultiValueColumnFilter(columnFilters: Readonly<ColumnFiltersState>, columnId: string): string[] {
 	const matchedFilter = columnFilters.find(filter => filter.id === columnId);
 	if (!Array.isArray(matchedFilter?.value)) {
 		return [];

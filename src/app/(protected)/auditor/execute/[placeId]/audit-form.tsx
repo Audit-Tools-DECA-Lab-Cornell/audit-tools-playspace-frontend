@@ -159,12 +159,11 @@ function buildIncrementalDraftPatch(previous: AuditDraftPatch, current: AuditDra
 		})
 	);
 	const metaChanged = JSON.stringify(current.meta ?? null) !== JSON.stringify(previous.meta ?? null);
-	const preAuditChanged =
-		JSON.stringify(current.pre_audit ?? null) !== JSON.stringify(previous.pre_audit ?? null);
+	const preAuditChanged = JSON.stringify(current.pre_audit ?? null) !== JSON.stringify(previous.pre_audit ?? null);
 
 	return {
-		meta: metaChanged ? current.meta ?? null : undefined,
-		pre_audit: preAuditChanged ? current.pre_audit ?? null : undefined,
+		meta: metaChanged ? (current.meta ?? null) : undefined,
+		pre_audit: preAuditChanged ? (current.pre_audit ?? null) : undefined,
 		sections: changedSections
 	};
 }
@@ -269,11 +268,7 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 	}, [createOrResumeQuery.data, instrument]);
 
 	const patchDraft = useMutation({
-		mutationFn: async (input: {
-			auditId: string;
-			patch: AuditDraftPatch;
-			fullPatch: AuditDraftPatch;
-		}) =>
+		mutationFn: async (input: { auditId: string; patch: AuditDraftPatch; fullPatch: AuditDraftPatch }) =>
 			playspaceApi.auditor.patchAuditDraft(input.auditId, input.patch),
 		onSuccess: (saveResult, variables) => {
 			const syncedPatchJson = JSON.stringify(variables.fullPatch);

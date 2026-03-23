@@ -54,7 +54,7 @@ export function setBrowserAuthSession(input: {
 	role: UserRole;
 	accessToken: string;
 	accountId?: string | null;
-	auditorCode?: string;
+	auditorCode?: string | null;
 }) {
 	// 8 hours
 	const maxAgeSeconds = 60 * 60 * 8;

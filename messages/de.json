@@ -1,1431 +1,1431 @@
 {
-    "metadata": {
-        "title": "Playspace Audit Tool",
-        "description": "Playspace Play Value- und Usability-Audit-Tool"
-    },
-    "common": {
-        "roles": {
-            "administrator": "Administrator",
-            "manager": "Manager",
-            "auditor": "Prüfer"
-        },
-        "workspace": {
-            "administrator": "Administrator-Arbeitsbereich",
-            "manager": "Manager-Arbeitsbereich",
-            "auditor": "Prüfer-Arbeitsbereich"
-        },
-        "format": {
-            "notSet": "Nicht festgelegt",
-            "noRecentActivity": "Keine kürzliche Aktivität",
-            "pending": "Ausstehend",
-            "locationPending": "Ort ausstehend",
-            "datesPending": "Termine ausstehend",
-            "starts": "Beginnt {date}",
-            "ends": "Endet {date}"
-        }
-    },
-    "shell": {
-        "productName": "Playspace Audit Tool",
-        "productTagline": "Spielwert & Nutzbarkeit",
-        "workspaceLabel": "Arbeitsbereich",
-        "openMenu": "Menü öffnen",
-        "navigationTitle": "Navigation",
-        "mobileBrand": "Playspace",
-        "navigation": {
-            "dashboard": "Dashboard",
-            "accounts": "Konten",
-            "projects": "Projekte",
-            "places": "Orte",
-            "auditors": "Prüfer",
-            "audits": "Audits",
-            "system": "System",
-            "settings": "Einstellungen",
-            "assignments": "Zuweisungen",
-            "reports": "Berichte"
-        },
-        "userMenu": {
-            "auditorWithCode": "Prüfer ({code})",
-            "accountLabel": "Konto",
-            "settings": "Einstellungen",
-            "signOut": "Abmelden"
-        }
-    },
-    "shared": {
-        "dialog": {
-            "close": "Schließen"
-        },
-        "sheet": {
-            "close": "Schließen"
-        },
-        "confirmDialog": {
-            "cancel": "Abbrechen"
-        },
-        "pagination": {
-            "showing": "Angezeigt werden {start}-{end} von {total} {itemLabel}",
-            "previous": "Zurück",
-            "next": "Weiter",
-            "page": "Seite {current} von {total}"
-        },
-        "entityRowActions": {
-            "label": "Aktionen"
-        }
-    },
-    "tables": {
-        "shared": {
-            "emptyMessage": "Keine Ergebnisse gefunden.",
-            "toolbar": {
-                "searchPlaceholder": "Datensätze suchen...",
-                "reset": "Zurücksetzen",
-                "columns": "Spalten",
-                "toggleColumns": "Spalten ein-/ausblenden"
-            },
-            "pagination": {
-                "showing": "Zeige Ergebnisse {start} bis {end} von {total}",
-                "rowsPerPage": "Zeilen pro Seite",
-                "page": "Seite {current} von {total}"
-            }
-        },
-        "audits": {
-            "title": "Audit-Aktivität",
-            "description": "Überprüfen Sie Audit-Fortschritt, Herkunft, Aktualität und Score-Ausgabe.",
-            "emptyMessage": "Keine Audit-Aktivitäten entsprechen den aktuellen Filtern.",
-            "searchPlaceholder": "Audits suchen...",
-            "copyAuditCode": "Audit-Code {auditCode} kopieren",
-            "copied": "Kopiert",
-            "copyId": "ID kopieren",
-            "auditorLabel": "Prüfer",
-            "columns": {
-                "audit": "Audit",
-                "status": "Status",
-                "started": "Gestartet",
-                "submitted": "Eingereicht",
-                "score": "Punktzahl"
-            },
-            "status": {
-                "submitted": "eingereicht",
-                "in_progress": "in Bearbeitung",
-                "paused": "pausiert"
-            }
-        },
-        "auditors": {
-            "title": "Prüfer",
-            "description": "Überprüfen Sie Identität, Zuweisungslast und aktuelle Aktivität.",
-            "emptyMessage": "Keine Prüfer entsprechen den aktuellen Filtern.",
-            "searchPlaceholder": "Prüfer suchen...",
-            "emailPending": "E-Mail ausstehend",
-            "rolePending": "Rolle ausstehend",
-            "columns": {
-                "auditor": "Prüfer",
-                "role": "Rolle",
-                "assignments": "Zuweisungen",
-                "completed": "Abgeschlossen",
-                "lastActive": "Zuletzt aktiv"
-            }
-        },
-        "projects": {
-            "title": "Projekte",
-            "description": "Verfolgen Sie Umfang, Betriebsstatus und Umsetzungsqualität von Projekten.",
-            "emptyMessage": "Keine Projekte entsprechen den aktuellen Filtern.",
-            "searchPlaceholder": "Projekte suchen...",
-            "overviewPending": "Übersicht ausstehend.",
-            "notSpecified": "Nicht angegeben",
-            "coverage": {
-                "places": "{count} Orte",
-                "auditors": "{count} Auditoren"
-            },
-            "columns": {
-                "project": "Projekt",
-                "placeTypes": "Orte-Typen",
-                "status": "Status",
-                "dates": "Daten",
-                "coverage": "Abdeckung",
-                "meanScore": "Durchschnittswert"
-            },
-            "status": {
-                "planned": "geplant",
-                "active": "aktiv",
-                "completed": "abgeschlossen"
-            }
-        },
-        "places": {
-            "title": "Orte",
-            "description": "Überwachen Sie den Status von Orten, den Audit-Durchsatz und die Aktualität auf einen Blick.",
-            "emptyMessage": "Keine Orte entsprechen den aktuellen Filtern.",
-            "searchPlaceholder": "Orte suchen...",
-            "typePending": "Typ ausstehend",
-            "columns": {
-                "place": "Ort",
-                "type": "Typ",
-                "status": "Status",
-                "audits": "Audits",
-                "meanScore": "Durchschnittswert",
-                "lastAudited": "Zuletzt auditiert"
-            },
-            "status": {
-                "submitted": "eingereicht",
-                "in_progress": "in Bearbeitung",
-                "not_started": "nicht begonnen"
-            }
-        }
-    },
-    "admin": {
-        "dashboard": {
-            "error": {
-                "title": "Administrator-Dashboard nicht verfügbar",
-                "description": "Aktualisieren Sie diese Seite, um es erneut zu versuchen. Wenn das Problem weiterhin besteht, überprüfen Sie den Administrator-Anmeldekontekt und öffnen Sie das Dashboard erneut.",
-                "retry": "Erneut versuchen"
-            },
-            "header": {
-                "eyebrow": "Administrator-Arbeitsbereich",
-                "title": "Plattformübersicht",
-                "description": "Globale Sicht auf Konten, Projekte, Orte, Auditoren und den Audit-Status.",
-                "actions": {
-                    "accounts": "Konten",
-                    "audits": "Audits"
-                }
-            },
-            "stats": {
-                "accounts": {
-                    "title": "Konten",
-                    "helper": "Registrierte Arbeitsbereichskonten."
-                },
-                "projects": {
-                    "title": "Projekte",
-                    "helper": "Verfolgte Programme über alle Konten hinweg."
-                },
-                "places": {
-                    "title": "Orte",
-                    "helper": "Aktive Prüfstandorte in der Plattform."
-                },
-                "auditors": {
-                    "title": "Prüfer",
-                    "helper": "Profile mit Zugriff auf die Vor-Ort-Durchführung."
-                },
-                "audits": {
-                    "title": "Audits",
-                    "helper": "Alle auf der Plattform erfassten Audit-Sitzungen."
-                },
-                "submitted": {
-                    "title": "Eingereicht",
-                    "helper": "Abgeschlossene Sitzungen mit Bewertung."
-                },
-                "inProgress": {
-                    "title": "In Bearbeitung",
-                    "helper": "Sitzungen, an denen noch gearbeitet wird."
-                }
-            },
-            "latestAudits": {
-                "title": "Neueste Audits",
-                "empty": "Aktuelle Audit-Aktivitäten werden hier angezeigt, sobald Konten mit dem Einreichen von Sitzungen beginnen.",
-                "auditorLabel": "Prüfer"
-            },
-            "status": {
-                "submitted": "eingereicht",
-                "in_progress": "in Bearbeitung",
-                "paused": "pausiert"
-            }
-        },
-        "accounts": {
-            "error": {
-                "title": "Konten nicht verfügbar",
-                "description": "Laden Sie diese Seite neu, um es erneut zu versuchen. Wenn das Problem weiterhin besteht, öffnen Sie das Administrator-Dashboard erneut und versuchen Sie es noch einmal.",
-                "retry": "Erneut versuchen"
-            },
-            "header": {
-                "eyebrow": "Administrator-Arbeitsbereich",
-                "title": "Konten",
-                "description": "Globales Kontenverzeichnis mit maskierten E-Mail-Adressen und Entitätsanzahlen zum Schutz der Privatsphäre."
-            },
-            "breadcrumbs": {
-                "dashboard": "Dashboard",
-                "accounts": "Konten"
-            },
-            "table": {
-                "title": "Kontenverzeichnis",
-                "description": "Suchen und vergleichen Sie den Umfang von Konten mithilfe datenschutzsicherer Kennungen und Zählwerte.",
-                "searchPlaceholder": "Konten suchen...",
-                "emptyMessage": "Keine Konten entsprechen den aktuellen Filtern.",
-                "emailHidden": "E-Mail verborgen",
-                "columns": {
-                    "account": "Konto",
-                    "type": "Typ",
-                    "projects": "Programme",
-                    "places": "Orte",
-                    "auditors": "Prüfer",
-                    "created": "Erstellt"
-                }
-            }
-        },
-        "auditors": {
-            "error": {
-                "title": "Prüfer nicht verfügbar",
-                "description": "Laden Sie diese Seite neu, um es erneut zu versuchen. Wenn das Problem weiterhin besteht, kehren Sie zum Administrator-Dashboard zurück und öffnen Sie die Prüfer erneut.",
-                "retry": "Erneut versuchen"
-            },
-            "header": {
-                "eyebrow": "Administrator-Arbeitsbereich",
-                "title": "Prüfer",
-                "description": "Datenschutzsichere globale Prüferliste anhand von Prüfercodes."
-            },
-            "breadcrumbs": {
-                "dashboard": "Dashboard",
-                "auditors": "Prüfer"
-            },
-            "table": {
-                "title": "Globale Prüferliste",
-                "description": "Datenschutzsichere Transparenz über Einsatzzuweisungen und Lieferergebnisse hinweg.",
-                "searchPlaceholder": "Prüfer suchen...",
-                "emptyMessage": "Keine Prüfer entsprechen den aktuellen Filtern.",
-                "emailHidden": "E-Mail ausgeblendet",
-                "columns": {
-                    "auditor": "Prüfer",
-                    "assignments": "Zuweisungen",
-                    "completed": "Abgeschlossen",
-                    "lastActive": "Zuletzt aktiv"
-                }
-            }
-        },
-        "projects": {
-            "error": {
-                "title": "Projekte nicht verfügbar",
-                "description": "Laden Sie diese Seite neu, um es erneut zu versuchen. Wenn das Problem weiterhin besteht, kehren Sie zum Administrator-Dashboard zurück und öffnen Sie die Projekte erneut.",
-                "retry": "Erneut versuchen"
-            },
-            "header": {
-                "eyebrow": "Administrator-Arbeitsbereich",
-                "title": "Projekte",
-                "description": "Projektkatalog für mehrere Konten mit Kennzahlen zu Abdeckung und Ergebnissen."
-            },
-            "breadcrumbs": {
-                "dashboard": "Dashboard",
-                "projects": "Projekte"
-            },
-            "table": {
-                "title": "Projektkatalog",
-                "description": "Prüfen Sie Projektumfang, Personalbesetzung und Bewertungen kontoübergreifend auf Unternehmensebene.",
-                "searchPlaceholder": "Projekte suchen...",
-                "emptyMessage": "Keine Projekte entsprechen den aktuellen Filtern.",
-                "columns": {
-                    "project": "Projekt",
-                    "dates": "Daten",
-                    "places": "Orte",
-                    "auditors": "Prüfer",
-                    "completed": "Abgeschlossen",
-                    "meanScore": "Durchschnittswert"
-                }
-            }
-        },
-        "places": {
-            "error": {
-                "title": "Orte nicht verfügbar",
-                "description": "Laden Sie diese Seite neu, um es erneut zu versuchen. Wenn das Problem weiterhin besteht, kehren Sie zum Administrator-Dashboard zurück und öffnen Sie die Orte erneut.",
-                "retry": "Erneut versuchen"
-            },
-            "header": {
-                "eyebrow": "Administrator-Arbeitsbereich",
-                "title": "Orte",
-                "description": "Ortsbestand für mehrere Konten mit aggregiertem Prüfungsdurchsatz."
-            },
-            "breadcrumbs": {
-                "dashboard": "Dashboard",
-                "places": "Orte"
-            },
-            "table": {
-                "title": "Ortsbestand",
-                "description": "Audit-Durchsatz und letzte Aktivität für jeden erfassten Ort.",
-                "searchPlaceholder": "Orte suchen...",
-                "emptyMessage": "Keine Orte entsprechen den aktuellen Filtern.",
-                "columns": {
-                    "place": "Ort",
-                    "completed": "Abgeschlossen",
-                    "meanScore": "Durchschnittswert",
-                    "latestAudit": "Letztes Audit"
-                }
-            }
-        },
-        "audits": {
-            "error": {
-                "title": "Audits nicht verfügbar",
-                "description": "Aktualisieren Sie diese Seite, um es erneut zu versuchen. Wenn das Problem weiterhin besteht, kehren Sie zum Administrator-Dashboard zurück und öffnen Sie Audits erneut.",
-                "retry": "Erneut versuchen"
-            },
-            "header": {
-                "eyebrow": "Administrator-Arbeitsbereich",
-                "title": "Audits",
-                "description": "Globaler Aktivitäts-Feed für Audits mit Konten-/Projekt-/Ortszuordnung."
-            },
-            "breadcrumbs": {
-                "dashboard": "Dashboard",
-                "audits": "Audits"
-            },
-            "table": {
-                "title": "Audit-Aktivität",
-                "description": "Überwachen Sie den auditweiten Durchsatz, die Zuordnung und den Zustellstatus der Plattform.",
-                "emptyMessage": "Keine Audits entsprechen den aktuellen Filtern."
-            }
-        },
-        "system": {
-            "error": {
-                "title": "Systemmetadaten nicht verfügbar",
-                "description": "Aktualisieren Sie diese Seite, um es erneut zu versuchen. Wenn das Problem weiterhin besteht, kehren Sie zum Administrator-Dashboard zurück und öffnen Sie die Systemmetadaten erneut.",
-                "retry": "Erneut versuchen"
-            },
-            "header": {
-                "eyebrow": "Administrator-Arbeitsbereich",
-                "title": "Systemmetadaten",
-                "description": "Laufzeitmetadaten und Instrument-Versionierung für die Audit-Plattform.",
-                "back": "Zurück zum Dashboard"
-            },
-            "breadcrumbs": {
-                "dashboard": "Dashboard",
-                "system": "System"
-            },
-            "stats": {
-                "instrumentVersion": {
-                    "title": "Instrumentenversion",
-                    "helper": "Aktuelle Version, die für Auditsitzungen bereitgestellt wird."
-                },
-                "auditSections": {
-                    "title": "Audit-Abschnitte",
-                    "helper": "Strukturierte Bereiche im Kerninstrument."
-                },
-                "questionCount": {
-                    "title": "Anzahl der Fragen",
-                    "helper": "{preAuditCount} Vor-Audit-Abfragen und {sectionCount} Abschnittsfragen."
-                },
-                "executionModes": {
-                    "title": "Ausführungsmodi",
-                    "helper": "Unterstützte Kombinationen aus Vor-Ort- und Umfrage-Workflows."
-                }
-            },
-            "instrumentMetadata": {
-                "title": "Instrumentenmetadaten",
-                "key": "Schlüssel",
-                "name": "Name",
-                "currentSheet": "Aktuelles Blatt",
-                "generated": "Generiert"
-            },
-            "executionCoverage": {
-                "title": "Ausführungserfassung",
-                "description": "Die Plattform unterstützt derzeit separate Prüfungsabläufe für Vor-Ort-, Survey- und kombinierte Audits. Diese Modi steuern, welche Abschnitte während der Ausführung freigeschaltet werden."
-            }
-        }
-    },
-    "login": {
-        "validation": {
-            "auditorCodeAlphanumeric": "Der Auditor-Code muss alphanumerisch sein.",
-            "auditorCodeInvalid": "Der Auditor-Code ist ungültig."
-        },
-        "fields": {
-            "email": "E-Mail",
-            "password": "Passwort",
-            "auditorCode": "Auditor-Code"
-        },
-        "actions": {
-            "signIn": "Anmelden",
-            "continue": "Weiter"
-        },
-        "admin": {
-            "title": "Anmeldung für Administratoren",
-            "description": "Überblick über alle Konten, Projekte, Orte und Audit-Aktivitäten.",
-            "emailPlaceholder": "admin@company.com",
-            "demoLabel": "Demo-Administrator:"
-        },
-        "manager": {
-            "title": "Anmeldung für Manager",
-            "description": "Dashboard mit vollem Zugriff: Projekte, Orte, Auditoren und kombinierte Scores.",
-            "emailPlaceholder": "manager@company.com",
-            "demoLabel": "Demo-Manager:",
-            "demoOr": "oder"
-        },
-        "auditor": {
-            "title": "Anmeldung für Auditoren",
-            "description": "Eingeschränkter Zugriff: Führen Sie zugewiesene Audits mit Ihrem Auditor-Code aus.",
-            "codePlaceholder": "A1B2C3",
-            "note": "Auditoren werden ausschließlich über den Code identifiziert. In der Benutzeroberfläche werden keine echten Namen angezeigt.",
-            "demoLabel": "Demo-Codes testen:"
-        }
-    },
-    "manager": {
-        "dashboard": {
-            "errors": {
-                "accountContextUnavailable": "Der Kontokontext des Managers ist nicht verfügbar.",
-                "loadFailed": "Beim Laden des Dashboards ist ein Fehler aufgetreten."
-            },
-            "emptyState": {
-                "title": "Dashboard nicht verfügbar",
-                "missingAccount": "Der Kontokontext des Managers fehlt in der aktuellen Sitzung."
-            },
-            "actions": {
-                "tryAgain": "Erneut versuchen"
-            },
-            "header": {
-                "eyebrow": "Manager-Dashboard",
-                "description": "Geteilte Kontenansicht über Projekte, Orte, Auditoren und aktuelle Einreichungen hinweg.",
-                "viewProjects": "Projekte anzeigen"
-            },
-            "stats": {
-                "projects": {
-                    "title": "Projekte",
-                    "helper": "Aktive und geplante Projekte in diesem Konto."
-                },
-                "places": {
-                    "title": "Orte",
-                    "helper": "Gesamtzahl der mit diesen Projekten verbundenen Orte."
-                },
-                "auditors": {
-                    "title": "Auditoren",
-                    "helper": "Aktuell diesem Konto zugewiesene Auditoren."
-                },
-                "completedAudits": {
-                    "title": "Abgeschlossene Audits",
-                    "helper": "Eingereichte Audits zur Prüfung und Berichterstellung."
-                }
-            },
-            "overview": {
-                "primaryManager": {
-                    "title": "Hauptmanager",
-                    "positionPending": "Position noch ausstehend",
-                    "phonePending": "Telefon noch ausstehend",
-                    "accountEmail": "Kontoe-Mail: {email}",
-                    "empty": "Es wurde noch kein Profil des primären Managers hinzugefügt."
-                },
-                "teamSnapshot": {
-                    "title": "Team-Übersicht",
-                    "managerCount": "{count} Manager",
-                    "auditorCount": "{count} Prüfer",
-                    "positionPending": "Position noch ausstehend",
-                    "primary": "Primär",
-                    "manager": "Manager"
-                }
-            },
-            "tabs": {
-                "projects": "Projekte",
-                "auditors": "Prüfer",
-                "description": "Konzentrieren Sie sich hier auf die Zeilen mit den wichtigsten Signalen und öffnen Sie dann die vollständigen Arbeitslisten, wenn Sie mehr Details benötigen."
-            },
-            "projectOverview": {
-                "title": "Projektübersicht",
-                "description": "Projekte mit den wichtigsten Signalen für die tägliche Überwachung.",
-                "viewAll": "Alle Projekte anzeigen",
-                "emptyTitle": "Noch keine Projekte",
-                "emptyDescription": "Projekte werden hier angezeigt, sobald das Team beginnt, Audit-Workstreams zu erstellen.",
-                "openProjects": "Projekte öffnen"
-            },
-            "auditorOverview": {
-                "title": "Zugewiesene Prüfer",
-                "description": "Aktuelle Aktivität des Teams und Auslastung der Zuweisungen.",
-                "viewAll": "Alle Prüfer anzeigen",
-                "emptyTitle": "Keine Prüfer zugewiesen",
-                "emptyDescription": "Laden Sie Prüfer ein oder weisen Sie sie zu, um hier Rolle, Auslastung und Aktivität zu sehen.",
-                "openAuditors": "Prüfer öffnen"
-            },
-            "recentActivity": {
-                "title": "Letzte Aktivitäten",
-                "viewAll": "Alle Audits anzeigen",
-                "submitted": "Eingereicht",
-                "empty": "Noch keine eingereichten Audits."
-            }
-        },
-        "audits": {
-            "header": {
-                "eyebrow": "Manager-Arbeitsbereich",
-                "title": "Audits",
-                "description": "Verfolgen Sie den Audit-Durchsatz und den Sitzungsstatus in Ihrem Konto.",
-                "actions": {
-                    "openPlaces": "Orte öffnen",
-                    "manageAssignments": "Zuweisungen verwalten"
-                }
-            },
-            "breadcrumbs": {
-                "dashboard": "Dashboard",
-                "audits": "Audits"
-            },
-            "missingAccount": "Der Kontext des Managerkontos fehlt in der aktuellen Sitzung.",
-            "error": {
-                "title": "Audits nicht verfügbar",
-                "retry": "Erneut versuchen"
-            },
-            "stats": {
-                "totalAudits": {
-                    "title": "Audits gesamt",
-                    "helper": "Alle entdeckten Auditsitzungen in den Manager-Standorten."
-                },
-                "submitted": {
-                    "title": "Eingereicht",
-                    "helper": "Sitzungen, die abgeschlossen und eingereicht wurden."
-                },
-                "inProgress": {
-                    "title": "In Bearbeitung",
-                    "helper": "Sitzungen, an denen noch gearbeitet wird oder die pausiert wurden."
-                },
-                "meanScore": {
-                    "title": "Durchschnittliche Bewertung",
-                    "helper": "Durchschnitt über eingereichte Sitzungen mit Bewertung."
-                }
-            },
-            "table": {
-                "title": "Audit-Aktivität",
-                "description": "Audit-Sitzungen über Projekte und Orte hinweg suchen und filtern.",
-                "emptyState": {
-                    "noAudits": "Noch keine Audits. Weisen Sie Auditoren einem Projekt oder Ort zu und bitten Sie sie dann, das erste Audit zu starten.",
-                    "noMatches": "Keine Audits entsprechen den aktuellen Filtern."
-                }
-            }
-        },
-        "places": {
-            "errors": {
-                "accountContextUnavailable": "Der Kontext des Manager-Kontos ist nicht verfügbar."
-            },
-            "header": {
-                "eyebrow": "Manager-Arbeitsbereich",
-                "title": "Orte",
-                "loadingDescription": "Operative Transparenz in jeden Ort Ihres Kontos.",
-                "description": "Operative Transparenz in jeden Ort Ihres Kontos. Fügen Sie neue Orte aus einem Projektarbeitsbereich hinzu.",
-                "openProjects": "Projekte öffnen, um Ort hinzuzufügen"
-            },
-            "breadcrumbs": {
-                "dashboard": "Dashboard",
-                "places": "Orte"
-            },
-            "missingAccount": "Der Kontext des Manager-Kontos fehlt in der aktuellen Sitzung.",
-            "error": {
-                "title": "Orte nicht verfügbar",
-                "description": "Manager-Orte konnten nicht geladen werden."
-            },
-            "actions": {
-                "tryAgain": "Erneut versuchen"
-            },
-            "stats": {
-                "totalPlaces": {
-                    "title": "Orte gesamt",
-                    "helper": "Alle Orte, die derzeit mit Ihren Projekten verknüpft sind."
-                },
-                "submitted": {
-                    "title": "Eingereicht",
-                    "helper": "Orte mit abgeschlossener Audit-Aktivität."
-                },
-                "inProgress": {
-                    "title": "In Bearbeitung",
-                    "helper": "Orte mit aktiver Entwurfsarbeit am Audit."
-                },
-                "meanScore": {
-                    "title": "Durchschnittliche Bewertung",
-                    "helper": "Durchschnitt über Orte mit eingereichter Bewertung."
-                }
-            },
-            "table": {
-                "title": "Ortsverwaltung",
-                "description": "Suchen, sortieren und jeden Ort in einer kontoweiten Tabelle im Detail ansehen.",
-                "searchPlaceholder": "Orte suchen...",
-                "typePending": "Typ ausstehend",
-                "columns": {
-                    "place": "Ort",
-                    "project": "Projekt",
-                    "type": "Typ",
-                    "status": "Status",
-                    "audits": "Audits",
-                    "meanScore": "Durchschnittswert",
-                    "lastAudited": "Zuletzt geprüft"
-                },
-                "actions": {
-                    "openPlace": "Ort öffnen",
-                    "openProject": "Projekt öffnen"
-                },
-                "status": {
-                    "submitted": "eingereicht",
-                    "in_progress": "in Bearbeitung",
-                    "not_started": "nicht begonnen"
-                },
-                "emptyState": {
-                    "noPlaces": "Noch keine Orte vorhanden. Fügen Sie Orte aus einem Projektarbeitsbereich hinzu, um mit den Prüfungen zu beginnen.",
-                    "noMatches": "Keine Orte entsprechen den aktuellen Filtern."
-                }
-            }
-        },
-        "placeDetail": {
-            "error": {
-                "title": "Ortsverlauf kann nicht geladen werden",
-                "description": "Versuchen Sie, diese Seite neu zu laden. Falls nötig, gehen Sie zurück zu den Orten und öffnen Sie diesen Standort erneut."
-            },
-            "actions": {
-                "backToPlaces": "Zurück zu den Orten"
-            },
-            "header": {
-                "eyebrow": "Ort-Aktivität",
-                "description": "Prüfverlauf, Einreichungshäufigkeit und Trend der Bewertung für diesen Ort."
-            },
-            "breadcrumbs": {
-                "dashboard": "Dashboard",
-                "places": "Orte"
-            },
-            "stats": {
-                "totalAudits": {
-                    "title": "Gesamtanzahl Prüfungen",
-                    "helper": "Alle Entwurfs- und eingereichten Prüfungssitzungen für diesen Ort."
-                },
-                "submitted": {
-                    "title": "Eingereicht",
-                    "helper": "Abgeschlossene Prüfungssitzungen mit finaler Bewertung."
-                },
-                "inProgress": {
-                    "title": "In Bearbeitung",
-                    "helper": "Sitzungen, die noch abgeschlossen werden müssen."
-                },
-                "meanScore": {
-                    "title": "Durchschnittswert",
-                    "helper": "Durchschnitt nur über eingereichte Prüfungen."
-                },
-                "latestSubmitted": {
-                    "title": "Zuletzt eingereicht",
-                    "helper": "Neueste Einreichung"
-                }
-            },
-            "table": {
-                "title": "Prüfverlauf",
-                "description": "Verfolgen Sie jede Prüfungssitzung für diesen Ort in einer filterbaren Aktivitätstabelle.",
-                "emptyMessage": "Für diesen Ort wurden noch keine Prüfungen erstellt."
-            }
-        },
-        "projectDetail": {
-            "error": {
-                "title": "Projekt nicht verfügbar",
-                "description": "Das Projekt konnte nicht geladen werden."
-            },
-            "actions": {
-                "backToProjects": "Zurück zu den Projekten",
-                "editProject": "Projekt bearbeiten",
-                "newPlace": "Neuer Ort"
-            },
-            "header": {
-                "eyebrow": "Projektarbeitsbereich",
-                "overviewPending": "Die Projektübersicht wird noch verfeinert."
-            },
-            "breadcrumbs": {
-                "dashboard": "Dashboard",
-                "projects": "Projekte"
-            },
-            "stats": {
-                "places": {
-                    "title": "Orte",
-                    "helper": "{count} Orte haben bereits Prüfaktivitäten."
-                },
-                "auditsCompleted": {
-                    "title": "Abgeschlossene Audits",
-                    "helper": "{count} Audits sind noch in Bearbeitung."
-                },
-                "auditorsAssigned": {
-                    "title": "Zugewiesene Auditoren",
-                    "helper": "Eindeutige Auditoren, die projekt- und ortsübergreifend zugewiesen sind."
-                },
-                "overallMeanScore": {
-                    "title": "Gesamtdurchschnittswert",
-                    "helper": "Durchschnitt nur über eingereichte Audits."
-                }
-            },
-            "tabs": {
-                "overview": "Übersicht",
-                "places": "Orte"
-            },
-            "overview": {
-                "title": "Projekteinstellungen",
-                "placeTypesPending": "Ausstehende Ortstypen",
-                "timeline": "Zeitplan",
-                "estimatedPlaces": "Geschätzte Orte",
-                "estimatedAuditors": "Geschätzte Auditoren",
-                "created": "Erstellt",
-                "auditorGuidance": "Anweisungen für Auditoren",
-                "auditorGuidancePending": "Beschreibung des Auditorenprofils steht noch aus."
-            },
-            "deliverySignals": {
-                "title": "Lieferhinweise",
-                "currentSubmittedMeanScore": "Aktueller eingereichter Durchschnittswert",
-                "placesWithAudits": "{count} Orte haben bereits Audit-Aktivitäten.",
-                "auditsInProgress": "{count} Audits sind noch in Bearbeitung.",
-                "auditorsAssigned": "{count} eindeutige Auditoren sind diesem Projekt zugewiesen."
-            },
-            "placesTable": {
-                "title": "Projektorte",
-                "description": "Verwalten Sie alle Audit-Standorte dieses Projekts in einer einzigen operativen Tabelle.",
-                "emptyMessage": "Noch keine Orte vorhanden. Erstellen Sie den ersten Ort, um die Audit-Operationen für dieses Projekt zu starten.",
-                "actions": {
-                    "openPlace": "Ort öffnen",
-                    "deletePlace": "Ort löschen"
-                }
-            },
-            "projectDialog": {
-                "title": "Projekt bearbeiten",
-                "description": "Aktualisieren Sie die Planungsmetadaten des Projekts und die Anweisungen für Auditoren.",
-                "submitLabel": "Änderungen speichern"
-            },
-            "placeSheet": {
-                "title": "Ort erstellen",
-                "description": "Fügen Sie diesem Projekt einen neuen Audit-Standort hinzu.",
-                "submitLabel": "Ort erstellen"
-            },
-            "confirmDelete": {
-                "title": "Ort löschen",
-                "description": "Diesen Ort löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
-                "descriptionWithName": "„{name}“ löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
-                "confirmLabel": "Ort löschen"
-            }
-        },
-        "assignments": {
-            "header": {
-                "eyebrow": "Manager-Arbeitsbereich",
-                "title": "Zuweisungsverwaltung",
-                "description": "Weisen Sie Auditoren projekt- oder ortsbezogen zu und passen Sie die Ausführungsmöglichkeiten an."
-            },
-            "breadcrumbs": {
-                "dashboard": "Dashboard",
-                "assignments": "Zuweisungen"
-            },
-            "missingAccount": "Der Kontext des Managerkontos fehlt in der aktuellen Sitzung.",
-            "errors": {
-                "accountContextUnavailable": "Der Kontext des Managerkontos ist nicht verfügbar.",
-                "selectAuditorBeforeCreate": "Wählen Sie vor dem Erstellen von Zuweisungen einen Prüfer aus.",
-                "selectAuditorBeforeDelete": "Wählen Sie vor dem Löschen von Zuweisungen einen Prüfer aus.",
-                "unableToCreateAssignment": "Die Zuweisung kann nicht erstellt werden.",
-                "unableToDeleteAssignment": "Die Zuweisung kann nicht gelöscht werden."
-            },
-            "error": {
-                "title": "Zuweisungen nicht verfügbar",
-                "description": "Zuweisungen konnten nicht geladen werden."
-            },
-            "actions": {
-                "tryAgain": "Erneut versuchen",
-                "newAssignment": "Neue Zuweisung",
-                "clear": "Leeren",
-                "delete": "Löschen",
-                "cancel": "Abbrechen",
-                "creating": "Wird erstellt...",
-                "createAssignment": "Zuweisung erstellen"
-            },
-            "validation": {
-                "auditorRequired": "Wählen Sie vor dem Erstellen einer Zuweisung einen Prüfer aus.",
-                "projectRequiredForPlace": "Wählen Sie das übergeordnete Projekt aus, damit Sie einen seiner Orte auswählen können.",
-                "projectRequired": "Wählen Sie das Projekt aus, das diese Zuweisung abdecken soll.",
-                "placeRequired": "Wählen Sie den Ort aus, den diese Zuweisung abdecken soll.",
-                "rolesRequired": "Wählen Sie mindestens eine Berechtigung für diese Zuweisung aus."
-            },
-            "roles": {
-                "auditor": "Prüfer",
-                "place_admin": "Ortsadministrator"
-            },
-            "auditorFocus": {
-                "title": "Prüferfokus",
-                "chooseAuditorTitle": "Prüfer auswählen",
-                "chooseAuditorDescription": "Filtern Sie die Liste und laden Sie dann den aktuellen Zugriff eines Prüfers auf Projekte und Orte, bevor Sie Änderungen vornehmen.",
-                "searchLabel": "Prüfer suchen",
-                "searchPlaceholder": "Nach Code, Name oder E-Mail suchen.",
-                "searchResults": "{count} Prüfer{count, plural, one {} other {}} entsprechen dem aktuellen Filter.",
-                "auditorLabel": "Prüfer",
-                "noMatchingAuditors": "Keine passenden Prüfer",
-                "selectAuditor": "Einen Prüfer auswählen",
-                "matchingAuditors": "Passende Prüfer",
-                "auditorHelp": "Wählen Sie einen Prüfer aus, um die Zuweisungsabdeckung zu prüfen oder veralteten Zugriff zu entfernen.",
-                "reviewHowItWorksTitle": "So funktioniert die Prüfung von Zuweisungen",
-                "reviewSteps": {
-                    "step1": "1. Laden Sie einen Prüfer, um den aktuellen Zugriff über Projekte und Orte hinweg zu sehen.",
-                    "step2": "2. Prüfen Sie die Abdeckung, bevor Sie Zuweisungen hinzufügen oder entfernen.",
-                    "step3": "3. Verwenden Sie „Neue Zuweisung“, um Zugriff zu gewähren, und kehren Sie dann hierher zurück, um ihn zu überprüfen."
-                }
-            },
-            "auditorSummary": {
-                "loadedAssignments": "{count} geladene Zuweisung{count, plural, one {} other {en}}",
-                "completedAudits": "{count} abgeschlossene Prüfungen"
-            },
-            "preview": {
-                "title": "Zuweisungsvorschau",
-                "description": "Wählen Sie einen Prüfer aus, um sein aktuelles Projekt und den Standortbereich, das jüngste Prüfvolumen sowie die auf dieser Seite verfügbaren Verwaltungsaktionen anzuzeigen.",
-                "projectScopeTitle": "Projektumfang",
-                "projectScopeDescription": "Gewähren Sie Zugriff auf alle Standorte in einem Projekt, wenn der Prüfer eine größere Abdeckung benötigt.",
-                "placeScopeTitle": "Standortumfang",
-                "placeScopeDescription": "Gewähren Sie Zugriff auf einen einzelnen Standort, wenn Sie eine engere Feldsteuerung benötigen.",
-                "openAuditors": "Prüfer öffnen"
-            },
-            "coverage": {
-                "title": "Zuweisungsabdeckung",
-                "selectAuditorTitle": "Wählen Sie einen Prüfer aus, um Zuweisungen zu laden",
-                "selectAuditorDescription": "Dieses Feld zeigt, worauf der ausgewählte Prüfer derzeit zugreifen kann, einschließlich Projektumfang, Standortumfang, gewährter Berechtigungen und direkter Verknüpfungen zum zugrunde liegenden Datensatz.",
-                "whatAppearsTitle": "Was hier angezeigt wird",
-                "whatAppears": {
-                    "projectAndPlaceCoverage": "Aktuelle Projekt- und Standortabdeckung",
-                    "capabilityBadges": "Berechtigungs-Badges für Prüf- und Standortverwaltungszugriff",
-                    "openAndDeleteActions": "Öffnen- und Löschen-Aktionen für jede Zuweisung"
-                },
-                "loadingAssignments": "Zuweisungen werden geladen...",
-                "errorTitle": "Zuweisungen nicht verfügbar",
-                "errorDescription": "Zuweisungen konnten nicht geladen werden.",
-                "emptyTitle": "Noch keine Zuweisungen",
-                "emptyDescriptionWithAuditor": "Verwenden Sie Neue Zuweisung, um {name} Zugriff auf ein Projekt oder einen Standort zu gewähren.",
-                "emptyDescription": "Verwenden Sie Neue Zuweisung, um Projekt- oder Standortzugriff zu gewähren.",
-                "recommendedNextStepTitle": "Empfohlener nächster Schritt",
-                "recommendedNextStepDescription": "Beginnen Sie mit dem Projektumfang, wenn der Prüfer eine größere Abdeckung benötigt, und fügen Sie dann standortbezogenen Zugriff hinzu, wenn Sie eine engere Kontrolle brauchen."
-            },
-            "assignment": {
-                "projectFallback": "Projekt {id}",
-                "projectPending": "Projekt ausstehend",
-                "assignmentFallback": "Zuweisung {id}",
-                "placeScope": "Standortumfang",
-                "projectScope": "Projektumfang",
-                "place": "Standort",
-                "project": "Projekt",
-                "assignedAt": "Zugewiesen am {value}",
-                "openPlace": "Standort öffnen",
-                "openProject": "Projekt öffnen"
-            },
-            "sheet": {
-                "title": "Zuweisung erstellen",
-                "description": "Gewähren Sie Projekt- oder Standortzugriff und wählen Sie aus, was der Prüfer innerhalb dieses Umfangs tun kann.",
-                "auditorLabel": "Prüfer",
-                "selectAuditor": "Prüfer auswählen",
-                "auditors": "Prüfer",
-                "auditorHelp": "Wählen Sie aus, wer diesen Zugriff erhalten soll.",
-                "scopeLabel": "Umfang",
-                "assignmentScope": "Zuweisungsumfang",
-                "project": "Projekt",
-                "place": "Ort",
-                "projectScopeDescription": "Der Projektumfang ermöglicht es dem Prüfer, innerhalb eines Projekts alle Orte zu bearbeiten.",
-                "placeScopeDescription": "Der Ortsumfang gewährt Zugriff nur auf einen einzelnen Standort.",
-                "projectLabel": "Projekt",
-                "selectProject": "Projekt auswählen",
-                "projects": "Projekte",
-                "projectHelp": "Wählen Sie das Projekt aus, das diese Zuweisung freischalten soll.",
-                "placeLabel": "Ort",
-                "selectPlace": "Ort auswählen",
-                "selectProjectFirst": "Wählen Sie zuerst ein Projekt aus",
-                "places": "Orte",
-                "selectProjectFirstHelp": "Wählen Sie zuerst ein Projekt aus, um dessen Orte zu laden.",
-                "placeHelp": "Wählen Sie den einen Ort aus, den diese Zuweisung abdecken soll.",
-                "placeOptionalHelp": "Die Ortsauswahl ist nur für den Ortsumfang erforderlich.",
-                "capabilitiesTitle": "Berechtigungen",
-                "capabilitiesDescription": "Wählen Sie aus, was der Prüfer innerhalb des ausgewählten Umfangs tun kann.",
-                "auditCapability": "Prüfberechtigung",
-                "placeAdminCapability": "Ort-Admin-Berechtigung"
-            },
-            "confirmDelete": {
-                "title": "Zuweisung löschen",
-                "description": "Diese Zuweisung entfernen? Der Prüfer verliert diesen Zugriff, bis Sie ihn erneut zuweisen.",
-                "descriptionWithScope": "Den Zugriff auf {scopeLabel} für „{scopeName}“ entfernen? Der Prüfer verliert diesen Zugriff, bis Sie ihn erneut zuweisen.",
-                "confirmLabel": "Zuweisung löschen"
-            }
-        }
-    },
-    "auditor": {
-        "dashboard": {
-            "header": {
-                "eyebrow": "Prüfer-Arbeitsbereich",
-                "title": "Prüfer-Dashboard",
-                "description": "Ihre zugewiesenen Orte und Aufgaben zur Prüfdurchführung."
-            },
-            "error": {
-                "title": "Das Prüfer-Dashboard konnte nicht geladen werden",
-                "description": "Versuchen Sie, die Seite zu aktualisieren. Wenn das Problem weiterhin besteht, überprüfen Sie Ihre Anmelderolle und Ihren Prüfercode."
-            },
-            "actions": {
-                "refresh": "Aktualisieren"
-            },
-            "stats": {
-                "assignedPlaces": {
-                    "title": "Zugewiesene Orte",
-                    "helper": "Orte, die sich aktuell in Ihrer Feldliste befinden."
-                },
-                "inProgress": {
-                    "title": "In Bearbeitung",
-                    "helper": "Aktive oder pausierte Sitzungen, die noch abgeschlossen werden müssen."
-                },
-                "submitted": {
-                    "title": "Eingereicht",
-                    "helper": "Abgeschlossene Sitzungen, die bereits eingereicht wurden."
-                },
-                "pendingPlaces": {
-                    "title": "Ausstehende Orte",
-                    "helper": "Zugewiesene Standorte, für die noch keine Prüfung eingereicht wurde."
-                },
-                "meanSubmittedScore": {
-                    "title": "Durchschnittliche eingereichte Punktzahl",
-                    "helper": "Durchschnitt nur über eingereichte Sitzungen."
-                }
-            },
-            "assignedPlaces": {
-                "title": "Zugewiesene Orte",
-                "empty": "Zugewiesene Orte werden hier angezeigt, nachdem eine Führungskraft Zugriff gewährt hat. Aktualisieren Sie die Seite, wenn Ihnen gerade Zugriff zugewiesen wurde.",
-                "resumeAudit": "Audit fortsetzen",
-                "startAudit": "Audit starten",
-                "openReport": "Bericht öffnen",
-                "viewAll": "Alle zugewiesenen Orte anzeigen"
-            },
-            "status": {
-                "in_progress": "in Bearbeitung",
-                "paused": "pausiert",
-                "submitted": "eingereicht",
-                "not_started": "nicht gestartet"
-            }
-        },
-        "places": {
-            "error": {
-                "title": "Orte konnten nicht geladen werden",
-                "description": "Versuchen Sie, die Seite zu aktualisieren. Wenn das Problem weiterhin besteht, prüfen Sie Ihre Anmelderolle und den Zugriffsbereich."
-            },
-            "actions": {
-                "refresh": "Aktualisieren"
-            },
-            "header": {
-                "eyebrow": "Auditor-Arbeitsbereich",
-                "title": "Zugewiesene Orte",
-                "description": "Prüfen Sie den Kontext und Status des Ortes und fahren Sie mit der Durchführung fort."
-            },
-            "breadcrumbs": {
-                "dashboard": "Dashboard",
-                "places": "Orte"
-            },
-            "list": {
-                "title": "Orte",
-                "empty": "Zugewiesene Orte werden hier angezeigt, nachdem eine Führungskraft Zugriff gewährt hat. Aktualisieren Sie die Seite, wenn Ihnen gerade Zugriff zugewiesen wurde.",
-                "resumeAudit": "Audit fortsetzen",
-                "startAudit": "Audit starten",
-                "locationPending": "Standort ausstehend",
-                "openReport": "Bericht öffnen"
-            },
-            "status": {
-                "in_progress": "in Bearbeitung",
-                "paused": "pausiert",
-                "submitted": "eingereicht",
-                "not_started": "nicht gestartet"
-            },
-            "pagination": {
-                "itemLabel": "Orte"
-            }
-        },
-        "reports": {
-            "error": {
-                "title": "Berichte konnten nicht geladen werden",
-                "description": "Versuchen Sie, die Seite zu aktualisieren. Wenn das Problem weiterhin besteht, überprüfen Sie Ihren Anmeldekontext."
-            },
-            "actions": {
-                "refresh": "Aktualisieren"
-            },
-            "header": {
-                "eyebrow": "Auditor-Arbeitsbereich",
-                "title": "Berichte",
-                "description": "Prüfen Sie eingereichte und laufende Auditsitzungen."
-            },
-            "breadcrumbs": {
-                "dashboard": "Dashboard",
-                "reports": "Berichte"
-            },
-            "list": {
-                "title": "Auditsitzungen",
-                "empty": "Eingereichte und laufende Sitzungen werden hier angezeigt, nachdem Sie ein zugewiesenes Audit gestartet haben.",
-                "openReport": "Bericht öffnen",
-                "resumeAudit": "Audit fortsetzen",
-                "submittedAt": "Eingereicht {value}",
-                "draftNotSubmitted": "Entwurf noch nicht eingereicht",
-                "startedAt": "Gestartet {value}"
-            },
-            "status": {
-                "in_progress": "in Bearbeitung",
-                "paused": "pausiert",
-                "submitted": "eingereicht"
-            },
-            "pagination": {
-                "itemLabel": "Audit-Sitzungen"
-            },
-            "summary": {
-                "title": "Anzahl eingereichter Berichte",
-                "description": "Sitzungen, die eingereicht wurden und zur Prüfung bereit sind."
-            }
-        },
-        "reportDetail": {
-            "error": {
-                "title": "Audit-Details konnten nicht geladen werden",
-                "description": "Versuchen Sie, die Seite zu aktualisieren, oder kehren Sie zu den Berichten zurück und öffnen Sie das Audit erneut."
-            },
-            "header": {
-                "eyebrow": "Audit-Berichtsdetails",
-                "description": "Audit {auditCode} · {status}"
-            },
-            "actions": {
-                "resumeAudit": "Audit fortsetzen",
-                "backToReports": "Zurück zu den Berichten"
-            },
-            "inProgressCard": {
-                "title": "Audit noch in Bearbeitung",
-                "description": "Verwenden Sie den Ausführungsbereich, um die erforderlichen Fragen abzuschließen, bevor diese Sitzung eingereicht werden kann.",
-                "continue": "Im Ausführungsbereich fortfahren"
-            },
-            "metadata": {
-                "title": "Sitzungsmetadaten",
-                "started": "Gestartet: {value}",
-                "submitted": "Eingereicht: {value}",
-                "executionMode": "Ausführungsmodus: {value}",
-                "notSelected": "Nicht ausgewählt",
-                "readyToSubmit": "Bereit zur Einreichung: {value}",
-                "yes": "Ja",
-                "no": "Nein"
-            },
-            "executionMode": {
-                "both": "Vor-Ort-Audit und Umfrage",
-                "survey": "Nur Umfrage",
-                "audit": "Nur Vor-Ort-Audit"
-            },
-            "scores": {
-                "title": "Bewertungen",
-                "summary": "Zusammenfassung: {value}",
-                "playValue": "Spielwert: {value}",
-                "usability": "Benutzerfreundlichkeit: {value}",
-                "sociability": "Sozialverträglichkeit: {value}"
-            },
-            "preAudit": {
-                "title": "Antworten vor dem Audit",
-                "notProvided": "Nicht angegeben",
-                "season": "Saison: {value}",
-                "userCount": "Anzahl der Nutzer: {value}",
-                "placeSize": "Größe des Ortes: {value}",
-                "weather": "Wetter: {value}",
-                "usersPresent": "Anwesende Nutzer: {value}",
-                "ageGroups": "Altersgruppen: {value}"
-            },
-            "sectionNotes": {
-                "title": "Abschnittsnotizen",
-                "empty": "Noch keine Abschnittsdaten verfügbar.",
-                "summary": "{notedCount} von {totalCount} Abschnitten enthalten Notizen.",
-                "showEmptySections": "Leere Abschnitte anzeigen ({count})",
-                "hideEmptySections": "Leere Abschnitte ausblenden ({count})",
-                "showSectionCodes": "Abschnittscodes anzeigen",
-                "hideSectionCodes": "Abschnittscodes ausblenden",
-                "noCapturedNotesTitle": "Noch keine erfassten Notizen",
-                "noCapturedNotesDescription": "Leere Abschnitte sind derzeit ausgeblendet. Blenden Sie sie ein, wenn Sie die vollständige Instrumentstruktur prüfen möchten.",
-                "capturedNote": "Erfasste Notiz",
-                "emptyBadge": "Leer",
-                "noNoteCaptured": "Keine Notiz erfasst."
-            },
-            "status": {
-                "in_progress": "in Bearbeitung",
-                "paused": "pausiert",
-                "submitted": "eingereicht"
-            }
-        },
-        "execute": {
-            "errors": {
-                "autoSaveFailed": "Automatisches Speichern fehlgeschlagen.",
-                "submitFailed": "Einreichen fehlgeschlagen."
-            },
-            "error": {
-                "title": "Audit kann nicht geöffnet werden",
-                "description": "Prüfen Sie, ob dieser Ort Ihrem Auditor-Konto zugewiesen ist, und versuchen Sie es erneut."
-            },
-            "status": {
-                "in_progress": "in Bearbeitung",
-                "paused": "pausiert",
-                "submitted": "eingereicht"
-            },
-            "common": {
-                "complete": "Vollständig",
-                "incomplete": "Unvollständig",
-                "yes": "Ja",
-                "notYet": "Noch nicht"
-            },
-            "roles": {
-                "auditor": "Auditor",
-                "place_admin": "Ort-Admin"
-            },
-            "actions": {
-                "backToPlaces": "Zurück zu den Orten",
-                "saveNow": "Jetzt speichern",
-                "submitting": "Wird eingereicht...",
-                "submitAudit": "Audit einreichen"
-            },
-            "header": {
-                "title": "Audit durchführen",
-                "place": "Ort: {name}",
-                "questionsAnswered": "{answered} / {total} Fragen beantwortet",
-                "saving": "Speichert...",
-                "savedAt": "Gespeichert um {time}",
-                "noUnsavedChanges": "Keine ungespeicherten Änderungen"
-            },
-            "overview": {
-                "title": "Audit-Übersicht",
-                "auditCode": "Audit-Code:",
-                "started": "Gestartet: {value}",
-                "assignmentRoles": "Zuweisungsrollen:",
-                "preAudit": "Vorab-Audit:",
-                "sections": "Abschnitte:",
-                "sectionsComplete": "{completed}/{total} abgeschlossen",
-                "readyToSubmit": "Bereit zur Übermittlung:"
-            },
-            "submission": {
-                "title": "Bereitschaft zur Übermittlung",
-                "readyDescription": "Alles Erforderliche für die Übermittlung ist abgeschlossen. Prüfen Sie Ihre Notizen und übermitteln Sie dann, wenn Sie bereit sind.",
-                "incompleteDescription": "Schließen Sie die verbleibenden Prüfpunkte ab, bevor Sie dieses Audit übermitteln.",
-                "readyBadge": "Bereit zur Übermittlung",
-                "remainingBadge": "{count} Prüfpunkt{count, plural, one {} other {e}} verbleibend",
-                "blockers": {
-                    "chooseExecutionMode": "Wählen Sie einen Ausführungsmodus aus.",
-                    "completePreAudit": "Schließen Sie die erforderlichen Vorab-Audit-Fragen ab.",
-                    "finishRemainingSections": "Schließen Sie die verbleibenden {count} Abschnitt{count, plural, one {} other {e}} ab."
-                }
-            },
-            "executionMode": {
-                "title": "Ausführungsmodus",
-                "noDescription": "Keine Beschreibung."
-            },
-            "preAudit": {
-                "title": "Vorab-Audit",
-                "auto": {
-                    "generatedOnSubmit": "Wird beim Übermitteln erstellt",
-                    "calculatedOnSubmit": "Wird beim Übermitteln berechnet",
-                    "minutes": "{count} Minuten"
-                }
-            },
-            "sections": {
-                "title": "Abschnitte",
-                "chooseMode": "Wählen Sie einen Ausführungsmodus aus, um die passenden Instrument-Abschnitte freizuschalten.",
-                "incompleteSummary": "{count} Abschnitte benötigen noch Aufmerksamkeit. Abgeschlossene Abschnitte werden am Ende gruppiert, damit Sie schneller durchsehen können.",
-                "completeSummary": "Alle Abschnitte sind abgeschlossen. Abgeschlossene Abschnitte bleiben zusammen gruppiert, damit Sie sie schnell prüfen können.",
-                "remainingBadge": "{count} Abschnitt{count, plural, one {} other {e}} verbleibend",
-                "answered": "{answered} / {total} beantwortet",
-                "allRequiredComplete": "Alle erforderlichen Fragen sind abgeschlossen.",
-                "questionsRemaining": "{count} Frage{count, plural, one {} other {n}} verbleibend",
-                "remainingShort": "{count} verbleibend"
-            },
-            "activeSection": {
-                "notesLabel": "Abschnittsnotizen",
-                "notesFallback": "Fügen Sie Beobachtungen oder Empfehlungen für diesen Abschnitt hinzu.",
-                "notesPlaceholder": "Beobachtungen, fehlende Funktionen oder Empfehlungen festhalten.",
-                "previousSection": "Vorheriger Abschnitt",
-                "nextSection": "Nächster Abschnitt"
-            },
-            "questionCard": {
-                "thisPlayspace": "Dieser Playspace",
-                "followUpScalesHidden": "Folge-Skalen bleiben ausgeblendet, bis die ausgewählte Mengenoption sie zulässt."
-            },
-            "submittedCard": {
-                "title": "Audit übermittelt",
-                "description": "Dieses Audit wurde übermittelt und ist jetzt schreibgeschützt. Öffnen Sie den Bericht, um den Endstand zu prüfen.",
-                "openReport": "Eingereichten Bericht öffnen"
-            }
-        }
-    },
-    "settings": {
-        "errors": {
-            "accountContextUnavailable": "Der Manager-Konto-Kontext ist nicht verfügbar."
-        },
-        "header": {
-            "eyebrow": "Arbeitsbereichseinstellungen",
-            "title": "Einstellungen",
-            "description": "Verwalten Sie Ihre Kontozusammenfassung, Darstellung und Barrierefreiheitseinstellungen.",
-            "backToDashboard": "Zurück zum Dashboard"
-        },
-        "breadcrumbs": {
-            "dashboard": "Dashboard",
-            "settings": "Einstellungen"
-        },
-        "common": {
-            "on": "Ein",
-            "off": "Aus"
-        },
-        "sessionUnavailable": {
-            "header": {
-                "eyebrow": "Arbeitsbereichseinstellungen",
-                "title": "Einstellungen",
-                "description": "Melden Sie sich an, um Anzeigeeinstellungen, Barrierefreiheit und Arbeitsbereichsdetails zu verwalten.",
-                "goToLogin": "Zum Login"
-            },
-            "card": {
-                "title": "Anmeldung erforderlich",
-                "description": "Sie müssen sich anmelden, bevor Sie die Einstellungen öffnen.",
-                "body": "Melden Sie sich erneut an, um Ihre Kontodaten zu prüfen und festzulegen, wie der Arbeitsbereich auf diesem Gerät angezeigt wird."
-            }
-        },
-        "profile": {
-            "title": "Ihr Konto",
-            "description": "Überprüfen Sie die in diesem Arbeitsbereich angezeigte Identität und Rolle.",
-            "managerFallback": "Manager",
-            "adminDisplayName": "Playspace Administrator",
-            "auditorWithCode": "Prüfer {code}",
-            "auditorFallback": "Prüfer",
-            "managerWorkspaceFallback": "Manager-Arbeitsbereich",
-            "adminSubtitle": "Globale Plattformüberwachung",
-            "auditorCodeSubtitle": "Prüfercode {code}",
-            "auditorSubtitle": "Arbeitsbereich für Vor-Ort-Prüfungen",
-            "emailFallback": "Nach dem vollständigen Rollout der Anmeldung verfügbar",
-            "memberSinceFallback": "Nach der Kontoeinrichtung verfügbar",
-            "fields": {
-                "role": "Rolle",
-                "workspace": "Arbeitsbereich",
-                "email": "E-Mail",
-                "memberSince": "Mitglied seit"
-            }
-        },
-        "security": {
-            "title": "Sicherheit",
-            "description": "Überprüfen Sie Ihre aktuelle Sitzung und melden Sie sich ab, wenn Sie fertig sind.",
-            "fields": {
-                "status": "Status",
-                "currentAccess": "Aktueller Zugriff",
-                "auditorCode": "Prüfercode",
-                "device": "Gerät"
-            },
-            "values": {
-                "signedIn": "Angemeldet",
-                "notApplicable": "Nicht zutreffend",
-                "currentBrowserSession": "Aktuelle Browser-Sitzung"
-            },
-            "sharedDeviceTitle": "Verwenden Sie ein gemeinsam genutztes Gerät?",
-            "sharedDeviceDescription": "Melden Sie sich ab, bevor Sie gehen, um Ihr Konto zu schützen.",
-            "signOut": "Abmelden"
-        },
-        "appearance": {
-            "title": "Darstellung",
-            "description": "Wählen Sie das Design und die Spracheinstellung, die im gesamten Web-Arbeitsbereich verwendet werden.",
-            "themeTitle": "Design",
-            "languageTitle": "Sprache",
-            "currentTheme": "Aktuelles Design: {value}",
-            "currentLocale": "Aktuelle Spracheinstellung: {value}",
-            "resolvedTheme": {
-                "light": "Hell",
-                "dark": "Dunkel"
-            },
-            "themeOptions": {
-                "system": {
-                    "label": "System",
-                    "description": "Den Geräteeinstellungen folgen."
-                },
-                "light": {
-                    "label": "Hell",
-                    "description": "Die hellere Arbeitsbereichs-Palette verwenden."
-                },
-                "dark": {
-                    "label": "Dunkel",
-                    "description": "Die Arbeitsbereichs-Palette mit geringerer Blendwirkung verwenden."
-                }
-            },
-            "languageOptions": {
-                "system": {
-                    "label": "Systemstandard",
-                    "description": "Der Spracheinstellung Ihres Browsers folgen."
-                },
-                "en": {
-                    "label": "Englisch",
-                    "description": "Englisch für die Gebietsschema-Formatierung verwenden."
-                },
-                "de": {
-                    "label": "Deutsch",
-                    "description": "Deutsch für die Gebietsschema-Formatierung verwenden."
-                },
-                "fr": {
-                    "label": "Französisch",
-                    "description": "Französisch für die Gebietsschema-Formatierung verwenden."
-                },
-                "ja": {
-                    "label": "Japanisch",
-                    "description": "Japanisch für die Gebietsschema-Formatierung verwenden."
-                },
-                "hi": {
-                    "label": "Hindi",
-                    "description": "Hindi für die Gebietsschema-Formatierung verwenden."
-                }
-            }
-        },
-        "accessibility": {
-            "title": "Barrierefreiheit",
-            "description": "Passen Sie Lesbarkeit und Kontrast für längere Prüf- und Audit-Sitzungen an.",
-            "highContrast": {
-                "title": "Hoher Kontrast",
-                "description": "Erhöhen Sie den Kontrast bei Text, Rahmen und Statusfarben."
-            },
-            "dyslexicFont": {
-                "title": "Dyslexie-Schrift",
-                "description": "Stellen Sie den Text für Fließtext und Überschriften in der gesamten App auf OpenDyslexic um."
-            },
-            "fontSize": {
-                "title": "Schriftgröße",
-                "description": "Skalieren Sie alle typografischen Elemente und Abstände auf Rem-Basis von {min}% bis {max}%."
-            },
-            "reset": "Barrierefreiheits-Standardeinstellungen zurücksetzen"
-        },
-        "managerOrganization": {
-            "title": "Organisationsprofil",
-            "description": "Überprüfen oder aktualisieren Sie die Organisation, die diesem Manager-Arbeitsbereich zugeordnet ist.",
-            "fields": {
-                "organization": "Organisation",
-                "organizationName": "Organisationsname",
-                "accountEmail": "Kontoe-Mailadresse",
-                "primaryContact": "Hauptansprechpartner",
-                "memberSince": "Mitglied seit"
-            },
-            "actions": {
-                "edit": "Bearbeiten",
-                "cancel": "Abbrechen",
-                "saveChanges": "Änderungen speichern"
-            },
-            "values": {
-                "pending": "Ausstehend"
-            },
-            "primaryContact": {
-                "title": "Hauptansprechpartner",
-                "positionPending": "Position ausstehend",
-                "phonePending": "Telefon ausstehend",
-                "empty": "Informationen zum Hauptansprechpartner werden hier angezeigt, sobald der Kontoinhaber konfiguriert ist."
-            },
-            "messages": {
-                "organizationUnavailable": "Organisationsdetails sind nicht verfügbar.",
-                "organizationSaved": "Organisationsdetails gespeichert.",
-                "unableToUpdate": "Die Organisationsdetails konnten nicht aktualisiert werden.",
-                "organizationNameRequired": "Der Organisationsname ist erforderlich.",
-                "accountEmailRequired": "Die Kontoe-Mailadresse ist erforderlich.",
-                "loadFailed": "Ihre Organisationsdetails konnten derzeit nicht geladen werden."
-            }
-        },
-        "managerContacts": {
-            "title": "Manager-Kontakte",
-            "description": "Personen mit Manager-Zugriff auf diesen Arbeitsbereich.",
-            "empty": "Informationen zu Manager-Kontakten werden hier angezeigt, sobald das Kontoverzeichnis konfiguriert ist.",
-            "primaryContactBadge": "Hauptansprechpartner",
-            "managerBadge": "Manager",
-            "positionPending": "Position ausstehend"
-        },
-        "adminWorkspace": {
-            "title": "Administratorzugriff",
-            "description": "Zentrale Übersicht über alle Konten, Orte und Audits.",
-            "fields": {
-                "role": "Rolle",
-                "scope": "Umfang",
-                "emailVisibility": "Sichtbarkeit von E-Mail-Adressen",
-                "auditorIdentity": "Prüferidentität"
-            },
-            "values": {
-                "role": "Administrator",
-                "scope": "Plattformweit",
-                "emailVisibility": "Nur E-Mails von Managern",
-                "auditorIdentity": "Zuerst Prüfercode"
-            }
-        },
-        "auditorWorkspace": {
-            "title": "Prüferzugriff",
-            "description": "Überprüfen Sie den Prüfungszugriff, der mit Ihrer aktuellen Anmeldung verknüpft ist.",
-            "fields": {
-                "role": "Rolle",
-                "auditorCode": "Prüfercode",
-                "workspace": "Arbeitsbereich",
-                "accessType": "Zugriffsart"
-            },
-            "values": {
-                "role": "Prüfer",
-                "codePending": "Code ausstehend",
-                "workspace": "Vor-Ort-Prüfungen",
-                "accessType": "Auftragsbasiert"
-            }
-        }
-    },
-    "notFound": {
-        "title": "Seite nicht gefunden",
-        "description": "Die gesuchte Seite existiert nicht oder Sie haben keinen Zugriff darauf.",
-        "actions": {
-            "login": "Zum Login gehen",
-            "home": "Startseite"
-        }
-    }
+	"metadata": {
+		"title": "Playspace Audit Tool",
+		"description": "Playspace Play Value- und Usability-Audit-Tool"
+	},
+	"common": {
+		"roles": {
+			"administrator": "Administrator",
+			"manager": "Manager",
+			"auditor": "Prüfer"
+		},
+		"workspace": {
+			"administrator": "Administrator-Arbeitsbereich",
+			"manager": "Manager-Arbeitsbereich",
+			"auditor": "Prüfer-Arbeitsbereich"
+		},
+		"format": {
+			"notSet": "Nicht festgelegt",
+			"noRecentActivity": "Keine kürzliche Aktivität",
+			"pending": "Ausstehend",
+			"locationPending": "Ort ausstehend",
+			"datesPending": "Termine ausstehend",
+			"starts": "Beginnt {date}",
+			"ends": "Endet {date}"
+		}
+	},
+	"shell": {
+		"productName": "Playspace Audit Tool",
+		"productTagline": "Spielwert & Nutzbarkeit",
+		"workspaceLabel": "Arbeitsbereich",
+		"openMenu": "Menü öffnen",
+		"navigationTitle": "Navigation",
+		"mobileBrand": "Playspace",
+		"navigation": {
+			"dashboard": "Dashboard",
+			"accounts": "Konten",
+			"projects": "Projekte",
+			"places": "Orte",
+			"auditors": "Prüfer",
+			"audits": "Audits",
+			"system": "System",
+			"settings": "Einstellungen",
+			"assignments": "Zuweisungen",
+			"reports": "Berichte"
+		},
+		"userMenu": {
+			"auditorWithCode": "Prüfer ({code})",
+			"accountLabel": "Konto",
+			"settings": "Einstellungen",
+			"signOut": "Abmelden"
+		}
+	},
+	"shared": {
+		"dialog": {
+			"close": "Schließen"
+		},
+		"sheet": {
+			"close": "Schließen"
+		},
+		"confirmDialog": {
+			"cancel": "Abbrechen"
+		},
+		"pagination": {
+			"showing": "Angezeigt werden {start}-{end} von {total} {itemLabel}",
+			"previous": "Zurück",
+			"next": "Weiter",
+			"page": "Seite {current} von {total}"
+		},
+		"entityRowActions": {
+			"label": "Aktionen"
+		}
+	},
+	"tables": {
+		"shared": {
+			"emptyMessage": "Keine Ergebnisse gefunden.",
+			"toolbar": {
+				"searchPlaceholder": "Datensätze suchen...",
+				"reset": "Zurücksetzen",
+				"columns": "Spalten",
+				"toggleColumns": "Spalten ein-/ausblenden"
+			},
+			"pagination": {
+				"showing": "Zeige Ergebnisse {start} bis {end} von {total}",
+				"rowsPerPage": "Zeilen pro Seite",
+				"page": "Seite {current} von {total}"
+			}
+		},
+		"audits": {
+			"title": "Audit-Aktivität",
+			"description": "Überprüfen Sie Audit-Fortschritt, Herkunft, Aktualität und Score-Ausgabe.",
+			"emptyMessage": "Keine Audit-Aktivitäten entsprechen den aktuellen Filtern.",
+			"searchPlaceholder": "Audits suchen...",
+			"copyAuditCode": "Audit-Code {auditCode} kopieren",
+			"copied": "Kopiert",
+			"copyId": "ID kopieren",
+			"auditorLabel": "Prüfer",
+			"columns": {
+				"audit": "Audit",
+				"status": "Status",
+				"started": "Gestartet",
+				"submitted": "Eingereicht",
+				"score": "Punktzahl"
+			},
+			"status": {
+				"submitted": "eingereicht",
+				"in_progress": "in Bearbeitung",
+				"paused": "pausiert"
+			}
+		},
+		"auditors": {
+			"title": "Prüfer",
+			"description": "Überprüfen Sie Identität, Zuweisungslast und aktuelle Aktivität.",
+			"emptyMessage": "Keine Prüfer entsprechen den aktuellen Filtern.",
+			"searchPlaceholder": "Prüfer suchen...",
+			"emailPending": "E-Mail ausstehend",
+			"rolePending": "Rolle ausstehend",
+			"columns": {
+				"auditor": "Prüfer",
+				"role": "Rolle",
+				"assignments": "Zuweisungen",
+				"completed": "Abgeschlossen",
+				"lastActive": "Zuletzt aktiv"
+			}
+		},
+		"projects": {
+			"title": "Projekte",
+			"description": "Verfolgen Sie Umfang, Betriebsstatus und Umsetzungsqualität von Projekten.",
+			"emptyMessage": "Keine Projekte entsprechen den aktuellen Filtern.",
+			"searchPlaceholder": "Projekte suchen...",
+			"overviewPending": "Übersicht ausstehend.",
+			"notSpecified": "Nicht angegeben",
+			"coverage": {
+				"places": "{count} Orte",
+				"auditors": "{count} Auditoren"
+			},
+			"columns": {
+				"project": "Projekt",
+				"placeTypes": "Orte-Typen",
+				"status": "Status",
+				"dates": "Daten",
+				"coverage": "Abdeckung",
+				"meanScore": "Durchschnittswert"
+			},
+			"status": {
+				"planned": "geplant",
+				"active": "aktiv",
+				"completed": "abgeschlossen"
+			}
+		},
+		"places": {
+			"title": "Orte",
+			"description": "Überwachen Sie den Status von Orten, den Audit-Durchsatz und die Aktualität auf einen Blick.",
+			"emptyMessage": "Keine Orte entsprechen den aktuellen Filtern.",
+			"searchPlaceholder": "Orte suchen...",
+			"typePending": "Typ ausstehend",
+			"columns": {
+				"place": "Ort",
+				"type": "Typ",
+				"status": "Status",
+				"audits": "Audits",
+				"meanScore": "Durchschnittswert",
+				"lastAudited": "Zuletzt auditiert"
+			},
+			"status": {
+				"submitted": "eingereicht",
+				"in_progress": "in Bearbeitung",
+				"not_started": "nicht begonnen"
+			}
+		}
+	},
+	"admin": {
+		"dashboard": {
+			"error": {
+				"title": "Administrator-Dashboard nicht verfügbar",
+				"description": "Aktualisieren Sie diese Seite, um es erneut zu versuchen. Wenn das Problem weiterhin besteht, überprüfen Sie den Administrator-Anmeldekontekt und öffnen Sie das Dashboard erneut.",
+				"retry": "Erneut versuchen"
+			},
+			"header": {
+				"eyebrow": "Administrator-Arbeitsbereich",
+				"title": "Plattformübersicht",
+				"description": "Globale Sicht auf Konten, Projekte, Orte, Auditoren und den Audit-Status.",
+				"actions": {
+					"accounts": "Konten",
+					"audits": "Audits"
+				}
+			},
+			"stats": {
+				"accounts": {
+					"title": "Konten",
+					"helper": "Registrierte Arbeitsbereichskonten."
+				},
+				"projects": {
+					"title": "Projekte",
+					"helper": "Verfolgte Programme über alle Konten hinweg."
+				},
+				"places": {
+					"title": "Orte",
+					"helper": "Aktive Prüfstandorte in der Plattform."
+				},
+				"auditors": {
+					"title": "Prüfer",
+					"helper": "Profile mit Zugriff auf die Vor-Ort-Durchführung."
+				},
+				"audits": {
+					"title": "Audits",
+					"helper": "Alle auf der Plattform erfassten Audit-Sitzungen."
+				},
+				"submitted": {
+					"title": "Eingereicht",
+					"helper": "Abgeschlossene Sitzungen mit Bewertung."
+				},
+				"inProgress": {
+					"title": "In Bearbeitung",
+					"helper": "Sitzungen, an denen noch gearbeitet wird."
+				}
+			},
+			"latestAudits": {
+				"title": "Neueste Audits",
+				"empty": "Aktuelle Audit-Aktivitäten werden hier angezeigt, sobald Konten mit dem Einreichen von Sitzungen beginnen.",
+				"auditorLabel": "Prüfer"
+			},
+			"status": {
+				"submitted": "eingereicht",
+				"in_progress": "in Bearbeitung",
+				"paused": "pausiert"
+			}
+		},
+		"accounts": {
+			"error": {
+				"title": "Konten nicht verfügbar",
+				"description": "Laden Sie diese Seite neu, um es erneut zu versuchen. Wenn das Problem weiterhin besteht, öffnen Sie das Administrator-Dashboard erneut und versuchen Sie es noch einmal.",
+				"retry": "Erneut versuchen"
+			},
+			"header": {
+				"eyebrow": "Administrator-Arbeitsbereich",
+				"title": "Konten",
+				"description": "Globales Kontenverzeichnis mit maskierten E-Mail-Adressen und Entitätsanzahlen zum Schutz der Privatsphäre."
+			},
+			"breadcrumbs": {
+				"dashboard": "Dashboard",
+				"accounts": "Konten"
+			},
+			"table": {
+				"title": "Kontenverzeichnis",
+				"description": "Suchen und vergleichen Sie den Umfang von Konten mithilfe datenschutzsicherer Kennungen und Zählwerte.",
+				"searchPlaceholder": "Konten suchen...",
+				"emptyMessage": "Keine Konten entsprechen den aktuellen Filtern.",
+				"emailHidden": "E-Mail verborgen",
+				"columns": {
+					"account": "Konto",
+					"type": "Typ",
+					"projects": "Programme",
+					"places": "Orte",
+					"auditors": "Prüfer",
+					"created": "Erstellt"
+				}
+			}
+		},
+		"auditors": {
+			"error": {
+				"title": "Prüfer nicht verfügbar",
+				"description": "Laden Sie diese Seite neu, um es erneut zu versuchen. Wenn das Problem weiterhin besteht, kehren Sie zum Administrator-Dashboard zurück und öffnen Sie die Prüfer erneut.",
+				"retry": "Erneut versuchen"
+			},
+			"header": {
+				"eyebrow": "Administrator-Arbeitsbereich",
+				"title": "Prüfer",
+				"description": "Datenschutzsichere globale Prüferliste anhand von Prüfercodes."
+			},
+			"breadcrumbs": {
+				"dashboard": "Dashboard",
+				"auditors": "Prüfer"
+			},
+			"table": {
+				"title": "Globale Prüferliste",
+				"description": "Datenschutzsichere Transparenz über Einsatzzuweisungen und Lieferergebnisse hinweg.",
+				"searchPlaceholder": "Prüfer suchen...",
+				"emptyMessage": "Keine Prüfer entsprechen den aktuellen Filtern.",
+				"emailHidden": "E-Mail ausgeblendet",
+				"columns": {
+					"auditor": "Prüfer",
+					"assignments": "Zuweisungen",
+					"completed": "Abgeschlossen",
+					"lastActive": "Zuletzt aktiv"
+				}
+			}
+		},
+		"projects": {
+			"error": {
+				"title": "Projekte nicht verfügbar",
+				"description": "Laden Sie diese Seite neu, um es erneut zu versuchen. Wenn das Problem weiterhin besteht, kehren Sie zum Administrator-Dashboard zurück und öffnen Sie die Projekte erneut.",
+				"retry": "Erneut versuchen"
+			},
+			"header": {
+				"eyebrow": "Administrator-Arbeitsbereich",
+				"title": "Projekte",
+				"description": "Projektkatalog für mehrere Konten mit Kennzahlen zu Abdeckung und Ergebnissen."
+			},
+			"breadcrumbs": {
+				"dashboard": "Dashboard",
+				"projects": "Projekte"
+			},
+			"table": {
+				"title": "Projektkatalog",
+				"description": "Prüfen Sie Projektumfang, Personalbesetzung und Bewertungen kontoübergreifend auf Unternehmensebene.",
+				"searchPlaceholder": "Projekte suchen...",
+				"emptyMessage": "Keine Projekte entsprechen den aktuellen Filtern.",
+				"columns": {
+					"project": "Projekt",
+					"dates": "Daten",
+					"places": "Orte",
+					"auditors": "Prüfer",
+					"completed": "Abgeschlossen",
+					"meanScore": "Durchschnittswert"
+				}
+			}
+		},
+		"places": {
+			"error": {
+				"title": "Orte nicht verfügbar",
+				"description": "Laden Sie diese Seite neu, um es erneut zu versuchen. Wenn das Problem weiterhin besteht, kehren Sie zum Administrator-Dashboard zurück und öffnen Sie die Orte erneut.",
+				"retry": "Erneut versuchen"
+			},
+			"header": {
+				"eyebrow": "Administrator-Arbeitsbereich",
+				"title": "Orte",
+				"description": "Ortsbestand für mehrere Konten mit aggregiertem Prüfungsdurchsatz."
+			},
+			"breadcrumbs": {
+				"dashboard": "Dashboard",
+				"places": "Orte"
+			},
+			"table": {
+				"title": "Ortsbestand",
+				"description": "Audit-Durchsatz und letzte Aktivität für jeden erfassten Ort.",
+				"searchPlaceholder": "Orte suchen...",
+				"emptyMessage": "Keine Orte entsprechen den aktuellen Filtern.",
+				"columns": {
+					"place": "Ort",
+					"completed": "Abgeschlossen",
+					"meanScore": "Durchschnittswert",
+					"latestAudit": "Letztes Audit"
+				}
+			}
+		},
+		"audits": {
+			"error": {
+				"title": "Audits nicht verfügbar",
+				"description": "Aktualisieren Sie diese Seite, um es erneut zu versuchen. Wenn das Problem weiterhin besteht, kehren Sie zum Administrator-Dashboard zurück und öffnen Sie Audits erneut.",
+				"retry": "Erneut versuchen"
+			},
+			"header": {
+				"eyebrow": "Administrator-Arbeitsbereich",
+				"title": "Audits",
+				"description": "Globaler Aktivitäts-Feed für Audits mit Konten-/Projekt-/Ortszuordnung."
+			},
+			"breadcrumbs": {
+				"dashboard": "Dashboard",
+				"audits": "Audits"
+			},
+			"table": {
+				"title": "Audit-Aktivität",
+				"description": "Überwachen Sie den auditweiten Durchsatz, die Zuordnung und den Zustellstatus der Plattform.",
+				"emptyMessage": "Keine Audits entsprechen den aktuellen Filtern."
+			}
+		},
+		"system": {
+			"error": {
+				"title": "Systemmetadaten nicht verfügbar",
+				"description": "Aktualisieren Sie diese Seite, um es erneut zu versuchen. Wenn das Problem weiterhin besteht, kehren Sie zum Administrator-Dashboard zurück und öffnen Sie die Systemmetadaten erneut.",
+				"retry": "Erneut versuchen"
+			},
+			"header": {
+				"eyebrow": "Administrator-Arbeitsbereich",
+				"title": "Systemmetadaten",
+				"description": "Laufzeitmetadaten und Instrument-Versionierung für die Audit-Plattform.",
+				"back": "Zurück zum Dashboard"
+			},
+			"breadcrumbs": {
+				"dashboard": "Dashboard",
+				"system": "System"
+			},
+			"stats": {
+				"instrumentVersion": {
+					"title": "Instrumentenversion",
+					"helper": "Aktuelle Version, die für Auditsitzungen bereitgestellt wird."
+				},
+				"auditSections": {
+					"title": "Audit-Abschnitte",
+					"helper": "Strukturierte Bereiche im Kerninstrument."
+				},
+				"questionCount": {
+					"title": "Anzahl der Fragen",
+					"helper": "{preAuditCount} Vor-Audit-Abfragen und {sectionCount} Abschnittsfragen."
+				},
+				"executionModes": {
+					"title": "Ausführungsmodi",
+					"helper": "Unterstützte Kombinationen aus Vor-Ort- und Umfrage-Workflows."
+				}
+			},
+			"instrumentMetadata": {
+				"title": "Instrumentenmetadaten",
+				"key": "Schlüssel",
+				"name": "Name",
+				"currentSheet": "Aktuelles Blatt",
+				"generated": "Generiert"
+			},
+			"executionCoverage": {
+				"title": "Ausführungserfassung",
+				"description": "Die Plattform unterstützt derzeit separate Prüfungsabläufe für Vor-Ort-, Survey- und kombinierte Audits. Diese Modi steuern, welche Abschnitte während der Ausführung freigeschaltet werden."
+			}
+		}
+	},
+	"login": {
+		"validation": {
+			"auditorCodeAlphanumeric": "Der Auditor-Code muss alphanumerisch sein.",
+			"auditorCodeInvalid": "Der Auditor-Code ist ungültig."
+		},
+		"fields": {
+			"email": "E-Mail",
+			"password": "Passwort",
+			"auditorCode": "Auditor-Code"
+		},
+		"actions": {
+			"signIn": "Anmelden",
+			"continue": "Weiter"
+		},
+		"admin": {
+			"title": "Anmeldung für Administratoren",
+			"description": "Überblick über alle Konten, Projekte, Orte und Audit-Aktivitäten.",
+			"emailPlaceholder": "admin@company.com",
+			"demoLabel": "Demo-Administrator:"
+		},
+		"manager": {
+			"title": "Anmeldung für Manager",
+			"description": "Dashboard mit vollem Zugriff: Projekte, Orte, Auditoren und kombinierte Scores.",
+			"emailPlaceholder": "manager@company.com",
+			"demoLabel": "Demo-Manager:",
+			"demoOr": "oder"
+		},
+		"auditor": {
+			"title": "Anmeldung für Auditoren",
+			"description": "Eingeschränkter Zugriff: Führen Sie zugewiesene Audits mit Ihrem Auditor-Code aus.",
+			"codePlaceholder": "A1B2C3",
+			"note": "Auditoren werden ausschließlich über den Code identifiziert. In der Benutzeroberfläche werden keine echten Namen angezeigt.",
+			"demoLabel": "Demo-Codes testen:"
+		}
+	},
+	"manager": {
+		"dashboard": {
+			"errors": {
+				"accountContextUnavailable": "Der Kontokontext des Managers ist nicht verfügbar.",
+				"loadFailed": "Beim Laden des Dashboards ist ein Fehler aufgetreten."
+			},
+			"emptyState": {
+				"title": "Dashboard nicht verfügbar",
+				"missingAccount": "Der Kontokontext des Managers fehlt in der aktuellen Sitzung."
+			},
+			"actions": {
+				"tryAgain": "Erneut versuchen"
+			},
+			"header": {
+				"eyebrow": "Manager-Dashboard",
+				"description": "Geteilte Kontenansicht über Projekte, Orte, Auditoren und aktuelle Einreichungen hinweg.",
+				"viewProjects": "Projekte anzeigen"
+			},
+			"stats": {
+				"projects": {
+					"title": "Projekte",
+					"helper": "Aktive und geplante Projekte in diesem Konto."
+				},
+				"places": {
+					"title": "Orte",
+					"helper": "Gesamtzahl der mit diesen Projekten verbundenen Orte."
+				},
+				"auditors": {
+					"title": "Auditoren",
+					"helper": "Aktuell diesem Konto zugewiesene Auditoren."
+				},
+				"completedAudits": {
+					"title": "Abgeschlossene Audits",
+					"helper": "Eingereichte Audits zur Prüfung und Berichterstellung."
+				}
+			},
+			"overview": {
+				"primaryManager": {
+					"title": "Hauptmanager",
+					"positionPending": "Position noch ausstehend",
+					"phonePending": "Telefon noch ausstehend",
+					"accountEmail": "Kontoe-Mail: {email}",
+					"empty": "Es wurde noch kein Profil des primären Managers hinzugefügt."
+				},
+				"teamSnapshot": {
+					"title": "Team-Übersicht",
+					"managerCount": "{count} Manager",
+					"auditorCount": "{count} Prüfer",
+					"positionPending": "Position noch ausstehend",
+					"primary": "Primär",
+					"manager": "Manager"
+				}
+			},
+			"tabs": {
+				"projects": "Projekte",
+				"auditors": "Prüfer",
+				"description": "Konzentrieren Sie sich hier auf die Zeilen mit den wichtigsten Signalen und öffnen Sie dann die vollständigen Arbeitslisten, wenn Sie mehr Details benötigen."
+			},
+			"projectOverview": {
+				"title": "Projektübersicht",
+				"description": "Projekte mit den wichtigsten Signalen für die tägliche Überwachung.",
+				"viewAll": "Alle Projekte anzeigen",
+				"emptyTitle": "Noch keine Projekte",
+				"emptyDescription": "Projekte werden hier angezeigt, sobald das Team beginnt, Audit-Workstreams zu erstellen.",
+				"openProjects": "Projekte öffnen"
+			},
+			"auditorOverview": {
+				"title": "Zugewiesene Prüfer",
+				"description": "Aktuelle Aktivität des Teams und Auslastung der Zuweisungen.",
+				"viewAll": "Alle Prüfer anzeigen",
+				"emptyTitle": "Keine Prüfer zugewiesen",
+				"emptyDescription": "Laden Sie Prüfer ein oder weisen Sie sie zu, um hier Rolle, Auslastung und Aktivität zu sehen.",
+				"openAuditors": "Prüfer öffnen"
+			},
+			"recentActivity": {
+				"title": "Letzte Aktivitäten",
+				"viewAll": "Alle Audits anzeigen",
+				"submitted": "Eingereicht",
+				"empty": "Noch keine eingereichten Audits."
+			}
+		},
+		"audits": {
+			"header": {
+				"eyebrow": "Manager-Arbeitsbereich",
+				"title": "Audits",
+				"description": "Verfolgen Sie den Audit-Durchsatz und den Sitzungsstatus in Ihrem Konto.",
+				"actions": {
+					"openPlaces": "Orte öffnen",
+					"manageAssignments": "Zuweisungen verwalten"
+				}
+			},
+			"breadcrumbs": {
+				"dashboard": "Dashboard",
+				"audits": "Audits"
+			},
+			"missingAccount": "Der Kontext des Managerkontos fehlt in der aktuellen Sitzung.",
+			"error": {
+				"title": "Audits nicht verfügbar",
+				"retry": "Erneut versuchen"
+			},
+			"stats": {
+				"totalAudits": {
+					"title": "Audits gesamt",
+					"helper": "Alle entdeckten Auditsitzungen in den Manager-Standorten."
+				},
+				"submitted": {
+					"title": "Eingereicht",
+					"helper": "Sitzungen, die abgeschlossen und eingereicht wurden."
+				},
+				"inProgress": {
+					"title": "In Bearbeitung",
+					"helper": "Sitzungen, an denen noch gearbeitet wird oder die pausiert wurden."
+				},
+				"meanScore": {
+					"title": "Durchschnittliche Bewertung",
+					"helper": "Durchschnitt über eingereichte Sitzungen mit Bewertung."
+				}
+			},
+			"table": {
+				"title": "Audit-Aktivität",
+				"description": "Audit-Sitzungen über Projekte und Orte hinweg suchen und filtern.",
+				"emptyState": {
+					"noAudits": "Noch keine Audits. Weisen Sie Auditoren einem Projekt oder Ort zu und bitten Sie sie dann, das erste Audit zu starten.",
+					"noMatches": "Keine Audits entsprechen den aktuellen Filtern."
+				}
+			}
+		},
+		"places": {
+			"errors": {
+				"accountContextUnavailable": "Der Kontext des Manager-Kontos ist nicht verfügbar."
+			},
+			"header": {
+				"eyebrow": "Manager-Arbeitsbereich",
+				"title": "Orte",
+				"loadingDescription": "Operative Transparenz in jeden Ort Ihres Kontos.",
+				"description": "Operative Transparenz in jeden Ort Ihres Kontos. Fügen Sie neue Orte aus einem Projektarbeitsbereich hinzu.",
+				"openProjects": "Projekte öffnen, um Ort hinzuzufügen"
+			},
+			"breadcrumbs": {
+				"dashboard": "Dashboard",
+				"places": "Orte"
+			},
+			"missingAccount": "Der Kontext des Manager-Kontos fehlt in der aktuellen Sitzung.",
+			"error": {
+				"title": "Orte nicht verfügbar",
+				"description": "Manager-Orte konnten nicht geladen werden."
+			},
+			"actions": {
+				"tryAgain": "Erneut versuchen"
+			},
+			"stats": {
+				"totalPlaces": {
+					"title": "Orte gesamt",
+					"helper": "Alle Orte, die derzeit mit Ihren Projekten verknüpft sind."
+				},
+				"submitted": {
+					"title": "Eingereicht",
+					"helper": "Orte mit abgeschlossener Audit-Aktivität."
+				},
+				"inProgress": {
+					"title": "In Bearbeitung",
+					"helper": "Orte mit aktiver Entwurfsarbeit am Audit."
+				},
+				"meanScore": {
+					"title": "Durchschnittliche Bewertung",
+					"helper": "Durchschnitt über Orte mit eingereichter Bewertung."
+				}
+			},
+			"table": {
+				"title": "Ortsverwaltung",
+				"description": "Suchen, sortieren und jeden Ort in einer kontoweiten Tabelle im Detail ansehen.",
+				"searchPlaceholder": "Orte suchen...",
+				"typePending": "Typ ausstehend",
+				"columns": {
+					"place": "Ort",
+					"project": "Projekt",
+					"type": "Typ",
+					"status": "Status",
+					"audits": "Audits",
+					"meanScore": "Durchschnittswert",
+					"lastAudited": "Zuletzt geprüft"
+				},
+				"actions": {
+					"openPlace": "Ort öffnen",
+					"openProject": "Projekt öffnen"
+				},
+				"status": {
+					"submitted": "eingereicht",
+					"in_progress": "in Bearbeitung",
+					"not_started": "nicht begonnen"
+				},
+				"emptyState": {
+					"noPlaces": "Noch keine Orte vorhanden. Fügen Sie Orte aus einem Projektarbeitsbereich hinzu, um mit den Prüfungen zu beginnen.",
+					"noMatches": "Keine Orte entsprechen den aktuellen Filtern."
+				}
+			}
+		},
+		"placeDetail": {
+			"error": {
+				"title": "Ortsverlauf kann nicht geladen werden",
+				"description": "Versuchen Sie, diese Seite neu zu laden. Falls nötig, gehen Sie zurück zu den Orten und öffnen Sie diesen Standort erneut."
+			},
+			"actions": {
+				"backToPlaces": "Zurück zu den Orten"
+			},
+			"header": {
+				"eyebrow": "Ort-Aktivität",
+				"description": "Prüfverlauf, Einreichungshäufigkeit und Trend der Bewertung für diesen Ort."
+			},
+			"breadcrumbs": {
+				"dashboard": "Dashboard",
+				"places": "Orte"
+			},
+			"stats": {
+				"totalAudits": {
+					"title": "Gesamtanzahl Prüfungen",
+					"helper": "Alle Entwurfs- und eingereichten Prüfungssitzungen für diesen Ort."
+				},
+				"submitted": {
+					"title": "Eingereicht",
+					"helper": "Abgeschlossene Prüfungssitzungen mit finaler Bewertung."
+				},
+				"inProgress": {
+					"title": "In Bearbeitung",
+					"helper": "Sitzungen, die noch abgeschlossen werden müssen."
+				},
+				"meanScore": {
+					"title": "Durchschnittswert",
+					"helper": "Durchschnitt nur über eingereichte Prüfungen."
+				},
+				"latestSubmitted": {
+					"title": "Zuletzt eingereicht",
+					"helper": "Neueste Einreichung"
+				}
+			},
+			"table": {
+				"title": "Prüfverlauf",
+				"description": "Verfolgen Sie jede Prüfungssitzung für diesen Ort in einer filterbaren Aktivitätstabelle.",
+				"emptyMessage": "Für diesen Ort wurden noch keine Prüfungen erstellt."
+			}
+		},
+		"projectDetail": {
+			"error": {
+				"title": "Projekt nicht verfügbar",
+				"description": "Das Projekt konnte nicht geladen werden."
+			},
+			"actions": {
+				"backToProjects": "Zurück zu den Projekten",
+				"editProject": "Projekt bearbeiten",
+				"newPlace": "Neuer Ort"
+			},
+			"header": {
+				"eyebrow": "Projektarbeitsbereich",
+				"overviewPending": "Die Projektübersicht wird noch verfeinert."
+			},
+			"breadcrumbs": {
+				"dashboard": "Dashboard",
+				"projects": "Projekte"
+			},
+			"stats": {
+				"places": {
+					"title": "Orte",
+					"helper": "{count} Orte haben bereits Prüfaktivitäten."
+				},
+				"auditsCompleted": {
+					"title": "Abgeschlossene Audits",
+					"helper": "{count} Audits sind noch in Bearbeitung."
+				},
+				"auditorsAssigned": {
+					"title": "Zugewiesene Auditoren",
+					"helper": "Eindeutige Auditoren, die projekt- und ortsübergreifend zugewiesen sind."
+				},
+				"overallMeanScore": {
+					"title": "Gesamtdurchschnittswert",
+					"helper": "Durchschnitt nur über eingereichte Audits."
+				}
+			},
+			"tabs": {
+				"overview": "Übersicht",
+				"places": "Orte"
+			},
+			"overview": {
+				"title": "Projekteinstellungen",
+				"placeTypesPending": "Ausstehende Ortstypen",
+				"timeline": "Zeitplan",
+				"estimatedPlaces": "Geschätzte Orte",
+				"estimatedAuditors": "Geschätzte Auditoren",
+				"created": "Erstellt",
+				"auditorGuidance": "Anweisungen für Auditoren",
+				"auditorGuidancePending": "Beschreibung des Auditorenprofils steht noch aus."
+			},
+			"deliverySignals": {
+				"title": "Lieferhinweise",
+				"currentSubmittedMeanScore": "Aktueller eingereichter Durchschnittswert",
+				"placesWithAudits": "{count} Orte haben bereits Audit-Aktivitäten.",
+				"auditsInProgress": "{count} Audits sind noch in Bearbeitung.",
+				"auditorsAssigned": "{count} eindeutige Auditoren sind diesem Projekt zugewiesen."
+			},
+			"placesTable": {
+				"title": "Projektorte",
+				"description": "Verwalten Sie alle Audit-Standorte dieses Projekts in einer einzigen operativen Tabelle.",
+				"emptyMessage": "Noch keine Orte vorhanden. Erstellen Sie den ersten Ort, um die Audit-Operationen für dieses Projekt zu starten.",
+				"actions": {
+					"openPlace": "Ort öffnen",
+					"deletePlace": "Ort löschen"
+				}
+			},
+			"projectDialog": {
+				"title": "Projekt bearbeiten",
+				"description": "Aktualisieren Sie die Planungsmetadaten des Projekts und die Anweisungen für Auditoren.",
+				"submitLabel": "Änderungen speichern"
+			},
+			"placeSheet": {
+				"title": "Ort erstellen",
+				"description": "Fügen Sie diesem Projekt einen neuen Audit-Standort hinzu.",
+				"submitLabel": "Ort erstellen"
+			},
+			"confirmDelete": {
+				"title": "Ort löschen",
+				"description": "Diesen Ort löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+				"descriptionWithName": "„{name}“ löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+				"confirmLabel": "Ort löschen"
+			}
+		},
+		"assignments": {
+			"header": {
+				"eyebrow": "Manager-Arbeitsbereich",
+				"title": "Zuweisungsverwaltung",
+				"description": "Weisen Sie Auditoren projekt- oder ortsbezogen zu und passen Sie die Ausführungsmöglichkeiten an."
+			},
+			"breadcrumbs": {
+				"dashboard": "Dashboard",
+				"assignments": "Zuweisungen"
+			},
+			"missingAccount": "Der Kontext des Managerkontos fehlt in der aktuellen Sitzung.",
+			"errors": {
+				"accountContextUnavailable": "Der Kontext des Managerkontos ist nicht verfügbar.",
+				"selectAuditorBeforeCreate": "Wählen Sie vor dem Erstellen von Zuweisungen einen Prüfer aus.",
+				"selectAuditorBeforeDelete": "Wählen Sie vor dem Löschen von Zuweisungen einen Prüfer aus.",
+				"unableToCreateAssignment": "Die Zuweisung kann nicht erstellt werden.",
+				"unableToDeleteAssignment": "Die Zuweisung kann nicht gelöscht werden."
+			},
+			"error": {
+				"title": "Zuweisungen nicht verfügbar",
+				"description": "Zuweisungen konnten nicht geladen werden."
+			},
+			"actions": {
+				"tryAgain": "Erneut versuchen",
+				"newAssignment": "Neue Zuweisung",
+				"clear": "Leeren",
+				"delete": "Löschen",
+				"cancel": "Abbrechen",
+				"creating": "Wird erstellt...",
+				"createAssignment": "Zuweisung erstellen"
+			},
+			"validation": {
+				"auditorRequired": "Wählen Sie vor dem Erstellen einer Zuweisung einen Prüfer aus.",
+				"projectRequiredForPlace": "Wählen Sie das übergeordnete Projekt aus, damit Sie einen seiner Orte auswählen können.",
+				"projectRequired": "Wählen Sie das Projekt aus, das diese Zuweisung abdecken soll.",
+				"placeRequired": "Wählen Sie den Ort aus, den diese Zuweisung abdecken soll.",
+				"rolesRequired": "Wählen Sie mindestens eine Berechtigung für diese Zuweisung aus."
+			},
+			"roles": {
+				"auditor": "Prüfer",
+				"place_admin": "Ortsadministrator"
+			},
+			"auditorFocus": {
+				"title": "Prüferfokus",
+				"chooseAuditorTitle": "Prüfer auswählen",
+				"chooseAuditorDescription": "Filtern Sie die Liste und laden Sie dann den aktuellen Zugriff eines Prüfers auf Projekte und Orte, bevor Sie Änderungen vornehmen.",
+				"searchLabel": "Prüfer suchen",
+				"searchPlaceholder": "Nach Code, Name oder E-Mail suchen.",
+				"searchResults": "{count} Prüfer{count, plural, one {} other {}} entsprechen dem aktuellen Filter.",
+				"auditorLabel": "Prüfer",
+				"noMatchingAuditors": "Keine passenden Prüfer",
+				"selectAuditor": "Einen Prüfer auswählen",
+				"matchingAuditors": "Passende Prüfer",
+				"auditorHelp": "Wählen Sie einen Prüfer aus, um die Zuweisungsabdeckung zu prüfen oder veralteten Zugriff zu entfernen.",
+				"reviewHowItWorksTitle": "So funktioniert die Prüfung von Zuweisungen",
+				"reviewSteps": {
+					"step1": "1. Laden Sie einen Prüfer, um den aktuellen Zugriff über Projekte und Orte hinweg zu sehen.",
+					"step2": "2. Prüfen Sie die Abdeckung, bevor Sie Zuweisungen hinzufügen oder entfernen.",
+					"step3": "3. Verwenden Sie „Neue Zuweisung“, um Zugriff zu gewähren, und kehren Sie dann hierher zurück, um ihn zu überprüfen."
+				}
+			},
+			"auditorSummary": {
+				"loadedAssignments": "{count} geladene Zuweisung{count, plural, one {} other {en}}",
+				"completedAudits": "{count} abgeschlossene Prüfungen"
+			},
+			"preview": {
+				"title": "Zuweisungsvorschau",
+				"description": "Wählen Sie einen Prüfer aus, um sein aktuelles Projekt und den Standortbereich, das jüngste Prüfvolumen sowie die auf dieser Seite verfügbaren Verwaltungsaktionen anzuzeigen.",
+				"projectScopeTitle": "Projektumfang",
+				"projectScopeDescription": "Gewähren Sie Zugriff auf alle Standorte in einem Projekt, wenn der Prüfer eine größere Abdeckung benötigt.",
+				"placeScopeTitle": "Standortumfang",
+				"placeScopeDescription": "Gewähren Sie Zugriff auf einen einzelnen Standort, wenn Sie eine engere Feldsteuerung benötigen.",
+				"openAuditors": "Prüfer öffnen"
+			},
+			"coverage": {
+				"title": "Zuweisungsabdeckung",
+				"selectAuditorTitle": "Wählen Sie einen Prüfer aus, um Zuweisungen zu laden",
+				"selectAuditorDescription": "Dieses Feld zeigt, worauf der ausgewählte Prüfer derzeit zugreifen kann, einschließlich Projektumfang, Standortumfang, gewährter Berechtigungen und direkter Verknüpfungen zum zugrunde liegenden Datensatz.",
+				"whatAppearsTitle": "Was hier angezeigt wird",
+				"whatAppears": {
+					"projectAndPlaceCoverage": "Aktuelle Projekt- und Standortabdeckung",
+					"capabilityBadges": "Berechtigungs-Badges für Prüf- und Standortverwaltungszugriff",
+					"openAndDeleteActions": "Öffnen- und Löschen-Aktionen für jede Zuweisung"
+				},
+				"loadingAssignments": "Zuweisungen werden geladen...",
+				"errorTitle": "Zuweisungen nicht verfügbar",
+				"errorDescription": "Zuweisungen konnten nicht geladen werden.",
+				"emptyTitle": "Noch keine Zuweisungen",
+				"emptyDescriptionWithAuditor": "Verwenden Sie Neue Zuweisung, um {name} Zugriff auf ein Projekt oder einen Standort zu gewähren.",
+				"emptyDescription": "Verwenden Sie Neue Zuweisung, um Projekt- oder Standortzugriff zu gewähren.",
+				"recommendedNextStepTitle": "Empfohlener nächster Schritt",
+				"recommendedNextStepDescription": "Beginnen Sie mit dem Projektumfang, wenn der Prüfer eine größere Abdeckung benötigt, und fügen Sie dann standortbezogenen Zugriff hinzu, wenn Sie eine engere Kontrolle brauchen."
+			},
+			"assignment": {
+				"projectFallback": "Projekt {id}",
+				"projectPending": "Projekt ausstehend",
+				"assignmentFallback": "Zuweisung {id}",
+				"placeScope": "Standortumfang",
+				"projectScope": "Projektumfang",
+				"place": "Standort",
+				"project": "Projekt",
+				"assignedAt": "Zugewiesen am {value}",
+				"openPlace": "Standort öffnen",
+				"openProject": "Projekt öffnen"
+			},
+			"sheet": {
+				"title": "Zuweisung erstellen",
+				"description": "Gewähren Sie Projekt- oder Standortzugriff und wählen Sie aus, was der Prüfer innerhalb dieses Umfangs tun kann.",
+				"auditorLabel": "Prüfer",
+				"selectAuditor": "Prüfer auswählen",
+				"auditors": "Prüfer",
+				"auditorHelp": "Wählen Sie aus, wer diesen Zugriff erhalten soll.",
+				"scopeLabel": "Umfang",
+				"assignmentScope": "Zuweisungsumfang",
+				"project": "Projekt",
+				"place": "Ort",
+				"projectScopeDescription": "Der Projektumfang ermöglicht es dem Prüfer, innerhalb eines Projekts alle Orte zu bearbeiten.",
+				"placeScopeDescription": "Der Ortsumfang gewährt Zugriff nur auf einen einzelnen Standort.",
+				"projectLabel": "Projekt",
+				"selectProject": "Projekt auswählen",
+				"projects": "Projekte",
+				"projectHelp": "Wählen Sie das Projekt aus, das diese Zuweisung freischalten soll.",
+				"placeLabel": "Ort",
+				"selectPlace": "Ort auswählen",
+				"selectProjectFirst": "Wählen Sie zuerst ein Projekt aus",
+				"places": "Orte",
+				"selectProjectFirstHelp": "Wählen Sie zuerst ein Projekt aus, um dessen Orte zu laden.",
+				"placeHelp": "Wählen Sie den einen Ort aus, den diese Zuweisung abdecken soll.",
+				"placeOptionalHelp": "Die Ortsauswahl ist nur für den Ortsumfang erforderlich.",
+				"capabilitiesTitle": "Berechtigungen",
+				"capabilitiesDescription": "Wählen Sie aus, was der Prüfer innerhalb des ausgewählten Umfangs tun kann.",
+				"auditCapability": "Prüfberechtigung",
+				"placeAdminCapability": "Ort-Admin-Berechtigung"
+			},
+			"confirmDelete": {
+				"title": "Zuweisung löschen",
+				"description": "Diese Zuweisung entfernen? Der Prüfer verliert diesen Zugriff, bis Sie ihn erneut zuweisen.",
+				"descriptionWithScope": "Den Zugriff auf {scopeLabel} für „{scopeName}“ entfernen? Der Prüfer verliert diesen Zugriff, bis Sie ihn erneut zuweisen.",
+				"confirmLabel": "Zuweisung löschen"
+			}
+		}
+	},
+	"auditor": {
+		"dashboard": {
+			"header": {
+				"eyebrow": "Prüfer-Arbeitsbereich",
+				"title": "Prüfer-Dashboard",
+				"description": "Ihre zugewiesenen Orte und Aufgaben zur Prüfdurchführung."
+			},
+			"error": {
+				"title": "Das Prüfer-Dashboard konnte nicht geladen werden",
+				"description": "Versuchen Sie, die Seite zu aktualisieren. Wenn das Problem weiterhin besteht, überprüfen Sie Ihre Anmelderolle und Ihren Prüfercode."
+			},
+			"actions": {
+				"refresh": "Aktualisieren"
+			},
+			"stats": {
+				"assignedPlaces": {
+					"title": "Zugewiesene Orte",
+					"helper": "Orte, die sich aktuell in Ihrer Feldliste befinden."
+				},
+				"inProgress": {
+					"title": "In Bearbeitung",
+					"helper": "Aktive oder pausierte Sitzungen, die noch abgeschlossen werden müssen."
+				},
+				"submitted": {
+					"title": "Eingereicht",
+					"helper": "Abgeschlossene Sitzungen, die bereits eingereicht wurden."
+				},
+				"pendingPlaces": {
+					"title": "Ausstehende Orte",
+					"helper": "Zugewiesene Standorte, für die noch keine Prüfung eingereicht wurde."
+				},
+				"meanSubmittedScore": {
+					"title": "Durchschnittliche eingereichte Punktzahl",
+					"helper": "Durchschnitt nur über eingereichte Sitzungen."
+				}
+			},
+			"assignedPlaces": {
+				"title": "Zugewiesene Orte",
+				"empty": "Zugewiesene Orte werden hier angezeigt, nachdem eine Führungskraft Zugriff gewährt hat. Aktualisieren Sie die Seite, wenn Ihnen gerade Zugriff zugewiesen wurde.",
+				"resumeAudit": "Audit fortsetzen",
+				"startAudit": "Audit starten",
+				"openReport": "Bericht öffnen",
+				"viewAll": "Alle zugewiesenen Orte anzeigen"
+			},
+			"status": {
+				"in_progress": "in Bearbeitung",
+				"paused": "pausiert",
+				"submitted": "eingereicht",
+				"not_started": "nicht gestartet"
+			}
+		},
+		"places": {
+			"error": {
+				"title": "Orte konnten nicht geladen werden",
+				"description": "Versuchen Sie, die Seite zu aktualisieren. Wenn das Problem weiterhin besteht, prüfen Sie Ihre Anmelderolle und den Zugriffsbereich."
+			},
+			"actions": {
+				"refresh": "Aktualisieren"
+			},
+			"header": {
+				"eyebrow": "Auditor-Arbeitsbereich",
+				"title": "Zugewiesene Orte",
+				"description": "Prüfen Sie den Kontext und Status des Ortes und fahren Sie mit der Durchführung fort."
+			},
+			"breadcrumbs": {
+				"dashboard": "Dashboard",
+				"places": "Orte"
+			},
+			"list": {
+				"title": "Orte",
+				"empty": "Zugewiesene Orte werden hier angezeigt, nachdem eine Führungskraft Zugriff gewährt hat. Aktualisieren Sie die Seite, wenn Ihnen gerade Zugriff zugewiesen wurde.",
+				"resumeAudit": "Audit fortsetzen",
+				"startAudit": "Audit starten",
+				"locationPending": "Standort ausstehend",
+				"openReport": "Bericht öffnen"
+			},
+			"status": {
+				"in_progress": "in Bearbeitung",
+				"paused": "pausiert",
+				"submitted": "eingereicht",
+				"not_started": "nicht gestartet"
+			},
+			"pagination": {
+				"itemLabel": "Orte"
+			}
+		},
+		"reports": {
+			"error": {
+				"title": "Berichte konnten nicht geladen werden",
+				"description": "Versuchen Sie, die Seite zu aktualisieren. Wenn das Problem weiterhin besteht, überprüfen Sie Ihren Anmeldekontext."
+			},
+			"actions": {
+				"refresh": "Aktualisieren"
+			},
+			"header": {
+				"eyebrow": "Auditor-Arbeitsbereich",
+				"title": "Berichte",
+				"description": "Prüfen Sie eingereichte und laufende Auditsitzungen."
+			},
+			"breadcrumbs": {
+				"dashboard": "Dashboard",
+				"reports": "Berichte"
+			},
+			"list": {
+				"title": "Auditsitzungen",
+				"empty": "Eingereichte und laufende Sitzungen werden hier angezeigt, nachdem Sie ein zugewiesenes Audit gestartet haben.",
+				"openReport": "Bericht öffnen",
+				"resumeAudit": "Audit fortsetzen",
+				"submittedAt": "Eingereicht {value}",
+				"draftNotSubmitted": "Entwurf noch nicht eingereicht",
+				"startedAt": "Gestartet {value}"
+			},
+			"status": {
+				"in_progress": "in Bearbeitung",
+				"paused": "pausiert",
+				"submitted": "eingereicht"
+			},
+			"pagination": {
+				"itemLabel": "Audit-Sitzungen"
+			},
+			"summary": {
+				"title": "Anzahl eingereichter Berichte",
+				"description": "Sitzungen, die eingereicht wurden und zur Prüfung bereit sind."
+			}
+		},
+		"reportDetail": {
+			"error": {
+				"title": "Audit-Details konnten nicht geladen werden",
+				"description": "Versuchen Sie, die Seite zu aktualisieren, oder kehren Sie zu den Berichten zurück und öffnen Sie das Audit erneut."
+			},
+			"header": {
+				"eyebrow": "Audit-Berichtsdetails",
+				"description": "Audit {auditCode} · {status}"
+			},
+			"actions": {
+				"resumeAudit": "Audit fortsetzen",
+				"backToReports": "Zurück zu den Berichten"
+			},
+			"inProgressCard": {
+				"title": "Audit noch in Bearbeitung",
+				"description": "Verwenden Sie den Ausführungsbereich, um die erforderlichen Fragen abzuschließen, bevor diese Sitzung eingereicht werden kann.",
+				"continue": "Im Ausführungsbereich fortfahren"
+			},
+			"metadata": {
+				"title": "Sitzungsmetadaten",
+				"started": "Gestartet: {value}",
+				"submitted": "Eingereicht: {value}",
+				"executionMode": "Ausführungsmodus: {value}",
+				"notSelected": "Nicht ausgewählt",
+				"readyToSubmit": "Bereit zur Einreichung: {value}",
+				"yes": "Ja",
+				"no": "Nein"
+			},
+			"executionMode": {
+				"both": "Vor-Ort-Audit und Umfrage",
+				"survey": "Nur Umfrage",
+				"audit": "Nur Vor-Ort-Audit"
+			},
+			"scores": {
+				"title": "Bewertungen",
+				"summary": "Zusammenfassung: {value}",
+				"playValue": "Spielwert: {value}",
+				"usability": "Benutzerfreundlichkeit: {value}",
+				"sociability": "Sozialverträglichkeit: {value}"
+			},
+			"preAudit": {
+				"title": "Antworten vor dem Audit",
+				"notProvided": "Nicht angegeben",
+				"season": "Saison: {value}",
+				"userCount": "Anzahl der Nutzer: {value}",
+				"placeSize": "Größe des Ortes: {value}",
+				"weather": "Wetter: {value}",
+				"usersPresent": "Anwesende Nutzer: {value}",
+				"ageGroups": "Altersgruppen: {value}"
+			},
+			"sectionNotes": {
+				"title": "Abschnittsnotizen",
+				"empty": "Noch keine Abschnittsdaten verfügbar.",
+				"summary": "{notedCount} von {totalCount} Abschnitten enthalten Notizen.",
+				"showEmptySections": "Leere Abschnitte anzeigen ({count})",
+				"hideEmptySections": "Leere Abschnitte ausblenden ({count})",
+				"showSectionCodes": "Abschnittscodes anzeigen",
+				"hideSectionCodes": "Abschnittscodes ausblenden",
+				"noCapturedNotesTitle": "Noch keine erfassten Notizen",
+				"noCapturedNotesDescription": "Leere Abschnitte sind derzeit ausgeblendet. Blenden Sie sie ein, wenn Sie die vollständige Instrumentstruktur prüfen möchten.",
+				"capturedNote": "Erfasste Notiz",
+				"emptyBadge": "Leer",
+				"noNoteCaptured": "Keine Notiz erfasst."
+			},
+			"status": {
+				"in_progress": "in Bearbeitung",
+				"paused": "pausiert",
+				"submitted": "eingereicht"
+			}
+		},
+		"execute": {
+			"errors": {
+				"autoSaveFailed": "Automatisches Speichern fehlgeschlagen.",
+				"submitFailed": "Einreichen fehlgeschlagen."
+			},
+			"error": {
+				"title": "Audit kann nicht geöffnet werden",
+				"description": "Prüfen Sie, ob dieser Ort Ihrem Auditor-Konto zugewiesen ist, und versuchen Sie es erneut."
+			},
+			"status": {
+				"in_progress": "in Bearbeitung",
+				"paused": "pausiert",
+				"submitted": "eingereicht"
+			},
+			"common": {
+				"complete": "Vollständig",
+				"incomplete": "Unvollständig",
+				"yes": "Ja",
+				"notYet": "Noch nicht"
+			},
+			"roles": {
+				"auditor": "Auditor",
+				"place_admin": "Ort-Admin"
+			},
+			"actions": {
+				"backToPlaces": "Zurück zu den Orten",
+				"saveNow": "Jetzt speichern",
+				"submitting": "Wird eingereicht...",
+				"submitAudit": "Audit einreichen"
+			},
+			"header": {
+				"title": "Audit durchführen",
+				"place": "Ort: {name}",
+				"questionsAnswered": "{answered} / {total} Fragen beantwortet",
+				"saving": "Speichert...",
+				"savedAt": "Gespeichert um {time}",
+				"noUnsavedChanges": "Keine ungespeicherten Änderungen"
+			},
+			"overview": {
+				"title": "Audit-Übersicht",
+				"auditCode": "Audit-Code:",
+				"started": "Gestartet: {value}",
+				"assignmentRoles": "Zuweisungsrollen:",
+				"preAudit": "Vorab-Audit:",
+				"sections": "Abschnitte:",
+				"sectionsComplete": "{completed}/{total} abgeschlossen",
+				"readyToSubmit": "Bereit zur Übermittlung:"
+			},
+			"submission": {
+				"title": "Bereitschaft zur Übermittlung",
+				"readyDescription": "Alles Erforderliche für die Übermittlung ist abgeschlossen. Prüfen Sie Ihre Notizen und übermitteln Sie dann, wenn Sie bereit sind.",
+				"incompleteDescription": "Schließen Sie die verbleibenden Prüfpunkte ab, bevor Sie dieses Audit übermitteln.",
+				"readyBadge": "Bereit zur Übermittlung",
+				"remainingBadge": "{count} Prüfpunkt{count, plural, one {} other {e}} verbleibend",
+				"blockers": {
+					"chooseExecutionMode": "Wählen Sie einen Ausführungsmodus aus.",
+					"completePreAudit": "Schließen Sie die erforderlichen Vorab-Audit-Fragen ab.",
+					"finishRemainingSections": "Schließen Sie die verbleibenden {count} Abschnitt{count, plural, one {} other {e}} ab."
+				}
+			},
+			"executionMode": {
+				"title": "Ausführungsmodus",
+				"noDescription": "Keine Beschreibung."
+			},
+			"preAudit": {
+				"title": "Vorab-Audit",
+				"auto": {
+					"generatedOnSubmit": "Wird beim Übermitteln erstellt",
+					"calculatedOnSubmit": "Wird beim Übermitteln berechnet",
+					"minutes": "{count} Minuten"
+				}
+			},
+			"sections": {
+				"title": "Abschnitte",
+				"chooseMode": "Wählen Sie einen Ausführungsmodus aus, um die passenden Instrument-Abschnitte freizuschalten.",
+				"incompleteSummary": "{count} Abschnitte benötigen noch Aufmerksamkeit. Abgeschlossene Abschnitte werden am Ende gruppiert, damit Sie schneller durchsehen können.",
+				"completeSummary": "Alle Abschnitte sind abgeschlossen. Abgeschlossene Abschnitte bleiben zusammen gruppiert, damit Sie sie schnell prüfen können.",
+				"remainingBadge": "{count} Abschnitt{count, plural, one {} other {e}} verbleibend",
+				"answered": "{answered} / {total} beantwortet",
+				"allRequiredComplete": "Alle erforderlichen Fragen sind abgeschlossen.",
+				"questionsRemaining": "{count} Frage{count, plural, one {} other {n}} verbleibend",
+				"remainingShort": "{count} verbleibend"
+			},
+			"activeSection": {
+				"notesLabel": "Abschnittsnotizen",
+				"notesFallback": "Fügen Sie Beobachtungen oder Empfehlungen für diesen Abschnitt hinzu.",
+				"notesPlaceholder": "Beobachtungen, fehlende Funktionen oder Empfehlungen festhalten.",
+				"previousSection": "Vorheriger Abschnitt",
+				"nextSection": "Nächster Abschnitt"
+			},
+			"questionCard": {
+				"thisPlayspace": "Dieser Playspace",
+				"followUpScalesHidden": "Folge-Skalen bleiben ausgeblendet, bis die ausgewählte Mengenoption sie zulässt."
+			},
+			"submittedCard": {
+				"title": "Audit übermittelt",
+				"description": "Dieses Audit wurde übermittelt und ist jetzt schreibgeschützt. Öffnen Sie den Bericht, um den Endstand zu prüfen.",
+				"openReport": "Eingereichten Bericht öffnen"
+			}
+		}
+	},
+	"settings": {
+		"errors": {
+			"accountContextUnavailable": "Der Manager-Konto-Kontext ist nicht verfügbar."
+		},
+		"header": {
+			"eyebrow": "Arbeitsbereichseinstellungen",
+			"title": "Einstellungen",
+			"description": "Verwalten Sie Ihre Kontozusammenfassung, Darstellung und Barrierefreiheitseinstellungen.",
+			"backToDashboard": "Zurück zum Dashboard"
+		},
+		"breadcrumbs": {
+			"dashboard": "Dashboard",
+			"settings": "Einstellungen"
+		},
+		"common": {
+			"on": "Ein",
+			"off": "Aus"
+		},
+		"sessionUnavailable": {
+			"header": {
+				"eyebrow": "Arbeitsbereichseinstellungen",
+				"title": "Einstellungen",
+				"description": "Melden Sie sich an, um Anzeigeeinstellungen, Barrierefreiheit und Arbeitsbereichsdetails zu verwalten.",
+				"goToLogin": "Zum Login"
+			},
+			"card": {
+				"title": "Anmeldung erforderlich",
+				"description": "Sie müssen sich anmelden, bevor Sie die Einstellungen öffnen.",
+				"body": "Melden Sie sich erneut an, um Ihre Kontodaten zu prüfen und festzulegen, wie der Arbeitsbereich auf diesem Gerät angezeigt wird."
+			}
+		},
+		"profile": {
+			"title": "Ihr Konto",
+			"description": "Überprüfen Sie die in diesem Arbeitsbereich angezeigte Identität und Rolle.",
+			"managerFallback": "Manager",
+			"adminDisplayName": "Playspace Administrator",
+			"auditorWithCode": "Prüfer {code}",
+			"auditorFallback": "Prüfer",
+			"managerWorkspaceFallback": "Manager-Arbeitsbereich",
+			"adminSubtitle": "Globale Plattformüberwachung",
+			"auditorCodeSubtitle": "Prüfercode {code}",
+			"auditorSubtitle": "Arbeitsbereich für Vor-Ort-Prüfungen",
+			"emailFallback": "Nach dem vollständigen Rollout der Anmeldung verfügbar",
+			"memberSinceFallback": "Nach der Kontoeinrichtung verfügbar",
+			"fields": {
+				"role": "Rolle",
+				"workspace": "Arbeitsbereich",
+				"email": "E-Mail",
+				"memberSince": "Mitglied seit"
+			}
+		},
+		"security": {
+			"title": "Sicherheit",
+			"description": "Überprüfen Sie Ihre aktuelle Sitzung und melden Sie sich ab, wenn Sie fertig sind.",
+			"fields": {
+				"status": "Status",
+				"currentAccess": "Aktueller Zugriff",
+				"auditorCode": "Prüfercode",
+				"device": "Gerät"
+			},
+			"values": {
+				"signedIn": "Angemeldet",
+				"notApplicable": "Nicht zutreffend",
+				"currentBrowserSession": "Aktuelle Browser-Sitzung"
+			},
+			"sharedDeviceTitle": "Verwenden Sie ein gemeinsam genutztes Gerät?",
+			"sharedDeviceDescription": "Melden Sie sich ab, bevor Sie gehen, um Ihr Konto zu schützen.",
+			"signOut": "Abmelden"
+		},
+		"appearance": {
+			"title": "Darstellung",
+			"description": "Wählen Sie das Design und die Spracheinstellung, die im gesamten Web-Arbeitsbereich verwendet werden.",
+			"themeTitle": "Design",
+			"languageTitle": "Sprache",
+			"currentTheme": "Aktuelles Design: {value}",
+			"currentLocale": "Aktuelle Spracheinstellung: {value}",
+			"resolvedTheme": {
+				"light": "Hell",
+				"dark": "Dunkel"
+			},
+			"themeOptions": {
+				"system": {
+					"label": "System",
+					"description": "Den Geräteeinstellungen folgen."
+				},
+				"light": {
+					"label": "Hell",
+					"description": "Die hellere Arbeitsbereichs-Palette verwenden."
+				},
+				"dark": {
+					"label": "Dunkel",
+					"description": "Die Arbeitsbereichs-Palette mit geringerer Blendwirkung verwenden."
+				}
+			},
+			"languageOptions": {
+				"system": {
+					"label": "Systemstandard",
+					"description": "Der Spracheinstellung Ihres Browsers folgen."
+				},
+				"en": {
+					"label": "Englisch",
+					"description": "Englisch für die Gebietsschema-Formatierung verwenden."
+				},
+				"de": {
+					"label": "Deutsch",
+					"description": "Deutsch für die Gebietsschema-Formatierung verwenden."
+				},
+				"fr": {
+					"label": "Französisch",
+					"description": "Französisch für die Gebietsschema-Formatierung verwenden."
+				},
+				"ja": {
+					"label": "Japanisch",
+					"description": "Japanisch für die Gebietsschema-Formatierung verwenden."
+				},
+				"hi": {
+					"label": "Hindi",
+					"description": "Hindi für die Gebietsschema-Formatierung verwenden."
+				}
+			}
+		},
+		"accessibility": {
+			"title": "Barrierefreiheit",
+			"description": "Passen Sie Lesbarkeit und Kontrast für längere Prüf- und Audit-Sitzungen an.",
+			"highContrast": {
+				"title": "Hoher Kontrast",
+				"description": "Erhöhen Sie den Kontrast bei Text, Rahmen und Statusfarben."
+			},
+			"dyslexicFont": {
+				"title": "Dyslexie-Schrift",
+				"description": "Stellen Sie den Text für Fließtext und Überschriften in der gesamten App auf OpenDyslexic um."
+			},
+			"fontSize": {
+				"title": "Schriftgröße",
+				"description": "Skalieren Sie alle typografischen Elemente und Abstände auf Rem-Basis von {min}% bis {max}%."
+			},
+			"reset": "Barrierefreiheits-Standardeinstellungen zurücksetzen"
+		},
+		"managerOrganization": {
+			"title": "Organisationsprofil",
+			"description": "Überprüfen oder aktualisieren Sie die Organisation, die diesem Manager-Arbeitsbereich zugeordnet ist.",
+			"fields": {
+				"organization": "Organisation",
+				"organizationName": "Organisationsname",
+				"accountEmail": "Kontoe-Mailadresse",
+				"primaryContact": "Hauptansprechpartner",
+				"memberSince": "Mitglied seit"
+			},
+			"actions": {
+				"edit": "Bearbeiten",
+				"cancel": "Abbrechen",
+				"saveChanges": "Änderungen speichern"
+			},
+			"values": {
+				"pending": "Ausstehend"
+			},
+			"primaryContact": {
+				"title": "Hauptansprechpartner",
+				"positionPending": "Position ausstehend",
+				"phonePending": "Telefon ausstehend",
+				"empty": "Informationen zum Hauptansprechpartner werden hier angezeigt, sobald der Kontoinhaber konfiguriert ist."
+			},
+			"messages": {
+				"organizationUnavailable": "Organisationsdetails sind nicht verfügbar.",
+				"organizationSaved": "Organisationsdetails gespeichert.",
+				"unableToUpdate": "Die Organisationsdetails konnten nicht aktualisiert werden.",
+				"organizationNameRequired": "Der Organisationsname ist erforderlich.",
+				"accountEmailRequired": "Die Kontoe-Mailadresse ist erforderlich.",
+				"loadFailed": "Ihre Organisationsdetails konnten derzeit nicht geladen werden."
+			}
+		},
+		"managerContacts": {
+			"title": "Manager-Kontakte",
+			"description": "Personen mit Manager-Zugriff auf diesen Arbeitsbereich.",
+			"empty": "Informationen zu Manager-Kontakten werden hier angezeigt, sobald das Kontoverzeichnis konfiguriert ist.",
+			"primaryContactBadge": "Hauptansprechpartner",
+			"managerBadge": "Manager",
+			"positionPending": "Position ausstehend"
+		},
+		"adminWorkspace": {
+			"title": "Administratorzugriff",
+			"description": "Zentrale Übersicht über alle Konten, Orte und Audits.",
+			"fields": {
+				"role": "Rolle",
+				"scope": "Umfang",
+				"emailVisibility": "Sichtbarkeit von E-Mail-Adressen",
+				"auditorIdentity": "Prüferidentität"
+			},
+			"values": {
+				"role": "Administrator",
+				"scope": "Plattformweit",
+				"emailVisibility": "Nur E-Mails von Managern",
+				"auditorIdentity": "Zuerst Prüfercode"
+			}
+		},
+		"auditorWorkspace": {
+			"title": "Prüferzugriff",
+			"description": "Überprüfen Sie den Prüfungszugriff, der mit Ihrer aktuellen Anmeldung verknüpft ist.",
+			"fields": {
+				"role": "Rolle",
+				"auditorCode": "Prüfercode",
+				"workspace": "Arbeitsbereich",
+				"accessType": "Zugriffsart"
+			},
+			"values": {
+				"role": "Prüfer",
+				"codePending": "Code ausstehend",
+				"workspace": "Vor-Ort-Prüfungen",
+				"accessType": "Auftragsbasiert"
+			}
+		}
+	},
+	"notFound": {
+		"title": "Seite nicht gefunden",
+		"description": "Die gesuchte Seite existiert nicht oder Sie haben keinen Zugriff darauf.",
+		"actions": {
+			"login": "Zum Login gehen",
+			"home": "Startseite"
+		}
+	}
 }

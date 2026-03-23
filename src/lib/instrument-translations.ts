@@ -86,9 +86,7 @@ export type InstrumentTranslations = Readonly<{
 	sections?: Readonly<Record<string, InstrumentSectionTranslation>>;
 }>;
 
-const INSTRUMENT_TRANSLATIONS_BY_LOCALE: Readonly<
-	Partial<Record<InstrumentLocale, InstrumentTranslations>>
-> = {
+const INSTRUMENT_TRANSLATIONS_BY_LOCALE: Readonly<Partial<Record<InstrumentLocale, InstrumentTranslations>>> = {
 	en: enInstrumentTranslations
 	// de: deInstrumentTranslations,
 	// fr: frInstrumentTranslations,

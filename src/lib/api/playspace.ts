@@ -1087,9 +1087,7 @@ export const playspaceApi = {
 	admin: {
 		overview: async (): Promise<AdminOverview> =>
 			fetchValidatedJson("/playspace/admin/overview", adminOverviewSchema),
-		accounts: async (
-			query: AdminAccountsQuery = {}
-		): Promise<PaginatedResponse<AdminAccountRow>> =>
+		accounts: async (query: AdminAccountsQuery = {}): Promise<PaginatedResponse<AdminAccountRow>> =>
 			fetchValidatedJson(
 				`/playspace/admin/accounts${buildQueryString({
 					page: query.page,
