@@ -105,7 +105,7 @@ export default function AuditorDashboardPage() {
 					title={t("stats.meanSubmittedScore.title")}
 					value={formatScoreLabel(summary.average_submitted_score, formatT)}
 					helper={t("stats.meanSubmittedScore.helper")}
-					tone="violet"
+					tone="info"
 				/>
 			</div>
 
@@ -138,7 +138,9 @@ export default function AuditorDashboardPage() {
 								</div>
 
 								<div className="flex flex-wrap items-center gap-2">
-									<Badge variant={getStatusBadgeVariant(place.audit_status)} className="font-medium">
+									<Badge
+										variant={getStatusBadgeVariant(place.audit_status)}
+										className="font-medium text-foreground">
 										{place.audit_status
 											? t(`status.${place.audit_status.toLowerCase()}`)
 											: t("status.not_started")}
@@ -148,7 +150,7 @@ export default function AuditorDashboardPage() {
 											<Link href={reportHref}>{t("assignedPlaces.openReport")}</Link>
 										</Button>
 									) : (
-										<Button asChild size="sm" variant={isResumeAction ? "outline" : "default"}>
+										<Button asChild size="sm">
 											<Link href={actionHref}>{actionLabel}</Link>
 										</Button>
 									)}

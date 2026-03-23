@@ -156,14 +156,14 @@ export function formatProjectDateRange(
  */
 export function getProjectStatusClassName(status: ProjectSummary["status"]): string {
 	if (status === "completed") {
-		return "border-[color:rgba(111,154,127,0.24)] bg-[color:rgba(111,154,127,0.12)] text-[color:#6F9A7F]";
+		return "border-status-success-border bg-status-success-surface text-status-success";
 	}
 
 	if (status === "planned") {
-		return "border-[color:rgba(185,154,90,0.24)] bg-[color:rgba(185,154,90,0.12)] text-[color:#B99A5A]";
+		return "border-status-pending-border bg-status-pending-surface text-status-pending";
 	}
 
-	return "border-[color:rgba(197,138,92,0.24)] bg-[color:rgba(197,138,92,0.12)] text-[color:#C58A5C]";
+	return "border-status-in-progress-border bg-status-in-progress-surface text-status-in-progress";
 }
 
 /**
@@ -171,12 +171,12 @@ export function getProjectStatusClassName(status: ProjectSummary["status"]): str
  */
 export function getPlaceStatusClassName(status: PlaceSummary["status"]): string {
 	if (status === "submitted") {
-		return "border-[color:rgba(111,154,127,0.24)] bg-[color:rgba(111,154,127,0.12)] text-[color:#6F9A7F]";
+		return "border-status-success-border bg-status-success-surface text-status-success";
 	}
 
 	if (status === "in_progress") {
-		return "border-[color:rgba(197,138,92,0.24)] bg-[color:rgba(197,138,92,0.12)] text-[color:#C58A5C]";
+		return "border-status-in-progress-border bg-status-in-progress-surface text-status-in-progress";
 	}
 
-	return "border-[color:rgba(185,154,90,0.24)] bg-[color:rgba(185,154,90,0.12)] text-[color:#B99A5A]";
+	return "border-status-pending-border bg-status-pending-surface text-status-pending";
 }

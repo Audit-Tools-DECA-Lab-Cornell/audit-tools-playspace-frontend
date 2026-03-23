@@ -27,6 +27,13 @@ interface ManagerProjectDetailPageProps {
 	}>;
 }
 
+const PROJECT_DETAIL_SKELETON_IDS = [
+	"project-detail-skeleton-1",
+	"project-detail-skeleton-2",
+	"project-detail-skeleton-3",
+	"project-detail-skeleton-4"
+] as const;
+
 function getErrorMessage(error: unknown, fallbackMessage: string): string {
 	if (error instanceof Error) {
 		return error.message;
@@ -110,9 +117,12 @@ export default function ManagerProjectDetailPage({ params }: Readonly<ManagerPro
 			<div className="space-y-6">
 				<div className="h-20 animate-pulse rounded-card border border-border bg-card" />
 				<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-					{Array.from({ length: 4 }).map((_, index) => {
+					{PROJECT_DETAIL_SKELETON_IDS.map(skeletonId => {
 						return (
-							<div key={index} className="h-36 animate-pulse rounded-card border border-border bg-card" />
+							<div
+								key={skeletonId}
+								className="h-36 animate-pulse rounded-card border border-border bg-card"
+							/>
 						);
 					})}
 				</div>
@@ -138,9 +148,12 @@ export default function ManagerProjectDetailPage({ params }: Readonly<ManagerPro
 			<div className="space-y-6">
 				<div className="h-20 animate-pulse rounded-card border border-border bg-card" />
 				<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-					{Array.from({ length: 4 }).map((_, index) => {
+					{PROJECT_DETAIL_SKELETON_IDS.map(skeletonId => {
 						return (
-							<div key={index} className="h-36 animate-pulse rounded-card border border-border bg-card" />
+							<div
+								key={skeletonId}
+								className="h-36 animate-pulse rounded-card border border-border bg-card"
+							/>
 						);
 					})}
 				</div>
@@ -205,11 +218,11 @@ export default function ManagerProjectDetailPage({ params }: Readonly<ManagerPro
 					title={t("stats.overallMeanScore.title")}
 					value={formatScoreLabel(stats.average_score, formatT)}
 					helper={t("stats.overallMeanScore.helper")}
-					tone="violet"
+					tone="info"
 				/>
 			</div>
 			<Tabs defaultValue="overview">
-				<TabsList>
+				<TabsList variant="line" className="w-full justify-start">
 					<TabsTrigger value="overview">{t("tabs.overview")}</TabsTrigger>
 					<TabsTrigger value="places">{t("tabs.places")}</TabsTrigger>
 				</TabsList>

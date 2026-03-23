@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import * as React from "react";
 import { z } from "zod";
+import { DESIGN_SYSTEM, applyDesignSystemVariables, clampDesignSystemFontScale } from "@/lib/design-system";
 import {
 	LANGUAGE_PREFERENCES,
 	LOCALE_PREFERENCE_COOKIE_NAME,
@@ -13,8 +14,8 @@ import {
 } from "@/i18n/config";
 
 const PREFERENCES_STORAGE_KEY = "playspace_web_preferences";
-const MIN_FONT_SCALE = 0.85;
-const MAX_FONT_SCALE = 1.3;
+const MIN_FONT_SCALE = DESIGN_SYSTEM.fontScale.min;
+const MAX_FONT_SCALE = DESIGN_SYSTEM.fontScale.max;
 const THEME_MODES = ["system", "light", "dark"] as const;
 
 const preferencesSchema = z.object({
@@ -86,7 +87,7 @@ function getSystemTheme(): ResolvedTheme {
  * Normalize any requested font scale into the supported range.
  */
 function clampFontScale(scale: number): number {
-	return Math.round(Math.max(MIN_FONT_SCALE, Math.min(MAX_FONT_SCALE, scale)) * 100) / 100;
+	return clampDesignSystemFontScale(scale);
 }
 
 /**
@@ -178,8 +179,12 @@ function applyPreferencesToDocument(input: {
 	root.dataset.contrast = input.highContrast ? "high" : "standard";
 	root.dataset.dyslexicFont = input.dyslexicFont ? "true" : "false";
 	root.lang = input.resolvedLanguage;
-	root.style.setProperty("--app-font-scale", String(clampFontScale(input.fontScale)));
-	// root.style.setProperty("--font-body", input.dyslexicFont ? "OpenDyslexic, var(--font-body), sans-serif" : "var(--font-body), sans-serif");
+	applyDesignSystemVariables(root, {
+		theme: input.resolvedTheme,
+		contrast: input.highContrast ? "high" : "standard",
+		fontScale: input.fontScale,
+		dyslexicFont: input.dyslexicFont
+	});
 }
 
 /**

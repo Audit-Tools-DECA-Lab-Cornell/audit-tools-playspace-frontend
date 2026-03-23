@@ -114,12 +114,14 @@ export default function AuditorPlacesPage() {
 									</p>
 								</div>
 								<div className="flex flex-wrap items-center gap-2">
-									<Badge variant={getStatusBadgeVariant(place.audit_status)} className="font-medium">
+									<Badge
+										variant={getStatusBadgeVariant(place.audit_status)}
+										className="font-medium text-foreground">
 										{place.audit_status
 											? t(`status.${place.audit_status.toLowerCase()}`)
 											: t("status.not_started")}
 									</Badge>
-									<Button asChild size="sm" variant={isResumeAction ? "outline" : "default"}>
+									<Button asChild size="sm">
 										<Link href={executeHref}>{primaryActionLabel}</Link>
 									</Button>
 									{reportHref ? (

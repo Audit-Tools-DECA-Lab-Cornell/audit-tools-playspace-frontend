@@ -38,8 +38,16 @@ export default function AuditorReportsPage() {
 		queryKey: ["playspace", "auditor", "dashboardSummary", "reportsPage"],
 		queryFn: () => playspaceApi.auditor.dashboardSummary()
 	});
-	const audits = auditsQuery.data?.items ?? [];
+	const audits = React.useMemo(() => {
+		return auditsQuery.data?.items ?? [];
+	}, [auditsQuery.data?.items]);
 	const pageCount = auditsQuery.data?.total_pages ?? 1;
+	const actionableAudits = React.useMemo(() => {
+		return audits.filter(audit => audit.status !== "SUBMITTED");
+	}, [audits]);
+	const submittedAudits = React.useMemo(() => {
+		return audits.filter(audit => audit.status === "SUBMITTED");
+	}, [audits]);
 
 	React.useEffect(() => {
 		if (currentPage > pageCount) {
@@ -84,51 +92,81 @@ export default function AuditorReportsPage() {
 				</CardHeader>
 				<CardContent className="space-y-3">
 					{audits.length === 0 ? <p className="text-sm text-muted-foreground">{t("list.empty")}</p> : null}
-					{audits.map(audit => {
-						const detailHref =
-							audit.status === "SUBMITTED"
-								? `/auditor/reports/${encodeURIComponent(audit.audit_id)}`
-								: `/auditor/execute/${encodeURIComponent(audit.place_id)}`;
-						const detailLabel = audit.status === "SUBMITTED" ? t("list.openReport") : t("list.resumeAudit");
-						const submissionLabel = audit.submitted_at
-							? t("list.submittedAt", { value: formatDateTimeLabel(audit.submitted_at, formatT) })
-							: t("list.draftNotSubmitted");
-						return (
-							<div
-								key={audit.audit_id}
-								className="flex flex-col gap-3 rounded-card border border-border/70 bg-card/60 p-4 lg:flex-row lg:items-center lg:justify-between">
-								<div className="min-w-0 space-y-1">
-									<p className="font-medium text-foreground">{audit.place_name}</p>
-									<div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-										<span>{audit.project_name}</span>
-										<code
-											title={audit.audit_code}
-											className="rounded-md bg-muted/65 px-2 py-1 font-mono text-[11px] tracking-[0.04em] text-foreground/80">
-											{formatAuditCodeReference(audit.audit_code)}
-										</code>
-									</div>
-									<p className="text-xs text-muted-foreground">
-										{t("list.startedAt", { value: formatDateTimeLabel(audit.started_at, formatT) })}{" "}
-										· {submissionLabel}
-									</p>
-								</div>
-								<div className="flex flex-wrap items-center gap-2">
-									<Badge variant={getStatusBadgeVariant(audit.status)} className="font-medium">
-										{t(`status.${audit.status.toLowerCase()}`)}
-									</Badge>
-									<Badge variant="outline" className="font-mono tabular-nums">
-										{formatScoreLabel(audit.summary_score, formatT)}
-									</Badge>
-									<Button
-										asChild
-										size="sm"
-										variant={audit.status === "SUBMITTED" ? "secondary" : "outline"}>
-										<Link href={detailHref}>{detailLabel}</Link>
-									</Button>
-								</div>
+					{[
+						{
+							key: "actionRequired",
+							title: t("groups.actionRequired", { count: actionableAudits.length }),
+							items: actionableAudits
+						},
+						{
+							key: "submitted",
+							title: t("groups.submitted", { count: submittedAudits.length }),
+							items: submittedAudits
+						}
+					]
+						.filter(group => group.items.length > 0)
+						.map(group => (
+							<div key={group.key} className="space-y-3">
+								<p className="text-xs font-semibold tracking-[0.12em] text-text-secondary uppercase">
+									{group.title}
+								</p>
+								{group.items.map(audit => {
+									const detailHref =
+										audit.status === "SUBMITTED"
+											? `/auditor/reports/${encodeURIComponent(audit.audit_id)}`
+											: `/auditor/execute/${encodeURIComponent(audit.place_id)}`;
+									const detailLabel =
+										audit.status === "SUBMITTED" ? t("list.openReport") : t("list.resumeAudit");
+									const submissionLabel = audit.submitted_at
+										? t("list.submittedAt", {
+												value: formatDateTimeLabel(audit.submitted_at, formatT)
+											})
+										: t("list.draftNotSubmitted");
+
+									return (
+										<div
+											key={audit.audit_id}
+											className="flex flex-col gap-3 rounded-card border border-border/70 bg-card/60 p-4 lg:flex-row lg:items-center lg:justify-between">
+											<div className="min-w-0 space-y-1">
+												<p className="font-medium text-foreground">{audit.place_name}</p>
+												<div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+													<span>{audit.project_name}</span>
+													<code
+														title={audit.audit_code}
+														className="rounded-md bg-muted/65 px-2 py-1 font-mono text-[11px] tracking-[0.04em] text-foreground/80">
+														{formatAuditCodeReference(audit.audit_code)}
+													</code>
+												</div>
+												<p className="text-xs text-muted-foreground">
+													{t("list.startedAt", {
+														value: formatDateTimeLabel(audit.started_at, formatT)
+													})}{" "}
+													· {submissionLabel}
+												</p>
+											</div>
+											<div className="flex flex-wrap items-center gap-2">
+												<Badge
+													variant={getStatusBadgeVariant(audit.status)}
+													className="font-medium text-foreground">
+													{t(`status.${audit.status.toLowerCase()}`)}
+												</Badge>
+												<Badge
+													variant="outline"
+													className="font-mono tabular-nums text-foreground">
+													{formatScoreLabel(audit.summary_score, formatT)}
+												</Badge>
+												<Button
+													asChild
+													size="sm"
+													variant={audit.status === "SUBMITTED" ? "secondary" : "default"}>
+													<Link href={detailHref}>{detailLabel}</Link>
+												</Button>
+											</div>
+										</div>
+									);
+								})}
 							</div>
-						);
-					})}
+						))}
 					<PaginationControls
 						currentPage={currentPage}
 						pageCount={pageCount}
@@ -141,7 +179,7 @@ export default function AuditorReportsPage() {
 			</Card>
 			<Card>
 				<CardHeader>
-					<CardTitle className="text-base text-foreground/70">{t("summary.title")}</CardTitle>
+					<CardTitle>{t("summary.title")}</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-2">
 					<p className="font-mono text-[2rem] font-semibold leading-none tabular-nums">

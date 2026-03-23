@@ -21,7 +21,16 @@
 			"locationPending": "Ort ausstehend",
 			"datesPending": "Termine ausstehend",
 			"starts": "Beginnt {date}",
-			"ends": "Endet {date}"
+			"ends": "Endet {date}",
+			"stats": {
+				"pendingPlaces": {
+					"title": "Orte ausstehend",
+					"helper": "Orte, die noch nicht eingereicht wurden."
+				},
+				"meanSubmittedScore": {
+					"helper": "Durchschnitt der eingereichten Bewertungen."
+				}
+			}
 		}
 	},
 	"shell": {
@@ -524,6 +533,7 @@
 				"title": "Letzte Aktivitäten",
 				"viewAll": "Alle Audits anzeigen",
 				"submitted": "Eingereicht",
+				"score": "Score {value}",
 				"empty": "Noch keine eingereichten Audits."
 			}
 		},
@@ -582,7 +592,12 @@
 				"title": "Orte",
 				"loadingDescription": "Operative Transparenz in jeden Ort Ihres Kontos.",
 				"description": "Operative Transparenz in jeden Ort Ihres Kontos. Fügen Sie neue Orte aus einem Projektarbeitsbereich hinzu.",
-				"openProjects": "Projekte öffnen, um Ort hinzuzufügen"
+				"openProjects": "Projekte öffnen"
+			},
+			"addPlaceCallout": {
+				"title": "Orte aus einem Projektarbeitsbereich hinzufügen",
+				"description": "Orte werden innerhalb eines Projekts erstellt, damit sie den richtigen Kontext und den passenden operativen Umfang erhalten. Öffnen Sie ein Projekt, wenn Sie einen neuen Ort hinzufügen möchten.",
+				"action": "Projekte öffnen"
 			},
 			"breadcrumbs": {
 				"dashboard": "Dashboard",
@@ -708,11 +723,11 @@
 			"stats": {
 				"places": {
 					"title": "Orte",
-					"helper": "{count} Orte haben bereits Prüfaktivitäten."
+					"helper": "{count} {count, plural, one {Ort hat bereits Audit-Aktivität} other {Orte haben bereits Audit-Aktivität}}."
 				},
 				"auditsCompleted": {
 					"title": "Abgeschlossene Audits",
-					"helper": "{count} Audits sind noch in Bearbeitung."
+					"helper": "{count} {count, plural, one {Audit ist noch in Bearbeitung} other {Audits sind noch in Bearbeitung}}."
 				},
 				"auditorsAssigned": {
 					"title": "Zugewiesene Auditoren",
@@ -740,8 +755,8 @@
 			"deliverySignals": {
 				"title": "Lieferhinweise",
 				"currentSubmittedMeanScore": "Aktueller eingereichter Durchschnittswert",
-				"placesWithAudits": "{count} Orte haben bereits Audit-Aktivitäten.",
-				"auditsInProgress": "{count} Audits sind noch in Bearbeitung.",
+				"placesWithAudits": "{count} {count, plural, one {Ort hat bereits Audit-Aktivität} other {Orte haben bereits Audit-Aktivität}}.",
+				"auditsInProgress": "{count} {count, plural, one {Audit ist noch in Bearbeitung} other {Audits sind noch in Bearbeitung}}.",
 				"auditorsAssigned": "{count} eindeutige Auditoren sind diesem Projekt zugewiesen."
 			},
 			"placesTable": {
@@ -1023,6 +1038,10 @@
 				"submittedAt": "Eingereicht {value}",
 				"draftNotSubmitted": "Entwurf noch nicht eingereicht",
 				"startedAt": "Gestartet {value}"
+			},
+			"groups": {
+				"actionRequired": "Erfordert Aufmerksamkeit ({count})",
+				"submitted": "Eingereicht ({count})"
 			},
 			"status": {
 				"in_progress": "in Bearbeitung",

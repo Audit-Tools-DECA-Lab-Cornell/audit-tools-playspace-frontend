@@ -131,8 +131,8 @@ function ScaleSelector({
 							className={cn(
 								"h-auto min-h-12 justify-center whitespace-normal rounded-field px-4 py-3 text-center leading-5",
 								isSelected
-									? "border-primary bg-primary/10 text-primary hover:bg-primary/15"
-									: "bg-background text-foreground hover:bg-secondary"
+									? "border-primary bg-primary text-primary-foreground hover:bg-primary/90"
+									: "border-action-outline-border bg-background text-foreground hover:border-foreground/35 hover:bg-secondary/70"
 							)}
 							disabled={disabled}
 							onClick={() => {

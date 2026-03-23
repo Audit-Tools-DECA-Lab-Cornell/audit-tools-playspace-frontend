@@ -21,7 +21,16 @@
 			"locationPending": "Location pending",
 			"datesPending": "Dates pending",
 			"starts": "Starts {date}",
-			"ends": "Ends {date}"
+			"ends": "Ends {date}",
+			"stats": {
+				"pendingPlaces": {
+					"title": "stats.pendingPlaces.title",
+					"helper": "stats.pendingPlaces.helper"
+				},
+				"meanSubmittedScore": {
+					"helper": "stats.meanSubmittedScore.helper"
+				}
+			}
 		}
 	},
 	"shell": {
@@ -524,6 +533,7 @@
 				"title": "Recent activity",
 				"viewAll": "View all audits",
 				"submitted": "Submitted",
+				"score": "Score {value}",
 				"empty": "No submitted audits yet."
 			}
 		},
@@ -582,7 +592,12 @@
 				"title": "Places",
 				"loadingDescription": "Operational visibility into every place across your account.",
 				"description": "Operational visibility into every place across your account. Add new places from a project workspace.",
-				"openProjects": "Open projects to add place"
+				"openProjects": "Open projects"
+			},
+			"addPlaceCallout": {
+				"title": "Add places from a project workspace",
+				"description": "Places are created inside a project so they inherit the right context and operational scope. Open a project when you need to add a new place.",
+				"action": "Open projects"
 			},
 			"breadcrumbs": {
 				"dashboard": "Dashboard",
@@ -708,11 +723,11 @@
 			"stats": {
 				"places": {
 					"title": "Places",
-					"helper": "{count} places already have audit activity."
+					"helper": "{count} {count, plural, one {place already has} other {places already have}} audit activity."
 				},
 				"auditsCompleted": {
 					"title": "Audits Completed",
-					"helper": "{count} audits still in progress."
+					"helper": "{count} {count, plural, one {audit is} other {audits are}} still in progress."
 				},
 				"auditorsAssigned": {
 					"title": "Auditors Assigned",
@@ -740,8 +755,8 @@
 			"deliverySignals": {
 				"title": "Delivery signals",
 				"currentSubmittedMeanScore": "Current submitted mean score",
-				"placesWithAudits": "{count} places already have audit activity.",
-				"auditsInProgress": "{count} audits are still in progress.",
+				"placesWithAudits": "{count} {count, plural, one {place already has} other {places already have}} audit activity.",
+				"auditsInProgress": "{count} {count, plural, one {audit is} other {audits are}} still in progress.",
 				"auditorsAssigned": "{count} unique auditors are assigned across this project."
 			},
 			"placesTable": {
@@ -1023,6 +1038,10 @@
 				"submittedAt": "Submitted {value}",
 				"draftNotSubmitted": "Draft not submitted yet",
 				"startedAt": "Started {value}"
+			},
+			"groups": {
+				"actionRequired": "Action required ({count})",
+				"submitted": "Submitted ({count})"
 			},
 			"status": {
 				"in_progress": "in progress",

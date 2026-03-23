@@ -17,7 +17,10 @@ export interface BackButtonProps {
  */
 export function BackButton({ href, label, className }: Readonly<BackButtonProps>) {
 	return (
-		<Button asChild variant="outline" className={cn("gap-2", className)}>
+		<Button
+			asChild
+			variant="ghost"
+			className={cn("gap-2 px-2.5 text-text-secondary hover:text-foreground", className)}>
 			<Link href={href}>
 				<ArrowLeftIcon data-icon="inline-start" aria-hidden="true" />
 				<span>{label}</span>

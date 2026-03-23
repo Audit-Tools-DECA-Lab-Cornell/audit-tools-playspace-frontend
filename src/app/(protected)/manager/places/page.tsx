@@ -43,6 +43,13 @@ function isManagerPlaceStatus(value: string): value is ManagerPlaceRow["status"]
 	return value === "not_started" || value === "in_progress" || value === "submitted";
 }
 
+const MANAGER_PLACES_SKELETON_IDS = [
+	"manager-places-skeleton-1",
+	"manager-places-skeleton-2",
+	"manager-places-skeleton-3",
+	"manager-places-skeleton-4"
+] as const;
+
 export default function ManagerPlacesPage() {
 	const t = useTranslations("manager.places");
 	const formatT = useTranslations("common.format");
@@ -261,9 +268,9 @@ export default function ManagerPlacesPage() {
 					]}
 				/>
 				<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-					{Array.from({ length: 4 }).map((_, index) => (
+					{MANAGER_PLACES_SKELETON_IDS.map(skeletonId => (
 						<div
-							key={`places-stat-skeleton-${index}`}
+							key={skeletonId}
 							className="h-32 animate-pulse rounded-card border border-border bg-card"
 						/>
 					))}
@@ -304,12 +311,18 @@ export default function ManagerPlacesPage() {
 					{ label: t("breadcrumbs.dashboard"), href: "/manager/dashboard" },
 					{ label: t("breadcrumbs.places") }
 				]}
-				actions={
-					<Button asChild variant="outline">
-						<Link href="/manager/projects">{t("header.openProjects")}</Link>
-					</Button>
-				}
 			/>
+			<Card className="border-primary/25 bg-primary/5">
+				<CardContent className="flex flex-col gap-4 py-5 sm:flex-row sm:items-center sm:justify-between">
+					<div className="space-y-1">
+						<p className="font-medium text-foreground">{t("addPlaceCallout.title")}</p>
+						<p className="text-sm text-muted-foreground">{t("addPlaceCallout.description")}</p>
+					</div>
+					<Button asChild>
+						<Link href="/manager/projects">{t("addPlaceCallout.action")}</Link>
+					</Button>
+				</CardContent>
+			</Card>
 			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
 				<StatCard
 					title={t("stats.totalPlaces.title")}
@@ -332,7 +345,7 @@ export default function ManagerPlacesPage() {
 					title={t("stats.meanScore.title")}
 					value={meanScore}
 					helper={t("stats.meanScore.helper")}
-					tone="violet"
+					tone="info"
 				/>
 			</div>
 			<DataTable

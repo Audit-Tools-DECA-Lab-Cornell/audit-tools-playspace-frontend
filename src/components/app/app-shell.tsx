@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 import {
+	ChevronDown,
 	ClipboardList,
 	FolderKanban,
 	LayoutDashboard,
@@ -124,8 +125,9 @@ function UserMenu({ role, auditorCode }: Readonly<{ role: UserRole; auditorCode:
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
-				<Button variant="secondary" className="gap-2">
+				<Button variant="secondary" className="gap-2 border border-action-outline-border bg-secondary/75">
 					<span className="max-w-56 truncate">{label}</span>
+					<ChevronDown className="h-4 w-4 text-text-secondary" aria-hidden="true" />
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="end" className="w-56">
@@ -172,16 +174,16 @@ export function AppShell({ role, auditorCode, children }: Readonly<AppShellProps
 								</div>
 								<div className="grid">
 									<span className="text-base font-semibold leading-5">{shellT("productName")}</span>
-									<span className="text-xs text-muted-foreground">{shellT("productTagline")}</span>
+									<span className="text-sm text-muted-foreground">{shellT("productTagline")}</span>
 								</div>
 							</div>
-							<div className="inline-flex w-fit rounded-pill border border-border/70 bg-muted/60 px-3 py-1 text-xs font-semibold tracking-[0.14em] text-muted-foreground uppercase">
+							<div className="inline-flex w-fit rounded-pill border border-primary/30 bg-primary/10 px-3 py-1 text-(length:--workspace-label-size) font-semibold tracking-(--workspace-label-tracking) text-primary uppercase">
 								{roleLabel}
 							</div>
 						</div>
 						<Separator />
 						<div className="flex-1 overflow-auto p-3">
-							<p className="px-3 pb-2 text-xs font-semibold tracking-[0.18em] text-muted-foreground uppercase">
+							<p className="px-3 pb-2 text-(length:--workspace-label-size) font-semibold tracking-(--workspace-label-tracking) text-text-secondary uppercase">
 								{shellT("workspaceLabel")}
 							</p>
 							<NavLinks items={navItems} />

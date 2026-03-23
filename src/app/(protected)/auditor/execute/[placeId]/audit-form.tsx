@@ -540,30 +540,50 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 
 	return (
 		<div className="space-y-6">
-			<div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-				<div className="space-y-2">
-					<h1 className="text-2xl font-semibold tracking-tight">{t("header.title")}</h1>
-					<p className="text-sm text-muted-foreground">{t("header.place", { name: session.place_name })}</p>
-				</div>
+			<div className="sticky top-16 z-20 -mx-4 border-b border-border/70 bg-background/95 px-4 py-4 backdrop-blur md:-mx-6 md:px-6">
+				<div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+					<div className="space-y-2">
+						<h1 className="text-2xl font-semibold tracking-tight">{t("header.title")}</h1>
+						<p className="text-sm text-muted-foreground">
+							{t("header.place", { name: session.place_name })}
+						</p>
+					</div>
 
-				<div className="flex flex-wrap items-center gap-2">
-					<Badge variant="outline" className="font-medium">
-						{t(`status.${session.status.toLowerCase()}`)}
-					</Badge>
-					<Badge variant="secondary">
-						{t("header.questionsAnswered", {
-							answered: answeredVisibleQuestions,
-							total: totalVisibleQuestions
-						})}
-					</Badge>
-					{patchDraft.isPending ? (
-						<Badge variant="secondary">{t("header.saving")}</Badge>
-					) : lastSavedAt ? (
-						<Badge variant="secondary">{t("header.savedAt", { time: formatTime(lastSavedAt) })}</Badge>
-					) : (
-						<Badge variant="outline">{t("header.noUnsavedChanges")}</Badge>
-					)}
-					<BackButton href="/auditor/places" label={t("actions.backToPlaces")} />
+					<div className="flex flex-wrap items-center gap-2 lg:justify-end">
+						<Badge variant="outline" className="font-medium text-foreground">
+							{t(`status.${session.status.toLowerCase()}`)}
+						</Badge>
+						<Badge variant="secondary" className="font-medium">
+							{t("header.questionsAnswered", {
+								answered: answeredVisibleQuestions,
+								total: totalVisibleQuestions
+							})}
+						</Badge>
+						{patchDraft.isPending ? (
+							<Badge variant="secondary">{t("header.saving")}</Badge>
+						) : lastSavedAt ? (
+							<Badge variant="secondary">{t("header.savedAt", { time: formatTime(lastSavedAt) })}</Badge>
+						) : (
+							<Badge variant="outline">{t("header.noUnsavedChanges")}</Badge>
+						)}
+						{saveError ? <Badge variant="destructive">{saveError}</Badge> : null}
+						<BackButton href="/auditor/places" label={t("actions.backToPlaces")} />
+						<Button
+							type="button"
+							variant="outline"
+							onClick={handleSaveNow}
+							disabled={patchDraft.isPending || isReadOnly}>
+							{t("actions.saveNow")}
+						</Button>
+						<Button
+							type="button"
+							disabled={!readyToSubmit || submitAudit.isPending || isReadOnly}
+							onClick={() => {
+								submitAudit.mutate(session.audit_id);
+							}}>
+							{submitAudit.isPending ? t("actions.submitting") : t("actions.submitAudit")}
+						</Button>
+					</div>
 				</div>
 			</div>
 
@@ -659,11 +679,11 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 									className={cn(
 										"rounded-card border p-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60",
 										isSelected
-											? "border-primary bg-primary/10"
-											: "border-border bg-card hover:bg-secondary/50",
+											? "border-primary bg-primary/12 shadow-field"
+											: "border-action-outline-border bg-card hover:bg-secondary/60",
 										isReadOnly && "cursor-not-allowed opacity-70"
 									)}>
-									<p className="text-xs font-semibold tracking-[0.08em] text-foreground/70">
+									<p className="text-xs font-semibold tracking-[0.08em] text-text-secondary">
 										{mode.key}
 									</p>
 									<p className="mt-2 text-sm font-medium text-foreground">{mode.label}</p>
@@ -749,10 +769,10 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 											className={cn(
 												"rounded-card border p-4 text-left transition-colors touch-manipulation focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60",
 												isActive
-													? "border-primary bg-primary/10"
+													? "border-primary bg-primary/12 shadow-field"
 													: sectionRow.progress.isComplete
-														? "border-border/70 bg-muted/35 opacity-90 hover:bg-muted/50"
-														: "border-border bg-card hover:bg-secondary/50"
+														? "border-status-success-border border-l-4 border-l-status-success bg-status-success-surface hover:bg-status-success-surface"
+														: "border-action-outline-border bg-card hover:bg-secondary/60"
 											)}>
 											<div className="flex items-start justify-between gap-3">
 												<div className="space-y-1">
@@ -832,7 +852,7 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 							<Label htmlFor={`section-note-${activeSection.section.section_key}`}>
 								{t("activeSection.notesLabel")}
 							</Label>
-							<p className="text-sm text-muted-foreground">
+							<p className="text-sm leading-6 text-muted-foreground">
 								{activeSection.section.notes_prompt ?? t("activeSection.notesFallback")}
 							</p>
 							<Textarea
@@ -882,25 +902,6 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 					</CardContent>
 				</Card>
 			) : null}
-
-			<div className="flex flex-wrap items-center justify-end gap-2">
-				{saveError ? <Badge variant="destructive">{saveError}</Badge> : null}
-				<Button
-					type="button"
-					variant="outline"
-					onClick={handleSaveNow}
-					disabled={patchDraft.isPending || isReadOnly}>
-					{t("actions.saveNow")}
-				</Button>
-				<Button
-					type="button"
-					disabled={!readyToSubmit || submitAudit.isPending || isReadOnly}
-					onClick={() => {
-						submitAudit.mutate(session.audit_id);
-					}}>
-					{submitAudit.isPending ? t("actions.submitting") : t("actions.submitAudit")}
-				</Button>
-			</div>
 
 			{isReadOnly ? (
 				<Card>
@@ -995,8 +996,8 @@ function ChoiceFieldCard({
 							className={cn(
 								"h-auto min-h-12 justify-center whitespace-normal px-4 py-3 text-center",
 								isSelected
-									? "border-primary bg-primary/10 text-primary hover:bg-primary/15"
-									: "bg-background text-foreground hover:bg-secondary"
+									? "border-primary bg-primary text-primary-foreground hover:bg-primary/90"
+									: "border-action-outline-border bg-background text-foreground hover:border-foreground/35 hover:bg-secondary/70"
 							)}
 							onClick={() => {
 								if (question.input_type === "single_select") {

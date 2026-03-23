@@ -164,7 +164,50 @@ export function ManagerDashboardClient({
 				/>
 			</div>
 
-			<OverviewPanels account={account} managerProfiles={managerProfiles} auditors={auditors} />
+			<Card>
+				<CardHeader>
+					<CardTitle>{t("recentActivity.title")}</CardTitle>
+					<CardAction>
+						<Button asChild size="sm" variant="outline">
+							<Link href="/manager/audits">{t("recentActivity.viewAll")}</Link>
+						</Button>
+					</CardAction>
+				</CardHeader>
+				<CardContent className="space-y-3">
+					{account.recent_activity.length > 0 ? (
+						account.recent_activity.map(activity => (
+							<div
+								key={activity.audit_id}
+								className="flex flex-col gap-3 rounded-card border border-border/70 bg-card/60 p-4">
+								<div className="space-y-1">
+									<p className="font-medium text-foreground">{activity.place_name}</p>
+									<p className="text-sm text-muted-foreground">{activity.project_name}</p>
+									<div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
+										<code
+											title={activity.audit_code}
+											className="rounded-md bg-muted/65 px-2 py-1 font-mono text-[11px] tracking-[0.04em] text-foreground/80">
+											{formatAuditCodeReference(activity.audit_code)}
+										</code>
+										<span>{formatDateTimeLabel(activity.completed_at, formatT)}</span>
+									</div>
+								</div>
+								<div className="flex items-center justify-between gap-2">
+									<Badge variant="secondary" className="font-medium">
+										{t("recentActivity.submitted")}
+									</Badge>
+									<Badge className="font-mono tabular-nums">
+										{t("recentActivity.score", {
+											value: formatScoreLabel(activity.score, formatT)
+										})}
+									</Badge>
+								</div>
+							</div>
+						))
+					) : (
+						<p className="text-sm text-muted-foreground">{t("recentActivity.empty")}</p>
+					)}
+				</CardContent>
+			</Card>
 
 			<div className="flex flex-col gap-6">
 				<Tabs defaultValue={projects.length > 0 ? "projects" : "auditors"} className="gap-4">
@@ -226,49 +269,9 @@ export function ManagerDashboardClient({
 						)}
 					</TabsContent>
 				</Tabs>
-				<Card>
-					<CardHeader>
-						<CardTitle>{t("recentActivity.title")}</CardTitle>
-						<CardAction>
-							<Button asChild size="sm" variant="outline">
-								<Link href="/manager/audits">{t("recentActivity.viewAll")}</Link>
-							</Button>
-						</CardAction>
-					</CardHeader>
-					<CardContent className="space-y-3">
-						{account.recent_activity.length > 0 ? (
-							account.recent_activity.map(activity => (
-								<div
-									key={activity.audit_id}
-									className="flex flex-col gap-3 rounded-card border border-border/70 bg-card/60 p-4">
-									<div className="space-y-1">
-										<p className="font-medium text-foreground">{activity.place_name}</p>
-										<p className="text-sm text-muted-foreground">{activity.project_name}</p>
-										<div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-											<code
-												title={activity.audit_code}
-												className="rounded-md bg-muted/65 px-2 py-1 font-mono text-[11px] tracking-[0.04em] text-foreground/80">
-												{formatAuditCodeReference(activity.audit_code)}
-											</code>
-											<span>{formatDateTimeLabel(activity.completed_at, formatT)}</span>
-										</div>
-									</div>
-									<div className="flex items-center justify-between gap-2">
-										<Badge variant="secondary" className="font-medium">
-											{t("recentActivity.submitted")}
-										</Badge>
-										<Badge className="font-mono tabular-nums">
-											{formatScoreLabel(activity.score, formatT)}
-										</Badge>
-									</div>
-								</div>
-							))
-						) : (
-							<p className="text-sm text-muted-foreground">{t("recentActivity.empty")}</p>
-						)}
-					</CardContent>
-				</Card>
 			</div>
+
+			<OverviewPanels account={account} managerProfiles={managerProfiles} auditors={auditors} />
 		</div>
 	);
 }

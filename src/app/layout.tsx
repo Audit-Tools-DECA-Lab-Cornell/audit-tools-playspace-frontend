@@ -1,9 +1,11 @@
+import type { CSSProperties } from "react";
 import type { Metadata } from "next";
 import { Geist, JetBrains_Mono, Space_Grotesk } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, getTranslations } from "next-intl/server";
 import "@fontsource/opendyslexic";
 import { getRequestLanguageState } from "@/i18n/server-locale";
+import { DESIGN_SYSTEM, getDesignSystemCssVariables } from "@/lib/design-system";
 import "./globals.css";
 import { Providers } from "./providers";
 
@@ -23,6 +25,12 @@ const monoFont = JetBrains_Mono({
 	subsets: ["latin"]
 });
 
+const initialDesignSystemStyle = getDesignSystemCssVariables({
+	theme: DESIGN_SYSTEM.defaultTheme,
+	contrast: DESIGN_SYSTEM.defaultContrast,
+	fontScale: DESIGN_SYSTEM.fontScale.default
+}) as CSSProperties;
+
 export async function generateMetadata(): Promise<Metadata> {
 	const t = await getTranslations("metadata");
 
@@ -41,7 +49,13 @@ export default async function RootLayout({
 	const messages = await getMessages();
 
 	return (
-		<html lang={locale} suppressHydrationWarning>
+		<html
+			lang={locale}
+			suppressHydrationWarning
+			className={DESIGN_SYSTEM.defaultTheme === "dark" ? "dark" : undefined}
+			data-contrast={DESIGN_SYSTEM.defaultContrast}
+			data-dyslexic-font="false"
+			style={initialDesignSystemStyle}>
 			<body className={`${bodyFont.variable} ${headingFont.variable} ${monoFont.variable} antialiased`}>
 				<NextIntlClientProvider locale={locale} messages={messages}>
 					<Providers initialLanguagePreference={preference} initialResolvedLanguage={locale}>

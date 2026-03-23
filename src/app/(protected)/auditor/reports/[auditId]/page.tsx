@@ -149,7 +149,7 @@ export default function AuditorReportDetailPage() {
 				actions={
 					<div className="flex flex-wrap items-center gap-2">
 						{canResumeAudit ? (
-							<Button asChild variant="outline">
+							<Button asChild>
 								<Link href={`/auditor/execute/${encodeURIComponent(audit.place_id)}`}>
 									{t("actions.resumeAudit")}
 								</Link>
@@ -166,7 +166,7 @@ export default function AuditorReportDetailPage() {
 					</CardHeader>
 					<CardContent className="space-y-3">
 						<p className="text-sm text-muted-foreground">{t("inProgressCard.description")}</p>
-						<Button asChild variant="outline">
+						<Button asChild>
 							<Link href={`/auditor/execute/${encodeURIComponent(audit.place_id)}`}>
 								{t("inProgressCard.continue")}
 							</Link>
@@ -376,16 +376,23 @@ export default function AuditorReportDetailPage() {
 															</code>
 														) : null}
 													</div>
-													<Badge
-														variant={hasNote ? "secondary" : "outline"}
-														className="font-medium">
-														{hasNote
-															? t("sectionNotes.capturedNote")
-															: t("sectionNotes.emptyBadge")}
-													</Badge>
+													{hasNote ? (
+														<Badge variant="secondary" className="font-medium">
+															{t("sectionNotes.capturedNote")}
+														</Badge>
+													) : null}
 												</div>
 												<p className="mt-3 text-sm text-muted-foreground">
-													{hasNote ? section.note : t("sectionNotes.noNoteCaptured")}
+													{hasNote ? (
+														section.note
+													) : (
+														<>
+															<span aria-hidden="true">-</span>
+															<span className="sr-only">
+																{t("sectionNotes.noNoteCaptured")}
+															</span>
+														</>
+													)}
 												</p>
 											</div>
 										);
