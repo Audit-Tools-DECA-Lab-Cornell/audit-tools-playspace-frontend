@@ -1,11 +1,11 @@
 {
-	"generated_at": "2026-03-22T21:39:24.370601+00:00",
+	"generated_at": "2026-03-23T21:40:41.955130+00:00",
 	"app_base_url": "https://audit-tools-playsafe-frontend.vercel.app",
 	"api_base_url": "https://audit-tools-backend.onrender.com",
 	"output_directory": "/Users/praty/Desktop/StudentJob/playspace/audit-tools-playspace-frontend/public/screenshots",
 	"total_targets": 25,
-	"success_count": 19,
-	"failure_count": 6,
+	"success_count": 25,
+	"failure_count": 0,
 	"successes": [
 		{
 			"route_pattern": "/admin/accounts",
@@ -16,12 +16,12 @@
 			"session_label": "admin",
 			"target_url": "https://audit-tools-playsafe-frontend.vercel.app/admin/accounts?__capture=true&__variant=admin%3A%3Aadmin__accounts",
 			"output_file": "screenshots/admin__admin__accounts.png",
-			"screenshot_url": "https://iad.microlink.io/TOzaLclvndbxEoonEpiy6TuLxXettxNX4kt5VE81BAcZOt32cn9DAe7AK2ntdV6mUMhHU6tnd7LcR9Pac-Qjjg.png",
+			"screenshot_url": "https://iad.microlink.io/3aJgVX9sHD8m7rHWhK4YNTQoO7EQQWC2sV_isgk7JLygia6rylvpkt2iiEV-MofidmWOOvYv28Q1UgboKxiuJw.png",
 			"image_width": 1920,
 			"image_height": 1489,
 			"image_type": "png",
-			"image_size_bytes": 169646,
-			"completed_at": "2026-03-22T21:34:29.086128+00:00"
+			"image_size_bytes": 173782,
+			"completed_at": "2026-03-23T21:34:07.988543+00:00"
 		},
 		{
 			"route_pattern": "/admin/auditors",
@@ -32,12 +32,12 @@
 			"session_label": "admin",
 			"target_url": "https://audit-tools-playsafe-frontend.vercel.app/admin/auditors?__capture=true&__variant=admin%3A%3Aadmin__auditors",
 			"output_file": "screenshots/admin__admin__auditors.png",
-			"screenshot_url": "https://iad.microlink.io/-GBQcdKIhc7LtXiG0OivBAlzmP9_0sFYRKxKK3U9PrCggcsvgQCjLdI8W3tligcVpkOqtAVVjrKny8mN9rThMQ.png",
+			"screenshot_url": "https://iad.microlink.io/Per_AQZdGCaXkD9TdKivf8nEsICtNE3Yn_XCo2lbRUe58z5a3S245LYAva4-Laggwbef3LZ-SJgVBuo2NjzLFg.png",
 			"image_width": 1920,
 			"image_height": 1549,
 			"image_type": "png",
-			"image_size_bytes": 146961,
-			"completed_at": "2026-03-22T21:34:43.923053+00:00"
+			"image_size_bytes": 151525,
+			"completed_at": "2026-03-23T21:34:24.054978+00:00"
 		},
 		{
 			"route_pattern": "/admin/audits",
@@ -48,12 +48,12 @@
 			"session_label": "admin",
 			"target_url": "https://audit-tools-playsafe-frontend.vercel.app/admin/audits?__capture=true&__variant=admin%3A%3Aadmin__audits",
 			"output_file": "screenshots/admin__admin__audits.png",
-			"screenshot_url": "https://iad.microlink.io/ASuELLvWu6h7jKbBXvz_rjRL_H78tP2dV-4rfDObS9CN4yzuzjmLpzPxkQ6Q_m7l8V5Xz1VSk6uTwNbNEsV6sQ.png",
+			"screenshot_url": "https://iad.microlink.io/uO_SdyhDshi8J8OD6EDgRF9iy0OOpGr6idBPUi7DT2T2DO5HjBB9CeRRBNtsvAyMDFJtvYSRt0iQR_PWJJiQpw.png",
 			"image_width": 1920,
 			"image_height": 2129,
 			"image_type": "png",
-			"image_size_bytes": 289730,
-			"completed_at": "2026-03-22T21:34:59.379243+00:00"
+			"image_size_bytes": 289915,
+			"completed_at": "2026-03-23T21:34:38.751505+00:00"
 		},
 		{
 			"route_pattern": "/admin/dashboard",
@@ -64,12 +64,12 @@
 			"session_label": "admin",
 			"target_url": "https://audit-tools-playsafe-frontend.vercel.app/admin/dashboard?__capture=true&__variant=admin%3A%3Aadmin__dashboard",
 			"output_file": "screenshots/admin__admin__dashboard.png",
-			"screenshot_url": "https://iad.microlink.io/nwOzK3Wv09nudIRpTlwkOgY21MKRJYdnKALVRTaKC86NNNCmAagzfa7UuXpnhOa4eQ-DOSolRtI3zxJmXpoNlg.png",
+			"screenshot_url": "https://iad.microlink.io/aEhyGN9Wb2QdC8EbUnXVa1LAvBTk_ilZnYT-32BzeMvVizz_3VIKTQEtMwZ6dVCSb9vNtiqdMfKOqCoU4jQn-A.png",
 			"image_width": 1920,
-			"image_height": 1230,
+			"image_height": 1243,
 			"image_type": "png",
-			"image_size_bytes": 180862,
-			"completed_at": "2026-03-22T21:35:14.710811+00:00"
+			"image_size_bytes": 190596,
+			"completed_at": "2026-03-23T21:34:56.619258+00:00"
 		},
 		{
 			"route_pattern": "/admin/places",
@@ -80,12 +80,12 @@
 			"session_label": "admin",
 			"target_url": "https://audit-tools-playsafe-frontend.vercel.app/admin/places?__capture=true&__variant=admin%3A%3Aadmin__places",
 			"output_file": "screenshots/admin__admin__places.png",
-			"screenshot_url": "https://iad.microlink.io/2bk9BPmXs7PFPi3ms88tC-GKu9eQXW4rYyfr_wbpPAQKt9RfuDOjRdM6ae107XHVS53prVZtTvWZtqcGxQ8uyA.png",
+			"screenshot_url": "https://iad.microlink.io/2pEXWm_VNDhbIlDWoBQS_PwM8BIeSPSlf_5MSCaWHJ3FctUgd8zfV7yIMf9IHfNhE85NN7hl6DRyIdUldprvvw.png",
 			"image_width": 1920,
 			"image_height": 1729,
 			"image_type": "png",
-			"image_size_bytes": 243689,
-			"completed_at": "2026-03-22T21:35:30.845069+00:00"
+			"image_size_bytes": 245406,
+			"completed_at": "2026-03-23T21:35:11.265621+00:00"
 		},
 		{
 			"route_pattern": "/admin/projects",
@@ -96,12 +96,12 @@
 			"session_label": "admin",
 			"target_url": "https://audit-tools-playsafe-frontend.vercel.app/admin/projects?__capture=true&__variant=admin%3A%3Aadmin__projects",
 			"output_file": "screenshots/admin__admin__projects.png",
-			"screenshot_url": "https://iad.microlink.io/9mK5cIIno7yIckTiVBYqfslMIqjELObphKL1s-igUJVYm3gE83qgUqBMHb-eXCGPP24z-FNFAUqTXjLQK2OVvg.png",
+			"screenshot_url": "https://iad.microlink.io/mGzMv18-a3C2SyokVbSwc215otnmva0rDR3JiGOr5wQ1t0EUJKAIa_gbnzy4OLmi3YMxOt5-Wv6DJdfb38I2_A.png",
 			"image_width": 1920,
 			"image_height": 1335,
 			"image_type": "png",
-			"image_size_bytes": 178626,
-			"completed_at": "2026-03-22T21:35:45.197284+00:00"
+			"image_size_bytes": 181306,
+			"completed_at": "2026-03-23T21:35:29.793193+00:00"
 		},
 		{
 			"route_pattern": "/admin/system",
@@ -112,12 +112,12 @@
 			"session_label": "admin",
 			"target_url": "https://audit-tools-playsafe-frontend.vercel.app/admin/system?__capture=true&__variant=admin%3A%3Aadmin__system",
 			"output_file": "screenshots/admin__admin__system.png",
-			"screenshot_url": "https://iad.microlink.io/32k5CnKfCXt2FOfN-Y-DXSlMqQU2oBb45ZzmPtS2JcGVD-xj3SV73NXgq16od4itLc60npAqeZqRVjYjFFxhHg.png",
+			"screenshot_url": "https://iad.microlink.io/vWQssi_aUPwksWDi8Z2ihO-gGXmVFFRIgkjEKTEBX2X18eF1OqyfnsiTmBZ68V-MxfbGirdbkzoaBwZQnHTlyA.png",
 			"image_width": 1920,
 			"image_height": 1080,
 			"image_type": "png",
-			"image_size_bytes": 146930,
-			"completed_at": "2026-03-22T21:35:59.796186+00:00"
+			"image_size_bytes": 156041,
+			"completed_at": "2026-03-23T21:35:44.623714+00:00"
 		},
 		{
 			"route_pattern": "/auditor/dashboard",
@@ -128,12 +128,12 @@
 			"session_label": "auditor",
 			"target_url": "https://audit-tools-playsafe-frontend.vercel.app/auditor/dashboard?__capture=true&__variant=auditor%3A%3Aauditor__dashboard",
 			"output_file": "screenshots/auditor__auditor__dashboard.png",
-			"screenshot_url": "https://iad.microlink.io/ZeIEU2wSrWV1CoDzDAjlfmrrioBSG-Yk3rz9ShZWfpbrxXl8LoVQcloatk6QvjbH3Y9rY80IydLNbNXjCigPMQ.png",
+			"screenshot_url": "https://iad.microlink.io/uBg5MZ9H1qx6ps1TO3jtEUHseVI2LhpO0nnJV0Yyxf3n1tABTwIjM0Cie9BzgcXK7_X2ymUnW108A_I221W92w.png",
 			"image_width": 1920,
-			"image_height": 1136,
+			"image_height": 1179,
 			"image_type": "png",
-			"image_size_bytes": 150938,
-			"completed_at": "2026-03-22T21:36:14.446485+00:00"
+			"image_size_bytes": 167444,
+			"completed_at": "2026-03-23T21:35:58.935227+00:00"
 		},
 		{
 			"route_pattern": "/auditor/execute/[placeId]",
@@ -144,12 +144,12 @@
 			"session_label": "auditor",
 			"target_url": "https://audit-tools-playsafe-frontend.vercel.app/auditor/execute/ccf47f7a-f09b-56fb-91dd-52b2da2b6403?__capture=true&__variant=auditor%3A%3Aauditor__execute__placeId",
 			"output_file": "screenshots/auditor__auditor__execute__placeId.png",
-			"screenshot_url": "https://iad.microlink.io/zehrUAkbYLzA2_bd6Bbvr-o5kdR_rsdcN0HlhR0MzJpQyEDxyv1sNGK7cvEo94q2eG-YgeqELKmeE3ByNZ7cUg.png",
+			"screenshot_url": "https://iad.microlink.io/R38L0tvSkxSKMcnVDaoUwm4JHPvGzxnbWpnyCVNJQnMcFN1HTBnkxm-qEAZqjrJrTodGcWOJK7loyslaAKsLdw.png",
 			"image_width": 1920,
-			"image_height": 5191,
+			"image_height": 5185,
 			"image_type": "png",
-			"image_size_bytes": 584065,
-			"completed_at": "2026-03-22T21:36:29.415659+00:00"
+			"image_size_bytes": 602766,
+			"completed_at": "2026-03-23T21:36:15.910850+00:00"
 		},
 		{
 			"route_pattern": "/auditor/places",
@@ -160,12 +160,12 @@
 			"session_label": "auditor",
 			"target_url": "https://audit-tools-playsafe-frontend.vercel.app/auditor/places?__capture=true&__variant=auditor%3A%3Aauditor__places",
 			"output_file": "screenshots/auditor__auditor__places.png",
-			"screenshot_url": "https://iad.microlink.io/X2i5UsYdZTRHNdXqT5_pL5o4pgW9T0DlYJvr1DbwJUyeYNemDY70cJwXO0bW__rzpFoK8da63umMRFkbdfVqmg.png",
+			"screenshot_url": "https://iad.microlink.io/rYFPyz50pNNiqTuhcee3200nA3WBGKjxXed0FGX8ECZm0vpzh7JK7GEIVJyaBzoDBik_JIpGfv8jyzOqFSWiWQ.png",
 			"image_width": 1920,
 			"image_height": 1383,
 			"image_type": "png",
-			"image_size_bytes": 190628,
-			"completed_at": "2026-03-22T21:36:44.537202+00:00"
+			"image_size_bytes": 197861,
+			"completed_at": "2026-03-23T21:36:31.323272+00:00"
 		},
 		{
 			"route_pattern": "/auditor/reports/[auditId]",
@@ -176,12 +176,12 @@
 			"session_label": "auditor",
 			"target_url": "https://audit-tools-playsafe-frontend.vercel.app/auditor/reports/73bf00dd-60a9-406b-a960-94590e3e3cb2?__capture=true&__variant=auditor%3A%3Aauditor__reports__auditId",
 			"output_file": "screenshots/auditor__auditor__reports__auditId.png",
-			"screenshot_url": "https://iad.microlink.io/dpMY-83YhykKdMa-4w-cB2JKdK9WxcRoeqwFQZHqCJVKyZcLykdoHIwdyWlFPnW5AX0JOqm4jb4pLBKg3T6GsQ.png",
+			"screenshot_url": "https://iad.microlink.io/t_oHU71LEr1fEj2x8_VvLgkxcMhx-4NEzZHvXxKZuESZ20RdFJVZgIa7fwFaP8cn7S7iTGg8uC3oYvx-i-DDBg.png",
 			"image_width": 1920,
-			"image_height": 2169,
+			"image_height": 2173,
 			"image_type": "png",
-			"image_size_bytes": 246383,
-			"completed_at": "2026-03-22T21:36:59.075379+00:00"
+			"image_size_bytes": 220601,
+			"completed_at": "2026-03-23T21:36:46.658932+00:00"
 		},
 		{
 			"route_pattern": "/auditor/reports",
@@ -192,12 +192,12 @@
 			"session_label": "auditor",
 			"target_url": "https://audit-tools-playsafe-frontend.vercel.app/auditor/reports?__capture=true&__variant=auditor%3A%3Aauditor__reports",
 			"output_file": "screenshots/auditor__auditor__reports.png",
-			"screenshot_url": "https://iad.microlink.io/z_7c5KQAZNrzmLVB4I5KEC6OR4TYY_BJX1mc7mFoTs5ZmPJBLWv_gfDQ_u_aKpS7Dpu2hpgthY5NcJ5gG0dApg.png",
+			"screenshot_url": "https://iad.microlink.io/M5p8VWjBstG9202cUgcGOzY6MkOQ1i9GXMyyC9p8ptKkfl92Dh6Hipz8iBOMM02fHCD_cj2iHRh4nAyGtDGd9Q.png",
 			"image_width": 1920,
-			"image_height": 1404,
+			"image_height": 1463,
 			"image_type": "png",
-			"image_size_bytes": 201050,
-			"completed_at": "2026-03-22T21:37:13.331635+00:00"
+			"image_size_bytes": 218629,
+			"completed_at": "2026-03-23T21:37:01.343733+00:00"
 		},
 		{
 			"route_pattern": "/manager/assignments",
@@ -208,12 +208,12 @@
 			"session_label": "manager",
 			"target_url": "https://audit-tools-playsafe-frontend.vercel.app/manager/assignments?__capture=true&__variant=manager%3A%3Amanager__assignments",
 			"output_file": "screenshots/manager__manager__assignments.png",
-			"screenshot_url": "https://iad.microlink.io/mnRA-zwt3fq_e3nKpgvbc7Vx-vfx0Oi8R8ni9cdpuwWfF6q3_tT8ICoJj5k6nxRn7wljeO5EyVbqDlT26egoCg.png",
+			"screenshot_url": "https://iad.microlink.io/OE2D_tCk0UMM9Q1jYCc-iu5c8iChCos6eic5fDl6QHI6RNmhBHU6HpoDfoKB1sy9OKzrQEYOxYKdNIwqifwQdQ.png",
 			"image_width": 1920,
-			"image_height": 1153,
+			"image_height": 1155,
 			"image_type": "png",
-			"image_size_bytes": 178387,
-			"completed_at": "2026-03-22T21:37:33.295380+00:00"
+			"image_size_bytes": 181467,
+			"completed_at": "2026-03-23T21:37:16.533856+00:00"
 		},
 		{
 			"route_pattern": "/manager/auditors",
@@ -224,12 +224,28 @@
 			"session_label": "manager",
 			"target_url": "https://audit-tools-playsafe-frontend.vercel.app/manager/auditors?__capture=true&__variant=manager%3A%3Amanager__auditors",
 			"output_file": "screenshots/manager__manager__auditors.png",
-			"screenshot_url": "https://iad.microlink.io/ogjfANQwB8Iqc8LmQ2RwWdZ1yfaJq0M4DyGjDq1NXZgaiYb3h6TUUzWAR28knXqT-8YzUy1GfSMjRB8jICedNw.png",
+			"screenshot_url": "https://iad.microlink.io/50Z8l_VHDO7zbYfBxgFSZXj1c0hPF5zDmAMIFI8Y8x96npSLIxVY0cdLxD_4__8fw0iqP-yXM2pJEU2cdCw8Dg.png",
 			"image_width": 1920,
-			"image_height": 2006,
+			"image_height": 2019,
 			"image_type": "png",
-			"image_size_bytes": 229317,
-			"completed_at": "2026-03-22T21:37:48.332579+00:00"
+			"image_size_bytes": 241497,
+			"completed_at": "2026-03-23T21:37:33.334143+00:00"
+		},
+		{
+			"route_pattern": "/manager/audits",
+			"source_file": "src/app/(protected)/manager/audits/page.tsx",
+			"access": "manager",
+			"variant": "manager::manager__audits",
+			"resolved_path": "/manager/audits",
+			"session_label": "manager",
+			"target_url": "https://audit-tools-playsafe-frontend.vercel.app/manager/audits?__capture=true&__variant=manager%3A%3Amanager__audits",
+			"output_file": "screenshots/manager__manager__audits.png",
+			"screenshot_url": "https://iad.microlink.io/WsNRF6nzzS-QfFNaXjAXIjNLlOY9pSGeycB9tLpge6GnRut3qchc_7Br5ixVtEJNNvqL5S1k7w9lkiEW6bsEzA.png",
+			"image_width": 1920,
+			"image_height": 2359,
+			"image_type": "png",
+			"image_size_bytes": 301807,
+			"completed_at": "2026-03-23T21:37:48.549712+00:00"
 		},
 		{
 			"route_pattern": "/manager/dashboard",
@@ -240,12 +256,12 @@
 			"session_label": "manager",
 			"target_url": "https://audit-tools-playsafe-frontend.vercel.app/manager/dashboard?__capture=true&__variant=manager%3A%3Amanager__dashboard",
 			"output_file": "screenshots/manager__manager__dashboard.png",
-			"screenshot_url": "https://iad.microlink.io/9ePjbQxmsGObnpSVmXnSzRQHc315j0wRn1bdQrSu7y5PaCTz0bFrPZw_9QV6weQCWnQ899YKPhgH4tZCSliplw.png",
+			"screenshot_url": "https://iad.microlink.io/Dj1Xn3A-45Olh3YlWatUo8RCau5M6gZSwvFxUh7uP9HiDeKBeV0ZEkT21qIOvw7763wxQO-kLEU1mMvcs1pQoQ.png",
 			"image_width": 1920,
-			"image_height": 2598,
+			"image_height": 2614,
 			"image_type": "png",
-			"image_size_bytes": 347198,
-			"completed_at": "2026-03-22T21:38:18.156520+00:00"
+			"image_size_bytes": 363776,
+			"completed_at": "2026-03-23T21:38:06.383508+00:00"
 		},
 		{
 			"route_pattern": "/manager/places/[placeId]",
@@ -256,12 +272,12 @@
 			"session_label": "manager",
 			"target_url": "https://audit-tools-playsafe-frontend.vercel.app/manager/places/ccf47f7a-f09b-56fb-91dd-52b2da2b6403?__capture=true&__variant=manager%3A%3Amanager__places__placeId",
 			"output_file": "screenshots/manager__manager__places__placeId.png",
-			"screenshot_url": "https://iad.microlink.io/a-fBEaeZfUOElqIw2oiNPzyF4HO-mISkR6irSt7LUN0CSOq9ig-IIFEIS9LJNJ_nkOtrE-X_33vRWIjZOZSbWg.png",
+			"screenshot_url": "https://iad.microlink.io/0uyNp1PvrmJSIOb1HfQgKCuH4Kga-7erNmaARAeGThr1IxbWGAkZA-ifMH1ckrL_rJp5lRD_cgFBZzhNpua7uQ.png",
 			"image_width": 1920,
 			"image_height": 1080,
 			"image_type": "png",
-			"image_size_bytes": 126841,
-			"completed_at": "2026-03-22T21:38:36.533227+00:00"
+			"image_size_bytes": 136848,
+			"completed_at": "2026-03-23T21:38:24.821321+00:00"
 		},
 		{
 			"route_pattern": "/manager/places",
@@ -272,12 +288,12 @@
 			"session_label": "manager",
 			"target_url": "https://audit-tools-playsafe-frontend.vercel.app/manager/places?__capture=true&__variant=manager%3A%3Amanager__places",
 			"output_file": "screenshots/manager__manager__places.png",
-			"screenshot_url": "https://iad.microlink.io/qMVgL9KOWWiGQAsPeo6qiMGongM5NZ2961ibaLH0R99NyLYJS0x06RM2AlDLpF5aWz5PLMrR_8hiWW41oGYa-g.png",
+			"screenshot_url": "https://iad.microlink.io/tIc_fmKbjmdOdI7HDhkeLWUn62QBVA5oa5aDJjqkftoHwap5pkrZWQOH-c928N5ZumL8AFD_EPUQcQLDFC_Mzg.png",
 			"image_width": 1920,
-			"image_height": 1906,
+			"image_height": 2075,
 			"image_type": "png",
-			"image_size_bytes": 317145,
-			"completed_at": "2026-03-22T21:38:52.243486+00:00"
+			"image_size_bytes": 320941,
+			"completed_at": "2026-03-23T21:38:42.350913+00:00"
 		},
 		{
 			"route_pattern": "/manager/projects/[projectId]",
@@ -288,12 +304,12 @@
 			"session_label": "manager",
 			"target_url": "https://audit-tools-playsafe-frontend.vercel.app/manager/projects/52a2021e-a6cb-5de8-921c-b86c2717ed53?__capture=true&__variant=manager%3A%3Amanager__projects__projectId",
 			"output_file": "screenshots/manager__manager__projects__projectId.png",
-			"screenshot_url": "https://iad.microlink.io/AVd2Cj9XBqNnlpwSg8TTR8JCccZBsBnyOyMAe8mpkkXw1UAEsxd1tq2bgH393B_IYLFo3PMt3_JXQg9XatSA_w.png",
+			"screenshot_url": "https://iad.microlink.io/jp2r6Fwp6W0TWrxvefNEYsANES4S_dC20NAOyqmNRADkZ4f3umYFZd9OmgLwnMR8XR8K7mR0Pguyr4xaWrfguA.png",
 			"image_width": 1920,
 			"image_height": 1080,
 			"image_type": "png",
-			"image_size_bytes": 143149,
-			"completed_at": "2026-03-22T21:39:07.562005+00:00"
+			"image_size_bytes": 153790,
+			"completed_at": "2026-03-23T21:38:58.917062+00:00"
 		},
 		{
 			"route_pattern": "/manager/projects",
@@ -304,24 +320,12 @@
 			"session_label": "manager",
 			"target_url": "https://audit-tools-playsafe-frontend.vercel.app/manager/projects?__capture=true&__variant=manager%3A%3Amanager__projects",
 			"output_file": "screenshots/manager__manager__projects.png",
-			"screenshot_url": "https://iad.microlink.io/7WuBaT3mgReWvLLftYZZTu8HuFT_o7WNkLYEu7pR0Bj1VpgBn2FukKgUQa2Aul_FguZP9iS0XJSxjmiK-KTyug.png",
+			"screenshot_url": "https://iad.microlink.io/RmZkr9Gl7rClV5BXhhhHMqgG_vYjYWa64AvHXvEB3sx46P48iFGV-tldlSbGGgZSkXZs3mqgKaGar6FmEXWzeQ.png",
 			"image_width": 1920,
-			"image_height": 1520,
+			"image_height": 1533,
 			"image_type": "png",
-			"image_size_bytes": 260990,
-			"completed_at": "2026-03-22T21:39:22.337686+00:00"
-		}
-	],
-	"failures": [
-		{
-			"route_pattern": "/manager/audits",
-			"source_file": "src/app/(protected)/manager/audits/page.tsx",
-			"access": "manager",
-			"variant": "manager::manager__audits",
-			"resolved_path": "/manager/audits",
-			"session_label": "manager",
-			"error": "GET https://api.microlink.io/?url=https%3A%2F%2Faudit-tools-playsafe-frontend.vercel.app%2Fmanager%2Faudits%3F__capture%3Dtrue%26__variant%3Dmanager%253A%253Amanager__audits&screenshot=true&screenshot.fullPage=true&fullPage=true&screenshot.type=png&meta=false&waitUntil=networkidle2&waitForTimeout=10s&timeout=60s&force=true&viewport.width=1920&viewport.height=1080&viewport.deviceScaleFactor=1.0&viewport.isMobile=false&viewport.hasTouch=false&viewport.isLandscape=true failed with HTTP 500: {\"status\":\"fail\",\"code\":\"EFATAL\",\"more\":\"https://microlink.io/efatal\",\"report\":\"mailto:hello@microlink.io?subject=%5Bmicrolink%5D%20Request%20failed&body=Hello%2C%20The%20following%20API%20request%20wasn't%20processed%20properly%3A%0A%0A%20%20-%20request%20id%20%20%3A%200002f523-8eb0-4052-b3ce-4897bbe929b8%0A%20%20-%20request%20uri%20%3A%20https%3A%2F%2Fapi.microlink.io%2F%3Fforce%3Dtrue%26fullPage%3Dtrue%26meta%3Dfalse%26screenshot%3Dtrue%26screenshot.fullPage%3Dtrue%26screenshot.type%3Dpng%26timeout%3D60s%26url%3Dhttps%3A%2F%2Faudit-tools-playsafe-frontend.vercel.app%2Fmanager%2Faudits%3F__capture%253Dtrue%2526__variant%253Dmanager%25253A%25253Amanager__audits%26viewport.deviceScaleFactor%3D1.0%26viewport.hasTouch%3Dfalse%26viewport.height%3D1080%26viewport.isLandscape%3Dtrue%26viewport.isMobile%3Dfalse%26viewport.width%3D1920%26waitForTimeout%3D10s%26waitUntil%3Dnetworkidle2%0A%20%20-%20error%20code%20%20%3A%20EFATAL%20(https%3A%2F%2Fmicrolink.io%2Fefatal).%0A%0ACan%20you%20take%20a%20look%3F%20Thanks!%0A\",\"message\":\"Resolved `https://audit-tools-playsafe-frontend.vercel.app/manager/audits?__capture=true&__variant=manager%3A%3Amanager__audits` failed. Make sure your URL is valid and it has HTML content.\"}",
-			"completed_at": "2026-03-22T21:38:02.133600+00:00"
+			"image_size_bytes": 270014,
+			"completed_at": "2026-03-23T21:39:14.752480+00:00"
 		},
 		{
 			"route_pattern": "/settings",
@@ -330,8 +334,14 @@
 			"variant": "admin::settings",
 			"resolved_path": "/settings",
 			"session_label": "admin",
-			"error": "GET https://api.microlink.io/?url=https%3A%2F%2Faudit-tools-playsafe-frontend.vercel.app%2Fsettings%3F__capture%3Dtrue%26__variant%3Dadmin%253A%253Asettings&screenshot=true&screenshot.fullPage=true&fullPage=true&screenshot.type=png&meta=false&waitUntil=networkidle2&waitForTimeout=10s&timeout=60s&force=true&viewport.width=1920&viewport.height=1080&viewport.deviceScaleFactor=1.0&viewport.isMobile=false&viewport.hasTouch=false&viewport.isLandscape=true failed with HTTP 429: {\"status\":\"fail\",\"code\":\"ERATE\",\"more\":\"https://microlink.io/erate\",\"message\":\"Your daily rate limit has been reached. Upgrade to a PRO plan.\"}",
-			"completed_at": "2026-03-22T21:39:22.753501+00:00"
+			"target_url": "https://audit-tools-playsafe-frontend.vercel.app/settings?__capture=true&__variant=admin%3A%3Asettings",
+			"output_file": "screenshots/admin__settings.png",
+			"screenshot_url": "https://iad.microlink.io/AzJbw5DM8p6n_Fctl00fY7PwNPhxInq80SAS-Nn1GTZllRDZw3x6SA9kXFy8ZXjhy2B26rez7zWz-ocrjx79mA.png",
+			"image_width": 1920,
+			"image_height": 1432,
+			"image_type": "png",
+			"image_size_bytes": 216601,
+			"completed_at": "2026-03-23T21:39:30.589473+00:00"
 		},
 		{
 			"route_pattern": "/settings",
@@ -340,8 +350,14 @@
 			"variant": "manager::settings",
 			"resolved_path": "/settings",
 			"session_label": "manager",
-			"error": "GET https://api.microlink.io/?url=https%3A%2F%2Faudit-tools-playsafe-frontend.vercel.app%2Fsettings%3F__capture%3Dtrue%26__variant%3Dmanager%253A%253Asettings&screenshot=true&screenshot.fullPage=true&fullPage=true&screenshot.type=png&meta=false&waitUntil=networkidle2&waitForTimeout=10s&timeout=60s&force=true&viewport.width=1920&viewport.height=1080&viewport.deviceScaleFactor=1.0&viewport.isMobile=false&viewport.hasTouch=false&viewport.isLandscape=true failed with HTTP 429: {\"status\":\"fail\",\"code\":\"ERATE\",\"more\":\"https://microlink.io/erate\",\"message\":\"Your daily rate limit has been reached. Upgrade to a PRO plan.\"}",
-			"completed_at": "2026-03-22T21:39:23.038528+00:00"
+			"target_url": "https://audit-tools-playsafe-frontend.vercel.app/settings?__capture=true&__variant=manager%3A%3Asettings",
+			"output_file": "screenshots/manager__settings.png",
+			"screenshot_url": "https://iad.microlink.io/LI3Xr0VuLp6uIgNPqNZvOkktGA3cqgyRhcGvse0jyPG1QDzaLmpcHrwbZ30NbXHOJghM7BStpUK1kWRvd7jGPw.png",
+			"image_width": 1920,
+			"image_height": 1610,
+			"image_type": "png",
+			"image_size_bytes": 258664,
+			"completed_at": "2026-03-23T21:39:48.309553+00:00"
 		},
 		{
 			"route_pattern": "/settings",
@@ -350,8 +366,14 @@
 			"variant": "auditor::settings",
 			"resolved_path": "/settings",
 			"session_label": "auditor",
-			"error": "GET https://api.microlink.io/?url=https%3A%2F%2Faudit-tools-playsafe-frontend.vercel.app%2Fsettings%3F__capture%3Dtrue%26__variant%3Dauditor%253A%253Asettings&screenshot=true&screenshot.fullPage=true&fullPage=true&screenshot.type=png&meta=false&waitUntil=networkidle2&waitForTimeout=10s&timeout=60s&force=true&viewport.width=1920&viewport.height=1080&viewport.deviceScaleFactor=1.0&viewport.isMobile=false&viewport.hasTouch=false&viewport.isLandscape=true failed with HTTP 429: {\"status\":\"fail\",\"code\":\"ERATE\",\"more\":\"https://microlink.io/erate\",\"message\":\"Your daily rate limit has been reached. Upgrade to a PRO plan.\"}",
-			"completed_at": "2026-03-22T21:39:23.403029+00:00"
+			"target_url": "https://audit-tools-playsafe-frontend.vercel.app/settings?__capture=true&__variant=auditor%3A%3Asettings",
+			"output_file": "screenshots/auditor__settings.png",
+			"screenshot_url": "https://iad.microlink.io/8CInCwS7IhRM35_zH2tlhBlB2TEk0s7ACLHWpMpjHhtO-Hc3apVweqAjywIEk_9CC_4LQHiOv29nvFb6xoqjVA.png",
+			"image_width": 1920,
+			"image_height": 1432,
+			"image_type": "png",
+			"image_size_bytes": 204921,
+			"completed_at": "2026-03-23T21:40:05.552365+00:00"
 		},
 		{
 			"route_pattern": "/login",
@@ -360,8 +382,14 @@
 			"variant": "public::login",
 			"resolved_path": "/login",
 			"session_label": "public",
-			"error": "GET https://api.microlink.io/?url=https%3A%2F%2Faudit-tools-playsafe-frontend.vercel.app%2Flogin%3F__capture%3Dtrue%26__variant%3Dpublic%253A%253Alogin&screenshot=true&screenshot.fullPage=true&fullPage=true&screenshot.type=png&meta=false&waitUntil=networkidle2&waitForTimeout=10s&timeout=60s&force=true&viewport.width=1920&viewport.height=1080&viewport.deviceScaleFactor=1.0&viewport.isMobile=false&viewport.hasTouch=false&viewport.isLandscape=true failed with HTTP 429: {\"status\":\"fail\",\"code\":\"ERATE\",\"more\":\"https://microlink.io/erate\",\"message\":\"Your daily rate limit has been reached. Upgrade to a PRO plan.\"}",
-			"completed_at": "2026-03-22T21:39:24.086805+00:00"
+			"target_url": "https://audit-tools-playsafe-frontend.vercel.app/login?__capture=true&__variant=public%3A%3Alogin",
+			"output_file": "screenshots/public__login.png",
+			"screenshot_url": "https://iad.microlink.io/VW5qOXEh9tOo9OhDlwpmgl2qNrJbkPYxHNa5NnWtADCu8-KZ2VPcCugIjQ1EC2w9RNHdNmjUAUbg90eb6Dztng.png",
+			"image_width": 1920,
+			"image_height": 1080,
+			"image_type": "png",
+			"image_size_bytes": 74345,
+			"completed_at": "2026-03-23T21:40:22.600923+00:00"
 		},
 		{
 			"route_pattern": "/",
@@ -370,8 +398,15 @@
 			"variant": "public::root",
 			"resolved_path": "/",
 			"session_label": "public",
-			"error": "GET https://api.microlink.io/?url=https%3A%2F%2Faudit-tools-playsafe-frontend.vercel.app%2F%3F__capture%3Dtrue%26__variant%3Dpublic%253A%253Aroot&screenshot=true&screenshot.fullPage=true&fullPage=true&screenshot.type=png&meta=false&waitUntil=networkidle2&waitForTimeout=10s&timeout=60s&force=true&viewport.width=1920&viewport.height=1080&viewport.deviceScaleFactor=1.0&viewport.isMobile=false&viewport.hasTouch=false&viewport.isLandscape=true failed with HTTP 429: {\"status\":\"fail\",\"code\":\"ERATE\",\"more\":\"https://microlink.io/erate\",\"message\":\"Your daily rate limit has been reached. Upgrade to a PRO plan.\"}",
-			"completed_at": "2026-03-22T21:39:24.370546+00:00"
+			"target_url": "https://audit-tools-playsafe-frontend.vercel.app/?__capture=true&__variant=public%3A%3Aroot",
+			"output_file": "screenshots/public__root.png",
+			"screenshot_url": "https://iad.microlink.io/5rs0HcsGr4BVAs8OmQ3EDm4ZPiuv1E0C0ySD2TTTf5HX3F5THoc96o6qWMv9CeW10U-MQVWmxwo_vsCYgUsiOw.png",
+			"image_width": 1920,
+			"image_height": 1080,
+			"image_type": "png",
+			"image_size_bytes": 74345,
+			"completed_at": "2026-03-23T21:40:41.955113+00:00"
 		}
-	]
+	],
+	"failures": []
 }

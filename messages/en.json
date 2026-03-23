@@ -432,7 +432,9 @@
 		},
 		"actions": {
 			"signIn": "Sign in",
-			"continue": "Continue"
+			"signingIn": "Signing in...",
+			"continue": "Continue",
+			"continuing": "Continuing..."
 		},
 		"admin": {
 			"title": "Administrator sign in",

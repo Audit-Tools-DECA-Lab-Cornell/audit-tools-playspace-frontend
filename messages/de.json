@@ -432,7 +432,9 @@
 		},
 		"actions": {
 			"signIn": "Anmelden",
-			"continue": "Weiter"
+			"signingIn": "Anmeldung läuft...",
+			"continue": "Weiter",
+			"continuing": "Weiterleitung läuft..."
 		},
 		"admin": {
 			"title": "Anmeldung für Administratoren",

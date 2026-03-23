@@ -32,6 +32,8 @@ interface AuditorLoginValues {
 	auditorCode: string;
 }
 
+type FormSubmitHandler = NonNullable<React.ComponentProps<"form">["onSubmit"]>;
+
 function isSafeInternalPath(value: string): boolean {
 	return value.startsWith("/") && !value.startsWith("//");
 }
@@ -65,9 +67,30 @@ export interface LoginFormProps {
 	nextParam: string | null;
 }
 
+interface PendingButtonLabelProps {
+	label: string;
+}
+
+/**
+ * Renders the compact loading treatment for the active submit button.
+ */
+function PendingButtonLabel({ label }: Readonly<PendingButtonLabelProps>) {
+	return (
+		<>
+			<span
+				aria-hidden="true"
+				className="size-4 animate-spin rounded-full border-2 border-current border-r-transparent"
+			/>
+			<span>{label}</span>
+		</>
+	);
+}
+
 export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 	const router = useRouter();
 	const t = useTranslations("login");
+	const [isNavigating, startNavigation] = React.useTransition();
+	const [activeLoginRole, setActiveLoginRole] = React.useState<UserRole | null>(null);
 	const [adminValues, setAdminValues] = React.useState<AdminLoginValues>({
 		email: "",
 		password: ""
@@ -91,7 +114,25 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 		});
 	}, [t]);
 
-	const handleAdminSubmit: React.FormEventHandler<HTMLFormElement> = event => {
+	const isAdminPending = isNavigating && activeLoginRole === "admin";
+	const isManagerPending = isNavigating && activeLoginRole === "manager";
+	const isAuditorPending = isNavigating && activeLoginRole === "auditor";
+
+	/**
+	 * Preserves the active submit button while the post-login route transition begins.
+	 */
+	const startRedirectAfterLogin = React.useCallback(
+		(role: UserRole) => {
+			const redirectPath = getRedirectAfterLogin(role, nextParam);
+			setActiveLoginRole(role);
+			startNavigation(() => {
+				router.push(redirectPath);
+			});
+		},
+		[nextParam, router, startNavigation]
+	);
+
+	const handleAdminSubmit: FormSubmitHandler = event => {
 		event.preventDefault();
 
 		const parsedValues = adminLoginSchema.safeParse(adminValues);
@@ -116,12 +157,10 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 			accessToken: createDemoAccessToken(),
 			accountId: resolveAdminAccountId()
 		});
-
-		const redirectPath = getRedirectAfterLogin("admin", nextParam);
-		router.push(redirectPath);
+		startRedirectAfterLogin("admin");
 	};
 
-	const handleManagerSubmit: React.FormEventHandler<HTMLFormElement> = event => {
+	const handleManagerSubmit: FormSubmitHandler = event => {
 		event.preventDefault();
 
 		const parsedValues = managerLoginSchema.safeParse(managerValues);
@@ -147,12 +186,10 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 			accessToken: createDemoAccessToken(),
 			accountId: resolveManagerAccountId(parsedValues.data.email)
 		});
-
-		const redirectPath = getRedirectAfterLogin("manager", nextParam);
-		router.push(redirectPath);
+		startRedirectAfterLogin("manager");
 	};
 
-	const handleAuditorSubmit: React.FormEventHandler<HTMLFormElement> = event => {
+	const handleAuditorSubmit: FormSubmitHandler = event => {
 		event.preventDefault();
 
 		const parsedValues = auditorLoginSchema.safeParse(auditorValues);
@@ -170,9 +207,7 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 			accessToken: createDemoAccessToken(),
 			auditorCode: parsedValues.data.auditorCode
 		});
-
-		const redirectPath = getRedirectAfterLogin("auditor", nextParam);
-		router.push(redirectPath);
+		startRedirectAfterLogin("auditor");
 	};
 
 	return (
@@ -235,7 +270,13 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 									) : null}
 								</div>
 
-								<Button type="submit">{t("actions.signIn")}</Button>
+								<Button type="submit" disabled={isNavigating} aria-busy={isAdminPending}>
+									{isAdminPending ? (
+										<PendingButtonLabel label={t("actions.signingIn")} />
+									) : (
+										t("actions.signIn")
+									)}
+								</Button>
 								<p className="text-xs text-muted-foreground">
 									{t("admin.demoLabel")}{" "}
 									<span className="font-mono">playspace.admin@example.org</span>
@@ -300,7 +341,13 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 									) : null}
 								</div>
 
-								<Button type="submit">{t("actions.signIn")}</Button>
+								<Button type="submit" disabled={isNavigating} aria-busy={isManagerPending}>
+									{isManagerPending ? (
+										<PendingButtonLabel label={t("actions.signingIn")} />
+									) : (
+										t("actions.signIn")
+									)}
+								</Button>
 								<p className="text-xs text-muted-foreground">
 									{t("manager.demoLabel")} <span className="font-mono">manager@example.org</span>{" "}
 									{t("manager.demoOr")}{" "}
@@ -335,7 +382,13 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 									) : null}
 								</div>
 
-								<Button type="submit">{t("actions.continue")}</Button>
+								<Button type="submit" disabled={isNavigating} aria-busy={isAuditorPending}>
+									{isAuditorPending ? (
+										<PendingButtonLabel label={t("actions.continuing")} />
+									) : (
+										t("actions.continue")
+									)}
+								</Button>
 							</form>
 
 							<Separator className="my-6" />
