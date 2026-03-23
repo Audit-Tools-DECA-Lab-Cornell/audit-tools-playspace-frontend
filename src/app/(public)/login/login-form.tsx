@@ -5,10 +5,9 @@ import { useTranslations } from "next-intl";
 import * as React from "react";
 import { z } from "zod";
 
-import { buildMockAuthSession, resolvePostLoginPath } from "@/lib/auth/auth-mode";
 import { setBrowserAuthSession } from "@/lib/auth/browser-session";
+import { resolveAdminAccountId, resolveManagerAccountId } from "@/lib/auth/demo-identities";
 import type { UserRole } from "@/lib/auth/role";
-import { resolveManagerAccountId } from "@/lib/auth/demo-identities";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -33,26 +32,40 @@ interface AuditorLoginValues {
 	auditorCode: string;
 }
 
+function isSafeInternalPath(value: string): boolean {
+	return value.startsWith("/") && !value.startsWith("//");
+}
+
+function getDefaultDashboard(role: UserRole): string {
+	if (role === "admin") return "/admin/dashboard";
+	return role === "manager" ? "/manager/dashboard" : "/auditor/dashboard";
+}
+
+function isAllowedNextPath(role: UserRole, nextPath: string): boolean {
+	if (!isSafeInternalPath(nextPath)) return false;
+	if (nextPath.startsWith("/settings")) return true;
+	if (role === "admin") return nextPath.startsWith("/admin");
+	if (role === "manager") return nextPath.startsWith("/manager");
+	return nextPath.startsWith("/auditor");
+}
+
+function getRedirectAfterLogin(role: UserRole, nextParam: string | null): string {
+	if (nextParam && isAllowedNextPath(role, nextParam)) return nextParam;
+	return getDefaultDashboard(role);
+}
+
+function createDemoAccessToken(): string {
+	if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
+		return crypto.randomUUID();
+	}
+	return `demo_${Date.now()}`;
+}
+
 export interface LoginFormProps {
 	nextParam: string | null;
-	isMockMode: boolean;
 }
 
-type FormSubmitEvent = Parameters<NonNullable<React.ComponentProps<"form">["onSubmit"]>>[0];
-
-function getMockLoginHref(role: UserRole, nextParam: string | null): string {
-	const searchParams = new URLSearchParams({
-		role
-	});
-
-	if (nextParam) {
-		searchParams.set("next", nextParam);
-	}
-
-	return `/api/mock-login?${searchParams.toString()}`;
-}
-
-export function LoginForm({ nextParam, isMockMode }: Readonly<LoginFormProps>) {
+export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 	const router = useRouter();
 	const t = useTranslations("login");
 	const [adminValues, setAdminValues] = React.useState<AdminLoginValues>({
@@ -78,14 +91,7 @@ export function LoginForm({ nextParam, isMockMode }: Readonly<LoginFormProps>) {
 		});
 	}, [t]);
 
-	const handleMockLogin = React.useCallback(
-		(role: UserRole) => {
-			globalThis.window.location.assign(getMockLoginHref(role, nextParam));
-		},
-		[nextParam]
-	);
-
-	const handleAdminSubmit = (event: FormSubmitEvent) => {
+	const handleAdminSubmit: React.FormEventHandler<HTMLFormElement> = event => {
 		event.preventDefault();
 
 		const parsedValues = adminLoginSchema.safeParse(adminValues);
@@ -105,13 +111,17 @@ export function LoginForm({ nextParam, isMockMode }: Readonly<LoginFormProps>) {
 		}
 
 		setAdminErrors({});
-		setBrowserAuthSession(buildMockAuthSession("admin"));
+		setBrowserAuthSession({
+			role: "admin",
+			accessToken: createDemoAccessToken(),
+			accountId: resolveAdminAccountId()
+		});
 
-		const redirectPath = resolvePostLoginPath("admin", nextParam);
+		const redirectPath = getRedirectAfterLogin("admin", nextParam);
 		router.push(redirectPath);
 	};
 
-	const handleManagerSubmit = (event: FormSubmitEvent) => {
+	const handleManagerSubmit: React.FormEventHandler<HTMLFormElement> = event => {
 		event.preventDefault();
 
 		const parsedValues = managerLoginSchema.safeParse(managerValues);
@@ -132,17 +142,17 @@ export function LoginForm({ nextParam, isMockMode }: Readonly<LoginFormProps>) {
 		}
 
 		setManagerErrors({});
-		setBrowserAuthSession(
-			buildMockAuthSession("manager", {
-				accountId: resolveManagerAccountId(parsedValues.data.email)
-			})
-		);
+		setBrowserAuthSession({
+			role: "manager",
+			accessToken: createDemoAccessToken(),
+			accountId: resolveManagerAccountId(parsedValues.data.email)
+		});
 
-		const redirectPath = resolvePostLoginPath("manager", nextParam);
+		const redirectPath = getRedirectAfterLogin("manager", nextParam);
 		router.push(redirectPath);
 	};
 
-	const handleAuditorSubmit = (event: FormSubmitEvent) => {
+	const handleAuditorSubmit: React.FormEventHandler<HTMLFormElement> = event => {
 		event.preventDefault();
 
 		const parsedValues = auditorLoginSchema.safeParse(auditorValues);
@@ -155,41 +165,20 @@ export function LoginForm({ nextParam, isMockMode }: Readonly<LoginFormProps>) {
 		}
 
 		setAuditorErrors({});
-		setBrowserAuthSession(
-			buildMockAuthSession("auditor", {
-				auditorCode: parsedValues.data.auditorCode
-			})
-		);
+		setBrowserAuthSession({
+			role: "auditor",
+			accessToken: createDemoAccessToken(),
+			auditorCode: parsedValues.data.auditorCode
+		});
 
-		const redirectPath = resolvePostLoginPath("auditor", nextParam);
+		const redirectPath = getRedirectAfterLogin("auditor", nextParam);
 		router.push(redirectPath);
 	};
 
 	return (
 		<div className="min-h-dvh bg-background">
 			<div className="mx-auto flex min-h-dvh w-full max-w-5xl items-center px-4 py-10">
-				<div className="w-full space-y-6">
-					{isMockMode ? (
-						<Card>
-							<CardHeader>
-								<CardTitle>Mock Sign In</CardTitle>
-								<CardDescription>Fast role-based access for local quality testing.</CardDescription>
-							</CardHeader>
-							<CardContent className="flex flex-wrap gap-3">
-								<Button type="button" onClick={() => handleMockLogin("admin")}>
-									Continue as Admin
-								</Button>
-								<Button type="button" variant="secondary" onClick={() => handleMockLogin("manager")}>
-									Continue as Manager
-								</Button>
-								<Button type="button" variant="outline" onClick={() => handleMockLogin("auditor")}>
-									Continue as Auditor
-								</Button>
-							</CardContent>
-						</Card>
-					) : null}
-
-					<div className="grid w-full gap-6 lg:grid-cols-3">
+				<div className="grid w-full gap-6 lg:grid-cols-3">
 					<Card>
 						<CardHeader>
 							<CardTitle>{t("admin.title")}</CardTitle>
@@ -358,7 +347,6 @@ export function LoginForm({ nextParam, isMockMode }: Readonly<LoginFormProps>) {
 							</p>
 						</CardContent>
 					</Card>
-					</div>
 				</div>
 			</div>
 		</div>

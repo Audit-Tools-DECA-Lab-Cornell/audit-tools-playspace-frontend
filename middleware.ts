@@ -1,12 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-import { getDefaultDashboardPath } from "@/lib/auth/auth-mode";
-import { AUTH_COOKIE_NAMES, parseUserRole, type UserRole } from "@/lib/auth/role";
-
-interface AuthState {
-	role: UserRole | null;
-	isAuthenticated: boolean;
-}
+import { AUTH_COOKIE_NAMES, parseUserRole } from "./src/lib/auth/role";
 
 function redirectToLogin(request: NextRequest) {
 	const loginUrl = request.nextUrl.clone();
@@ -18,7 +12,7 @@ function redirectToLogin(request: NextRequest) {
 	return NextResponse.redirect(loginUrl);
 }
 
-function getAuthState(request: NextRequest): AuthState {
+function getAuthState(request: NextRequest) {
 	const role = parseUserRole(request.cookies.get(AUTH_COOKIE_NAMES.role)?.value);
 	const accessToken = request.cookies.get(AUTH_COOKIE_NAMES.accessToken)?.value ?? null;
 
@@ -28,56 +22,46 @@ function getAuthState(request: NextRequest): AuthState {
 	};
 }
 
-function getFallbackDashboardPath(currentRole: UserRole, requiredRole: UserRole): string {
-	if (requiredRole === "admin") {
-		return currentRole === "manager" ? "/manager/dashboard" : "/auditor/dashboard";
-	}
-
-	if (requiredRole === "manager") {
-		return currentRole === "admin" ? "/admin/dashboard" : "/auditor/dashboard";
-	}
-
-	return currentRole === "admin" ? "/admin/dashboard" : "/manager/dashboard";
-}
-
-function handleLoginRoute(request: NextRequest, auth: AuthState): NextResponse {
-	if (!auth.isAuthenticated || !auth.role) {
-		return NextResponse.next();
-	}
-
-	return NextResponse.redirect(new URL(getDefaultDashboardPath(auth.role), request.url));
-}
-
-function handleProtectedRoleRoute(request: NextRequest, auth: AuthState, requiredRole: UserRole): NextResponse {
-	if (!auth.isAuthenticated || !auth.role) {
-		return redirectToLogin(request);
-	}
-
-	if (auth.role !== requiredRole) {
-		return NextResponse.redirect(new URL(getFallbackDashboardPath(auth.role, requiredRole), request.url));
-	}
-
-	return NextResponse.next();
-}
-
 export function middleware(request: NextRequest) {
 	const pathname = request.nextUrl.pathname;
 	const auth = getAuthState(request);
 
 	if (pathname.startsWith("/login")) {
-		return handleLoginRoute(request, auth);
+		if (!auth.isAuthenticated || !auth.role) return NextResponse.next();
+		const dashboardPath =
+			auth.role === "admin"
+				? "/admin/dashboard"
+				: auth.role === "manager"
+					? "/manager/dashboard"
+					: "/auditor/dashboard";
+		return NextResponse.redirect(new URL(dashboardPath, request.url));
 	}
 
 	if (pathname.startsWith("/admin")) {
-		return handleProtectedRoleRoute(request, auth, "admin");
+		if (!auth.isAuthenticated) return redirectToLogin(request);
+		if (auth.role !== "admin") {
+			const fallbackPath = auth.role === "manager" ? "/manager/dashboard" : "/auditor/dashboard";
+			return NextResponse.redirect(new URL(fallbackPath, request.url));
+		}
+		return NextResponse.next();
 	}
 
 	if (pathname.startsWith("/manager")) {
-		return handleProtectedRoleRoute(request, auth, "manager");
+		if (!auth.isAuthenticated) return redirectToLogin(request);
+		if (auth.role !== "manager") {
+			const fallbackPath = auth.role === "admin" ? "/admin/dashboard" : "/auditor/dashboard";
+			return NextResponse.redirect(new URL(fallbackPath, request.url));
+		}
+		return NextResponse.next();
 	}
 
 	if (pathname.startsWith("/auditor")) {
-		return handleProtectedRoleRoute(request, auth, "auditor");
+		if (!auth.isAuthenticated) return redirectToLogin(request);
+		if (auth.role !== "auditor") {
+			const fallbackPath = auth.role === "admin" ? "/admin/dashboard" : "/manager/dashboard";
+			return NextResponse.redirect(new URL(fallbackPath, request.url));
+		}
+		return NextResponse.next();
 	}
 
 	if (pathname.startsWith("/settings")) {
@@ -89,5 +73,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-	matcher: ["/", "/login", "/admin/:path*", "/manager/:path*", "/auditor/:path*", "/settings/:path*"]
+	matcher: ["/login", "/admin/:path*", "/manager/:path*", "/auditor/:path*", "/settings/:path*"]
 };
