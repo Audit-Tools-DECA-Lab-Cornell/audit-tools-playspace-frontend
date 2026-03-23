@@ -1,6 +1,5 @@
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
 
-import { buildMockAuthSession, getMockAuthSessionFromHeader, isMockAuthMode, MOCK_AUTH_HEADERS } from "./auth-mode";
 import { AUTH_COOKIE_NAMES, parseUserRole } from "./role";
 import type { AuthSession } from "./session";
 
@@ -28,28 +27,5 @@ export async function getServerAuthSession(): Promise<ServerAuthSession | null> 
 		return { role, accessToken, accountId, auditorCode };
 	}
 
-	if (!isMockAuthMode()) {
-		return null;
-	}
-
-	if (role) {
-		const auditorCode =
-			role === "auditor" ? normalizeCookieValue(cookieStore.get(AUTH_COOKIE_NAMES.auditorCode)?.value) : null;
-		return buildMockAuthSession(role, {
-			accessToken: accessToken ?? undefined,
-			accountId,
-			auditorCode
-		});
-	}
-
-	const headerStore = await headers();
-	const headerSession = getMockAuthSessionFromHeader(headerStore.get(MOCK_AUTH_HEADERS.role), {
-		accountId: normalizeCookieValue(headerStore.get(MOCK_AUTH_HEADERS.accountId)),
-		auditorCode: normalizeCookieValue(headerStore.get(MOCK_AUTH_HEADERS.auditorCode))
-	});
-	if (headerSession) {
-		return headerSession;
-	}
-
-	return buildMockAuthSession("admin");
+	return null;
 }

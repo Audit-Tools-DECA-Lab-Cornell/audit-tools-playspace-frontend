@@ -1,15 +1,8 @@
 import { resolveAdminAccountId, resolveManagerAccountId } from "./demo-identities";
 import type { UserRole } from "./role";
-import { parseUserRole } from "./role";
 import type { AuthSession } from "./session";
 
 export type AuthMode = "real" | "mock";
-
-export const MOCK_AUTH_HEADERS = {
-	role: "x-playspace-mock-role",
-	accountId: "x-playspace-mock-account-id",
-	auditorCode: "x-playspace-mock-auditor-code"
-} as const;
 
 const DEFAULT_MANAGER_EMAIL = "manager@example.org";
 const DEFAULT_AUDITOR_CODE = "AKL-01";
@@ -43,33 +36,55 @@ export function getAuthMode(): AuthMode {
 }
 
 /**
- * Return whether the app should auto-seed a mock dashboard session.
+ * Return whether the app should use the mock login flow.
  */
 export function isMockAuthMode(): boolean {
 	return getAuthMode() === "mock";
 }
 
 /**
- * Derive the role that best matches the requested route in mock mode.
+ * Return the default landing page for a signed-in role.
  */
-export function resolveMockRoleForPath(pathname: string, currentRole: UserRole | null = null): UserRole {
-	if (pathname.startsWith("/admin")) {
-		return "admin";
+export function getDefaultDashboardPath(role: UserRole): string {
+	if (role === "admin") {
+		return "/admin/dashboard";
 	}
 
-	if (pathname.startsWith("/manager")) {
-		return "manager";
+	return role === "manager" ? "/manager/dashboard" : "/auditor/dashboard";
+}
+
+/**
+ * Ensure post-login redirects stay inside the app.
+ */
+export function isSafeInternalPath(value: string): boolean {
+	return value.startsWith("/") && !value.startsWith("//");
+}
+
+/**
+ * Restrict post-login redirects to routes allowed for the selected role.
+ */
+export function resolvePostLoginPath(role: UserRole, nextPath: string | null): string {
+	if (!nextPath || !isSafeInternalPath(nextPath)) {
+		return getDefaultDashboardPath(role);
 	}
 
-	if (pathname.startsWith("/auditor")) {
-		return "auditor";
+	if (nextPath.startsWith("/settings")) {
+		return nextPath;
 	}
 
-	if (pathname.startsWith("/settings")) {
-		return currentRole ?? "admin";
+	if (role === "admin" && nextPath.startsWith("/admin")) {
+		return nextPath;
 	}
 
-	return currentRole ?? "admin";
+	if (role === "manager" && nextPath.startsWith("/manager")) {
+		return nextPath;
+	}
+
+	if (role === "auditor" && nextPath.startsWith("/auditor")) {
+		return nextPath;
+	}
+
+	return getDefaultDashboardPath(role);
 }
 
 /**
@@ -100,19 +115,4 @@ export function buildMockAuthSession(
 					: DEFAULT_AUDITOR_CODE
 				: null
 	};
-}
-
-/**
- * Parse a request header role into a seeded mock session when possible.
- */
-export function getMockAuthSessionFromHeader(
-	roleHeaderValue: string | null,
-	overrides: Partial<Pick<AuthSession, "accountId" | "auditorCode">> = {}
-): AuthSession | null {
-	const role = parseUserRole(roleHeaderValue);
-	if (!role) {
-		return null;
-	}
-
-	return buildMockAuthSession(role, overrides);
 }
