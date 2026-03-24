@@ -8,7 +8,6 @@ const accountTypeSchema = z.enum(["ADMIN", "MANAGER", "AUDITOR"]);
 const projectStatusSchema = z.enum(["planned", "active", "completed"]);
 const placeStatusSchema = z.enum(["not_started", "in_progress", "submitted"]);
 const auditStatusSchema = z.enum(["IN_PROGRESS", "PAUSED", "SUBMITTED"]);
-const assignmentRoleSchema = z.enum(["auditor", "place_admin"]);
 const executionModeSchema = z.enum(["audit", "survey", "both"]);
 
 const managerProfileSchema = z.object({
@@ -132,6 +131,8 @@ const scoreTotalsSchema = z.object({
 const placeAuditHistoryItemSchema = z.object({
 	audit_id: z.string().uuid(),
 	audit_code: z.string(),
+	project_id: z.string().uuid(),
+	project_name: z.string(),
 	auditor_code: z.string(),
 	status: auditStatusSchema,
 	started_at: z.string().datetime(),
@@ -143,6 +144,7 @@ const placeHistorySchema = z.object({
 	place_id: z.string().uuid(),
 	place_name: z.string(),
 	project_id: z.string().uuid(),
+	project_name: z.string(),
 	total_audits: z.number().int().nonnegative(),
 	submitted_audits: z.number().int().nonnegative(),
 	in_progress_audits: z.number().int().nonnegative(),
@@ -215,26 +217,25 @@ const managerAuditsListSchema = z.object({
 const assignmentSchema = z.object({
 	id: z.string().uuid(),
 	auditor_profile_id: z.string().uuid(),
-	project_id: z.string().uuid().nullable(),
+	project_id: z.string().uuid(),
 	place_id: z.string().uuid().nullable(),
 	scope_type: z.enum(["project", "place"]),
 	scope_id: z.string().uuid(),
 	scope_name: z.string(),
 	project_name: z.string(),
 	place_name: z.string().nullable(),
-	audit_roles: z.array(assignmentRoleSchema),
 	assigned_at: z.string().datetime()
 });
 
 const assignmentWriteSchema = z.object({
-	project_id: z.string().uuid().nullable().optional(),
-	place_id: z.string().uuid().nullable().optional(),
-	audit_roles: z.array(assignmentRoleSchema).min(1)
+	project_id: z.string().uuid(),
+	place_id: z.string().uuid().nullable().optional()
 });
 
 const placeDetailSchema = z.object({
 	id: z.string().uuid(),
-	project_id: z.string().uuid(),
+	project_ids: z.array(z.string().uuid()),
+	project_names: z.array(z.string()),
 	name: z.string(),
 	city: z.string().nullable(),
 	province: z.string().nullable(),
@@ -298,7 +299,7 @@ const projectUpdateRequestSchema = z.object({
 });
 
 const placeCreateRequestSchema = z.object({
-	project_id: z.string().uuid(),
+	project_ids: z.array(z.string().uuid()).min(1),
 	name: z.string().min(1),
 	city: z.string().nullable().optional(),
 	province: z.string().nullable().optional(),
@@ -313,6 +314,7 @@ const placeCreateRequestSchema = z.object({
 });
 
 const placeUpdateRequestSchema = z.object({
+	project_ids: z.array(z.string().uuid()).optional(),
 	name: z.string().min(1).optional(),
 	city: z.string().nullable().optional(),
 	province: z.string().nullable().optional(),
@@ -355,7 +357,6 @@ const auditorPlaceSchema = z.object({
 	city: z.string().nullable(),
 	province: z.string().nullable(),
 	country: z.string().nullable(),
-	assignment_roles: z.array(assignmentRoleSchema),
 	audit_status: auditStatusSchema.nullable(),
 	audit_id: z.string().uuid().nullable(),
 	started_at: z.string().datetime().nullable(),
@@ -436,10 +437,11 @@ const auditScoresSchema = z.object({
 const auditSessionSchema = z.object({
 	audit_id: z.string().uuid(),
 	audit_code: z.string(),
+	project_id: z.string().uuid(),
+	project_name: z.string(),
 	place_id: z.string().uuid(),
 	place_name: z.string(),
 	place_type: z.string().nullable(),
-	assignment_roles: z.array(assignmentRoleSchema),
 	allowed_execution_modes: z.array(executionModeSchema),
 	selected_execution_mode: executionModeSchema.nullable(),
 	status: auditStatusSchema,
@@ -895,13 +897,16 @@ export const playspaceApi = {
 			)
 	},
 	places: {
-		audits: async (placeId: string): Promise<PlaceAuditHistoryItem[]> =>
+		audits: async (placeId: string, projectId: string): Promise<PlaceAuditHistoryItem[]> =>
 			fetchValidatedJson(
-				`/playspace/places/${encodeURIComponent(placeId)}/audits`,
+				`/playspace/places/${encodeURIComponent(placeId)}/audits${buildQueryString({ project_id: projectId })}`,
 				z.array(placeAuditHistoryItemSchema)
 			),
-		history: async (placeId: string): Promise<PlaceHistory> =>
-			fetchValidatedJson(`/playspace/places/${encodeURIComponent(placeId)}/history`, placeHistorySchema)
+		history: async (placeId: string, projectId: string): Promise<PlaceHistory> =>
+			fetchValidatedJson(
+				`/playspace/places/${encodeURIComponent(placeId)}/history${buildQueryString({ project_id: projectId })}`,
+				placeHistorySchema
+			)
 	},
 	assignments: {
 		list: async (auditorProfileId: string): Promise<Assignment[]> =>
@@ -970,11 +975,13 @@ export const playspaceApi = {
 			fetchValidatedJson("/playspace/auditor/me/dashboard-summary", auditorDashboardSummarySchema),
 		createOrResumeAudit: async (
 			placeId: string,
+			projectId: string,
 			executionMode?: "audit" | "survey" | "both"
 		): Promise<AuditSession> =>
 			fetchValidatedJson(`/playspace/places/${encodeURIComponent(placeId)}/audits/access`, auditSessionSchema, {
 				method: "POST",
 				body: JSON.stringify({
+					project_id: projectId,
 					execution_mode: executionMode ?? null
 				})
 			}),

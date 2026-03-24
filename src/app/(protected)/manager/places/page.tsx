@@ -146,7 +146,7 @@ export default function ManagerPlacesPage() {
 				cell: ({ row }) => (
 					<div className="min-w-[280px] space-y-1">
 						<Link
-							href={`/manager/places/${encodeURIComponent(row.original.id)}`}
+							href={`/manager/places/${encodeURIComponent(row.original.id)}?projectId=${encodeURIComponent(row.original.project_id)}`}
 							className="font-medium text-foreground transition-colors hover:text-primary">
 							{row.original.name}
 						</Link>
@@ -218,7 +218,7 @@ export default function ManagerPlacesPage() {
 						actions={[
 							{
 								label: t("table.actions.openPlace"),
-								href: `/manager/places/${encodeURIComponent(row.original.id)}`,
+								href: `/manager/places/${encodeURIComponent(row.original.id)}?projectId=${encodeURIComponent(row.original.project_id)}`,
 								icon: MapPinnedIcon
 							},
 							{
@@ -328,6 +328,7 @@ export default function ManagerPlacesPage() {
 					title={t("stats.totalPlaces.title")}
 					value={String(placesQuery.data.summary.total_places)}
 					helper={t("stats.totalPlaces.helper")}
+					tone="primary"
 				/>
 				<StatCard
 					title={t("stats.submitted.title")}

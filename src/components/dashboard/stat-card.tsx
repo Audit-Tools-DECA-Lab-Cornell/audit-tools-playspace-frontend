@@ -4,12 +4,12 @@ import { cn } from "@/lib/utils";
 type StatTone = "neutral" | "primary" | "success" | "warning" | "info" | "violet";
 
 const toneClassesByTone: Record<StatTone, string> = {
-	neutral: "bg-stat-accent-neutral",
-	primary: "bg-stat-accent-neutral",
+	neutral: "bg-status-danger",
+	primary: "bg-accent-terracotta",
 	success: "bg-status-success",
 	warning: "bg-status-warning",
 	info: "bg-stat-accent-info",
-	violet: "bg-stat-accent-info"
+	violet: "bg-accent-violet"
 };
 
 export interface StatCardProps {

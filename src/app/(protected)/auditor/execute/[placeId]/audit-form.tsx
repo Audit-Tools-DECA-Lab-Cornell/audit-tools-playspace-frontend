@@ -18,7 +18,6 @@ import {
 import { BackButton } from "@/components/dashboard/back-button";
 import { formatAuditCodeReference } from "@/components/dashboard/utils";
 import type {
-	AssignmentRole,
 	ExecutionMode,
 	InstrumentQuestion,
 	InstrumentSection,
@@ -35,6 +34,7 @@ import { cn } from "@/lib/utils";
 
 export interface AuditExecuteFormProps {
 	placeId: string;
+	projectId: string;
 }
 
 type ExecutionModeSelection = ExecutionMode | "";
@@ -110,13 +110,6 @@ function createSectionDrafts(
 	}
 
 	return drafts;
-}
-
-/**
- * Format assignment roles with localized labels.
- */
-function formatAssignmentRoleLabel(role: AssignmentRole, t: ExecuteTranslator): string {
-	return t(`roles.${role}`);
 }
 
 /**
@@ -213,7 +206,7 @@ function getInitialActiveSectionKey(sectionRows: readonly SectionProgressRow[]):
 	return firstIncomplete?.section.section_key ?? sectionRows[0]?.section.section_key ?? null;
 }
 
-export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
+export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFormProps>) {
 	const t = useTranslations("auditor.execute");
 	const instrument = useLocalizedInstrument();
 	const [selectedMode, setSelectedMode] = React.useState<ExecutionModeSelection>("");
@@ -229,8 +222,8 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 	const lastSavedPatchRef = React.useRef<AuditDraftPatch | null>(null);
 
 	const createOrResumeQuery = useQuery({
-		queryKey: ["playspace", "auditor", "execute", placeId],
-		queryFn: () => playspaceApi.auditor.createOrResumeAudit(placeId)
+		queryKey: ["playspace", "auditor", "execute", projectId, placeId],
+		queryFn: () => playspaceApi.auditor.createOrResumeAudit(placeId, projectId)
 	});
 
 	React.useEffect(() => {
@@ -353,46 +346,29 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 			progress: getInstrumentSectionLocalProgress(section, sectionDrafts[section.section_key]?.responses ?? {})
 		}));
 	}, [sectionDrafts, visibleSections]);
-	const orderedSectionRows = React.useMemo<SectionProgressRow[]>(() => {
-		const incompleteSections: SectionProgressRow[] = [];
-		const completedSections: SectionProgressRow[] = [];
-
-		for (const sectionRow of sectionRows) {
-			if (sectionRow.progress.isComplete) {
-				completedSections.push(sectionRow);
-				continue;
-			}
-
-			incompleteSections.push(sectionRow);
-		}
-
-		return [...incompleteSections, ...completedSections];
-	}, [sectionRows]);
 
 	React.useEffect(() => {
-		if (orderedSectionRows.length === 0) {
+		if (sectionRows.length === 0) {
 			setActiveSectionKey(null);
 			return;
 		}
 
-		const currentSectionStillVisible = orderedSectionRows.some(
+		const currentSectionStillVisible = sectionRows.some(
 			sectionRow => sectionRow.section.section_key === activeSectionKey
 		);
 		if (currentSectionStillVisible) {
 			return;
 		}
 
-		setActiveSectionKey(getInitialActiveSectionKey(orderedSectionRows));
-	}, [activeSectionKey, orderedSectionRows]);
+		setActiveSectionKey(getInitialActiveSectionKey(sectionRows));
+	}, [activeSectionKey, sectionRows]);
 
-	const activeSectionIndex = orderedSectionRows.findIndex(
-		sectionRow => sectionRow.section.section_key === activeSectionKey
-	);
-	const activeSection = activeSectionIndex >= 0 ? orderedSectionRows[activeSectionIndex] : null;
-	const previousSection = activeSectionIndex > 0 ? orderedSectionRows[activeSectionIndex - 1] : null;
+	const activeSectionIndex = sectionRows.findIndex(sectionRow => sectionRow.section.section_key === activeSectionKey);
+	const activeSection = activeSectionIndex >= 0 ? sectionRows[activeSectionIndex] : null;
+	const previousSection = activeSectionIndex > 0 ? sectionRows[activeSectionIndex - 1] : null;
 	const nextSection =
-		activeSectionIndex >= 0 && activeSectionIndex < orderedSectionRows.length - 1
-			? orderedSectionRows[activeSectionIndex + 1]
+		activeSectionIndex >= 0 && activeSectionIndex < sectionRows.length - 1
+			? sectionRows[activeSectionIndex + 1]
 			: null;
 
 	const requiredPreAuditComplete = isRequiredPreAuditComplete(instrument.pre_audit_questions, preAuditValues);
@@ -604,10 +580,7 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 						<p className="tabular-nums">
 							{t("overview.started", { value: new Date(session.started_at).toLocaleString() })}
 						</p>
-						<p>
-							{t("overview.assignmentRoles")}{" "}
-							{session.assignment_roles.map(role => formatAssignmentRoleLabel(role, t)).join(", ")}
-						</p>
+						<p>{`Project ${session.project_name}`}</p>
 					</div>
 					<div className="space-y-2 text-sm text-muted-foreground">
 						<p>
@@ -753,7 +726,7 @@ export function AuditExecuteForm({ placeId }: Readonly<AuditExecuteFormProps>) {
 								</Badge>
 							</div>
 							<div className="grid gap-3 lg:grid-cols-2">
-								{orderedSectionRows.map(sectionRow => {
+								{sectionRows.map(sectionRow => {
 									const remainingQuestionCount =
 										sectionRow.progress.visibleQuestionCount -
 										sectionRow.progress.answeredQuestionCount;

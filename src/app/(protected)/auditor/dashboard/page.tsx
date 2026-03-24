@@ -83,6 +83,7 @@ export default function AuditorDashboardPage() {
 					title={t("stats.assignedPlaces.title")}
 					value={String(summary.total_assigned_places)}
 					helper={t("stats.assignedPlaces.helper")}
+					tone="info"
 				/>
 				<StatCard
 					title={t("stats.inProgress.title")}
@@ -94,12 +95,13 @@ export default function AuditorDashboardPage() {
 					title={t("stats.submitted.title")}
 					value={String(summary.submitted_audits)}
 					helper={t("stats.submitted.helper")}
-					tone="success"
+					tone="violet"
 				/>
 				<StatCard
 					title={t("stats.pendingPlaces.title")}
 					value={String(summary.pending_places)}
 					helper={t("stats.pendingPlaces.helper")}
+					tone="success"
 				/>
 				<StatCard
 					title={t("stats.meanSubmittedScore.title")}
@@ -118,11 +120,10 @@ export default function AuditorDashboardPage() {
 						<p className="text-sm text-muted-foreground">{t("assignedPlaces.empty")}</p>
 					) : null}
 					{places.map(place => {
-						const actionHref = `/auditor/execute/${encodeURIComponent(place.place_id)}`;
-						const reportHref =
-							place.audit_id !== null
-								? `/auditor/reports/${encodeURIComponent(place.audit_id)}`
-								: "/auditor/reports";
+						const actionHref = `/auditor/execute/${encodeURIComponent(place.place_id)}?projectId=${encodeURIComponent(place.project_id)}`;
+						const reportHref = place.audit_id
+							? `/auditor/reports/${encodeURIComponent(place.audit_id)}`
+							: "/auditor/reports";
 						const isResumeAction = place.audit_status === "IN_PROGRESS" || place.audit_status === "PAUSED";
 						const actionLabel = isResumeAction
 							? t("assignedPlaces.resumeAudit")

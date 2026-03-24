@@ -150,7 +150,8 @@ export default function AuditorReportDetailPage() {
 					<div className="flex flex-wrap items-center gap-2">
 						{canResumeAudit ? (
 							<Button asChild>
-								<Link href={`/auditor/execute/${encodeURIComponent(audit.place_id)}`}>
+								<Link
+									href={`/auditor/execute/${encodeURIComponent(audit.place_id)}?projectId=${encodeURIComponent(audit.project_id)}`}>
 									{t("actions.resumeAudit")}
 								</Link>
 							</Button>
@@ -167,7 +168,8 @@ export default function AuditorReportDetailPage() {
 					<CardContent className="space-y-3">
 						<p className="text-sm text-muted-foreground">{t("inProgressCard.description")}</p>
 						<Button asChild>
-							<Link href={`/auditor/execute/${encodeURIComponent(audit.place_id)}`}>
+							<Link
+								href={`/auditor/execute/${encodeURIComponent(audit.place_id)}?projectId=${encodeURIComponent(audit.project_id)}`}>
 								{t("inProgressCard.continue")}
 							</Link>
 						</Button>
@@ -180,6 +182,7 @@ export default function AuditorReportDetailPage() {
 						<CardTitle>{t("metadata.title")}</CardTitle>
 					</CardHeader>
 					<CardContent className="space-y-2 text-sm text-muted-foreground">
+						<p>{`Project ${audit.project_name}`}</p>
 						<p>{t("metadata.started", { value: formatDateTimeLabel(audit.started_at, formatT) })}</p>
 						<p>{t("metadata.submitted", { value: formatDateTimeLabel(audit.submitted_at, formatT) })}</p>
 						<p>

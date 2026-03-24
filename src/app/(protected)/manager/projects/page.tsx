@@ -187,6 +187,7 @@ export default function ManagerProjectsPage() {
 					title="Total Projects"
 					value={String(projects.length)}
 					helper="Planned and active project workstreams in this account."
+					tone="info"
 				/>
 				<StatCard
 					title="Active"

@@ -61,6 +61,7 @@ export default function AdminSystemPage() {
 					value={system.instrument_version}
 					valueClassName="font-sans text-xl leading-snug md:text-2xl"
 					helper={t("stats.instrumentVersion.helper")}
+					tone="info"
 				/>
 				<StatCard
 					title={t("stats.auditSections.title")}

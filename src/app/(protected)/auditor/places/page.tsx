@@ -90,7 +90,7 @@ export default function AuditorPlacesPage() {
 				<CardContent className="space-y-3">
 					{places.length === 0 ? <p className="text-sm text-muted-foreground">{t("list.empty")}</p> : null}
 					{places.map(place => {
-						const executeHref = `/auditor/execute/${encodeURIComponent(place.place_id)}`;
+						const executeHref = `/auditor/execute/${encodeURIComponent(place.place_id)}?projectId=${encodeURIComponent(place.project_id)}`;
 						const reportHref =
 							place.audit_status === "SUBMITTED" && place.audit_id
 								? `/auditor/reports/${encodeURIComponent(place.audit_id)}`

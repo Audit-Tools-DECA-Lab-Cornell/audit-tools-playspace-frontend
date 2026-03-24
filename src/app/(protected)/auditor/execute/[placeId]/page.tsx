@@ -6,12 +6,25 @@ type PageParams = {
 	placeId?: string | string[];
 };
 
-export default async function AuditorExecuteAuditPage({ params }: Readonly<{ params: Promise<PageParams> }>) {
+type PageSearchParams = {
+	projectId?: string | string[];
+};
+
+export default async function AuditorExecuteAuditPage({
+	params,
+	searchParams
+}: Readonly<{
+	params: Promise<PageParams>;
+	searchParams: Promise<PageSearchParams>;
+}>) {
 	const resolvedParams = await params;
+	const resolvedSearchParams = await searchParams;
 	const placeIdParam = resolvedParams.placeId;
+	const projectIdParam = resolvedSearchParams.projectId;
 	const placeId = Array.isArray(placeIdParam) ? placeIdParam[0] : placeIdParam;
+	const projectId = Array.isArray(projectIdParam) ? projectIdParam[0] : projectIdParam;
 
-	if (!placeId) notFound();
+	if (!placeId || !projectId) notFound();
 
-	return <AuditExecuteForm placeId={placeId} />;
+	return <AuditExecuteForm placeId={placeId} projectId={projectId} />;
 }

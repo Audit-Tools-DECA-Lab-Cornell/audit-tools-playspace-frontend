@@ -211,6 +211,7 @@ export default function ManagerAuditsPage() {
 					title={t("stats.totalAudits.title")}
 					value={String(auditsQuery.data.summary.total_audits)}
 					helper={t("stats.totalAudits.helper")}
+					tone="info"
 				/>
 				<StatCard
 					title={t("stats.submitted.title")}

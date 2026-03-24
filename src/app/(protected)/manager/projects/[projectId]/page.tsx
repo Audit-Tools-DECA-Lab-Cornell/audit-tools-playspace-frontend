@@ -71,7 +71,7 @@ export default function ManagerProjectDetailPage({ params }: Readonly<ManagerPro
 	});
 
 	const createPlace = useMutation({
-		mutationFn: async (payload: PlaceSheetPayload & { project_id: string }) =>
+		mutationFn: async (payload: PlaceSheetPayload & { project_ids: string[] }) =>
 			playspaceApi.management.places.create(payload),
 		onSuccess: async () => {
 			await queryClient.invalidateQueries({
@@ -221,13 +221,13 @@ export default function ManagerProjectDetailPage({ params }: Readonly<ManagerPro
 					tone="info"
 				/>
 			</div>
-			<Tabs defaultValue="overview">
+			<Tabs defaultValue="overview" className="gap-4">
 				<TabsList variant="line" className="w-full justify-start">
 					<TabsTrigger value="overview">{t("tabs.overview")}</TabsTrigger>
 					<TabsTrigger value="places">{t("tabs.places")}</TabsTrigger>
 				</TabsList>
 				<TabsContent value="overview">
-					<div className="grid gap-5 xl:grid-cols-[1.15fr_0.85fr]">
+					<div className="grid gap-5 xl:grid-cols-[1.05fr_0.95fr]">
 						<Card>
 							<CardHeader>
 								<CardTitle>{t("overview.title")}</CardTitle>
@@ -296,15 +296,18 @@ export default function ManagerProjectDetailPage({ params }: Readonly<ManagerPro
 						getRowActions={place => [
 							{
 								label: t("placesTable.actions.openPlace"),
-								href: `/manager/places/${encodeURIComponent(place.id)}`
+								href: `/manager/places/${encodeURIComponent(place.id)}?projectId=${encodeURIComponent(projectId)}`
 							},
 							{
 								label: t("placesTable.actions.deletePlace"),
-								onSelect: () =>
+								onSelect: () => {
+									console.log(place.id);
+									console.log(projectId);
 									setPlacePendingDelete({
 										id: place.id,
 										name: place.name
-									}),
+									});
+								},
 								icon: Trash2Icon,
 								variant: "destructive"
 							}
@@ -343,7 +346,7 @@ export default function ManagerProjectDetailPage({ params }: Readonly<ManagerPro
 				isPending={createPlace.isPending}
 				onSubmit={async payload => {
 					await createPlace.mutateAsync({
-						project_id: projectId,
+						project_ids: [projectId],
 						...payload
 					});
 				}}

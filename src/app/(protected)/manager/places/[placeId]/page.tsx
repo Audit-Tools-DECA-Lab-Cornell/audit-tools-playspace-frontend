@@ -1,6 +1,6 @@
 "use client";
 
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 
@@ -16,12 +16,20 @@ export default function ManagerPlaceDetailPage() {
 	const t = useTranslations("manager.placeDetail");
 	const formatT = useTranslations("common.format");
 	const params = useParams<{ placeId: string }>();
+	const searchParams = useSearchParams();
 	const placeId = params.placeId;
+	const projectId = searchParams.get("projectId");
 
 	const historyQuery = useQuery({
-		queryKey: ["playspace", "manager", "placeHistory", placeId],
-		queryFn: () => playspaceApi.places.history(placeId),
-		enabled: typeof placeId === "string" && placeId.length > 0
+		queryKey: ["playspace", "manager", "placeHistory", projectId, placeId],
+		queryFn: () => {
+			if (!projectId) {
+				throw new Error("Project context is required.");
+			}
+			return playspaceApi.places.history(placeId, projectId);
+		},
+		enabled:
+			typeof placeId === "string" && placeId.length > 0 && typeof projectId === "string" && projectId.length > 0
 	});
 	const history = historyQuery.data;
 
@@ -67,6 +75,11 @@ export default function ManagerPlaceDetailPage() {
 				]}
 				actions={<BackButton href="/manager/places" label={t("actions.backToPlaces")} />}
 			/>
+			<Card>
+				<CardContent className="py-2 text-xl text-muted-foreground">
+					<span className="font-bold text-primary">Project:</span> {`${history.project_name}`}
+				</CardContent>
+			</Card>
 			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
 				<StatCard
 					title={t("stats.totalAudits.title")}

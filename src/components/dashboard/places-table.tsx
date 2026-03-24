@@ -53,7 +53,7 @@ export function PlacesTable({
 					return (
 						<div className="min-w-[260px] space-y-1">
 							<Link
-								href={`${basePath}/${encodeURIComponent(place.id)}`}
+								href={`${basePath}/${encodeURIComponent(place.id)}?projectId=${encodeURIComponent(place.project_id)}`}
 								className="font-medium text-foreground transition-colors hover:text-primary">
 								{place.name}
 							</Link>

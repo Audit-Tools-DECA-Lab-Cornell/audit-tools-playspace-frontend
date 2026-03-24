@@ -159,6 +159,7 @@ export default function ManagerAuditorsPage() {
 					title="Total Auditors"
 					value={String(auditors.length)}
 					helper="Profiles currently linked to this account."
+					tone="info"
 				/>
 				<StatCard
 					title="Active Recently"

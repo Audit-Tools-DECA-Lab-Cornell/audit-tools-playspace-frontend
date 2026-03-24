@@ -35,7 +35,6 @@ interface AssignmentFieldErrors {
 	auditorId?: string;
 	projectId?: string;
 	placeId?: string;
-	roles?: string;
 }
 
 interface PendingAssignmentDelete {
@@ -44,18 +43,12 @@ interface PendingAssignmentDelete {
 	readonly scopeName: string;
 }
 
-type AssignmentTranslator = (key: string, values?: Record<string, string | number>) => string;
-
 function getErrorMessage(error: unknown, fallbackMessage: string): string {
 	if (error instanceof Error && error.message.trim().length > 0) {
 		return error.message;
 	}
 
 	return fallbackMessage;
-}
-
-function formatRoleLabel(role: "auditor" | "place_admin", t: AssignmentTranslator): string {
-	return t(`roles.${role}`);
 }
 
 export default function ManagerAssignmentsPage() {
@@ -72,8 +65,6 @@ export default function ManagerAssignmentsPage() {
 	const [selectedProjectId, setSelectedProjectId] = React.useState("");
 	const [selectedPlaceId, setSelectedPlaceId] = React.useState("");
 	const [auditorSearchQuery, setAuditorSearchQuery] = React.useState("");
-	const [allowSurvey, setAllowSurvey] = React.useState(true);
-	const [allowAudit, setAllowAudit] = React.useState(true);
 	const [fieldErrors, setFieldErrors] = React.useState<AssignmentFieldErrors>({});
 	const [formError, setFormError] = React.useState<string | null>(null);
 	const [listError, setListError] = React.useState<string | null>(null);
@@ -143,26 +134,16 @@ export default function ManagerAssignmentsPage() {
 				throw new Error(t("errors.selectAuditorBeforeCreate"));
 			}
 
-			const roles: Array<"auditor" | "place_admin"> = [];
-			if (allowAudit) {
-				roles.push("auditor");
-			}
-			if (allowSurvey) {
-				roles.push("place_admin");
-			}
-
 			if (scope === "project") {
 				return playspaceApi.assignments.create(selectedAuditorId, {
 					project_id: selectedProjectId,
-					place_id: null,
-					audit_roles: roles
+					place_id: null
 				});
 			}
 
 			return playspaceApi.assignments.create(selectedAuditorId, {
-				project_id: null,
-				place_id: selectedPlaceId,
-				audit_roles: roles
+				project_id: selectedProjectId,
+				place_id: selectedPlaceId
 			});
 		},
 		onSuccess: async () => {
@@ -172,8 +153,6 @@ export default function ManagerAssignmentsPage() {
 			setScope("project");
 			setSelectedProjectId("");
 			setSelectedPlaceId("");
-			setAllowSurvey(true);
-			setAllowAudit(true);
 			await queryClient.invalidateQueries({
 				queryKey: ["playspace", "manager", "assignments", "rows", selectedAuditorId]
 			});
@@ -297,10 +276,6 @@ export default function ManagerAssignmentsPage() {
 
 		if (scope === "place" && selectedPlaceId.trim().length === 0) {
 			nextFieldErrors.placeId = t("validation.placeRequired");
-		}
-
-		if (!allowAudit && !allowSurvey) {
-			nextFieldErrors.roles = t("validation.rolesRequired");
 		}
 
 		setFieldErrors(nextFieldErrors);
@@ -573,14 +548,11 @@ export default function ManagerAssignmentsPage() {
 										</p>
 									</div>
 									<div className="flex flex-wrap items-center gap-2">
-										{assignment.audit_roles.map(role => (
-											<Badge
-												key={`${assignment.id}_${role}`}
-												variant="outline"
-												className="font-medium">
-												{formatRoleLabel(role, t)}
-											</Badge>
-										))}
+										<Badge variant="outline" className="font-medium">
+											{assignment.scope_type === "place"
+												? "Project + place scope"
+												: "Project scope"}
+										</Badge>
 										{scopeHref ? (
 											<Button asChild type="button" variant="outline">
 												<Link href={scopeHref}>
@@ -754,37 +726,13 @@ export default function ManagerAssignmentsPage() {
 								</p>
 							)}
 						</div>
-						<fieldset className="grid gap-2 md:col-span-2">
-							<legend className="text-sm font-medium text-foreground">
-								{t("sheet.capabilitiesTitle")}
-							</legend>
-							<p className="text-sm text-muted-foreground">{t("sheet.capabilitiesDescription")}</p>
-							<div className="flex flex-wrap items-center gap-4">
-								<label className="flex items-center gap-2 text-sm">
-									<input
-										type="checkbox"
-										checked={allowAudit}
-										onChange={event => {
-											setAllowAudit(event.target.checked);
-											clearFieldError("roles");
-										}}
-									/>
-									{t("sheet.auditCapability")}
-								</label>
-								<label className="flex items-center gap-2 text-sm">
-									<input
-										type="checkbox"
-										checked={allowSurvey}
-										onChange={event => {
-											setAllowSurvey(event.target.checked);
-											clearFieldError("roles");
-										}}
-									/>
-									{t("sheet.placeAdminCapability")}
-								</label>
-							</div>
-							{fieldErrors.roles ? <p className="text-sm text-destructive">{fieldErrors.roles}</p> : null}
-						</fieldset>
+						<div className="grid gap-2 md:col-span-2">
+							<p className="text-sm font-medium text-foreground">Execution mode</p>
+							<p className="text-sm text-muted-foreground">
+								Auditors choose whether they are answering as audit, survey, or both when they open the
+								form.
+							</p>
+						</div>
 						{formError ? (
 							<p aria-live="polite" className="md:col-span-2 text-sm text-destructive">
 								{formError}
