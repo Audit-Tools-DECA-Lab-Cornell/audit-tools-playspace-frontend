@@ -10,7 +10,11 @@ import { DataTable } from "@/components/dashboard/data-table";
 import { DataTableColumnHeader } from "@/components/dashboard/data-table-column-header";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
-import { getTextColumnFilterValue, toBackendSortParam } from "@/components/dashboard/server-table-utils";
+import {
+	getTextColumnFilterValue,
+	preservePreviousData,
+	toBackendSortParam
+} from "@/components/dashboard/server-table-utils";
 import { formatDateTimeLabel } from "@/components/dashboard/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -24,7 +28,7 @@ export default function AdminAuditorsPage() {
 		pageIndex: 0,
 		pageSize: 10
 	});
-	const searchValue = getTextColumnFilterValue(columnFilters, "auditor");
+	const searchValue = getTextColumnFilterValue(columnFilters, "auditor_code");
 	const sortParam = toBackendSortParam(sorting);
 
 	React.useEffect(() => {
@@ -46,7 +50,8 @@ export default function AdminAuditorsPage() {
 				pageSize: pagination.pageSize,
 				search: searchValue,
 				sort: sortParam
-			})
+			}),
+		placeholderData: preservePreviousData
 	});
 
 	React.useEffect(() => {
@@ -65,11 +70,65 @@ export default function AdminAuditorsPage() {
 		}));
 	}, [auditorsQuery.data, pagination.pageIndex]);
 
-	if (auditorsQuery.isLoading) {
+	const isInitialLoading = auditorsQuery.isLoading && !auditorsQuery.data;
+
+	
+	const columns = React.useMemo<ColumnDef<AdminAuditorRow>[]>(
+		() => [
+			{
+				id: "auditor_code",
+				accessorFn: row => `${row.auditor_code} ${row.email_masked ?? ""}`,
+				header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.auditor")} />,
+				cell: ({ row }) => (
+					<div className="min-w-[220px] space-y-1">
+						<Badge variant="outline" className="font-mono text-primary uppercase tracking-[0.14em]">
+							{row.original.auditor_code}
+						</Badge>
+						<p className="text-sm text-muted-foreground">
+							{row.original.email_masked ?? t("table.emailHidden")}
+						</p>
+					</div>
+				),
+				enableHiding: false
+			},
+			{
+				accessorKey: "assignments_count",
+				header: ({ column }) => (
+					<DataTableColumnHeader column={column} title={t("table.columns.assignments")} align="end" />
+				),
+				cell: ({ row }) => (
+					<span className="block text-right font-mono tabular-nums">{row.original.assignments_count}</span>
+				)
+			},
+			{
+				accessorKey: "completed_audits",
+				header: ({ column }) => (
+					<DataTableColumnHeader column={column} title={t("table.columns.completed")} align="end" />
+				),
+				cell: ({ row }) => (
+					<span className="block text-right font-mono tabular-nums">{row.original.completed_audits}</span>
+				)
+			},
+			{
+				accessorKey: "last_active_at",
+				header: ({ column }) => (
+					<DataTableColumnHeader column={column} title={t("table.columns.lastActive")} align="end" />
+				),
+				cell: ({ row }) => (
+					<span className="block text-right text-sm text-muted-foreground tabular-nums">
+						{formatDateTimeLabel(row.original.last_active_at, formatT)}
+					</span>
+				)
+			}
+		],
+		[formatT, t]
+	);
+
+	if (isInitialLoading) {
 		return <div className="h-64 animate-pulse rounded-card border border-border bg-card" />;
 	}
 
-	if (auditorsQuery.isError || !auditorsQuery.data) {
+	if ((auditorsQuery.isError && !auditorsQuery.data) || !auditorsQuery.data) {
 		return (
 			<EmptyState
 				title={t("error.title")}
@@ -82,54 +141,6 @@ export default function AdminAuditorsPage() {
 			/>
 		);
 	}
-
-	const columns: ColumnDef<AdminAuditorRow>[] = [
-		{
-			id: "auditor",
-			accessorFn: row => `${row.auditor_code} ${row.email_masked ?? ""}`,
-			header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.auditor")} />,
-			cell: ({ row }) => (
-				<div className="min-w-[220px] space-y-1">
-					<Badge variant="outline" className="font-mono text-primary uppercase tracking-[0.14em]">
-						{row.original.auditor_code}
-					</Badge>
-					<p className="text-sm text-muted-foreground">
-						{row.original.email_masked ?? t("table.emailHidden")}
-					</p>
-				</div>
-			),
-			enableHiding: false
-		},
-		{
-			accessorKey: "assignments_count",
-			header: ({ column }) => (
-				<DataTableColumnHeader column={column} title={t("table.columns.assignments")} align="end" />
-			),
-			cell: ({ row }) => (
-				<span className="block text-right font-mono tabular-nums">{row.original.assignments_count}</span>
-			)
-		},
-		{
-			accessorKey: "completed_audits",
-			header: ({ column }) => (
-				<DataTableColumnHeader column={column} title={t("table.columns.completed")} align="end" />
-			),
-			cell: ({ row }) => (
-				<span className="block text-right font-mono tabular-nums">{row.original.completed_audits}</span>
-			)
-		},
-		{
-			accessorKey: "last_active_at",
-			header: ({ column }) => (
-				<DataTableColumnHeader column={column} title={t("table.columns.lastActive")} align="end" />
-			),
-			cell: ({ row }) => (
-				<span className="block text-right text-sm text-muted-foreground tabular-nums">
-					{formatDateTimeLabel(row.original.last_active_at, formatT)}
-				</span>
-			)
-		}
-	];
 
 	return (
 		<div className="space-y-6">
@@ -147,7 +158,7 @@ export default function AdminAuditorsPage() {
 				description={t("table.description")}
 				columns={columns}
 				data={auditorsQuery.data.items}
-				searchColumnId="auditor"
+				searchColumnId="auditor_code"
 				searchPlaceholder={t("table.searchPlaceholder")}
 				emptyMessage={t("table.emptyMessage")}
 				initialSorting={[{ id: "last_active_at", desc: true }]}
@@ -162,6 +173,7 @@ export default function AdminAuditorsPage() {
 				manualPagination
 				rowCount={auditorsQuery.data.total_count}
 				pageCount={auditorsQuery.data.total_pages}
+				isFetching={auditorsQuery.isFetching}
 			/>
 		</div>
 	);

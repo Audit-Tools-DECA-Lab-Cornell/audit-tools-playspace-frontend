@@ -1,13 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { PlusIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 
-import { playspaceApi } from "@/lib/api/playspace";
+import { playspaceApi, type AuditorSummary } from "@/lib/api/playspace";
 import { useAuthSession } from "@/components/app/auth-session-provider";
 import { ConfirmDialog } from "@/components/dashboard/confirm-dialog";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
@@ -28,6 +27,7 @@ import {
 	SelectValue
 } from "@/components/ui/select";
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { cn } from "@/lib/utils";
 
 type AssignmentScope = "project" | "place";
 
@@ -51,51 +51,139 @@ function getErrorMessage(error: unknown, fallbackMessage: string): string {
 	return fallbackMessage;
 }
 
+function filterAuditors(auditors: readonly AuditorSummary[], query: string): AuditorSummary[] {
+	const normalizedQuery = query.trim().toLowerCase();
+	if (normalizedQuery.length === 0) {
+		return [...auditors];
+	}
+
+	return auditors.filter(auditor => {
+		const searchableText = [auditor.auditor_code, auditor.full_name, auditor.email ?? ""].join(" ").toLowerCase();
+		return searchableText.includes(normalizedQuery);
+	});
+}
+
+interface AuditorListPickerProps {
+	readonly auditors: readonly AuditorSummary[];
+	readonly selectedAuditorId: string;
+	readonly searchQuery: string;
+	readonly searchLabel: string;
+	readonly searchPlaceholder: string;
+	readonly searchResultsText: string;
+	readonly pickerLabel: string;
+	readonly emptyLabel: string;
+	readonly helperText: string;
+	readonly clearLabel: string;
+	readonly onSearchQueryChange: (nextValue: string) => void;
+	readonly onSelectAuditor: (nextValue: string) => void;
+	readonly onClearSelection: () => void;
+	readonly errorText?: string;
+}
+
+function AuditorListPicker({
+	auditors,
+	selectedAuditorId,
+	searchQuery,
+	searchLabel,
+	searchPlaceholder,
+	searchResultsText,
+	pickerLabel,
+	emptyLabel,
+	helperText,
+	clearLabel,
+	onSearchQueryChange,
+	onSelectAuditor,
+	onClearSelection,
+	errorText
+}: Readonly<AuditorListPickerProps>) {
+	return (
+		<>
+			<div className="grid gap-2">
+				<Label htmlFor={`${pickerLabel}_search`}>{searchLabel}</Label>
+				<Input
+					id={`${pickerLabel}_search`}
+					name={`${pickerLabel}Search`}
+					autoComplete="off"
+					spellCheck={false}
+					value={searchQuery}
+					onChange={event => {
+						onSearchQueryChange(event.target.value);
+					}}
+					placeholder={searchPlaceholder}
+				/>
+				<p className="text-sm text-muted-foreground">{searchResultsText}</p>
+			</div>
+			<div className="grid gap-2">
+				<Label>{pickerLabel}</Label>
+				<div className="max-h-64 overflow-y-auto rounded-field border border-border bg-card">
+					{auditors.length === 0 ? (
+						<p className="px-4 py-3 text-sm text-muted-foreground">{emptyLabel}</p>
+					) : (
+						<div className="grid divide-y divide-border/60">
+							{auditors.map(auditor => {
+								const isSelected = auditor.id === selectedAuditorId;
+								return (
+									<button
+										key={auditor.id}
+										type="button"
+										className={cn(
+											"grid gap-1 px-4 py-3 text-left transition-colors",
+											isSelected ? "bg-primary/10" : "hover:bg-muted/40"
+										)}
+										onClick={() => {
+											onSelectAuditor(auditor.id);
+										}}>
+										<div className="flex flex-wrap items-center gap-2">
+											<code className="rounded-sm bg-muted px-2 py-1 font-mono text-[11px] tracking-[0.04em] text-foreground/80">
+												{auditor.auditor_code}
+											</code>
+											{auditor.role ? <Badge variant="secondary">{auditor.role}</Badge> : null}
+											{isSelected ? <Badge variant="outline">Selected</Badge> : null}
+										</div>
+										<p className="font-medium text-foreground">{auditor.full_name}</p>
+										<p className="text-sm text-muted-foreground">
+											{auditor.email ?? "Email pending"}
+										</p>
+									</button>
+								);
+							})}
+						</div>
+					)}
+				</div>
+				<div className="flex items-center justify-between gap-2">
+					{errorText ? (
+						<p className="text-sm text-destructive">{errorText}</p>
+					) : (
+						<p className="text-sm text-muted-foreground">{helperText}</p>
+					)}
+					{selectedAuditorId.trim().length > 0 ? (
+						<Button type="button" variant="ghost" onClick={onClearSelection}>
+							{clearLabel}
+						</Button>
+					) : null}
+				</div>
+			</div>
+		</>
+	);
+}
+
 export default function ManagerAssignmentsPage() {
 	const t = useTranslations("manager.assignments");
 	const formatT = useTranslations("common.format");
-	const searchParams = useSearchParams();
-	const router = useRouter();
-	const pathname = usePathname();
 	const session = useAuthSession();
 	const queryClient = useQueryClient();
 	const accountId = session?.role === "manager" ? session.accountId : null;
-	const [selectedAuditorId, setSelectedAuditorId] = React.useState(searchParams.get("auditorId") ?? "");
+	const [selectedAuditorId, setSelectedAuditorId] = React.useState("");
 	const [scope, setScope] = React.useState<AssignmentScope>("project");
 	const [selectedProjectId, setSelectedProjectId] = React.useState("");
 	const [selectedPlaceId, setSelectedPlaceId] = React.useState("");
 	const [auditorSearchQuery, setAuditorSearchQuery] = React.useState("");
+	const [sheetAuditorSearchQuery, setSheetAuditorSearchQuery] = React.useState("");
 	const [fieldErrors, setFieldErrors] = React.useState<AssignmentFieldErrors>({});
 	const [formError, setFormError] = React.useState<string | null>(null);
 	const [listError, setListError] = React.useState<string | null>(null);
 	const [isCreateSheetOpen, setIsCreateSheetOpen] = React.useState(false);
 	const [assignmentPendingDelete, setAssignmentPendingDelete] = React.useState<PendingAssignmentDelete | null>(null);
-
-	React.useEffect(() => {
-		const auditorIdFromUrl = searchParams.get("auditorId") ?? "";
-		setSelectedAuditorId(currentValue => {
-			return currentValue === auditorIdFromUrl ? currentValue : auditorIdFromUrl;
-		});
-	}, [searchParams]);
-
-	React.useEffect(() => {
-		const auditorIdFromUrl = searchParams.get("auditorId") ?? "";
-		if (auditorIdFromUrl === selectedAuditorId) {
-			return;
-		}
-
-		const nextSearchParams = new URLSearchParams(searchParams.toString());
-		if (selectedAuditorId.trim().length > 0) {
-			nextSearchParams.set("auditorId", selectedAuditorId);
-		} else {
-			nextSearchParams.delete("auditorId");
-		}
-
-		const nextQueryString = nextSearchParams.toString();
-		router.replace(nextQueryString.length > 0 ? `${pathname}?${nextQueryString}` : pathname, {
-			scroll: false
-		});
-	}, [pathname, router, searchParams, selectedAuditorId]);
 
 	const auditorsQuery = useQuery({
 		queryKey: ["playspace", "manager", "assignments", "auditors", accountId],
@@ -187,19 +275,14 @@ export default function ManagerAssignmentsPage() {
 	const places = projectPlacesQuery.data ?? [];
 	const assignments = assignmentsQuery.data ?? [];
 	const selectedAuditor = auditors.find(auditor => auditor.id === selectedAuditorId) ?? null;
-	const filteredAuditors = React.useMemo(() => {
-		const normalizedQuery = auditorSearchQuery.trim().toLowerCase();
-		if (normalizedQuery.length === 0) {
-			return auditors;
-		}
-
-		return auditors.filter(auditor => {
-			const searchableText = [auditor.auditor_code, auditor.full_name, auditor.email ?? ""]
-				.join(" ")
-				.toLowerCase();
-			return searchableText.includes(normalizedQuery);
-		});
-	}, [auditorSearchQuery, auditors]);
+	const filteredAuditors = React.useMemo(
+		() => filterAuditors(auditors, auditorSearchQuery),
+		[auditorSearchQuery, auditors]
+	);
+	const sheetFilteredAuditors = React.useMemo(
+		() => filterAuditors(auditors, sheetAuditorSearchQuery),
+		[auditors, sheetAuditorSearchQuery]
+	);
 
 	if (!accountId) {
 		return (
@@ -324,78 +407,30 @@ export default function ManagerAssignmentsPage() {
 								{t("auditorFocus.chooseAuditorDescription")}
 							</p>
 						</div>
-						<div className="grid gap-2">
-							<Label htmlFor="assignment_auditor_search">{t("auditorFocus.searchLabel")}</Label>
-							<Input
-								id="assignment_auditor_search"
-								name="assignmentAuditorSearch"
-								autoComplete="off"
-								spellCheck={false}
-								value={auditorSearchQuery}
-								onChange={event => {
-									setAuditorSearchQuery(event.target.value);
-								}}
-								placeholder={t("auditorFocus.searchPlaceholder")}
-							/>
-							<p className="text-sm text-muted-foreground">
-								{t("auditorFocus.searchResults", { count: filteredAuditors.length })}
-							</p>
-						</div>
-						<div className="grid gap-2">
-							<Label>{t("auditorFocus.auditorLabel")}</Label>
-							<div className="flex flex-col gap-2 sm:flex-row">
-								<div className="min-w-0 flex-1">
-									<Select
-										value={selectedAuditorId.trim().length > 0 ? selectedAuditorId : undefined}
-										onValueChange={nextValue => {
-											setSelectedAuditorId(nextValue);
-											clearFieldError("auditorId");
-											setListError(null);
-										}}>
-										<SelectTrigger
-											id="assignment_auditor_filter"
-											aria-label={t("auditorFocus.auditorLabel")}
-											aria-invalid={Boolean(fieldErrors.auditorId)}
-											disabled={auditors.length === 0 || filteredAuditors.length === 0}>
-											<SelectValue
-												placeholder={
-													filteredAuditors.length === 0
-														? t("auditorFocus.noMatchingAuditors")
-														: t("auditorFocus.selectAuditor")
-												}
-											/>
-										</SelectTrigger>
-										<SelectContent position="popper">
-											<SelectGroup>
-												<SelectLabel>{t("auditorFocus.matchingAuditors")}</SelectLabel>
-												{filteredAuditors.map(auditor => (
-													<SelectItem key={auditor.id} value={auditor.id}>
-														{`${auditor.auditor_code} · ${auditor.full_name}`}
-													</SelectItem>
-												))}
-											</SelectGroup>
-										</SelectContent>
-									</Select>
-								</div>
-								{selectedAuditorId.trim().length > 0 ? (
-									<Button
-										type="button"
-										variant="ghost"
-										onClick={() => {
-											setSelectedAuditorId("");
-											clearFieldError("auditorId");
-											setListError(null);
-										}}>
-										{t("actions.clear")}
-									</Button>
-								) : null}
-							</div>
-							{fieldErrors.auditorId ? (
-								<p className="text-sm text-destructive">{fieldErrors.auditorId}</p>
-							) : (
-								<p className="text-sm text-muted-foreground">{t("auditorFocus.auditorHelp")}</p>
-							)}
-						</div>
+						<AuditorListPicker
+							auditors={filteredAuditors}
+							selectedAuditorId={selectedAuditorId}
+							searchQuery={auditorSearchQuery}
+							searchLabel={t("auditorFocus.searchLabel")}
+							searchPlaceholder={t("auditorFocus.searchPlaceholder")}
+							searchResultsText={t("auditorFocus.searchResults", { count: filteredAuditors.length })}
+							pickerLabel={t("auditorFocus.auditorLabel")}
+							emptyLabel={t("auditorFocus.noMatchingAuditors")}
+							helperText={t("auditorFocus.auditorHelp")}
+							clearLabel={t("actions.clear")}
+							errorText={fieldErrors.auditorId}
+							onSearchQueryChange={setAuditorSearchQuery}
+							onSelectAuditor={nextValue => {
+								setSelectedAuditorId(nextValue);
+								clearFieldError("auditorId");
+								setListError(null);
+							}}
+							onClearSelection={() => {
+								setSelectedAuditorId("");
+								clearFieldError("auditorId");
+								setListError(null);
+							}}
+						/>
 						<div className="rounded-field border border-border/70 bg-muted/35 p-4">
 							<p className="font-medium text-foreground">{t("auditorFocus.reviewHowItWorksTitle")}</p>
 							<ol className="mt-3 grid gap-2 text-sm text-muted-foreground">
@@ -483,7 +518,7 @@ export default function ManagerAssignmentsPage() {
 								<p className="font-medium text-foreground">{t("coverage.whatAppearsTitle")}</p>
 								<ul className="mt-2 grid gap-2 text-sm text-muted-foreground">
 									<li>{t("coverage.whatAppears.projectAndPlaceCoverage")}</li>
-									<li>{t("coverage.whatAppears.capabilityBadges")}</li>
+									<li>Project and place scope summaries</li>
 									<li>{t("coverage.whatAppears.openAndDeleteActions")}</li>
 								</ul>
 							</div>
@@ -525,7 +560,7 @@ export default function ManagerAssignmentsPage() {
 								assignment.scope_type === "place" ? t("assignment.place") : t("assignment.project");
 							const scopeHref =
 								assignment.place_id !== null
-									? `/manager/places/${encodeURIComponent(assignment.place_id)}`
+									? `/manager/places/${encodeURIComponent(assignment.place_id)}?projectId=${encodeURIComponent(assignment.project_id)}`
 									: assignment.project_id !== null
 										? `/manager/projects/${encodeURIComponent(assignment.project_id)}`
 										: null;
@@ -589,37 +624,31 @@ export default function ManagerAssignmentsPage() {
 						<SheetDescription>{t("sheet.description")}</SheetDescription>
 					</SheetHeader>
 					<div className="grid min-h-0 flex-1 gap-4 overflow-y-auto px-6 py-5 md:grid-cols-2">
-						<div className="grid gap-2">
-							<Label>{t("sheet.auditorLabel")}</Label>
-							<Select
-								value={selectedAuditorId.trim().length > 0 ? selectedAuditorId : undefined}
-								onValueChange={nextValue => {
+						<div className="md:col-span-2">
+							<AuditorListPicker
+								auditors={sheetFilteredAuditors}
+								selectedAuditorId={selectedAuditorId}
+								searchQuery={sheetAuditorSearchQuery}
+								searchLabel={t("sheet.auditorLabel")}
+								searchPlaceholder={t("sheet.selectAuditor")}
+								searchResultsText={`${sheetFilteredAuditors.length} ${t("sheet.auditors")}`}
+								pickerLabel={t("sheet.auditorLabel")}
+								emptyLabel={t("auditorFocus.noMatchingAuditors")}
+								helperText={t("sheet.auditorHelp")}
+								clearLabel={t("actions.clear")}
+								errorText={fieldErrors.auditorId}
+								onSearchQueryChange={setSheetAuditorSearchQuery}
+								onSelectAuditor={nextValue => {
 									setSelectedAuditorId(nextValue);
 									clearFieldError("auditorId");
 									setFormError(null);
-								}}>
-								<SelectTrigger
-									id="auditor_select"
-									aria-label={t("sheet.auditorLabel")}
-									aria-invalid={Boolean(fieldErrors.auditorId)}>
-									<SelectValue placeholder={t("sheet.selectAuditor")} />
-								</SelectTrigger>
-								<SelectContent position="popper">
-									<SelectGroup>
-										<SelectLabel>{t("sheet.auditors")}</SelectLabel>
-										{auditors.map(auditor => (
-											<SelectItem key={auditor.id} value={auditor.id}>
-												{`${auditor.auditor_code} · ${auditor.full_name}`}
-											</SelectItem>
-										))}
-									</SelectGroup>
-								</SelectContent>
-							</Select>
-							{fieldErrors.auditorId ? (
-								<p className="text-sm text-destructive">{fieldErrors.auditorId}</p>
-							) : (
-								<p className="text-sm text-muted-foreground">{t("sheet.auditorHelp")}</p>
-							)}
+								}}
+								onClearSelection={() => {
+									setSelectedAuditorId("");
+									clearFieldError("auditorId");
+									setFormError(null);
+								}}
+							/>
 						</div>
 						<div className="grid gap-2">
 							<Label>{t("sheet.scopeLabel")}</Label>
@@ -725,13 +754,6 @@ export default function ManagerAssignmentsPage() {
 										: t("sheet.placeOptionalHelp")}
 								</p>
 							)}
-						</div>
-						<div className="grid gap-2 md:col-span-2">
-							<p className="text-sm font-medium text-foreground">Execution mode</p>
-							<p className="text-sm text-muted-foreground">
-								Auditors choose whether they are answering as audit, survey, or both when they open the
-								form.
-							</p>
 						</div>
 						{formError ? (
 							<p aria-live="polite" className="md:col-span-2 text-sm text-destructive">

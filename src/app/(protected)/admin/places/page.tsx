@@ -10,7 +10,11 @@ import { DataTable } from "@/components/dashboard/data-table";
 import { DataTableColumnHeader } from "@/components/dashboard/data-table-column-header";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
-import { getTextColumnFilterValue, toBackendSortParam } from "@/components/dashboard/server-table-utils";
+import {
+	getTextColumnFilterValue,
+	preservePreviousData,
+	toBackendSortParam
+} from "@/components/dashboard/server-table-utils";
 import { formatDateTimeLabel, formatScoreLabel } from "@/components/dashboard/utils";
 import { Button } from "@/components/ui/button";
 
@@ -33,7 +37,7 @@ export default function AdminPlacesPage() {
 		pageIndex: 0,
 		pageSize: 10
 	});
-	const searchValue = getTextColumnFilterValue(columnFilters, "place");
+	const searchValue = getTextColumnFilterValue(columnFilters, "name");
 	const sortParam = toBackendSortParam(sorting);
 
 	React.useEffect(() => {
@@ -55,7 +59,8 @@ export default function AdminPlacesPage() {
 				pageSize: pagination.pageSize,
 				search: searchValue,
 				sort: sortParam
-			})
+			}),
+		placeholderData: preservePreviousData
 	});
 
 	React.useEffect(() => {
@@ -74,11 +79,75 @@ export default function AdminPlacesPage() {
 		}));
 	}, [pagination.pageIndex, placesQuery.data]);
 
-	if (placesQuery.isLoading) {
+	const isInitialLoading = placesQuery.isLoading && !placesQuery.data;
+
+	
+
+	const columns = React.useMemo<ColumnDef<AdminPlaceRow>[]>(
+		() => [
+			{
+				id: "name",
+				accessorFn: row =>
+					`${row.name} ${row.project_name} ${row.account_name} ${formatLocation(row.city, row.province, row.country, formatT("locationPending"))}`,
+				header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.place")} />,
+				cell: ({ row }) => (
+					<div className="min-w-[260px] space-y-1">
+						<p className="font-medium text-foreground">{row.original.name}</p>
+						<p className="text-sm text-muted-foreground">
+							{row.original.account_name} · {row.original.project_name}
+						</p>
+						<p className="text-sm text-muted-foreground">
+							{formatLocation(
+								row.original.city,
+								row.original.province,
+								row.original.country,
+								formatT("locationPending")
+							)}
+						</p>
+					</div>
+				),
+				enableHiding: false
+			},
+			{
+				accessorKey: "audits_completed",
+				header: ({ column }) => (
+					<DataTableColumnHeader column={column} title={t("table.columns.completed")} align="end" />
+				),
+				cell: ({ row }) => (
+					<span className="block text-right font-mono tabular-nums">{row.original.audits_completed}</span>
+				)
+			},
+			{
+				accessorKey: "average_score",
+				header: ({ column }) => (
+					<DataTableColumnHeader column={column} title={t("table.columns.meanScore")} align="end" />
+				),
+				cell: ({ row }) => (
+					<span className="block text-right font-mono text-foreground tabular-nums">
+						{formatScoreLabel(row.original.average_score, formatT)}
+					</span>
+				)
+			},
+			{
+				accessorKey: "last_audited_at",
+				header: ({ column }) => (
+					<DataTableColumnHeader column={column} title={t("table.columns.latestAudit")} align="end" />
+				),
+				cell: ({ row }) => (
+					<span className="block text-right text-sm text-muted-foreground tabular-nums">
+						{formatDateTimeLabel(row.original.last_audited_at, formatT)}
+					</span>
+				)
+			}
+		],
+		[formatT, t]
+	);
+
+	if (isInitialLoading) {
 		return <div className="h-64 animate-pulse rounded-card border border-border bg-card" />;
 	}
 
-	if (placesQuery.isError || !placesQuery.data) {
+	if ((placesQuery.isError && !placesQuery.data) || !placesQuery.data) {
 		return (
 			<EmptyState
 				title={t("error.title")}
@@ -91,63 +160,6 @@ export default function AdminPlacesPage() {
 			/>
 		);
 	}
-
-	const columns: ColumnDef<AdminPlaceRow>[] = [
-		{
-			id: "place",
-			accessorFn: row =>
-				`${row.name} ${row.project_name} ${row.account_name} ${formatLocation(row.city, row.province, row.country, formatT("locationPending"))}`,
-			header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.place")} />,
-			cell: ({ row }) => (
-				<div className="min-w-[260px] space-y-1">
-					<p className="font-medium text-foreground">{row.original.name}</p>
-					<p className="text-sm text-muted-foreground">
-						{row.original.account_name} · {row.original.project_name}
-					</p>
-					<p className="text-sm text-muted-foreground">
-						{formatLocation(
-							row.original.city,
-							row.original.province,
-							row.original.country,
-							formatT("locationPending")
-						)}
-					</p>
-				</div>
-			),
-			enableHiding: false
-		},
-		{
-			accessorKey: "audits_completed",
-			header: ({ column }) => (
-				<DataTableColumnHeader column={column} title={t("table.columns.completed")} align="end" />
-			),
-			cell: ({ row }) => (
-				<span className="block text-right font-mono tabular-nums">{row.original.audits_completed}</span>
-			)
-		},
-		{
-			accessorKey: "average_score",
-			header: ({ column }) => (
-				<DataTableColumnHeader column={column} title={t("table.columns.meanScore")} align="end" />
-			),
-			cell: ({ row }) => (
-				<span className="block text-right font-mono text-foreground tabular-nums">
-					{formatScoreLabel(row.original.average_score, formatT)}
-				</span>
-			)
-		},
-		{
-			accessorKey: "last_audited_at",
-			header: ({ column }) => (
-				<DataTableColumnHeader column={column} title={t("table.columns.latestAudit")} align="end" />
-			),
-			cell: ({ row }) => (
-				<span className="block text-right text-sm text-muted-foreground tabular-nums">
-					{formatDateTimeLabel(row.original.last_audited_at, formatT)}
-				</span>
-			)
-		}
-	];
 
 	return (
 		<div className="space-y-6">
@@ -165,7 +177,7 @@ export default function AdminPlacesPage() {
 				description={t("table.description")}
 				columns={columns}
 				data={placesQuery.data.items}
-				searchColumnId="place"
+				searchColumnId="name"
 				searchPlaceholder={t("table.searchPlaceholder")}
 				emptyMessage={t("table.emptyMessage")}
 				initialSorting={[{ id: "last_audited_at", desc: true }]}
@@ -180,6 +192,7 @@ export default function AdminPlacesPage() {
 				manualPagination
 				rowCount={placesQuery.data.total_count}
 				pageCount={placesQuery.data.total_pages}
+				isFetching={placesQuery.isFetching}
 			/>
 		</div>
 	);

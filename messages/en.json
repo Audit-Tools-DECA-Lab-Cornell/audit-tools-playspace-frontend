@@ -85,8 +85,13 @@
 			"toolbar": {
 				"searchPlaceholder": "Search records...",
 				"reset": "Reset",
+				"apply": "Apply",
+				"discard": "Discard",
 				"columns": "Columns",
-				"toggleColumns": "Toggle columns"
+				"toggleColumns": "Toggle columns",
+				"pendingChanges": "Pending changes",
+				"updating": "Updating",
+				"showAllColumns": "Show all columns"
 			},
 			"pagination": {
 				"showing": "Showing {start} to {end} of {total} results",

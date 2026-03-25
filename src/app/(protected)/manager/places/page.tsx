@@ -16,6 +16,7 @@ import { EmptyState } from "@/components/dashboard/empty-state";
 import { EntityRowActions } from "@/components/dashboard/entity-row-actions";
 import {
 	getMultiValueColumnFilter,
+	preservePreviousData,
 	getTextColumnFilterValue,
 	toBackendSortParam
 } from "@/components/dashboard/server-table-utils";
@@ -61,7 +62,7 @@ export default function ManagerPlacesPage() {
 		pageIndex: 0,
 		pageSize: 10
 	});
-	const searchValue = getTextColumnFilterValue(columnFilters, "search");
+	const searchValue = getTextColumnFilterValue(columnFilters, "name");
 	const selectedProjectIds = getMultiValueColumnFilter(columnFilters, "project_id");
 	const selectedStatuses = getMultiValueColumnFilter(columnFilters, "status").filter(isManagerPlaceStatus);
 	const selectedProjectIdsKey = selectedProjectIds.join("|");
@@ -118,7 +119,8 @@ export default function ManagerPlacesPage() {
 				statuses: selectedStatuses
 			});
 		},
-		enabled: accountId !== null
+		enabled: accountId !== null,
+		placeholderData: preservePreviousData
 	});
 
 	React.useEffect(() => {
@@ -140,7 +142,7 @@ export default function ManagerPlacesPage() {
 	const columns = React.useMemo<ColumnDef<ManagerPlaceRow>[]>(
 		() => [
 			{
-				id: "search",
+				id: "name",
 				accessorFn: row => `${row.name} ${row.project_name} ${formatLocationLabel(row, formatT)}`,
 				header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.place")} />,
 				cell: ({ row }) => (
@@ -255,7 +257,10 @@ export default function ManagerPlacesPage() {
 		);
 	}
 
-	if (projectsQuery.isLoading || placesQuery.isLoading) {
+	const isInitialLoading =
+		(projectsQuery.isLoading && !projectsQuery.data) || (placesQuery.isLoading && !placesQuery.data);
+
+	if (isInitialLoading) {
 		return (
 			<div className="space-y-6">
 				<DashboardHeader
@@ -280,7 +285,12 @@ export default function ManagerPlacesPage() {
 		);
 	}
 
-	if (projectsQuery.isError || placesQuery.isError || !placesQuery.data || !projectsQuery.data) {
+	if (
+		(projectsQuery.isError && !projectsQuery.data) ||
+		(placesQuery.isError && !placesQuery.data) ||
+		!placesQuery.data ||
+		!projectsQuery.data
+	) {
 		return (
 			<EmptyState
 				title={t("error.title")}
@@ -354,7 +364,7 @@ export default function ManagerPlacesPage() {
 				description={t("table.description")}
 				columns={columns}
 				data={places}
-				searchColumnId="search"
+				searchColumnId="name"
 				searchPlaceholder={t("table.searchPlaceholder")}
 				filterConfigs={[
 					{
@@ -394,6 +404,7 @@ export default function ManagerPlacesPage() {
 				manualPagination
 				rowCount={placesQuery.data.total_count}
 				pageCount={placesQuery.data.total_pages}
+				isFetching={placesQuery.isFetching}
 			/>
 		</div>
 	);

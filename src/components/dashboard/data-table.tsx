@@ -67,6 +67,7 @@ export interface DataTableProps<TData, TValue> {
 	manualFiltering?: boolean;
 	rowCount?: number;
 	pageCount?: number;
+	isFetching?: boolean;
 }
 
 /**
@@ -94,7 +95,8 @@ export function DataTable<TData, TValue>({
 	manualSorting = false,
 	manualFiltering = false,
 	rowCount,
-	pageCount
+	pageCount,
+	isFetching = false
 }: Readonly<DataTableProps<TData, TValue>>) {
 	const t = useTranslations("tables.shared");
 	const [internalSorting, setInternalSorting] = React.useState<SortingState>(initialSorting);
@@ -185,6 +187,7 @@ export function DataTable<TData, TValue>({
 				searchPlaceholder={searchPlaceholder}
 				filterConfigs={filterConfigs}
 				action={action}
+				isFetching={isFetching}
 			/>
 			{/* min height is the number of rows * the height of the row */}
 			<CardContent className="p-0">

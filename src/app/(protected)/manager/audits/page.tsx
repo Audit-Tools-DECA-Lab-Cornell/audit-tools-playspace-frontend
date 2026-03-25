@@ -13,6 +13,7 @@ import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
 import {
 	getMultiValueColumnFilter,
+	preservePreviousData,
 	getTextColumnFilterValue,
 	toBackendSortParam
 } from "@/components/dashboard/server-table-utils";
@@ -40,7 +41,7 @@ export default function ManagerAuditsPage() {
 		pageIndex: 0,
 		pageSize: 10
 	});
-	const searchValue = getTextColumnFilterValue(columnFilters, "search");
+	const searchValue = getTextColumnFilterValue(columnFilters, "audit_code");
 	const selectedStatuses = getMultiValueColumnFilter(columnFilters, "status").filter(
 		(value): value is "IN_PROGRESS" | "PAUSED" | "SUBMITTED" =>
 			value === "IN_PROGRESS" || value === "PAUSED" || value === "SUBMITTED"
@@ -84,7 +85,8 @@ export default function ManagerAuditsPage() {
 				statuses: selectedStatuses
 			});
 		},
-		enabled: accountId !== null
+		enabled: accountId !== null,
+		placeholderData: preservePreviousData
 	});
 
 	React.useEffect(() => {
@@ -124,7 +126,9 @@ export default function ManagerAuditsPage() {
 		);
 	}
 
-	if (auditsQuery.isLoading) {
+	const isInitialLoading = auditsQuery.isLoading && !auditsQuery.data;
+
+	if (isInitialLoading) {
 		return (
 			<div className="space-y-6">
 				<DashboardHeader
@@ -149,7 +153,7 @@ export default function ManagerAuditsPage() {
 		);
 	}
 
-	if (auditsQuery.isError || !auditsQuery.data) {
+	if ((auditsQuery.isError && !auditsQuery.data) || !auditsQuery.data) {
 		return (
 			<EmptyState
 				title={t("error.title")}
@@ -169,7 +173,9 @@ export default function ManagerAuditsPage() {
 		status: audit.status,
 		auditorCode: audit.auditor_code,
 		projectName: audit.project_name,
+		projectId: audit.project_id,
 		placeName: audit.place_name,
+		placeId: audit.place_id,
 		startedAt: audit.started_at,
 		submittedAt: audit.submitted_at,
 		score: audit.summary_score
@@ -252,6 +258,7 @@ export default function ManagerAuditsPage() {
 				manualPagination
 				rowCount={auditsQuery.data.total_count}
 				pageCount={auditsQuery.data.total_pages}
+				isFetching={auditsQuery.isFetching}
 			/>
 		</div>
 	);

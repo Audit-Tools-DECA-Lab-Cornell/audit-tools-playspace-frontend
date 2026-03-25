@@ -20,7 +20,9 @@ export interface AuditActivityRow {
 	status: string;
 	auditorCode: string;
 	placeName?: string | null;
+	placeId?: string | null;
 	projectName?: string | null;
+	projectId?: string | null;
 	accountName?: string | null;
 	startedAt: string | null;
 	submittedAt: string | null;
@@ -46,6 +48,7 @@ export interface AuditsTableProps {
 	manualFiltering?: boolean;
 	rowCount?: number;
 	pageCount?: number;
+	isFetching?: boolean;
 }
 
 interface AuditIdentityCellProps {
@@ -152,14 +155,15 @@ export function AuditsTable({
 	manualSorting = false,
 	manualFiltering = false,
 	rowCount,
-	pageCount
+	pageCount,
+	isFetching = false
 }: Readonly<AuditsTableProps>) {
 	const t = useTranslations("tables.audits");
 	const formatT = useTranslations("common.format");
 	const columns = React.useMemo<ColumnDef<AuditActivityRow>[]>(
 		() => [
 			{
-				id: "search",
+				id: "audit_code",
 				accessorFn: row =>
 					[row.auditCode, row.auditorCode, row.placeName, row.projectName, row.accountName]
 						.filter(Boolean)
@@ -251,7 +255,7 @@ export function AuditsTable({
 			description={description ?? t("description")}
 			columns={columns}
 			data={rows}
-			searchColumnId="search"
+			searchColumnId="audit_code"
 			searchPlaceholder={t("searchPlaceholder")}
 			filterConfigs={[
 				{
@@ -275,6 +279,7 @@ export function AuditsTable({
 			manualFiltering={manualFiltering}
 			rowCount={rowCount}
 			pageCount={pageCount}
+			isFetching={isFetching}
 		/>
 	);
 }

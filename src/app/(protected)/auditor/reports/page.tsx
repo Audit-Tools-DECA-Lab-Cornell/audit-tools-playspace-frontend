@@ -1,65 +1,108 @@
 "use client";
 
-import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
+import type { ColumnFiltersState, PaginationState, SortingState } from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 
 import { playspaceApi } from "@/lib/api/playspace";
+import { AuditsTable, type AuditActivityRow } from "@/components/dashboard/audits-table";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
-import { PaginationControls } from "@/components/dashboard/pagination-controls";
-import { formatAuditCodeReference, formatDateTimeLabel, formatScoreLabel } from "@/components/dashboard/utils";
-import { Badge } from "@/components/ui/badge";
+import {
+	getMultiValueColumnFilter,
+	getTextColumnFilterValue,
+	preservePreviousData,
+	toBackendSortParam
+} from "@/components/dashboard/server-table-utils";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 const AUDITOR_REPORTS_PAGE_SIZE = 8;
 
-function getStatusBadgeVariant(status: "IN_PROGRESS" | "PAUSED" | "SUBMITTED") {
-	if (status === "SUBMITTED") return "default";
-	if (status === "IN_PROGRESS" || status === "PAUSED") return "secondary";
-	return "outline";
-}
-
 export default function AuditorReportsPage() {
 	const t = useTranslations("auditor.reports");
-	const formatT = useTranslations("common.format");
-	const [currentPage, setCurrentPage] = React.useState(1);
+	const [sorting, setSorting] = React.useState<SortingState>([{ id: "started_at", desc: true }]);
+	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+	const [pagination, setPagination] = React.useState<PaginationState>({
+		pageIndex: 0,
+		pageSize: AUDITOR_REPORTS_PAGE_SIZE
+	});
+	const searchValue = getTextColumnFilterValue(columnFilters, "audit_code");
+	const selectedStatuses = getMultiValueColumnFilter(columnFilters, "status").filter(
+		(value): value is "IN_PROGRESS" | "PAUSED" | "SUBMITTED" =>
+			value === "IN_PROGRESS" || value === "PAUSED" || value === "SUBMITTED"
+	);
+	const selectedStatusesKey = selectedStatuses.join("|");
+	const sortParam = toBackendSortParam(sorting);
+
+	React.useEffect(() => {
+		setPagination(currentValue => {
+			return currentValue.pageIndex === 0
+				? currentValue
+				: {
+						...currentValue,
+						pageIndex: 0
+					};
+		});
+	}, [searchValue, selectedStatusesKey, sortParam]);
+
 	const auditsQuery = useQuery({
-		queryKey: ["playspace", "auditor", "audits", "reports", currentPage],
+		queryKey: [
+			"playspace",
+			"auditor",
+			"audits",
+			"reports",
+			pagination.pageIndex,
+			pagination.pageSize,
+			searchValue,
+			sortParam,
+			selectedStatuses
+		],
 		queryFn: () =>
 			playspaceApi.auditor.audits({
-				page: currentPage,
-				pageSize: AUDITOR_REPORTS_PAGE_SIZE,
-				sort: "-started_at"
-			})
+				page: pagination.pageIndex + 1,
+				pageSize: pagination.pageSize,
+				search: searchValue,
+				sort: sortParam,
+				statuses: selectedStatuses.map(status => status.toLowerCase() as "submitted" | "in_progress" | "paused")
+			}),
+		placeholderData: preservePreviousData
 	});
 	const summaryQuery = useQuery({
 		queryKey: ["playspace", "auditor", "dashboardSummary", "reportsPage"],
-		queryFn: () => playspaceApi.auditor.dashboardSummary()
+		queryFn: () => playspaceApi.auditor.dashboardSummary(),
+		placeholderData: preservePreviousData
 	});
-	const audits = React.useMemo(() => {
-		return auditsQuery.data?.items ?? [];
-	}, [auditsQuery.data?.items]);
-	const pageCount = auditsQuery.data?.total_pages ?? 1;
-	const actionableAudits = React.useMemo(() => {
-		return audits.filter(audit => audit.status !== "SUBMITTED");
-	}, [audits]);
-	const submittedAudits = React.useMemo(() => {
-		return audits.filter(audit => audit.status === "SUBMITTED");
-	}, [audits]);
 
 	React.useEffect(() => {
-		if (currentPage > pageCount) {
-			setCurrentPage(pageCount);
+		if (!auditsQuery.data) {
+			return;
 		}
-	}, [currentPage, pageCount]);
 
-	if (auditsQuery.isLoading || summaryQuery.isLoading) {
+		const maxPageIndex = Math.max(auditsQuery.data.total_pages - 1, 0);
+		if (pagination.pageIndex <= maxPageIndex) {
+			return;
+		}
+
+		setPagination(currentValue => ({
+			...currentValue,
+			pageIndex: maxPageIndex
+		}));
+	}, [auditsQuery.data, pagination.pageIndex]);
+
+	const isInitialLoading =
+		(auditsQuery.isLoading && !auditsQuery.data) || (summaryQuery.isLoading && !summaryQuery.data);
+
+	if (isInitialLoading) {
 		return <div className="h-64 animate-pulse rounded-card border border-border bg-card" />;
 	}
 
-	if (auditsQuery.isError || summaryQuery.isError || !auditsQuery.data || !summaryQuery.data) {
+	if (
+		(auditsQuery.isError && !auditsQuery.data) ||
+		(summaryQuery.isError && !summaryQuery.data) ||
+		!auditsQuery.data ||
+		!summaryQuery.data
+	) {
 		return (
 			<Card>
 				<CardHeader>
@@ -86,97 +129,58 @@ export default function AuditorReportsPage() {
 					{ label: t("breadcrumbs.reports") }
 				]}
 			/>
-			<Card>
-				<CardHeader>
-					<CardTitle>{t("list.title")}</CardTitle>
-				</CardHeader>
-				<CardContent className="space-y-3">
-					{audits.length === 0 ? <p className="text-sm text-muted-foreground">{t("list.empty")}</p> : null}
-					{[
-						{
-							key: "actionRequired",
-							title: t("groups.actionRequired", { count: actionableAudits.length }),
-							items: actionableAudits
-						},
-						{
-							key: "submitted",
-							title: t("groups.submitted", { count: submittedAudits.length }),
-							items: submittedAudits
-						}
-					]
-						.filter(group => group.items.length > 0)
-						.map(group => (
-							<div key={group.key} className="space-y-3">
-								<p className="text-xs font-semibold tracking-[0.12em] text-text-secondary uppercase">
-									{group.title}
-								</p>
-								{group.items.map(audit => {
-									const detailHref =
-										audit.status === "SUBMITTED"
-											? `/auditor/reports/${encodeURIComponent(audit.audit_id)}`
-											: `/auditor/execute/${encodeURIComponent(audit.place_id)}`;
-									const detailLabel =
-										audit.status === "SUBMITTED" ? t("list.openReport") : t("list.resumeAudit");
-									const submissionLabel = audit.submitted_at
-										? t("list.submittedAt", {
-												value: formatDateTimeLabel(audit.submitted_at, formatT)
-											})
-										: t("list.draftNotSubmitted");
+			<AuditsTable
+				rows={auditsQuery.data.items.map<AuditActivityRow>(audit => ({
+					id: audit.audit_id,
+					auditCode: audit.audit_code,
+					status: audit.status,
+					auditorCode: "You",
+					projectName: audit.project_name,
+					projectId: audit.project_id,
+					placeName: audit.place_name,
+					placeId: audit.place_id,
+					startedAt: audit.started_at,
+					submittedAt: audit.submitted_at,
+					score: audit.summary_score
+				}))}
+				title={t("list.title")}
+				description={t("header.description")}
+				emptyMessage={t("list.empty")}
+				getRowActions={audit => {
+					const isSubmitted = audit.status === "SUBMITTED";
+					if (isSubmitted) {
+						return [
+							{
+								label: t("list.openReport"),
+								href: `/auditor/reports/${encodeURIComponent(audit.id)}`
+							}
+						];
+					}
 
-									return (
-										<div
-											key={audit.audit_id}
-											className="flex flex-col gap-3 rounded-card border border-border/70 bg-card/60 p-4 lg:flex-row lg:items-center lg:justify-between">
-											<div className="min-w-0 space-y-1">
-												<p className="font-medium text-foreground">{audit.place_name}</p>
-												<div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-													<span>{audit.project_name}</span>
-													<code
-														title={audit.audit_code}
-														className="rounded-md bg-muted/65 px-2 py-1 font-mono text-[11px] tracking-[0.04em] text-foreground/80">
-														{formatAuditCodeReference(audit.audit_code)}
-													</code>
-												</div>
-												<p className="text-xs text-muted-foreground">
-													{t("list.startedAt", {
-														value: formatDateTimeLabel(audit.started_at, formatT)
-													})}{" "}
-													· {submissionLabel}
-												</p>
-											</div>
-											<div className="flex flex-wrap items-center gap-2">
-												<Badge
-													variant={getStatusBadgeVariant(audit.status)}
-													className="font-medium text-foreground">
-													{t(`status.${audit.status.toLowerCase()}`)}
-												</Badge>
-												<Badge
-													variant="outline"
-													className="font-mono tabular-nums text-foreground">
-													{formatScoreLabel(audit.summary_score, formatT)}
-												</Badge>
-												<Button
-													asChild
-													size="sm"
-													variant={audit.status === "SUBMITTED" ? "secondary" : "default"}>
-													<Link href={detailHref}>{detailLabel}</Link>
-												</Button>
-											</div>
-										</div>
-									);
-								})}
-							</div>
-						))}
-					<PaginationControls
-						currentPage={currentPage}
-						pageCount={pageCount}
-						totalItems={auditsQuery.data.total_count}
-						pageSize={AUDITOR_REPORTS_PAGE_SIZE}
-						itemLabel={t("pagination.itemLabel")}
-						onPageChange={setCurrentPage}
-					/>
-				</CardContent>
-			</Card>
+					if (!audit.placeId || !audit.projectId) {
+						return [];
+					}
+
+					return [
+						{
+							label: t("list.resumeAudit"),
+							href: `/auditor/execute/${encodeURIComponent(audit.placeId)}?projectId=${encodeURIComponent(audit.projectId)}`
+						}
+					];
+				}}
+				sortingState={sorting}
+				onSortingStateChange={setSorting}
+				columnFiltersState={columnFilters}
+				onColumnFiltersStateChange={setColumnFilters}
+				paginationState={pagination}
+				onPaginationStateChange={setPagination}
+				manualFiltering
+				manualSorting
+				manualPagination
+				rowCount={auditsQuery.data.total_count}
+				pageCount={auditsQuery.data.total_pages}
+				isFetching={auditsQuery.isFetching}
+			/>
 			<Card>
 				<CardHeader>
 					<CardTitle>{t("summary.title")}</CardTitle>

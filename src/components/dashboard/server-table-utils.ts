@@ -33,3 +33,10 @@ export function toBackendSortParam(sorting: Readonly<SortingState>): string | un
 
 	return `${firstSort.desc ? "-" : ""}${firstSort.id}`;
 }
+
+/**
+ * Keep the current query payload visible while a new server-backed query is loading.
+ */
+export function preservePreviousData<TData>(previousData: TData | undefined): TData | undefined {
+	return previousData;
+}

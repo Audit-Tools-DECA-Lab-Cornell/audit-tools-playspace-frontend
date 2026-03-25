@@ -31,10 +31,16 @@ Treat each skill file as a mandatory briefing document.
 7. web-design-reviewer
    Path: .agents/skills/web-design-reviewer/SKILL.md
 
+8. tanstack-query-best-practices
+   Path: .agents/skills/tanstack-query-best-practices/SKILL.md
+
+9. tanstack-router-best-practices
+   Path: .agents/skills/tanstack-router-best-practices/SKILL.md
+
 ## Enforcement
 
 After reading all skill files, output a single line:
-"Skills loaded: frontend-design, penpot-uiux-design, polish, shadcn, ui-ux-pro-max, web-design-guidelines, web-design-reviewer"
+"Skills loaded: frontend-design, penpot-uiux-design, polish, shadcn, ui-ux-pro-max, web-design-guidelines, web-design-reviewer, tanstack-query-best-practices, tanstack-router-best-practices"
 
 Only then proceed with the task.
 
@@ -50,7 +56,7 @@ Paste this block at the **very top** of both prompts, before any other instructi
 MANDATORY FIRST STEP — READ ALL SKILL FILES BEFORE ANYTHING ELSE
 
 Use ReadFile on each of the following paths in order.
-Do not begin the task until all seven are read.
+Do not begin the task until all nine are read.
 
 1. .agents/skills/frontend-design/SKILL.md
 2. .agents/skills/penpot-uiux-design/SKILL.md
@@ -59,8 +65,10 @@ Do not begin the task until all seven are read.
 5. .agents/skills/ui-ux-pro-max/SKILL.md
 6. .agents/skills/web-design-guidelines/SKILL.md
 7. .agents/skills/web-design-reviewer/SKILL.md
+8. .agents/skills/tanstack-query-best-practices/SKILL.md
+9. .agents/skills/tanstack-router-best-practices/SKILL.md
 
-After reading all seven, output exactly:
+After reading all nine, output exactly:
 "Skills loaded: [list]"
 
 Then proceed with the task below.

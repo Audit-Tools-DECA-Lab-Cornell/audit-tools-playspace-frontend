@@ -12,6 +12,7 @@ import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
 import {
 	getMultiValueColumnFilter,
+	preservePreviousData,
 	getTextColumnFilterValue,
 	toBackendSortParam
 } from "@/components/dashboard/server-table-utils";
@@ -65,7 +66,8 @@ export default function AdminAccountsPage() {
 				search: searchValue,
 				sort: sortParam,
 				accountTypes: selectedAccountTypes
-			})
+			}),
+		placeholderData: preservePreviousData
 	});
 
 	React.useEffect(() => {
@@ -84,11 +86,81 @@ export default function AdminAccountsPage() {
 		}));
 	}, [accountsQuery.data, pagination.pageIndex]);
 
-	if (accountsQuery.isLoading) {
+	const isInitialLoading = accountsQuery.isLoading && !accountsQuery.data;
+
+
+
+	const columns = React.useMemo<ColumnDef<AdminAccountRow>[]>(
+		() => [
+			{
+				accessorKey: "name",
+				header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.account")} />,
+				cell: ({ row }) => (
+					<div className="min-w-[220px] space-y-1">
+						<p className="font-medium text-foreground">{row.original.name}</p>
+						<p className="text-sm text-muted-foreground">
+							{row.original.email_masked ?? t("table.emailHidden")}
+						</p>
+					</div>
+				)
+			},
+			{
+				accessorKey: "account_type",
+				header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.type")} />,
+				filterFn: getMultiValueFilterFn<AdminAccountRow>(),
+				cell: ({ row }) => (
+					<Badge variant="secondary" className="font-medium tracking-[0.14em] uppercase">
+						{row.original.account_type}
+					</Badge>
+				)
+			},
+			{
+				accessorKey: "projects_count",
+				header: ({ column }) => (
+					<DataTableColumnHeader column={column} title={t("table.columns.projects")} align="end" />
+				),
+				cell: ({ row }) => (
+					<span className="block text-right font-mono tabular-nums">{row.original.projects_count}</span>
+				)
+			},
+			{
+				accessorKey: "places_count",
+				header: ({ column }) => (
+					<DataTableColumnHeader column={column} title={t("table.columns.places")} align="end" />
+				),
+				cell: ({ row }) => (
+					<span className="block text-right font-mono tabular-nums">{row.original.places_count}</span>
+				)
+			},
+			{
+				accessorKey: "auditors_count",
+				header: ({ column }) => (
+					<DataTableColumnHeader column={column} title={t("table.columns.auditors")} align="end" />
+				),
+				cell: ({ row }) => (
+					<span className="block text-right font-mono tabular-nums">{row.original.auditors_count}</span>
+				)
+			},
+			{
+				accessorKey: "created_at",
+				header: ({ column }) => (
+					<DataTableColumnHeader column={column} title={t("table.columns.created")} align="end" />
+				),
+				cell: ({ row }) => (
+					<span className="block text-right text-sm text-muted-foreground tabular-nums">
+						{formatDateTimeLabel(row.original.created_at, formatT)}
+					</span>
+				)
+			}
+		],
+		[formatT, t]
+	);
+
+	if (isInitialLoading) {
 		return <div className="h-64 animate-pulse rounded-card border border-border bg-card" />;
 	}
 
-	if (accountsQuery.isError || !accountsQuery.data) {
+	if ((accountsQuery.isError && !accountsQuery.data) || !accountsQuery.data) {
 		return (
 			<EmptyState
 				title={t("error.title")}
@@ -101,69 +173,6 @@ export default function AdminAccountsPage() {
 			/>
 		);
 	}
-
-	const columns: ColumnDef<AdminAccountRow>[] = [
-		{
-			accessorKey: "name",
-			header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.account")} />,
-			cell: ({ row }) => (
-				<div className="min-w-[220px] space-y-1">
-					<p className="font-medium text-foreground">{row.original.name}</p>
-					<p className="text-sm text-muted-foreground">
-						{row.original.email_masked ?? t("table.emailHidden")}
-					</p>
-				</div>
-			)
-		},
-		{
-			accessorKey: "account_type",
-			header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.type")} />,
-			filterFn: getMultiValueFilterFn<AdminAccountRow>(),
-			cell: ({ row }) => (
-				<Badge variant="secondary" className="font-medium tracking-[0.14em] uppercase">
-					{row.original.account_type}
-				</Badge>
-			)
-		},
-		{
-			accessorKey: "projects_count",
-			header: ({ column }) => (
-				<DataTableColumnHeader column={column} title={t("table.columns.projects")} align="end" />
-			),
-			cell: ({ row }) => (
-				<span className="block text-right font-mono tabular-nums">{row.original.projects_count}</span>
-			)
-		},
-		{
-			accessorKey: "places_count",
-			header: ({ column }) => (
-				<DataTableColumnHeader column={column} title={t("table.columns.places")} align="end" />
-			),
-			cell: ({ row }) => (
-				<span className="block text-right font-mono tabular-nums">{row.original.places_count}</span>
-			)
-		},
-		{
-			accessorKey: "auditors_count",
-			header: ({ column }) => (
-				<DataTableColumnHeader column={column} title={t("table.columns.auditors")} align="end" />
-			),
-			cell: ({ row }) => (
-				<span className="block text-right font-mono tabular-nums">{row.original.auditors_count}</span>
-			)
-		},
-		{
-			accessorKey: "created_at",
-			header: ({ column }) => (
-				<DataTableColumnHeader column={column} title={t("table.columns.created")} align="end" />
-			),
-			cell: ({ row }) => (
-				<span className="block text-right text-sm text-muted-foreground tabular-nums">
-					{formatDateTimeLabel(row.original.created_at, formatT)}
-				</span>
-			)
-		}
-	];
 
 	return (
 		<div className="space-y-6">
@@ -210,6 +219,7 @@ export default function AdminAccountsPage() {
 				manualPagination
 				rowCount={accountsQuery.data.total_count}
 				pageCount={accountsQuery.data.total_pages}
+				isFetching={accountsQuery.isFetching}
 			/>
 		</div>
 	);
