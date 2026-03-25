@@ -52,7 +52,7 @@ export function AdminDashboardClient({ overview, latestAudits, errorMessage }: R
 					</div>
 				}
 			/>
-			<div className="grid grid-cols-[repeat(auto-fit,minmax(160px,1fr))] gap-4">
+			<div className="grid grid-cols-[repeat(auto-fit,minmax(300px,1fr))] gap-4 ">
 				<StatCard
 					title={t("stats.accounts.title")}
 					value={String(overview.total_accounts)}
@@ -76,12 +76,6 @@ export function AdminDashboardClient({ overview, latestAudits, errorMessage }: R
 					value={String(overview.total_auditors)}
 					helper={t("stats.auditors.helper")}
 					tone="warning"
-				/>
-				<StatCard
-					title={t("stats.audits.title")}
-					value={String(overview.total_audits)}
-					helper={t("stats.audits.helper")}
-					tone="success"
 				/>
 				<StatCard
 					title={t("stats.submitted.title")}

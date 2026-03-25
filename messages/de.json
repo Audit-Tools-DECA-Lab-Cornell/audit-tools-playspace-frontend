@@ -223,11 +223,11 @@
 					"helper": "Alle auf der Plattform erfassten Audit-Sitzungen."
 				},
 				"submitted": {
-					"title": "Eingereicht",
+					"title": "Eingereichte Audits",
 					"helper": "Abgeschlossene Sitzungen mit Bewertung."
 				},
 				"inProgress": {
-					"title": "In Bearbeitung",
+					"title": "In Bearbeitung Audits",
 					"helper": "Sitzungen, an denen noch gearbeitet wird."
 				}
 			},

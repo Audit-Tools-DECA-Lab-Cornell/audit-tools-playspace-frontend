@@ -223,11 +223,11 @@
 					"helper": "All audit sessions discovered platform-wide."
 				},
 				"submitted": {
-					"title": "Submitted",
+					"title": "Submitted Audits",
 					"helper": "Completed sessions with scoring."
 				},
 				"inProgress": {
-					"title": "In progress",
+					"title": "In Progress Audits",
 					"helper": "Sessions still being worked on."
 				}
 			},

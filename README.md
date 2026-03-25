@@ -21,6 +21,7 @@ This app is part of a hierarchical Audit Management System (Account → Projects
 
 <details>
   <summary>Manager Dashboard Pages</summary>
+  
   ![Manager Projects](public/screenshots/manager__manager__projects.png)
   ![Manager Places](public/screenshots/manager__manager__places.png)
   ![Manager Place](public/screenshots/manager__manager__places__placeId_projectId.png)
@@ -33,6 +34,7 @@ This app is part of a hierarchical Audit Management System (Account → Projects
 
 <details>
   <summary>Auditor Dashboard Pages</summary>
+
   ![Auditor Execute Page](public/screenshots/auditor__auditor__execute__placeId_projectId.png)
   ![Auditor Places Page](public/screenshots/auditor__auditor__places.png)
   ![Auditor Reports Page](public/screenshots/auditor__auditor__reports.png)
@@ -42,6 +44,7 @@ This app is part of a hierarchical Audit Management System (Account → Projects
 
 <details>
   <summary>Administrator Dashboard Pages</summary>
+  
   ![Administrator Accounts](public/screenshots/admin__admin__accounts.png)
   ![Administrator Projects](public/screenshots/admin__admin__projects.png)
   ![Administrator Places](public/screenshots/admin__admin__places.png)
