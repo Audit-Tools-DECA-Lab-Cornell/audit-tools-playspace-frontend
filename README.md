@@ -17,46 +17,51 @@ This app is part of a hierarchical Audit Management System (Account → Projects
 
 #### Dashboard Pages
 
-| Manager           | Auditor           | Administrator           |
-| ----------------- | ----------------- | ----------------------- |
 | Manager Dashboard | Auditor Dashboard | Administrator Dashboard |
+| ----------------- | ----------------- | ----------------------- |
+| ![Manager Dashboard](public/screenshots/manager__manager__dashboard.png) | ![Auditor Dashboard](public/screenshots/auditor__auditor__dashboard.png) | ![Admin Dashboard](public/screenshots/admin__admin__dashboard.png) |
 
 <details>
   <summary>Manager Dashboard Pages</summary>
-  <div class="grid grid-cols-2 grid-rows-4 gap-4">
-    <img src="public/screenshots/manager__manager__projects.png" alt="Manager Projects" />
-    <img src="public/screenshots/manager__manager__places.png" alt="Manager Places" />
-    <img src="public/screenshots/manager__manager__places__placeId_projectId.png" alt="Manager Place" />
-    <img src="public/screenshots/manager__manager__projects__projectId.png" alt="Manager Project" />
-    <img src="public/screenshots/manager__manager__audits.png" alt="Manager Audits" />
-    <img src="public/screenshots/manager__manager__auditors.png" alt="Manager Auditor" />
-    <img src="public/screenshots/manager__manager__assignments.png" alt="Manager Assignment" />
-    <img src="public/screenshots/manager__settings.png" alt="Manager Settings" />
-  </div>
+
+  | ![Manager Projects](public/screenshots/manager__manager__projects.png) | ![Manager Places](public/screenshots/manager__manager__places.png) |
+  | :---: | :---: |
+  | **Manager Projects** | **Manager Places** |
+  | ![Manager Place](public/screenshots/manager__manager__places__placeId_projectId.png) | ![Manager Project](public/screenshots/manager__manager__projects__projectId.png) |
+  | **Manager Place** | **Manager Project** |
+  | ![Manager Audits](public/screenshots/manager__manager__audits.png) | ![Manager Auditor](public/screenshots/manager__manager__auditors.png) |
+  | **Manager Audits** | **Manager Auditor** |
+  | ![Manager Assignment](public/screenshots/manager__manager__assignments.png) | ![Manager Settings](public/screenshots/manager__settings.png) |
+  | **Manager Assignment** | **Manager Settings** |
+
 </details>
 
 <details>
   <summary>Auditor Dashboard Pages</summary>
-  <div class="grid grid-cols-2 grid-rows-4 gap-4">
-    <img src="public/screenshots/auditor__auditor__execute__placeId_projectId.png" alt="Auditor Execute Page" />
-    <img src="public/screenshots/auditor__auditor__places.png" alt="Auditor Places Page" />
-    <img src="public/screenshots/auditor__auditor__reports.png" alt="Auditor Reports Page" />
-    <img src="public/screenshots/auditor__auditor__reports__auditId.png" alt="Auditor Report" />
-    <img src="public/screenshots/auditor__auditor__settings.png" alt="Auditor Settings" />
-  </div>
+
+  | ![Auditor Execute Page](public/screenshots/auditor__auditor__execute__placeId_projectId.png) | ![Auditor Places Page](public/screenshots/auditor__auditor__places.png) |
+  | :---: | :---: |
+  | **Auditor Execute Page** | **Auditor Places Page** |
+  | ![Auditor Reports Page](public/screenshots/auditor__auditor__reports.png) | ![Auditor Report](public/screenshots/auditor__auditor__reports__auditId.png) |
+  | **Auditor Reports Page** | **Auditor Report** |
+  | ![Auditor Settings](public/screenshots/auditor__auditor__settings.png) | |
+  | **Auditor Settings** | |
+
 </details>
 
 <details>
   <summary>Administrator Dashboard Pages</summary>
-  <div class="grid grid-cols-2 grid-rows-4 gap-4">
-    <img src="public/screenshots/admin__admin__accounts.png" alt="Administrator Accounts" />
-    <img src="public/screenshots/admin__admin__projects.png" alt="Administrator Projects" />
-    <img src="public/screenshots/admin__admin__places.png" alt="Administrator Places" />
-    <img src="public/screenshots/admin__admin__audits.png" alt="Administrator Audits" />
-    <img src="public/screenshots/admin__admin__auditors.png" alt="Administrator Auditor" />
-    <img src="public/screenshots/admin__admin__system.png" alt="Administrator System" />
-    <img src="public/screenshots/admin__settings.png" alt="Administrator Settings" />
-  </div>
+
+  | ![Administrator Accounts](public/screenshots/admin__admin__accounts.png) | ![Administrator Projects](public/screenshots/admin__admin__projects.png) |
+  | :---: | :---: |
+  | **Administrator Accounts** | **Administrator Projects** |
+  | ![Administrator Places](public/screenshots/admin__admin__places.png) | ![Administrator Audits](public/screenshots/admin__admin__audits.png) |
+  | **Administrator Places** | **Administrator Audits** |
+  | ![Administrator Auditor](public/screenshots/admin__admin__auditors.png) | ![Administrator System](public/screenshots/admin__admin__system.png) |
+  | **Administrator Auditor** | **Administrator System** |
+  | ![Administrator Settings](public/screenshots/admin__settings.png) | |
+  | **Administrator Settings** | |
+
 </details>
 
 ### RBAC roles
