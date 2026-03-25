@@ -44,7 +44,7 @@ This app is part of a hierarchical Audit Management System (Account → Projects
   | **Auditor Execute Page** | **Auditor Places Page** |
   | ![Auditor Reports Page](public/screenshots/auditor__auditor__reports.png) | ![Auditor Report](public/screenshots/auditor__auditor__reports__auditId.png) |
   | **Auditor Reports Page** | **Auditor Report** |
-  | ![Auditor Settings](public/screenshots/auditor__auditor__settings.png) | |
+  | ![Auditor Settings](public/screenshots/auditor__settings.png) | |
   | **Auditor Settings** | |
 
 </details>
