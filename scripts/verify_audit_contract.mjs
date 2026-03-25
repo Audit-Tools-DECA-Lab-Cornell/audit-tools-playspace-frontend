@@ -72,11 +72,9 @@ const { BASE_PLAYSPACE_INSTRUMENT } = loadTsModule(path.resolve(REPO_ROOT, "src/
 const { auditDraftPatchSchema, auditDraftSaveSchema, auditSessionSchema } = loadTsModule(
 	path.resolve(REPO_ROOT, "src/types/audit.ts")
 );
-const {
-	buildNextQuestionAnswers,
-	getVisibleSections,
-	getInstrumentSectionLocalProgress
-} = loadTsModule(path.resolve(REPO_ROOT, "src/lib/audit/selectors.ts"));
+const { buildNextQuestionAnswers, getVisibleSections, getInstrumentSectionLocalProgress } = loadTsModule(
+	path.resolve(REPO_ROOT, "src/lib/audit/selectors.ts")
+);
 
 const targetSection = BASE_PLAYSPACE_INSTRUMENT.sections[0];
 const targetQuestion = targetSection.questions.find(question => question.scales.length > 1);

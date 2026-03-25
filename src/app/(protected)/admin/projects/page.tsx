@@ -71,7 +71,6 @@ export default function AdminProjectsPage() {
 
 	const isInitialLoading = projectsQuery.isLoading && !projectsQuery.data;
 
-
 	const columns = React.useMemo<ColumnDef<AdminProjectRow>[]>(
 		() => [
 			{

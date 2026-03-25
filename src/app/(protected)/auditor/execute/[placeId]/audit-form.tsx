@@ -242,11 +242,7 @@ export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFo
 	}, [createOrResumeQuery.data, instrument]);
 
 	const patchDraft = useMutation({
-		mutationFn: async (input: {
-			auditId: string;
-			patch: AuditDraftPatch;
-			aggregateJson: string;
-		}) =>
+		mutationFn: async (input: { auditId: string; patch: AuditDraftPatch; aggregateJson: string }) =>
 			playspaceApi.auditor.patchAuditDraft(input.auditId, input.patch),
 		onSuccess: (saveResult, variables) => {
 			lastQueuedJsonRef.current = variables.aggregateJson;

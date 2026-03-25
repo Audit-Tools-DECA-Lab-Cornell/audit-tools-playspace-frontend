@@ -235,7 +235,10 @@ export default function ManagerProjectDetailPage({ params }: Readonly<ManagerPro
 							<CardContent className="space-y-5">
 								<div className="flex flex-wrap gap-2">
 									{placeTypeLabel.map(placeType => (
-										<Badge key={placeType} variant="outline">
+										<Badge
+											key={placeType}
+											variant="outline"
+											style={{ textTransform: "capitalize" }}>
 											{placeType}
 										</Badge>
 									))}

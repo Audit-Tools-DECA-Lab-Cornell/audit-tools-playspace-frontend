@@ -68,7 +68,9 @@ export function PlacesTable({
 				filterFn: getMultiValueFilterFn<PlaceSummary>(),
 				cell: ({ row }) =>
 					row.original.place_type ? (
-						<Badge variant="secondary">{row.original.place_type}</Badge>
+						<Badge variant="secondary" style={{ textTransform: "capitalize" }}>
+							{row.original.place_type}
+						</Badge>
 					) : (
 						<span className="text-sm text-muted-foreground">{t("typePending")}</span>
 					)

@@ -821,6 +821,7 @@
 				"tryAgain": "Erneut versuchen",
 				"newAssignment": "Neue Zuweisung",
 				"clear": "Leeren",
+				"reset": "Zurücksetzen",
 				"delete": "Löschen",
 				"cancel": "Abbrechen",
 				"creating": "Wird erstellt...",
@@ -847,22 +848,26 @@
 				"auditorLabel": "Prüfer",
 				"noMatchingAuditors": "Keine passenden Prüfer",
 				"selectAuditor": "Einen Prüfer auswählen",
+				"selected": "Ausgewählt",
+				"emailPending": "E-Mail ausstehend",
 				"matchingAuditors": "Passende Prüfer",
-				"auditorHelp": "Wählen Sie einen Prüfer aus, um die Zuweisungsabdeckung zu prüfen oder veralteten Zugriff zu entfernen.",
+				"auditorHelp": "Wählen Sie einen Prüfer aus, um die Abdeckung zu prüfen, Zugriff zu gewähren oder veraltete Zuweisungen zu entfernen.",
 				"reviewHowItWorksTitle": "So funktioniert die Prüfung von Zuweisungen",
 				"reviewSteps": {
 					"step1": "1. Laden Sie einen Prüfer, um den aktuellen Zugriff über Projekte und Orte hinweg zu sehen.",
 					"step2": "2. Prüfen Sie die Abdeckung, bevor Sie Zuweisungen hinzufügen oder entfernen.",
-					"step3": "3. Verwenden Sie „Neue Zuweisung“, um Zugriff zu gewähren, und kehren Sie dann hierher zurück, um ihn zu überprüfen."
+					"step3": "3. Verwenden Sie das Erstellungsfeld, um Zugriff zu gewähren, und prüfen Sie ihn anschließend unten."
 				}
 			},
 			"auditorSummary": {
 				"loadedAssignments": "{count} geladene Zuweisung{count, plural, one {} other {en}}",
+				"loadingAssignments": "Zuweisungen werden geladen",
+				"assignmentsUnavailable": "Zuweisungen nicht verfügbar",
 				"completedAudits": "{count} abgeschlossene Prüfungen"
 			},
 			"preview": {
-				"title": "Zuweisungsvorschau",
-				"description": "Wählen Sie einen Prüfer aus, um sein aktuelles Projekt und den Standortbereich, das jüngste Prüfvolumen sowie die auf dieser Seite verfügbaren Verwaltungsaktionen anzuzeigen.",
+				"title": "Zuweisung einrichten",
+				"description": "Wählen Sie einen Prüfer aus, um das Inline-Erstellungsfeld zu öffnen, Projekt- und Standortzugriff zu vergleichen und die aktuelle Abdeckung unten zu prüfen.",
 				"projectScopeTitle": "Projektumfang",
 				"projectScopeDescription": "Gewähren Sie Zugriff auf alle Standorte in einem Projekt, wenn der Prüfer eine größere Abdeckung benötigt.",
 				"placeScopeTitle": "Standortumfang",
@@ -872,10 +877,11 @@
 			"coverage": {
 				"title": "Zuweisungsabdeckung",
 				"selectAuditorTitle": "Wählen Sie einen Prüfer aus, um Zuweisungen zu laden",
-				"selectAuditorDescription": "Dieses Feld zeigt, worauf der ausgewählte Prüfer derzeit zugreifen kann, einschließlich Projektumfang, Standortumfang, gewährter Berechtigungen und direkter Verknüpfungen zum zugrunde liegenden Datensatz.",
+				"selectAuditorDescription": "Dieses Feld zeigt, worauf der ausgewählte Prüfer derzeit zugreifen kann, einschließlich Projektumfang, Standortumfang und direkter Verknüpfungen zum zugrunde liegenden Datensatz.",
 				"whatAppearsTitle": "Was hier angezeigt wird",
 				"whatAppears": {
 					"projectAndPlaceCoverage": "Aktuelle Projekt- und Standortabdeckung",
+					"scopeSummaries": "Zusammenfassungen für Projekt- und Standortumfang",
 					"capabilityBadges": "Berechtigungs-Badges für Prüf- und Standortverwaltungszugriff",
 					"openAndDeleteActions": "Öffnen- und Löschen-Aktionen für jede Zuweisung"
 				},
@@ -896,13 +902,21 @@
 				"projectScope": "Projektumfang",
 				"place": "Standort",
 				"project": "Projekt",
+				"projectAndPlaceScopeLabel": "Projekt- und Standortumfang",
+				"projectOnlyScopeLabel": "Projektumfang",
 				"assignedAt": "Zugewiesen am {value}",
 				"openPlace": "Standort öffnen",
 				"openProject": "Projekt öffnen"
 			},
+			"composer": {
+				"title": "Zuweisung erstellen",
+				"description": "Gewähren Sie dem ausgewählten Prüfer Projekt- oder Standortzugriff und prüfen Sie die neue Abdeckung anschließend unten.",
+				"createSuccess": "Die Zuweisung wurde erstellt. Das Formular ist für die nächste Zugriffsänderung bereit.",
+				"createSuccessWithAuditor": "Die Zuweisung für {name} wurde erstellt. Das Formular ist für die nächste Zugriffsänderung bereit."
+			},
 			"sheet": {
 				"title": "Zuweisung erstellen",
-				"description": "Gewähren Sie Projekt- oder Standortzugriff und wählen Sie aus, was der Prüfer innerhalb dieses Umfangs tun kann.",
+				"description": "Gewähren Sie dem ausgewählten Prüfer Projekt- oder Standortzugriff.",
 				"auditorLabel": "Prüfer",
 				"selectAuditor": "Prüfer auswählen",
 				"auditors": "Prüfer",

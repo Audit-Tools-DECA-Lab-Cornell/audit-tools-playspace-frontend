@@ -81,8 +81,6 @@ export default function AdminPlacesPage() {
 
 	const isInitialLoading = placesQuery.isLoading && !placesQuery.data;
 
-	
-
 	const columns = React.useMemo<ColumnDef<AdminPlaceRow>[]>(
 		() => [
 			{

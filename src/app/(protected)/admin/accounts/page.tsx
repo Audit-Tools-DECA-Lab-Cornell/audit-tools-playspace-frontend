@@ -88,8 +88,6 @@ export default function AdminAccountsPage() {
 
 	const isInitialLoading = accountsQuery.isLoading && !accountsQuery.data;
 
-
-
 	const columns = React.useMemo<ColumnDef<AdminAccountRow>[]>(
 		() => [
 			{

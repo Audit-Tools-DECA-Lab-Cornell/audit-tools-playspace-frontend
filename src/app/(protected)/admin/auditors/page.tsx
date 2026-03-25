@@ -72,7 +72,6 @@ export default function AdminAuditorsPage() {
 
 	const isInitialLoading = auditorsQuery.isLoading && !auditorsQuery.data;
 
-	
 	const columns = React.useMemo<ColumnDef<AdminAuditorRow>[]>(
 		() => [
 			{

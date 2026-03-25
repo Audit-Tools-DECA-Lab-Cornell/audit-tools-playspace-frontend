@@ -2,11 +2,17 @@
 
 import Link from "next/link";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { PlusIcon } from "lucide-react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 
 import { playspaceApi, type AuditorSummary } from "@/lib/api/playspace";
+import {
+	AssignmentComposerPanel,
+	type AssignmentFieldErrors,
+	type AssignmentScope,
+	type AssignmentSummaryState
+} from "@/components/dashboard/assignment-composer-panel";
 import { useAuthSession } from "@/components/app/auth-session-provider";
 import { ConfirmDialog } from "@/components/dashboard/confirm-dialog";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
@@ -17,31 +23,15 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-	Select,
-	SelectContent,
-	SelectGroup,
-	SelectItem,
-	SelectLabel,
-	SelectTrigger,
-	SelectValue
-} from "@/components/ui/select";
-import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-
-type AssignmentScope = "project" | "place";
-
-interface AssignmentFieldErrors {
-	auditorId?: string;
-	projectId?: string;
-	placeId?: string;
-}
 
 interface PendingAssignmentDelete {
 	readonly id: string;
 	readonly scopeLabel: string;
 	readonly scopeName: string;
 }
+
+const EMPTY_AUDITORS: readonly AuditorSummary[] = [];
 
 function getErrorMessage(error: unknown, fallbackMessage: string): string {
 	if (error instanceof Error && error.message.trim().length > 0) {
@@ -65,6 +55,9 @@ function filterAuditors(auditors: readonly AuditorSummary[], query: string): Aud
 
 interface AuditorListPickerProps {
 	readonly auditors: readonly AuditorSummary[];
+	readonly disabled?: boolean;
+	readonly emailPendingLabel: string;
+	readonly selectedLabel: string;
 	readonly selectedAuditorId: string;
 	readonly searchQuery: string;
 	readonly searchLabel: string;
@@ -82,6 +75,9 @@ interface AuditorListPickerProps {
 
 function AuditorListPicker({
 	auditors,
+	disabled = false,
+	emailPendingLabel,
+	selectedLabel,
 	selectedAuditorId,
 	searchQuery,
 	searchLabel,
@@ -127,9 +123,10 @@ function AuditorListPicker({
 										key={auditor.id}
 										type="button"
 										className={cn(
-											"grid gap-1 px-4 py-3 text-left transition-colors",
+											"grid gap-1 px-4 py-3 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-60",
 											isSelected ? "bg-primary/10" : "hover:bg-muted/40"
 										)}
+										disabled={disabled}
 										onClick={() => {
 											onSelectAuditor(auditor.id);
 										}}>
@@ -142,11 +139,11 @@ function AuditorListPicker({
 													{auditor.role}
 												</Badge>
 											) : null}
-											{isSelected ? <Badge variant="outline">Selected</Badge> : null}
+											{isSelected ? <Badge variant="outline">{selectedLabel}</Badge> : null}
 										</div>
 										<p className="font-medium text-foreground">{auditor.full_name}</p>
 										<p className="text-sm text-muted-foreground">
-											{auditor.email ?? "Email pending"}
+											{auditor.email ?? emailPendingLabel}
 										</p>
 									</button>
 								);
@@ -154,14 +151,14 @@ function AuditorListPicker({
 						</div>
 					)}
 				</div>
-				<div className="flex items-center justify-between gap-2">
+				<div className="flex items-center pt-2 px-2 justify-between gap-2">
 					{errorText ? (
 						<p className="text-sm text-destructive">{errorText}</p>
 					) : (
 						<p className="text-sm text-muted-foreground">{helperText}</p>
 					)}
 					{selectedAuditorId.trim().length > 0 ? (
-						<Button type="button" variant="ghost" onClick={onClearSelection}>
+						<Button type="button" variant="ghost" onClick={onClearSelection} disabled={disabled}>
 							{clearLabel}
 						</Button>
 					) : null}
@@ -176,18 +173,62 @@ export default function ManagerAssignmentsPage() {
 	const formatT = useTranslations("common.format");
 	const session = useAuthSession();
 	const queryClient = useQueryClient();
+	const pathname = usePathname();
+	const router = useRouter();
+	const searchParams = useSearchParams();
 	const accountId = session?.role === "manager" ? session.accountId : null;
 	const [selectedAuditorId, setSelectedAuditorId] = React.useState("");
 	const [scope, setScope] = React.useState<AssignmentScope>("project");
 	const [selectedProjectId, setSelectedProjectId] = React.useState("");
 	const [selectedPlaceId, setSelectedPlaceId] = React.useState("");
 	const [auditorSearchQuery, setAuditorSearchQuery] = React.useState("");
-	const [sheetAuditorSearchQuery, setSheetAuditorSearchQuery] = React.useState("");
 	const [fieldErrors, setFieldErrors] = React.useState<AssignmentFieldErrors>({});
 	const [formError, setFormError] = React.useState<string | null>(null);
+	const [createSuccessMessage, setCreateSuccessMessage] = React.useState<string | null>(null);
 	const [listError, setListError] = React.useState<string | null>(null);
-	const [isCreateSheetOpen, setIsCreateSheetOpen] = React.useState(false);
 	const [assignmentPendingDelete, setAssignmentPendingDelete] = React.useState<PendingAssignmentDelete | null>(null);
+	const hasInitializedSelectionFromQueryRef = React.useRef(false);
+	const scopeTriggerRef = React.useRef<HTMLButtonElement | null>(null);
+
+	const clearFieldError = React.useCallback((fieldName: keyof AssignmentFieldErrors) => {
+		setFieldErrors(currentValue => ({
+			...currentValue,
+			[fieldName]: undefined
+		}));
+	}, []);
+
+	/**
+	 * Reset the inline composer back to its default blank state.
+	 */
+	const resetComposer = React.useCallback(() => {
+		setScope("project");
+		setSelectedProjectId("");
+		setSelectedPlaceId("");
+		setFieldErrors({});
+		setFormError(null);
+		setCreateSuccessMessage(null);
+	}, []);
+
+	/**
+	 * Keep the page URL synchronized with the currently selected auditor.
+	 */
+	const syncAuditorSelectionInUrl = React.useCallback(
+		(nextAuditorId: string) => {
+			const normalizedAuditorId = nextAuditorId.trim();
+			const nextSearchParams = new URLSearchParams(searchParams.toString());
+
+			if (normalizedAuditorId.length > 0) {
+				nextSearchParams.set("auditorId", normalizedAuditorId);
+			} else {
+				nextSearchParams.delete("auditorId");
+			}
+
+			const nextQuery = nextSearchParams.toString();
+			const nextHref = nextQuery.length > 0 ? `${pathname}?${nextQuery}` : pathname;
+			router.replace(nextHref, { scroll: false });
+		},
+		[pathname, router, searchParams]
+	);
 
 	const auditorsQuery = useQuery({
 		queryKey: ["playspace", "manager", "assignments", "auditors", accountId],
@@ -221,52 +262,51 @@ export default function ManagerAssignmentsPage() {
 	});
 
 	const createAssignment = useMutation({
-		mutationFn: async () => {
-			if (selectedAuditorId.trim().length === 0) {
-				throw new Error(t("errors.selectAuditorBeforeCreate"));
-			}
-
-			if (scope === "project") {
-				return playspaceApi.assignments.create(selectedAuditorId, {
-					project_id: selectedProjectId,
-					place_id: null
-				});
-			}
-
-			return playspaceApi.assignments.create(selectedAuditorId, {
-				project_id: selectedProjectId,
-				place_id: selectedPlaceId
+		mutationFn: async (input: {
+			readonly auditorId: string;
+			readonly projectId: string;
+			readonly placeId: string | null;
+		}) => {
+			return playspaceApi.assignments.create(input.auditorId, {
+				project_id: input.projectId,
+				place_id: input.placeId
 			});
 		},
-		onSuccess: async () => {
-			setFieldErrors({});
-			setFormError(null);
+		onSuccess: async (_data, variables) => {
 			setListError(null);
-			setScope("project");
-			setSelectedProjectId("");
-			setSelectedPlaceId("");
 			await queryClient.invalidateQueries({
-				queryKey: ["playspace", "manager", "assignments", "rows", selectedAuditorId]
+				queryKey: ["playspace", "manager", "assignments", "rows", variables.auditorId]
 			});
-			setIsCreateSheetOpen(false);
+
+			if (selectedAuditorId === variables.auditorId) {
+				const createdAuditor = auditors.find(auditor => auditor.id === variables.auditorId) ?? null;
+				resetComposer();
+				setCreateSuccessMessage(
+					createdAuditor
+						? t("composer.createSuccessWithAuditor", { name: createdAuditor.full_name })
+						: t("composer.createSuccess")
+				);
+				scopeTriggerRef.current?.focus();
+			}
 		},
 		onError: error => {
+			setCreateSuccessMessage(null);
 			setFormError(error instanceof Error ? error.message : t("errors.unableToCreateAssignment"));
 		}
 	});
 
 	const deleteAssignment = useMutation({
-		mutationFn: async (assignmentId: string) => {
-			if (selectedAuditorId.trim().length === 0) {
+		mutationFn: async (input: { readonly assignmentId: string; readonly auditorId: string }) => {
+			if (input.auditorId.trim().length === 0) {
 				throw new Error(t("errors.selectAuditorBeforeDelete"));
 			}
-			return playspaceApi.assignments.delete(selectedAuditorId, assignmentId);
+			return playspaceApi.assignments.delete(input.auditorId, input.assignmentId);
 		},
-		onSuccess: async () => {
+		onSuccess: async (_data, variables) => {
 			setListError(null);
 			setAssignmentPendingDelete(null);
 			await queryClient.invalidateQueries({
-				queryKey: ["playspace", "manager", "assignments", "rows", selectedAuditorId]
+				queryKey: ["playspace", "manager", "assignments", "rows", variables.auditorId]
 			});
 		},
 		onError: error => {
@@ -274,19 +314,112 @@ export default function ManagerAssignmentsPage() {
 		}
 	});
 
-	const auditors = React.useMemo(() => auditorsQuery.data ?? [], [auditorsQuery.data]);
+	const auditors = auditorsQuery.data ?? EMPTY_AUDITORS;
 	const projects = projectsQuery.data ?? [];
 	const places = projectPlacesQuery.data ?? [];
 	const assignments = assignmentsQuery.data ?? [];
+	const assignmentsSummaryState: AssignmentSummaryState = assignmentsQuery.isLoading
+		? "loading"
+		: assignmentsQuery.isError
+			? "error"
+			: "ready";
 	const selectedAuditor = auditors.find(auditor => auditor.id === selectedAuditorId) ?? null;
-	const filteredAuditors = React.useMemo(
-		() => filterAuditors(auditors, auditorSearchQuery),
-		[auditorSearchQuery, auditors]
+	const queryAuditorId = searchParams.get("auditorId")?.trim() ?? "";
+	const filteredAuditors = filterAuditors(auditors, auditorSearchQuery);
+
+	React.useEffect(() => {
+		if (hasInitializedSelectionFromQueryRef.current || auditorsQuery.isLoading) {
+			return;
+		}
+
+		hasInitializedSelectionFromQueryRef.current = true;
+
+		if (queryAuditorId.length === 0) {
+			return;
+		}
+
+		const matchingAuditor = auditors.find(auditor => auditor.id === queryAuditorId) ?? null;
+		if (matchingAuditor) {
+			setSelectedAuditorId(matchingAuditor.id);
+			return;
+		}
+
+		syncAuditorSelectionInUrl("");
+	}, [auditors, auditorsQuery.isLoading, queryAuditorId, syncAuditorSelectionInUrl]);
+
+	React.useEffect(() => {
+		if (!hasInitializedSelectionFromQueryRef.current || selectedAuditorId === queryAuditorId) {
+			return;
+		}
+
+		syncAuditorSelectionInUrl(selectedAuditorId);
+	}, [queryAuditorId, selectedAuditorId, syncAuditorSelectionInUrl]);
+
+	const isSelectionLocked = createAssignment.isPending || deleteAssignment.isPending;
+
+	const handleSelectAuditor = React.useCallback(
+		(nextValue: string) => {
+			if (nextValue === selectedAuditorId) {
+				return;
+			}
+
+			setSelectedAuditorId(nextValue);
+			setAssignmentPendingDelete(null);
+			setListError(null);
+			resetComposer();
+		},
+		[resetComposer, selectedAuditorId]
 	);
-	const sheetFilteredAuditors = React.useMemo(
-		() => filterAuditors(auditors, sheetAuditorSearchQuery),
-		[auditors, sheetAuditorSearchQuery]
+
+	const handleClearSelection = React.useCallback(() => {
+		if (selectedAuditorId.trim().length === 0) {
+			return;
+		}
+
+		setSelectedAuditorId("");
+		setAssignmentPendingDelete(null);
+		setListError(null);
+		resetComposer();
+	}, [resetComposer, selectedAuditorId]);
+
+	const handleScopeChange = React.useCallback(
+		(nextValue: AssignmentScope) => {
+			setScope(nextValue);
+			setSelectedPlaceId("");
+			clearFieldError("projectId");
+			clearFieldError("placeId");
+			setFormError(null);
+			setCreateSuccessMessage(null);
+		},
+		[clearFieldError]
 	);
+
+	const handleProjectChange = React.useCallback(
+		(nextValue: string) => {
+			setSelectedProjectId(nextValue);
+			setSelectedPlaceId("");
+			clearFieldError("projectId");
+			clearFieldError("placeId");
+			setFormError(null);
+			setCreateSuccessMessage(null);
+		},
+		[clearFieldError]
+	);
+
+	const handlePlaceChange = React.useCallback(
+		(nextValue: string) => {
+			setSelectedPlaceId(nextValue);
+			clearFieldError("placeId");
+			setFormError(null);
+			setCreateSuccessMessage(null);
+		},
+		[clearFieldError]
+	);
+
+	const handleResetComposer = React.useCallback(() => {
+		resetComposer();
+		scopeTriggerRef.current?.focus();
+	}, [resetComposer]);
 
 	if (!accountId) {
 		return (
@@ -343,18 +476,9 @@ export default function ManagerAssignmentsPage() {
 		);
 	}
 
-	function clearFieldError(fieldName: keyof AssignmentFieldErrors) {
-		setFieldErrors(currentValue => ({
-			...currentValue,
-			[fieldName]: undefined
-		}));
-	}
-
 	function handleCreateAssignment() {
 		const nextFieldErrors: AssignmentFieldErrors = {};
-		if (selectedAuditorId.trim().length === 0) {
-			nextFieldErrors.auditorId = t("validation.auditorRequired");
-		}
+		const normalizedAuditorId = selectedAuditorId.trim();
 
 		if (selectedProjectId.trim().length === 0) {
 			nextFieldErrors.projectId =
@@ -367,12 +491,22 @@ export default function ManagerAssignmentsPage() {
 
 		setFieldErrors(nextFieldErrors);
 		setFormError(null);
+		setCreateSuccessMessage(null);
+
+		if (normalizedAuditorId.length === 0) {
+			setFormError(t("errors.selectAuditorBeforeCreate"));
+			return;
+		}
 
 		if (Object.values(nextFieldErrors).some(value => typeof value === "string")) {
 			return;
 		}
 
-		createAssignment.mutate();
+		createAssignment.mutate({
+			auditorId: normalizedAuditorId,
+			projectId: selectedProjectId,
+			placeId: scope === "project" ? null : selectedPlaceId
+		});
 	}
 
 	return (
@@ -385,18 +519,6 @@ export default function ManagerAssignmentsPage() {
 					{ label: t("breadcrumbs.dashboard"), href: "/manager/dashboard" },
 					{ label: t("breadcrumbs.assignments") }
 				]}
-				actions={
-					<Button
-						type="button"
-						className="gap-2"
-						disabled={auditors.length === 0}
-						onClick={() => {
-							setIsCreateSheetOpen(true);
-						}}>
-						<PlusIcon className="size-4" />
-						<span>{t("actions.newAssignment")}</span>
-					</Button>
-				}
 			/>
 
 			<Card>
@@ -413,6 +535,9 @@ export default function ManagerAssignmentsPage() {
 						</div>
 						<AuditorListPicker
 							auditors={filteredAuditors}
+							disabled={isSelectionLocked}
+							emailPendingLabel={t("auditorFocus.emailPending")}
+							selectedLabel={t("auditorFocus.selected")}
 							selectedAuditorId={selectedAuditorId}
 							searchQuery={auditorSearchQuery}
 							searchLabel={t("auditorFocus.searchLabel")}
@@ -422,18 +547,9 @@ export default function ManagerAssignmentsPage() {
 							emptyLabel={t("auditorFocus.noMatchingAuditors")}
 							helperText={t("auditorFocus.auditorHelp")}
 							clearLabel={t("actions.clear")}
-							errorText={fieldErrors.auditorId}
 							onSearchQueryChange={setAuditorSearchQuery}
-							onSelectAuditor={nextValue => {
-								setSelectedAuditorId(nextValue);
-								clearFieldError("auditorId");
-								setListError(null);
-							}}
-							onClearSelection={() => {
-								setSelectedAuditorId("");
-								clearFieldError("auditorId");
-								setListError(null);
-							}}
+							onSelectAuditor={handleSelectAuditor}
+							onClearSelection={handleClearSelection}
 						/>
 						<div className="rounded-field border border-border/70 bg-muted/35 p-4">
 							<p className="font-medium text-foreground">{t("auditorFocus.reviewHowItWorksTitle")}</p>
@@ -447,32 +563,26 @@ export default function ManagerAssignmentsPage() {
 
 					<div className="rounded-field border border-border bg-card p-4">
 						{selectedAuditor ? (
-							<div className="space-y-3">
-								<div className="space-y-1">
-									<p className="font-medium text-foreground">{selectedAuditor.full_name}</p>
-									<div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-										<code className="rounded-md bg-muted/65 px-2 py-1 font-mono text-[11px] tracking-[0.04em] text-foreground/80">
-											{selectedAuditor.auditor_code}
-										</code>
-										{selectedAuditor.email ? <span>{selectedAuditor.email}</span> : null}
-									</div>
-								</div>
-								<div className="flex flex-wrap gap-2">
-									{selectedAuditor.role ? (
-										<Badge variant="secondary" style={{ textTransform: "capitalize" }}>
-											{selectedAuditor.role}
-										</Badge>
-									) : null}
-									<Badge variant="outline">
-										{t("auditorSummary.loadedAssignments", { count: assignments.length })}
-									</Badge>
-									<Badge variant="outline">
-										{t("auditorSummary.completedAudits", {
-											count: selectedAuditor.completed_audits
-										})}
-									</Badge>
-								</div>
-							</div>
+							<AssignmentComposerPanel
+								assignmentsCount={assignments.length}
+								assignmentsSummaryState={assignmentsSummaryState}
+								fieldErrors={fieldErrors}
+								formError={formError}
+								isPending={createAssignment.isPending}
+								places={places}
+								projects={projects}
+								scope={scope}
+								scopeTriggerRef={scopeTriggerRef}
+								selectedAuditor={selectedAuditor}
+								selectedPlaceId={selectedPlaceId}
+								selectedProjectId={selectedProjectId}
+								successMessage={createSuccessMessage}
+								onPlaceChange={handlePlaceChange}
+								onProjectChange={handleProjectChange}
+								onReset={handleResetComposer}
+								onScopeChange={handleScopeChange}
+								onSubmit={handleCreateAssignment}
+							/>
 						) : (
 							<div className="space-y-4">
 								<div className="space-y-1">
@@ -524,7 +634,7 @@ export default function ManagerAssignmentsPage() {
 								<p className="font-medium text-foreground">{t("coverage.whatAppearsTitle")}</p>
 								<ul className="mt-2 grid gap-2 text-sm text-muted-foreground">
 									<li>{t("coverage.whatAppears.projectAndPlaceCoverage")}</li>
-									<li>Project and place scope summaries</li>
+									<li>{t("coverage.whatAppears.scopeSummaries")}</li>
 									<li>{t("coverage.whatAppears.openAndDeleteActions")}</li>
 								</ul>
 							</div>
@@ -591,8 +701,8 @@ export default function ManagerAssignmentsPage() {
 									<div className="flex flex-wrap items-center gap-2">
 										<Badge variant="outline" className="font-medium">
 											{assignment.scope_type === "place"
-												? "Project + place scope"
-												: "Project scope"}
+												? t("assignment.projectAndPlaceScopeLabel")
+												: t("assignment.projectOnlyScopeLabel")}
 										</Badge>
 										{scopeHref ? (
 											<Button asChild type="button" variant="outline">
@@ -623,169 +733,6 @@ export default function ManagerAssignmentsPage() {
 					)}
 				</CardContent>
 			</Card>
-			<Sheet open={isCreateSheetOpen} onOpenChange={setIsCreateSheetOpen}>
-				<SheetContent side="right" className="w-full gap-0 sm:max-w-xl">
-					<SheetHeader className="border-b border-border/70 px-6 py-5">
-						<SheetTitle>{t("sheet.title")}</SheetTitle>
-						<SheetDescription>{t("sheet.description")}</SheetDescription>
-					</SheetHeader>
-					<div className="grid min-h-0 flex-1 gap-4 overflow-y-auto px-6 py-5 md:grid-cols-2">
-						<div className="md:col-span-2">
-							<AuditorListPicker
-								auditors={sheetFilteredAuditors}
-								selectedAuditorId={selectedAuditorId}
-								searchQuery={sheetAuditorSearchQuery}
-								searchLabel={t("sheet.auditorLabel")}
-								searchPlaceholder={t("sheet.selectAuditor")}
-								searchResultsText={`${sheetFilteredAuditors.length} ${t("sheet.auditors")}`}
-								pickerLabel={t("sheet.auditorLabel")}
-								emptyLabel={t("auditorFocus.noMatchingAuditors")}
-								helperText={t("sheet.auditorHelp")}
-								clearLabel={t("actions.clear")}
-								errorText={fieldErrors.auditorId}
-								onSearchQueryChange={setSheetAuditorSearchQuery}
-								onSelectAuditor={nextValue => {
-									setSelectedAuditorId(nextValue);
-									clearFieldError("auditorId");
-									setFormError(null);
-								}}
-								onClearSelection={() => {
-									setSelectedAuditorId("");
-									clearFieldError("auditorId");
-									setFormError(null);
-								}}
-							/>
-						</div>
-						<div className="grid gap-2">
-							<Label>{t("sheet.scopeLabel")}</Label>
-							<Select
-								value={scope}
-								onValueChange={nextValue => {
-									setScope(nextValue as AssignmentScope);
-									setSelectedPlaceId("");
-									clearFieldError("projectId");
-									clearFieldError("placeId");
-									setFormError(null);
-								}}>
-								<SelectTrigger id="scope_select" aria-label={t("sheet.scopeLabel")}>
-									<SelectValue />
-								</SelectTrigger>
-								<SelectContent position="popper">
-									<SelectGroup>
-										<SelectLabel>{t("sheet.assignmentScope")}</SelectLabel>
-										<SelectItem value="project">{t("sheet.project")}</SelectItem>
-										<SelectItem value="place">{t("sheet.place")}</SelectItem>
-									</SelectGroup>
-								</SelectContent>
-							</Select>
-							<p className="text-sm text-muted-foreground">
-								{scope === "project"
-									? t("sheet.projectScopeDescription")
-									: t("sheet.placeScopeDescription")}
-							</p>
-						</div>
-						<div className="grid gap-2">
-							<Label>{t("sheet.projectLabel")}</Label>
-							<Select
-								value={selectedProjectId.trim().length > 0 ? selectedProjectId : undefined}
-								onValueChange={nextValue => {
-									setSelectedProjectId(nextValue);
-									setSelectedPlaceId("");
-									clearFieldError("projectId");
-									clearFieldError("placeId");
-									setFormError(null);
-								}}>
-								<SelectTrigger
-									id="project_select"
-									aria-label={t("sheet.projectLabel")}
-									aria-invalid={Boolean(fieldErrors.projectId)}>
-									<SelectValue placeholder={t("sheet.selectProject")} />
-								</SelectTrigger>
-								<SelectContent position="popper">
-									<SelectGroup>
-										<SelectLabel>{t("sheet.projects")}</SelectLabel>
-										{projects.map(project => (
-											<SelectItem key={project.id} value={project.id}>
-												{project.name}
-											</SelectItem>
-										))}
-									</SelectGroup>
-								</SelectContent>
-							</Select>
-							{fieldErrors.projectId ? (
-								<p className="text-sm text-destructive">{fieldErrors.projectId}</p>
-							) : (
-								<p className="text-sm text-muted-foreground">{t("sheet.projectHelp")}</p>
-							)}
-						</div>
-						<div className="grid gap-2">
-							<Label>{t("sheet.placeLabel")}</Label>
-							<Select
-								value={selectedPlaceId.trim().length > 0 ? selectedPlaceId : undefined}
-								onValueChange={nextValue => {
-									setSelectedPlaceId(nextValue);
-									clearFieldError("placeId");
-									setFormError(null);
-								}}
-								disabled={scope !== "place" || selectedProjectId.trim().length === 0}>
-								<SelectTrigger
-									id="place_select"
-									aria-label={t("sheet.placeLabel")}
-									aria-invalid={Boolean(fieldErrors.placeId)}>
-									<SelectValue placeholder={t("sheet.selectPlace")} />
-								</SelectTrigger>
-								<SelectContent position="popper">
-									<SelectGroup>
-										<SelectLabel>
-											{selectedProjectId.trim().length === 0
-												? t("sheet.selectProjectFirst")
-												: t("sheet.places")}
-										</SelectLabel>
-										{places.map(place => (
-											<SelectItem key={place.id} value={place.id}>
-												{place.name}
-											</SelectItem>
-										))}
-									</SelectGroup>
-								</SelectContent>
-							</Select>
-							{fieldErrors.placeId ? (
-								<p className="text-sm text-destructive">{fieldErrors.placeId}</p>
-							) : (
-								<p className="text-sm text-muted-foreground">
-									{scope === "place"
-										? selectedProjectId.trim().length === 0
-											? t("sheet.selectProjectFirstHelp")
-											: t("sheet.placeHelp")
-										: t("sheet.placeOptionalHelp")}
-								</p>
-							)}
-						</div>
-						{formError ? (
-							<p aria-live="polite" className="md:col-span-2 text-sm text-destructive">
-								{formError}
-							</p>
-						) : null}
-					</div>
-					<SheetFooter className="border-t border-border/70 px-6 py-4">
-						<div className="ml-auto flex flex-col-reverse gap-2 sm:flex-row">
-							<Button
-								type="button"
-								variant="outline"
-								onClick={() => setIsCreateSheetOpen(false)}
-								disabled={createAssignment.isPending}>
-								{t("actions.cancel")}
-							</Button>
-							<Button
-								type="button"
-								disabled={createAssignment.isPending}
-								onClick={handleCreateAssignment}>
-								{createAssignment.isPending ? t("actions.creating") : t("actions.createAssignment")}
-							</Button>
-						</div>
-					</SheetFooter>
-				</SheetContent>
-			</Sheet>
 			<ConfirmDialog
 				open={assignmentPendingDelete !== null}
 				onOpenChange={open => {
@@ -797,19 +744,22 @@ export default function ManagerAssignmentsPage() {
 				description={
 					assignmentPendingDelete
 						? t("confirmDelete.descriptionWithScope", {
-							scopeLabel: assignmentPendingDelete.scopeLabel,
-							scopeName: assignmentPendingDelete.scopeName
-						})
+								scopeLabel: assignmentPendingDelete.scopeLabel,
+								scopeName: assignmentPendingDelete.scopeName
+							})
 						: t("confirmDelete.description")
 				}
 				confirmLabel={t("confirmDelete.confirmLabel")}
 				isPending={deleteAssignment.isPending}
 				onConfirm={() => {
-					if (!assignmentPendingDelete) {
+					if (!assignmentPendingDelete || selectedAuditorId.trim().length === 0) {
 						return;
 					}
 
-					deleteAssignment.mutate(assignmentPendingDelete.id);
+					deleteAssignment.mutate({
+						assignmentId: assignmentPendingDelete.id,
+						auditorId: selectedAuditorId
+					});
 				}}
 			/>
 		</div>

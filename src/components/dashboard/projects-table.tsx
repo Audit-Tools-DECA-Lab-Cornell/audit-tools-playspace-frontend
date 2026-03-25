@@ -77,7 +77,10 @@ export function ProjectsTable({
 					return (
 						<div className="flex min-w-[220px] flex-wrap gap-1.5">
 							{placeTypes.slice(0, 3).map(placeType => (
-								<Badge key={`${row.original.id}_${placeType}`} variant="secondary">
+								<Badge
+									key={`${row.original.id}_${placeType}`}
+									variant="secondary"
+									style={{ textTransform: "capitalize" }}>
 									{placeType}
 								</Badge>
 							))}

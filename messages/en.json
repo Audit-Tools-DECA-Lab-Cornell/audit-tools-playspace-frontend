@@ -821,6 +821,7 @@
 				"tryAgain": "Try again",
 				"newAssignment": "New assignment",
 				"clear": "Clear",
+				"reset": "Reset",
 				"delete": "Delete",
 				"cancel": "Cancel",
 				"creating": "Creating...",
@@ -847,22 +848,26 @@
 				"auditorLabel": "Auditor",
 				"noMatchingAuditors": "No matching auditors",
 				"selectAuditor": "Select an auditor",
+				"selected": "Selected",
+				"emailPending": "Email pending",
 				"matchingAuditors": "Matching auditors",
-				"auditorHelp": "Choose an auditor to review assignment coverage or remove outdated access.",
+				"auditorHelp": "Choose an auditor to review coverage, grant access, or remove outdated assignments.",
 				"reviewHowItWorksTitle": "How assignment review works",
 				"reviewSteps": {
 					"step1": "1. Load one auditor to see current access across projects and places.",
 					"step2": "2. Review coverage before adding or removing assignments.",
-					"step3": "3. Use New assignment to grant access, then return here to verify it."
+					"step3": "3. Use the create panel to grant access, then verify it below."
 				}
 			},
 			"auditorSummary": {
 				"loadedAssignments": "{count} loaded assignment{count, plural, one {} other {s}}",
+				"loadingAssignments": "Loading assignments",
+				"assignmentsUnavailable": "Assignments unavailable",
 				"completedAudits": "{count} completed audits"
 			},
 			"preview": {
-				"title": "Assignment preview",
-				"description": "Select an auditor to reveal their current project and place coverage, recent audit volume, and the management actions available on this page.",
+				"title": "Assignment setup",
+				"description": "Select an auditor to open the inline create panel, compare project and place access, and review current coverage below.",
 				"projectScopeTitle": "Project scope",
 				"projectScopeDescription": "Grant access across every place in a project when the auditor needs wider coverage.",
 				"placeScopeTitle": "Place scope",
@@ -872,10 +877,11 @@
 			"coverage": {
 				"title": "Assignment coverage",
 				"selectAuditorTitle": "Select an auditor to load assignments",
-				"selectAuditorDescription": "This panel shows what the selected auditor can currently access, including project scope, place scope, granted capabilities, and direct links back to the underlying record.",
+				"selectAuditorDescription": "This panel shows what the selected auditor can currently access, including project scope, place scope, and direct links back to the underlying record.",
 				"whatAppearsTitle": "What appears here",
 				"whatAppears": {
 					"projectAndPlaceCoverage": "Current project and place coverage",
+					"scopeSummaries": "Project and place scope summaries",
 					"capabilityBadges": "Capability badges for audit and place-admin access",
 					"openAndDeleteActions": "Open and delete actions for each assignment"
 				},
@@ -896,13 +902,21 @@
 				"projectScope": "Project scope",
 				"place": "place",
 				"project": "project",
+				"projectAndPlaceScopeLabel": "Project + place scope",
+				"projectOnlyScopeLabel": "Project scope",
 				"assignedAt": "Assigned {value}",
 				"openPlace": "Open place",
 				"openProject": "Open project"
 			},
+			"composer": {
+				"title": "Create assignment",
+				"description": "Grant project or place access for the selected auditor, then verify the new coverage below.",
+				"createSuccess": "Assignment created. The form is ready for another access change.",
+				"createSuccessWithAuditor": "Assignment created for {name}. The form is ready for another access change."
+			},
 			"sheet": {
 				"title": "Create assignment",
-				"description": "Grant project or place access and choose what the auditor can do inside that scope.",
+				"description": "Grant project or place access for the selected auditor.",
 				"auditorLabel": "Auditor",
 				"selectAuditor": "Select auditor",
 				"auditors": "Auditors",

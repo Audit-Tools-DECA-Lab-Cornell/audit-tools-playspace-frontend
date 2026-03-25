@@ -85,9 +85,7 @@ function normalizeSearchValue(value: string): string {
 /**
  * Create an empty draft object for the configured multi-select filters.
  */
-function createEmptyDraftFilterValues(
-	filterConfigs: readonly DataTableFilterConfig[]
-): Record<string, string[]> {
+function createEmptyDraftFilterValues(filterConfigs: readonly DataTableFilterConfig[]): Record<string, string[]> {
 	return Object.fromEntries(filterConfigs.map(config => [config.columnId, [] as string[]]));
 }
 
@@ -198,28 +196,31 @@ export function DataTableToolbar<TData>({
 		}
 	}, [committedColumnVisibility, committedColumnVisibilitySignature, isColumnsMenuOpen]);
 
-	const commitSearchValue = React.useCallback((rawValue: string) => {
-		if (!searchColumnId) {
-			return;
-		}
+	const commitSearchValue = React.useCallback(
+		(rawValue: string) => {
+			if (!searchColumnId) {
+				return;
+			}
 
-		const normalizedValue = normalizeSearchValue(rawValue);
-		const normalizedCommittedValue = normalizeSearchValue(committedSearchValue);
-		if (normalizedValue === normalizedCommittedValue) {
-			return;
-		}
+			const normalizedValue = normalizeSearchValue(rawValue);
+			const normalizedCommittedValue = normalizeSearchValue(committedSearchValue);
+			if (normalizedValue === normalizedCommittedValue) {
+				return;
+			}
 
-		const nextColumnFilters = filterOutColumnFilters(table.getState().columnFilters, new Set([searchColumnId]));
-		if (normalizedValue.length > 0) {
-			nextColumnFilters.push({
-				id: searchColumnId,
-				value: normalizedValue
-			});
-		}
+			const nextColumnFilters = filterOutColumnFilters(table.getState().columnFilters, new Set([searchColumnId]));
+			if (normalizedValue.length > 0) {
+				nextColumnFilters.push({
+					id: searchColumnId,
+					value: normalizedValue
+				});
+			}
 
-		table.setColumnFilters(nextColumnFilters);
-		table.setPageIndex(0);
-	}, [committedSearchValue, searchColumnId, table]);
+			table.setColumnFilters(nextColumnFilters);
+			table.setPageIndex(0);
+		},
+		[committedSearchValue, searchColumnId, table]
+	);
 
 	React.useEffect(() => {
 		if (!searchColumnId) {
@@ -248,10 +249,13 @@ export function DataTableToolbar<TData>({
 		});
 	}, []);
 
-	const handleFiltersMenuOpenChange = React.useCallback((nextOpen: boolean) => {
-		setDraftFilterValues(committedFilterValues);
-		setIsFiltersMenuOpen(nextOpen);
-	}, [committedFilterValues]);
+	const handleFiltersMenuOpenChange = React.useCallback(
+		(nextOpen: boolean) => {
+			setDraftFilterValues(committedFilterValues);
+			setIsFiltersMenuOpen(nextOpen);
+		},
+		[committedFilterValues]
+	);
 
 	const resetDraftFilters = React.useCallback(() => {
 		setDraftFilterValues(emptyDraftFilterValues);
@@ -278,10 +282,13 @@ export function DataTableToolbar<TData>({
 		setIsFiltersMenuOpen(false);
 	}, [draftFilterValues, filterConfigs, hasPendingFilterChanges, managedFilterColumnIds, table]);
 
-	const handleColumnsMenuOpenChange = React.useCallback((nextOpen: boolean) => {
-		setDraftColumnVisibility(committedColumnVisibility);
-		setIsColumnsMenuOpen(nextOpen);
-	}, [committedColumnVisibility]);
+	const handleColumnsMenuOpenChange = React.useCallback(
+		(nextOpen: boolean) => {
+			setDraftColumnVisibility(committedColumnVisibility);
+			setIsColumnsMenuOpen(nextOpen);
+		},
+		[committedColumnVisibility]
+	);
 
 	const showAllColumns = React.useCallback(() => {
 		setDraftColumnVisibility(currentValue => {
@@ -341,7 +348,9 @@ export function DataTableToolbar<TData>({
 								<Button type="button" variant="outline" size="sm" className="h-9 gap-2 px-3.5">
 									<ListFilterIcon className="size-4" />
 									<span>{t("filters")}</span>
-									{appliedFilterCount > 0 ? <Badge variant="secondary">{appliedFilterCount}</Badge> : null}
+									{appliedFilterCount > 0 ? (
+										<Badge variant="secondary">{appliedFilterCount}</Badge>
+									) : null}
 								</Button>
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align="start" className="w-80 p-0">
@@ -351,7 +360,9 @@ export function DataTableToolbar<TData>({
 										<React.Fragment key={config.columnId}>
 											{configIndex > 0 ? <DropdownMenuSeparator /> : null}
 											<div className="space-y-1.5">
-												<DropdownMenuLabel className="px-2 py-1 text-[11px]">{config.title}</DropdownMenuLabel>
+												<DropdownMenuLabel className="px-2 py-1 text-[11px]">
+													{config.title}
+												</DropdownMenuLabel>
 												{config.options.length > 0 ? (
 													config.options.map(option => {
 														const selectedValues = draftFilterValues[config.columnId] ?? [];
@@ -374,7 +385,9 @@ export function DataTableToolbar<TData>({
 														);
 													})
 												) : (
-													<p className="px-3 py-2 text-sm text-muted-foreground">{t("noOptions")}</p>
+													<p className="px-3 py-2 text-sm text-muted-foreground">
+														{t("noOptions")}
+													</p>
 												)}
 											</div>
 										</React.Fragment>
