@@ -13,6 +13,44 @@ This app is part of a hierarchical Audit Management System (Account → Projects
 - **Forms**: React Hook Form + Zod
 - **Icons**: Lucide React
 
+### Screenshots
+#### Dashboard Pages
+| Manager | Auditor | Administrator |
+|------|------|------|
+| ![Manager Dashboard](public/screenshots/manager__manager__assignments.png) | ![Auditor Dashboard](public/screenshots/auditor__auditor__dashboard.png) | ![Administrator Dashboard](public/screenshots/admin__admin__dashboard.png) |
+
+<details>
+  <summary>Manager Dashboard Pages</summary>
+  ![Manager Projects](public/screenshots/manager__manager__projects.png)
+  ![Manager Places](public/screenshots/manager__manager__places.png)
+  ![Manager Place](public/screenshots/manager__manager__places__placeId_projectId.png)
+  ![Manager Project](public/screenshots/manager__manager__projects__projectId.png)
+  ![Manager Audits](public/screenshots/manager__manager__audits.png)
+  ![Manager Auditor](public/screenshots/manager__manager__auditors.png)
+  ![Manager Assignment](public/screenshots/manager__manager__assignments.png)
+  ![Manager Settings](public/screenshots/manager__settings.png)
+</details>
+
+<details>
+  <summary>Auditor Dashboard Pages</summary>
+  ![Auditor Execute Page](public/screenshots/auditor__auditor__execute__placeId_projectId.png)
+  ![Auditor Places Page](public/screenshots/auditor__auditor__places.png)
+  ![Auditor Reports Page](public/screenshots/auditor__auditor__reports.png)
+  ![Auditor Report](public/screenshots/auditor__auditor__reports__auditId.png)
+  ![Auditor Settings](public/screenshots/auditor__auditor__settings.png)
+</details>
+
+<details>
+  <summary>Administrator Dashboard Pages</summary>
+  ![Administrator Accounts](public/screenshots/admin__admin__accounts.png)
+  ![Administrator Projects](public/screenshots/admin__admin__projects.png)
+  ![Administrator Places](public/screenshots/admin__admin__places.png)
+  ![Administrator Audits](public/screenshots/admin__admin__audits.png)
+  ![Administrator Auditor](public/screenshots/admin__admin__auditors.png)
+  ![Administrator System](public/screenshots/admin__admin__system.png)
+  ![Administrator Settings](public/screenshots/admin__settings.png)
+</details>
+
 ### RBAC roles
 
 - **Managers (full access)**:
