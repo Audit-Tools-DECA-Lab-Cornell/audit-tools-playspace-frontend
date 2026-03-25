@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import type { ColumnFiltersState, Table, VisibilityState } from "@tanstack/react-table";
-import { ListFilterIcon, Loader2Icon, Settings2Icon, XIcon } from "lucide-react";
+import { ListFilterIcon, Loader2Icon, Settings2Icon } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { Badge } from "@/components/ui/badge";
@@ -37,6 +37,9 @@ export interface DataTableToolbarProps<TData> {
 	isFetching?: boolean;
 }
 
+/**
+ * Read a multi-select filter value from TanStack state as a string array.
+ */
 function readStringArrayFilterValue(rawValue: unknown): string[] {
 	if (!Array.isArray(rawValue)) {
 		return [];
@@ -45,6 +48,9 @@ function readStringArrayFilterValue(rawValue: unknown): string[] {
 	return rawValue.filter((value): value is string => typeof value === "string");
 }
 
+/**
+ * Compare two string arrays without caring about item order.
+ */
 function areStringArraysEqual(leftValues: readonly string[], rightValues: readonly string[]): boolean {
 	if (leftValues.length !== rightValues.length) {
 		return false;
@@ -54,6 +60,9 @@ function areStringArraysEqual(leftValues: readonly string[], rightValues: readon
 	return rightValues.every(value => leftSet.has(value));
 }
 
+/**
+ * Convert an internal column identifier into a human-readable label.
+ */
 function humanizeColumnId(columnId: string): string {
 	const withSpaces = columnId
 		.replaceAll("_", " ")
@@ -66,48 +75,34 @@ function humanizeColumnId(columnId: string): string {
 	return `${withSpaces.charAt(0).toUpperCase()}${withSpaces.slice(1)}`;
 }
 
-function DataTableFilterMenu<TData>({
-	config,
-	selectedValues,
-	onToggleValue
-}: Readonly<{
-	config: DataTableFilterConfig;
-	selectedValues: readonly string[];
-	onToggleValue: (columnId: string, optionValue: string, nextChecked: boolean) => void;
-}>) {
-	return (
-		<DropdownMenu>
-			<DropdownMenuTrigger asChild>
-				<Button type="button" variant="outline" size="sm" className="h-9 gap-2 px-3.5">
-					<ListFilterIcon className="size-4" />
-					<span>{config.title}</span>
-					{selectedValues.length > 0 ? <Badge variant="secondary">{selectedValues.length}</Badge> : null}
-				</Button>
-			</DropdownMenuTrigger>
-			<DropdownMenuContent align="start" className="w-56">
-				<DropdownMenuLabel>{config.title}</DropdownMenuLabel>
-				<DropdownMenuSeparator />
-				{config.options.map(option => {
-					const isChecked = selectedValues.includes(option.value);
-
-					return (
-						<DropdownMenuCheckboxItem
-							key={`${config.columnId}_${option.value}`}
-							checked={isChecked}
-							onCheckedChange={checked => {
-								onToggleValue(config.columnId, option.value, Boolean(checked));
-							}}>
-							{option.label}
-						</DropdownMenuCheckboxItem>
-					);
-				})}
-			</DropdownMenuContent>
-		</DropdownMenu>
-	);
+/**
+ * Normalize free-text search before it is committed to the table state.
+ */
+function normalizeSearchValue(value: string): string {
+	return value.trim();
 }
 
 /**
- * Shared table toolbar with search, faceted filters, and column visibility controls.
+ * Create an empty draft object for the configured multi-select filters.
+ */
+function createEmptyDraftFilterValues(
+	filterConfigs: readonly DataTableFilterConfig[]
+): Record<string, string[]> {
+	return Object.fromEntries(filterConfigs.map(config => [config.columnId, [] as string[]]));
+}
+
+/**
+ * Remove managed filters while preserving unrelated table filters.
+ */
+function filterOutColumnFilters(
+	columnFilters: Readonly<ColumnFiltersState>,
+	excludedColumnIds: ReadonlySet<string>
+): ColumnFiltersState {
+	return columnFilters.filter(filter => !excludedColumnIds.has(filter.id));
+}
+
+/**
+ * Shared table toolbar with smooth search, staged filters, and staged column visibility controls.
  */
 export function DataTableToolbar<TData>({
 	table,
@@ -123,55 +118,122 @@ export function DataTableToolbar<TData>({
 		return table.getAllColumns().filter(column => column.getCanHide());
 	}, [table]);
 	const tableState = table.getState();
-	const committedSearchValue =
-		typeof searchColumn?.getFilterValue() === "string" ? (searchColumn.getFilterValue() as string) : "";
+	const rawSearchValue = searchColumn?.getFilterValue();
+	const committedSearchValue = typeof rawSearchValue === "string" ? rawSearchValue : "";
 	const committedFilterValues = React.useMemo(() => {
 		const nextFilterValues: Record<string, string[]> = {};
 		for (const config of filterConfigs) {
-			const rawFilterValue = table.getColumn(config.columnId)?.getFilterValue();
-			nextFilterValues[config.columnId] = readStringArrayFilterValue(rawFilterValue);
+			const matchedFilter = tableState.columnFilters.find(filter => filter.id === config.columnId);
+			nextFilterValues[config.columnId] = readStringArrayFilterValue(matchedFilter?.value);
 		}
 		return nextFilterValues;
-	}, [filterConfigs, table, tableState.columnFilters]);
+	}, [filterConfigs, tableState.columnFilters]);
 	const committedColumnVisibility = React.useMemo(() => {
 		const nextVisibilityState: VisibilityState = {};
 		for (const column of hideableColumns) {
-			nextVisibilityState[column.id] = column.getIsVisible();
+			nextVisibilityState[column.id] = tableState.columnVisibility[column.id] ?? column.getIsVisible();
 		}
 		return nextVisibilityState;
 	}, [hideableColumns, tableState.columnVisibility]);
-	const committedSearchSignature = committedSearchValue.trim();
 	const committedFilterSignature = JSON.stringify(committedFilterValues);
 	const committedColumnVisibilitySignature = JSON.stringify(committedColumnVisibility);
+	const emptyDraftFilterValues = React.useMemo(() => {
+		return createEmptyDraftFilterValues(filterConfigs);
+	}, [filterConfigs]);
+	const managedFilterColumnIds = React.useMemo(() => {
+		return new Set(filterConfigs.map(config => config.columnId));
+	}, [filterConfigs]);
 	const [draftSearchValue, setDraftSearchValue] = React.useState(committedSearchValue);
-	const [draftFilterValues, setDraftFilterValues] = React.useState<Record<string, string[]>>(committedFilterValues);
-	const [draftColumnVisibility, setDraftColumnVisibility] =
-		React.useState<VisibilityState>(committedColumnVisibility);
-	const hasActiveFilters = tableState.columnFilters.length > 0;
+	const [draftFilterValues, setDraftFilterValues] = React.useState<Record<string, string[]>>(() => {
+		return committedFilterValues;
+	});
+	const [draftColumnVisibility, setDraftColumnVisibility] = React.useState<VisibilityState>(() => {
+		return committedColumnVisibility;
+	});
+	const [isFiltersMenuOpen, setIsFiltersMenuOpen] = React.useState(false);
+	const [isColumnsMenuOpen, setIsColumnsMenuOpen] = React.useState(false);
 	const resolvedSearchPlaceholder = searchPlaceholder ?? t("searchPlaceholder");
-	const hasPendingSearch = draftSearchValue.trim() !== committedSearchSignature;
-	const hasPendingFilters = filterConfigs.some(config => {
-		return !areStringArraysEqual(
-			draftFilterValues[config.columnId] ?? [],
-			committedFilterValues[config.columnId] ?? []
-		);
-	});
-	const hasPendingColumnVisibility = hideableColumns.some(column => {
-		return (draftColumnVisibility[column.id] ?? true) !== (committedColumnVisibility[column.id] ?? true);
-	});
-	const hasPendingChanges = hasPendingSearch || hasPendingFilters || hasPendingColumnVisibility;
+	const appliedFilterCount = React.useMemo(() => {
+		return filterConfigs.reduce((count, config) => {
+			return count + (committedFilterValues[config.columnId] ?? []).length;
+		}, 0);
+	}, [committedFilterValues, filterConfigs]);
+	const hasDraftFilterSelections = React.useMemo(() => {
+		return filterConfigs.some(config => {
+			return (draftFilterValues[config.columnId] ?? []).length > 0;
+		});
+	}, [draftFilterValues, filterConfigs]);
+	const hasPendingFilterChanges = React.useMemo(() => {
+		return filterConfigs.some(config => {
+			return !areStringArraysEqual(
+				draftFilterValues[config.columnId] ?? [],
+				committedFilterValues[config.columnId] ?? []
+			);
+		});
+	}, [committedFilterValues, draftFilterValues, filterConfigs]);
+	const hasPendingColumnVisibilityChanges = React.useMemo(() => {
+		return hideableColumns.some(column => {
+			return (draftColumnVisibility[column.id] ?? true) !== (committedColumnVisibility[column.id] ?? true);
+		});
+	}, [committedColumnVisibility, draftColumnVisibility, hideableColumns]);
+	const canShowAllColumns = React.useMemo(() => {
+		return hideableColumns.some(column => {
+			return (draftColumnVisibility[column.id] ?? true) === false;
+		});
+	}, [draftColumnVisibility, hideableColumns]);
 
 	React.useEffect(() => {
 		setDraftSearchValue(committedSearchValue);
-	}, [committedSearchSignature]);
+	}, [committedSearchValue]);
 
 	React.useEffect(() => {
-		setDraftFilterValues(committedFilterValues);
-	}, [committedFilterSignature]);
+		if (!isFiltersMenuOpen) {
+			setDraftFilterValues(committedFilterValues);
+		}
+	}, [committedFilterSignature, committedFilterValues, isFiltersMenuOpen]);
 
 	React.useEffect(() => {
-		setDraftColumnVisibility(committedColumnVisibility);
-	}, [committedColumnVisibilitySignature]);
+		if (!isColumnsMenuOpen) {
+			setDraftColumnVisibility(committedColumnVisibility);
+		}
+	}, [committedColumnVisibility, committedColumnVisibilitySignature, isColumnsMenuOpen]);
+
+	const commitSearchValue = React.useCallback((rawValue: string) => {
+		if (!searchColumnId) {
+			return;
+		}
+
+		const normalizedValue = normalizeSearchValue(rawValue);
+		const normalizedCommittedValue = normalizeSearchValue(committedSearchValue);
+		if (normalizedValue === normalizedCommittedValue) {
+			return;
+		}
+
+		const nextColumnFilters = filterOutColumnFilters(table.getState().columnFilters, new Set([searchColumnId]));
+		if (normalizedValue.length > 0) {
+			nextColumnFilters.push({
+				id: searchColumnId,
+				value: normalizedValue
+			});
+		}
+
+		table.setColumnFilters(nextColumnFilters);
+		table.setPageIndex(0);
+	}, [committedSearchValue, searchColumnId, table]);
+
+	React.useEffect(() => {
+		if (!searchColumnId) {
+			return;
+		}
+
+		const timeoutId = globalThis.setTimeout(() => {
+			commitSearchValue(draftSearchValue);
+		}, 300);
+
+		return () => {
+			globalThis.clearTimeout(timeoutId);
+		};
+	}, [commitSearchValue, draftSearchValue, searchColumnId]);
 
 	const handleToggleFilterValue = React.useCallback((columnId: string, optionValue: string, nextChecked: boolean) => {
 		setDraftFilterValues(currentValue => {
@@ -186,29 +248,21 @@ export function DataTableToolbar<TData>({
 		});
 	}, []);
 
-	const discardPendingChanges = React.useCallback(() => {
-		setDraftSearchValue(committedSearchValue);
+	const handleFiltersMenuOpenChange = React.useCallback((nextOpen: boolean) => {
 		setDraftFilterValues(committedFilterValues);
-		setDraftColumnVisibility(committedColumnVisibility);
-	}, [committedColumnVisibility, committedFilterValues, committedSearchValue]);
+		setIsFiltersMenuOpen(nextOpen);
+	}, [committedFilterValues]);
 
-	const applyPendingChanges = React.useCallback(() => {
-		const handledColumnIds = new Set(filterConfigs.map(config => config.columnId));
-		if (searchColumnId) {
-			handledColumnIds.add(searchColumnId);
+	const resetDraftFilters = React.useCallback(() => {
+		setDraftFilterValues(emptyDraftFilterValues);
+	}, [emptyDraftFilterValues]);
+
+	const applyFilterChanges = React.useCallback(() => {
+		if (!hasPendingFilterChanges) {
+			return;
 		}
 
-		const nextColumnFilters: ColumnFiltersState = tableState.columnFilters.filter(filter => {
-			return !handledColumnIds.has(filter.id);
-		});
-		const normalizedSearchValue = draftSearchValue.trim();
-		if (searchColumnId && normalizedSearchValue.length > 0) {
-			nextColumnFilters.push({
-				id: searchColumnId,
-				value: normalizedSearchValue
-			});
-		}
-
+		const nextColumnFilters = filterOutColumnFilters(table.getState().columnFilters, managedFilterColumnIds);
 		for (const config of filterConfigs) {
 			const nextValues = draftFilterValues[config.columnId] ?? [];
 			if (nextValues.length > 0) {
@@ -220,28 +274,14 @@ export function DataTableToolbar<TData>({
 		}
 
 		table.setColumnFilters(nextColumnFilters);
-		table.setColumnVisibility(draftColumnVisibility);
-		if (hasPendingSearch || hasPendingFilters) {
-			table.setPageIndex(0);
-		}
-	}, [
-		draftColumnVisibility,
-		draftFilterValues,
-		draftSearchValue,
-		filterConfigs,
-		hasPendingFilters,
-		hasPendingSearch,
-		searchColumnId,
-		table,
-		tableState.columnFilters
-	]);
-
-	const resetAppliedFilters = React.useCallback(() => {
-		table.resetColumnFilters();
 		table.setPageIndex(0);
-		setDraftSearchValue("");
-		setDraftFilterValues(Object.fromEntries(filterConfigs.map(config => [config.columnId, [] as string[]])));
-	}, [filterConfigs, table]);
+		setIsFiltersMenuOpen(false);
+	}, [draftFilterValues, filterConfigs, hasPendingFilterChanges, managedFilterColumnIds, table]);
+
+	const handleColumnsMenuOpenChange = React.useCallback((nextOpen: boolean) => {
+		setDraftColumnVisibility(committedColumnVisibility);
+		setIsColumnsMenuOpen(nextOpen);
+	}, [committedColumnVisibility]);
 
 	const showAllColumns = React.useCallback(() => {
 		setDraftColumnVisibility(currentValue => {
@@ -253,51 +293,38 @@ export function DataTableToolbar<TData>({
 		});
 	}, [hideableColumns]);
 
+	const applyColumnVisibilityChanges = React.useCallback(() => {
+		if (!hasPendingColumnVisibilityChanges) {
+			return;
+		}
+
+		table.setColumnVisibility(draftColumnVisibility);
+		setIsColumnsMenuOpen(false);
+	}, [draftColumnVisibility, hasPendingColumnVisibilityChanges, table]);
+
 	return (
 		<div className="flex flex-col gap-4 border-b border-border/70 px-6 pb-5 lg:justify-between">
 			<div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
 				{searchColumn ? (
-					<div className="flex flex-1 flex-col gap-2 sm:flex-row">
+					<div className="min-w-0 flex-1 lg:max-w-sm">
 						<Input
 							value={draftSearchValue}
 							onChange={event => setDraftSearchValue(event.target.value)}
 							onKeyDown={event => {
 								if (event.key === "Enter") {
 									event.preventDefault();
-									applyPendingChanges();
+									commitSearchValue(draftSearchValue);
 								}
 							}}
 							placeholder={resolvedSearchPlaceholder}
 							className="h-10 w-full"
 							aria-label={resolvedSearchPlaceholder}
 						/>
-						<div className="flex items-center gap-2 sm:justify-end">
-							{hasPendingChanges ? (
-								<Button type="button" variant="outline" onClick={discardPendingChanges}>
-									{t("discard")}
-								</Button>
-							) : null}
-							<Button type="button" onClick={applyPendingChanges} disabled={!hasPendingChanges}>
-								{t("apply")}
-							</Button>
-						</div>
 					</div>
 				) : (
-					<div className="flex flex-1 items-center gap-2">
-						{hasPendingChanges ? (
-							<>
-								<Button type="button" variant="outline" onClick={discardPendingChanges}>
-									{t("discard")}
-								</Button>
-								<Button type="button" onClick={applyPendingChanges}>
-									{t("apply")}
-								</Button>
-							</>
-						) : null}
-					</div>
+					<div className="flex-1" />
 				)}
-				<div className="flex items-center gap-2 sm:justify-end">
-					{hasPendingChanges ? <Badge variant="secondary">{t("pendingChanges")}</Badge> : null}
+				<div className="flex flex-wrap items-center gap-2 sm:justify-end">
 					{isFetching ? (
 						<Badge variant="outline" className="gap-1.5">
 							<Loader2Icon className="size-3.5 animate-spin" />
@@ -306,63 +333,126 @@ export function DataTableToolbar<TData>({
 					) : null}
 				</div>
 			</div>
-			<div className="flex flex-1 flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-start justify-between">
-				<div className="flex flex-col items-start justify-start gap-2">
-					<div className="flex flex-wrap flex-row items-center justify-between gap-2 sm:flex-nowrap">
-						{filterConfigs.map(config => (
-							<DataTableFilterMenu
-								key={config.columnId}
-								config={config}
-								selectedValues={draftFilterValues[config.columnId] ?? []}
-								onToggleValue={handleToggleFilterValue}
-							/>
-						))}
-					</div>
-					{hasActiveFilters ? (
-						<Button type="button" variant="ghost" size="sm" className="gap-2" onClick={resetAppliedFilters}>
-							<XIcon className="size-4" />
-							<span>{t("reset")}</span>
-						</Button>
+			<div className="flex flex-1 flex-col justify-between gap-3 sm:flex-row sm:flex-wrap sm:items-start">
+				<div className="flex flex-wrap items-center gap-2">
+					{filterConfigs.length > 0 ? (
+						<DropdownMenu open={isFiltersMenuOpen} onOpenChange={handleFiltersMenuOpenChange}>
+							<DropdownMenuTrigger asChild>
+								<Button type="button" variant="outline" size="sm" className="h-9 gap-2 px-3.5">
+									<ListFilterIcon className="size-4" />
+									<span>{t("filters")}</span>
+									{appliedFilterCount > 0 ? <Badge variant="secondary">{appliedFilterCount}</Badge> : null}
+								</Button>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent align="start" className="w-80 p-0">
+								<div className="max-h-80 space-y-3 overflow-y-auto p-2.5">
+									<DropdownMenuLabel className="px-2 py-1">{t("filters")}</DropdownMenuLabel>
+									{filterConfigs.map((config, configIndex) => (
+										<React.Fragment key={config.columnId}>
+											{configIndex > 0 ? <DropdownMenuSeparator /> : null}
+											<div className="space-y-1.5">
+												<DropdownMenuLabel className="px-2 py-1 text-[11px]">{config.title}</DropdownMenuLabel>
+												{config.options.length > 0 ? (
+													config.options.map(option => {
+														const selectedValues = draftFilterValues[config.columnId] ?? [];
+														const isChecked = selectedValues.includes(option.value);
+
+														return (
+															<DropdownMenuCheckboxItem
+																key={`${config.columnId}_${option.value}`}
+																checked={isChecked}
+																onSelect={event => event.preventDefault()}
+																onCheckedChange={checked => {
+																	handleToggleFilterValue(
+																		config.columnId,
+																		option.value,
+																		Boolean(checked)
+																	);
+																}}>
+																{option.label}
+															</DropdownMenuCheckboxItem>
+														);
+													})
+												) : (
+													<p className="px-3 py-2 text-sm text-muted-foreground">{t("noOptions")}</p>
+												)}
+											</div>
+										</React.Fragment>
+									))}
+								</div>
+								<div className="flex items-center justify-between gap-2 border-t border-border/70 p-2.5">
+									<Button
+										type="button"
+										variant="ghost"
+										size="sm"
+										onClick={resetDraftFilters}
+										disabled={!hasDraftFilterSelections && !hasPendingFilterChanges}>
+										{t("reset")}
+									</Button>
+									<Button
+										type="button"
+										size="sm"
+										onClick={applyFilterChanges}
+										disabled={!hasPendingFilterChanges}>
+										{t("applyChanges")}
+									</Button>
+								</div>
+							</DropdownMenuContent>
+						</DropdownMenu>
 					) : null}
 				</div>
 				<div className="flex flex-wrap items-center justify-end gap-2 sm:flex-nowrap">
 					{action}
-					<DropdownMenu>
-						<DropdownMenuTrigger asChild>
-							<Button type="button" variant="outline" size="sm" className="h-9 gap-2 px-3.5">
-								<Settings2Icon className="size-4" />
-								<span>{t("columns")}</span>
-							</Button>
-						</DropdownMenuTrigger>
-						<DropdownMenuContent align="end" className="w-52">
-							<DropdownMenuLabel>{t("toggleColumns")}</DropdownMenuLabel>
-							<DropdownMenuSeparator />
-							<Button
-								type="button"
-								variant="ghost"
-								size="sm"
-								className="mx-2 mb-2 justify-start px-2"
-								onClick={showAllColumns}>
-								{t("showAllColumns")}
-							</Button>
-							{table
-								.getAllColumns()
-								.filter(column => column.getCanHide())
-								.map(column => (
-									<DropdownMenuCheckboxItem
-										key={column.id}
-										checked={draftColumnVisibility[column.id] ?? column.getIsVisible()}
-										onCheckedChange={checked => {
-											setDraftColumnVisibility(currentValue => ({
-												...currentValue,
-												[column.id]: Boolean(checked)
-											}));
-										}}>
-										{humanizeColumnId(column.id)}
-									</DropdownMenuCheckboxItem>
-								))}
-						</DropdownMenuContent>
-					</DropdownMenu>
+					{hideableColumns.length > 0 ? (
+						<DropdownMenu open={isColumnsMenuOpen} onOpenChange={handleColumnsMenuOpenChange}>
+							<DropdownMenuTrigger asChild>
+								<Button type="button" variant="outline" size="sm" className="h-9 gap-2 px-3.5">
+									<Settings2Icon className="size-4" />
+									<span>{t("columns")}</span>
+								</Button>
+							</DropdownMenuTrigger>
+							<DropdownMenuContent align="end" className="w-60 p-0">
+								<div className="max-h-80 overflow-y-auto p-2.5">
+									<DropdownMenuLabel className="px-2 py-1">{t("toggleColumns")}</DropdownMenuLabel>
+									<Button
+										type="button"
+										variant="ghost"
+										size="sm"
+										className="mb-2 w-full justify-start px-2"
+										onClick={showAllColumns}
+										disabled={!canShowAllColumns}>
+										{t("showAllColumns")}
+									</Button>
+									<DropdownMenuSeparator />
+									<div className="space-y-1 pt-2">
+										{hideableColumns.map(column => (
+											<DropdownMenuCheckboxItem
+												key={column.id}
+												checked={draftColumnVisibility[column.id] ?? column.getIsVisible()}
+												onSelect={event => event.preventDefault()}
+												onCheckedChange={checked => {
+													setDraftColumnVisibility(currentValue => ({
+														...currentValue,
+														[column.id]: Boolean(checked)
+													}));
+												}}>
+												{humanizeColumnId(column.id)}
+											</DropdownMenuCheckboxItem>
+										))}
+									</div>
+								</div>
+								<div className="flex justify-end border-t border-border/70 p-2.5">
+									<Button
+										type="button"
+										size="sm"
+										onClick={applyColumnVisibilityChanges}
+										disabled={!hasPendingColumnVisibilityChanges}>
+										{t("applyChanges")}
+									</Button>
+								</div>
+							</DropdownMenuContent>
+						</DropdownMenu>
+					) : null}
 				</div>
 			</div>
 		</div>

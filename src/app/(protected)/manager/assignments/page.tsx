@@ -134,10 +134,14 @@ function AuditorListPicker({
 											onSelectAuditor(auditor.id);
 										}}>
 										<div className="flex flex-wrap items-center gap-2">
-											<code className="rounded-sm bg-muted px-2 py-1 font-mono text-[11px] tracking-[0.04em] text-foreground/80">
+											<Badge variant="outline" className="font-mono text-primary">
 												{auditor.auditor_code}
-											</code>
-											{auditor.role ? <Badge variant="secondary">{auditor.role}</Badge> : null}
+											</Badge>
+											{auditor.role ? (
+												<Badge variant="secondary" style={{ textTransform: "capitalize" }}>
+													{auditor.role}
+												</Badge>
+											) : null}
 											{isSelected ? <Badge variant="outline">Selected</Badge> : null}
 										</div>
 										<p className="font-medium text-foreground">{auditor.full_name}</p>
@@ -455,7 +459,9 @@ export default function ManagerAssignmentsPage() {
 								</div>
 								<div className="flex flex-wrap gap-2">
 									{selectedAuditor.role ? (
-										<Badge variant="secondary">{selectedAuditor.role}</Badge>
+										<Badge variant="secondary" style={{ textTransform: "capitalize" }}>
+											{selectedAuditor.role}
+										</Badge>
 									) : null}
 									<Badge variant="outline">
 										{t("auditorSummary.loadedAssignments", { count: assignments.length })}
@@ -791,9 +797,9 @@ export default function ManagerAssignmentsPage() {
 				description={
 					assignmentPendingDelete
 						? t("confirmDelete.descriptionWithScope", {
-								scopeLabel: assignmentPendingDelete.scopeLabel,
-								scopeName: assignmentPendingDelete.scopeName
-							})
+							scopeLabel: assignmentPendingDelete.scopeLabel,
+							scopeName: assignmentPendingDelete.scopeName
+						})
 						: t("confirmDelete.description")
 				}
 				confirmLabel={t("confirmDelete.confirmLabel")}

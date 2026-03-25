@@ -84,14 +84,17 @@
 			"emptyMessage": "No results found.",
 			"toolbar": {
 				"searchPlaceholder": "Search records...",
+				"filters": "Filters",
 				"reset": "Reset",
 				"apply": "Apply",
+				"applyChanges": "Apply changes",
 				"discard": "Discard",
 				"columns": "Columns",
 				"toggleColumns": "Toggle columns",
 				"pendingChanges": "Pending changes",
 				"updating": "Updating",
-				"showAllColumns": "Show all columns"
+				"showAllColumns": "Show all columns",
+				"noOptions": "No options available"
 			},
 			"pagination": {
 				"showing": "Showing {start} to {end} of {total} results",

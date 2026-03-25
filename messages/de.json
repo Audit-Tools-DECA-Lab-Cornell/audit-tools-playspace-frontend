@@ -84,14 +84,17 @@
 			"emptyMessage": "Keine Ergebnisse gefunden.",
 			"toolbar": {
 				"searchPlaceholder": "Datensätze suchen...",
+				"filters": "Filter",
 				"reset": "Zurücksetzen",
 				"apply": "Anwenden",
+				"applyChanges": "Änderungen anwenden",
 				"discard": "Verwerfen",
 				"columns": "Spalten",
 				"toggleColumns": "Spalten ein-/ausblenden",
 				"pendingChanges": "Ausstehende Änderungen",
 				"updating": "Aktualisiere",
-				"showAllColumns": "Alle Spalten anzeigen"
+				"showAllColumns": "Alle Spalten anzeigen",
+				"noOptions": "Keine Optionen verfügbar"
 			},
 			"pagination": {
 				"showing": "Zeige Ergebnisse {start} bis {end} von {total}",

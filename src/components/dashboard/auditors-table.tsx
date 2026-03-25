@@ -50,7 +50,7 @@ export function AuditorsTable({
 							<Badge variant="outline" className="font-mono text-primary">
 								{row.original.auditor_code}
 							</Badge>
-							{row.original.role ? <Badge variant="secondary">{row.original.role}</Badge> : null}
+							{row.original.role ? <Badge variant="secondary" style={{ textTransform: "capitalize" }}>{row.original.role}</Badge> : null}
 						</div>
 						<p className="font-medium text-foreground">{row.original.full_name}</p>
 						<p className="text-sm text-muted-foreground">{row.original.email ?? t("emailPending")}</p>
@@ -63,7 +63,7 @@ export function AuditorsTable({
 				header: ({ column }) => <DataTableColumnHeader column={column} title={t("columns.role")} />,
 				filterFn: getMultiValueFilterFn<AuditorSummary>(),
 				cell: ({ row }) => (
-					<span className="text-sm text-muted-foreground">{row.original.role ?? t("rolePending")}</span>
+					<span className="text-sm text-muted-foreground" style={{ textTransform: "capitalize" }}>{row.original.role ?? t("rolePending")}</span>
 				)
 			},
 			{
@@ -101,13 +101,13 @@ export function AuditorsTable({
 			},
 			...(getRowActions
 				? [
-						{
-							id: "actions",
-							enableSorting: false,
-							enableHiding: false,
-							cell: ({ row }) => <EntityRowActions actions={getRowActions(row.original)} />
-						} satisfies ColumnDef<AuditorSummary>
-					]
+					{
+						id: "actions",
+						enableSorting: false,
+						enableHiding: false,
+						cell: ({ row }) => <EntityRowActions actions={getRowActions(row.original)} />
+					} satisfies ColumnDef<AuditorSummary>
+				]
 				: [])
 		],
 		[formatT, getRowActions, t]
