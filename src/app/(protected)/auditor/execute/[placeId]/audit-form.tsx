@@ -113,59 +113,40 @@ function createSectionDrafts(
 }
 
 /**
- * Build one backend-compatible patch payload from local form state.
+ * Build one canonical aggregate draft-save payload from local form state.
  */
 function buildDraftPatchFromState(input: {
 	selectedMode: ExecutionModeSelection;
 	preAuditValues: Record<string, string | string[]>;
 	sectionDrafts: Record<string, SectionDraftState>;
+	schemaVersion: number;
+	expectedRevision: number;
 }): AuditDraftPatch {
 	return {
-		meta: input.selectedMode ? { execution_mode: input.selectedMode } : null,
-		pre_audit: {
-			season: readSingleValue(input.preAuditValues.season),
-			weather_conditions: readMultiValue(input.preAuditValues.weather_conditions),
-			users_present: readMultiValue(input.preAuditValues.users_present),
-			user_count: readSingleValue(input.preAuditValues.user_count),
-			age_groups: readMultiValue(input.preAuditValues.age_groups),
-			place_size: readSingleValue(input.preAuditValues.place_size)
+		expected_revision: input.expectedRevision,
+		aggregate: {
+			schema_version: input.schemaVersion,
+			meta: input.selectedMode ? { execution_mode: input.selectedMode } : null,
+			pre_audit: {
+				season: readSingleValue(input.preAuditValues.season),
+				weather_conditions: readMultiValue(input.preAuditValues.weather_conditions),
+				users_present: readMultiValue(input.preAuditValues.users_present),
+				user_count: readSingleValue(input.preAuditValues.user_count),
+				age_groups: readMultiValue(input.preAuditValues.age_groups),
+				place_size: readSingleValue(input.preAuditValues.place_size)
+			},
+			sections: Object.fromEntries(
+				Object.entries(input.sectionDrafts).map(([sectionKey, draft]) => [
+					sectionKey,
+					{
+						responses: draft.responses,
+						note: draft.note.trim().length > 0 ? draft.note : null
+					}
+				])
+			)
 		},
-		sections: Object.fromEntries(
-			Object.entries(input.sectionDrafts).map(([sectionKey, draft]) => [
-				sectionKey,
-				{
-					responses: draft.responses,
-					note: draft.note.trim().length > 0 ? draft.note : null
-				}
-			])
-		)
+		sections: {}
 	};
-}
-
-/**
- * Build the smallest patch needed to move the last-saved draft state to the current local state.
- */
-function buildIncrementalDraftPatch(previous: AuditDraftPatch, current: AuditDraftPatch): AuditDraftPatch {
-	const changedSections = Object.fromEntries(
-		Object.entries(current.sections).filter(([sectionKey, sectionPatch]) => {
-			return JSON.stringify(sectionPatch) !== JSON.stringify(previous.sections[sectionKey]);
-		})
-	);
-	const metaChanged = JSON.stringify(current.meta ?? null) !== JSON.stringify(previous.meta ?? null);
-	const preAuditChanged = JSON.stringify(current.pre_audit ?? null) !== JSON.stringify(previous.pre_audit ?? null);
-
-	return {
-		meta: metaChanged ? (current.meta ?? null) : undefined,
-		pre_audit: preAuditChanged ? (current.pre_audit ?? null) : undefined,
-		sections: changedSections
-	};
-}
-
-/**
- * Check whether an incremental draft patch contains any actual work for the backend.
- */
-function isEmptyIncrementalPatch(patch: AuditDraftPatch): boolean {
-	return patch.meta === undefined && patch.pre_audit === undefined && Object.keys(patch.sections).length === 0;
 }
 
 /**
@@ -208,7 +189,6 @@ function getInitialActiveSectionKey(sectionRows: readonly SectionProgressRow[]):
 
 export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFormProps>) {
 	const t = useTranslations("auditor.execute");
-	const instrument = useLocalizedInstrument();
 	const [selectedMode, setSelectedMode] = React.useState<ExecutionModeSelection>("");
 	const [activeSectionKey, setActiveSectionKey] = React.useState<string | null>(null);
 	const [session, setSession] = React.useState<AuditSession | null>(null);
@@ -219,12 +199,12 @@ export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFo
 	const initializedAuditIdRef = React.useRef<string | null>(null);
 	const lastQueuedJsonRef = React.useRef<string | null>(null);
 	const lastSavedJsonRef = React.useRef<string | null>(null);
-	const lastSavedPatchRef = React.useRef<AuditDraftPatch | null>(null);
 
 	const createOrResumeQuery = useQuery({
 		queryKey: ["playspace", "auditor", "execute", projectId, placeId],
 		queryFn: () => playspaceApi.auditor.createOrResumeAudit(placeId, projectId)
 	});
+	const instrument = useLocalizedInstrument(session?.instrument ?? createOrResumeQuery.data?.instrument ?? null);
 
 	React.useEffect(() => {
 		if (!createOrResumeQuery.data) {
@@ -247,12 +227,13 @@ export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFo
 		const initialPatch = buildDraftPatchFromState({
 			selectedMode: nextSelectedMode,
 			preAuditValues: nextPreAuditValues,
-			sectionDrafts: nextSectionDrafts
+			sectionDrafts: nextSectionDrafts,
+			schemaVersion: incomingSession.schema_version,
+			expectedRevision: incomingSession.revision
 		});
-		const initialPatchJson = JSON.stringify(initialPatch);
+		const initialPatchJson = JSON.stringify(initialPatch.aggregate ?? null);
 		lastQueuedJsonRef.current = initialPatchJson;
 		lastSavedJsonRef.current = initialPatchJson;
-		lastSavedPatchRef.current = initialPatch;
 		setSession(incomingSession);
 		setSelectedMode(nextSelectedMode);
 		setPreAuditValues(nextPreAuditValues);
@@ -261,15 +242,33 @@ export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFo
 	}, [createOrResumeQuery.data, instrument]);
 
 	const patchDraft = useMutation({
-		mutationFn: async (input: { auditId: string; patch: AuditDraftPatch; fullPatch: AuditDraftPatch }) =>
+		mutationFn: async (input: {
+			auditId: string;
+			patch: AuditDraftPatch;
+			aggregateJson: string;
+		}) =>
 			playspaceApi.auditor.patchAuditDraft(input.auditId, input.patch),
 		onSuccess: (saveResult, variables) => {
-			const syncedPatchJson = JSON.stringify(variables.fullPatch);
-			lastQueuedJsonRef.current = syncedPatchJson;
-			lastSavedJsonRef.current = syncedPatchJson;
-			lastSavedPatchRef.current = variables.fullPatch;
+			lastQueuedJsonRef.current = variables.aggregateJson;
+			lastSavedJsonRef.current = variables.aggregateJson;
 			setLastSavedAt(new Date(saveResult.saved_at));
 			setSaveError(null);
+			setSession(currentSession => {
+				if (currentSession === null) {
+					return currentSession;
+				}
+
+				return {
+					...currentSession,
+					schema_version: saveResult.schema_version,
+					revision: saveResult.revision,
+					aggregate: {
+						...currentSession.aggregate,
+						schema_version: saveResult.schema_version,
+						revision: saveResult.revision
+					}
+				};
+			});
 		},
 		onError: error => {
 			lastQueuedJsonRef.current = lastSavedJsonRef.current;
@@ -278,7 +277,8 @@ export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFo
 	});
 
 	const submitAudit = useMutation({
-		mutationFn: async (auditId: string) => playspaceApi.auditor.submitAudit(auditId),
+		mutationFn: async (input: { auditId: string; expectedRevision: number }) =>
+			playspaceApi.auditor.submitAudit(input.auditId, input.expectedRevision),
 		onSuccess: updatedSession => {
 			setSession(updatedSession);
 			setLastSavedAt(new Date());
@@ -290,12 +290,27 @@ export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFo
 	});
 
 	const buildDraftPatch = React.useCallback((): AuditDraftPatch => {
+		if (session === null) {
+			return {
+				expected_revision: 0,
+				aggregate: {
+					schema_version: 1,
+					meta: null,
+					pre_audit: null,
+					sections: {}
+				},
+				sections: {}
+			};
+		}
+
 		return buildDraftPatchFromState({
 			selectedMode,
 			preAuditValues,
-			sectionDrafts
+			sectionDrafts,
+			schemaVersion: session.schema_version,
+			expectedRevision: session.revision
 		});
-	}, [preAuditValues, sectionDrafts, selectedMode]);
+	}, [preAuditValues, sectionDrafts, selectedMode, session]);
 
 	React.useEffect(() => {
 		if (!session || session.status === "SUBMITTED") {
@@ -303,30 +318,19 @@ export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFo
 		}
 
 		const patch = buildDraftPatch();
-		const serializedFullPatch = JSON.stringify(patch);
-		if (serializedFullPatch === lastQueuedJsonRef.current) {
+		const serializedAggregateJson = JSON.stringify(patch.aggregate ?? null);
+		if (serializedAggregateJson === lastQueuedJsonRef.current) {
 			return;
 		}
 
-		const lastSavedPatch = lastSavedPatchRef.current;
-		if (!lastSavedPatch) {
-			return;
-		}
-
-		const incrementalPatch = buildIncrementalDraftPatch(lastSavedPatch, patch);
-		if (isEmptyIncrementalPatch(incrementalPatch)) {
-			lastQueuedJsonRef.current = serializedFullPatch;
-			return;
-		}
-
-		lastQueuedJsonRef.current = serializedFullPatch;
+		lastQueuedJsonRef.current = serializedAggregateJson;
 		setSaveError(null);
 
 		const timeoutHandle = globalThis.setTimeout(() => {
 			patchDraft.mutate({
 				auditId: session.audit_id,
-				patch: incrementalPatch,
-				fullPatch: patch
+				patch,
+				aggregateJson: serializedAggregateJson
 			});
 		}, 900);
 
@@ -397,22 +401,17 @@ export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFo
 			return;
 		}
 
-		const fullPatch = buildDraftPatch();
-		const lastSavedPatch = lastSavedPatchRef.current;
-		if (!lastSavedPatch) {
+		const patch = buildDraftPatch();
+		const aggregateJson = JSON.stringify(patch.aggregate ?? null);
+		if (aggregateJson === lastSavedJsonRef.current) {
 			return;
 		}
 
-		const incrementalPatch = buildIncrementalDraftPatch(lastSavedPatch, fullPatch);
-		if (isEmptyIncrementalPatch(incrementalPatch)) {
-			return;
-		}
-
-		lastQueuedJsonRef.current = JSON.stringify(fullPatch);
+		lastQueuedJsonRef.current = aggregateJson;
 		patchDraft.mutate({
 			auditId: session.audit_id,
-			patch: incrementalPatch,
-			fullPatch
+			patch,
+			aggregateJson
 		});
 	}
 
@@ -555,7 +554,10 @@ export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFo
 							type="button"
 							disabled={!readyToSubmit || submitAudit.isPending || isReadOnly}
 							onClick={() => {
-								submitAudit.mutate(session.audit_id);
+								submitAudit.mutate({
+									auditId: session.audit_id,
+									expectedRevision: session.revision
+								});
 							}}>
 							{submitAudit.isPending ? t("actions.submitting") : t("actions.submitAudit")}
 						</Button>

@@ -3,6 +3,8 @@
 import { isAxiosError } from "axios";
 import { z } from "zod";
 import { api } from "@/lib/api/api-client";
+import { BASE_PLAYSPACE_INSTRUMENT } from "@/lib/instrument";
+import { playspaceInstrumentSchema } from "@/types/audit";
 
 const accountTypeSchema = z.enum(["ADMIN", "MANAGER", "AUDITOR"]);
 const projectStatusSchema = z.enum(["planned", "active", "completed"]);
@@ -434,7 +436,16 @@ const auditScoresSchema = z.object({
 	by_domain: z.record(z.string(), scoreTotalsSchema)
 });
 
-const auditSessionSchema = z.object({
+const auditAggregateSchema = z.object({
+	schema_version: z.number().int().positive(),
+	revision: z.number().int().nonnegative(),
+	meta: auditMetaSchema,
+	pre_audit: auditPreAuditSchema,
+	sections: z.record(z.string(), auditSectionStateSchema)
+});
+
+const auditSessionSchema = z
+	.object({
 	audit_id: z.string().uuid(),
 	audit_code: z.string(),
 	project_id: z.string().uuid(),
@@ -447,6 +458,10 @@ const auditSessionSchema = z.object({
 	status: auditStatusSchema,
 	instrument_key: z.string(),
 	instrument_version: z.string(),
+	instrument: playspaceInstrumentSchema.optional().default(BASE_PLAYSPACE_INSTRUMENT),
+	schema_version: z.number().int().positive().optional().default(1),
+	revision: z.number().int().nonnegative().optional().default(0),
+	aggregate: auditAggregateSchema.optional(),
 	started_at: z.string().datetime(),
 	submitted_at: z.string().datetime().nullable(),
 	total_minutes: z.number().int().nullable(),
@@ -455,9 +470,57 @@ const auditSessionSchema = z.object({
 	sections: z.record(z.string(), auditSectionStateSchema),
 	scores: auditScoresSchema,
 	progress: auditProgressSchema
+	})
+	.transform(value => {
+		const aggregate = value.aggregate ?? {
+			schema_version: value.schema_version,
+			revision: value.revision,
+			meta: value.meta,
+			pre_audit: value.pre_audit,
+			sections: value.sections
+		};
+
+		return {
+			...value,
+			schema_version: aggregate.schema_version,
+			revision: aggregate.revision,
+			aggregate
+		};
+	});
+
+const auditAggregateWriteSchema = z.object({
+	schema_version: z.number().int().positive().optional(),
+	meta: z
+		.object({
+			execution_mode: executionModeSchema.nullable().optional()
+		})
+		.nullable()
+		.optional(),
+	pre_audit: z
+		.object({
+			season: z.string().nullable().optional(),
+			weather_conditions: z.array(z.string()).optional(),
+			users_present: z.array(z.string()).optional(),
+			user_count: z.string().nullable().optional(),
+			age_groups: z.array(z.string()).optional(),
+			place_size: z.string().nullable().optional()
+		})
+		.nullable()
+		.optional(),
+	sections: z
+		.record(
+			z.string(),
+			z.object({
+				responses: z.record(z.string(), z.record(z.string(), z.string())).default({}),
+				note: z.string().nullable().optional()
+			})
+		)
+		.default({})
 });
 
 const auditDraftPatchSchema = z.object({
+	expected_revision: z.number().int().nonnegative().optional(),
+	aggregate: auditAggregateWriteSchema.nullable().optional(),
 	meta: z
 		.object({
 			execution_mode: executionModeSchema.nullable().optional()
@@ -489,6 +552,8 @@ const auditDraftPatchSchema = z.object({
 const auditDraftSaveSchema = z.object({
 	audit_id: z.string().uuid(),
 	status: auditStatusSchema,
+	schema_version: z.number().int().positive(),
+	revision: z.number().int().nonnegative(),
 	draft_progress_percent: z.number().nullable(),
 	saved_at: z.string().datetime()
 });
@@ -994,10 +1059,10 @@ export const playspaceApi = {
 				body: JSON.stringify(parsedPatch)
 			});
 		},
-		submitAudit: async (auditId: string): Promise<AuditSession> =>
+		submitAudit: async (auditId: string, expectedRevision?: number): Promise<AuditSession> =>
 			fetchValidatedJson(`/playspace/audits/${encodeURIComponent(auditId)}/submit`, auditSessionSchema, {
 				method: "POST",
-				body: JSON.stringify({})
+				body: JSON.stringify(expectedRevision === undefined ? {} : { expected_revision: expectedRevision })
 			})
 	},
 	management: {

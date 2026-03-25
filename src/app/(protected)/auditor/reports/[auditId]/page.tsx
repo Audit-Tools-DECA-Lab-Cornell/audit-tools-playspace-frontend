@@ -66,7 +66,6 @@ function formatPreAuditValueList(
 export default function AuditorReportDetailPage() {
 	const t = useTranslations("auditor.reportDetail");
 	const formatT = useTranslations("common.format");
-	const instrument = useLocalizedInstrument();
 	const params = useParams<{ auditId: string }>();
 	const auditId = params.auditId;
 
@@ -76,6 +75,7 @@ export default function AuditorReportDetailPage() {
 		enabled: typeof auditId === "string" && auditId.length > 0
 	});
 	const audit = auditQuery.data ?? null;
+	const instrument = useLocalizedInstrument(audit?.instrument ?? null);
 	const sectionTitleByKey = React.useMemo(() => {
 		return Object.fromEntries(instrument.sections.map(section => [section.section_key, section.title])) as Readonly<
 			Record<string, string>

@@ -348,11 +348,12 @@ export function localizeInstrument(
  *
  * @returns The localized playspace instrument for the active language.
  */
-export function useLocalizedInstrument(): PlayspaceInstrument {
+export function useLocalizedInstrument(baseInstrumentOverride?: PlayspaceInstrument | null): PlayspaceInstrument {
 	const activeLanguage = usePreferences().resolvedLanguage;
 
 	return useMemo(() => {
 		const translations = getInstrumentTranslations(activeLanguage);
-		return localizeInstrument(BASE_PLAYSPACE_INSTRUMENT, translations);
-	}, [activeLanguage]);
+		const baseInstrument = baseInstrumentOverride ?? BASE_PLAYSPACE_INSTRUMENT;
+		return localizeInstrument(baseInstrument, translations);
+	}, [activeLanguage, baseInstrumentOverride]);
 }

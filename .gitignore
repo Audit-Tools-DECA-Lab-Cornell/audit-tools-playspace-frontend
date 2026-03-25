@@ -43,6 +43,7 @@ next-env.d.ts
 # Cursor/local tooling (project-specific)
 skills-lock.json
 .agents/
+.worktrees/
 
 .DS_Store
 
