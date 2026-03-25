@@ -14,56 +14,61 @@ This app is part of a hierarchical Audit Management System (Account → Projects
 - **Icons**: Lucide React
 
 ### Screenshots
+
 #### Dashboard Pages
-| Manager | Auditor | Administrator |
-|------|------|------|
-| ![Manager Dashboard](public/screenshots/manager__manager__assignments.png) | ![Auditor Dashboard](public/screenshots/auditor__auditor__dashboard.png) | ![Administrator Dashboard](public/screenshots/admin__admin__dashboard.png) |
+
+| Manager           | Auditor           | Administrator           |
+| ----------------- | ----------------- | ----------------------- |
+| Manager Dashboard | Auditor Dashboard | Administrator Dashboard |
 
 <details>
   <summary>Manager Dashboard Pages</summary>
-  
-  ![Manager Projects](public/screenshots/manager__manager__projects.png)
-  ![Manager Places](public/screenshots/manager__manager__places.png)
-  ![Manager Place](public/screenshots/manager__manager__places__placeId_projectId.png)
-  ![Manager Project](public/screenshots/manager__manager__projects__projectId.png)
-  ![Manager Audits](public/screenshots/manager__manager__audits.png)
-  ![Manager Auditor](public/screenshots/manager__manager__auditors.png)
-  ![Manager Assignment](public/screenshots/manager__manager__assignments.png)
-  ![Manager Settings](public/screenshots/manager__settings.png)
+  <div class="grid grid-cols-2 grid-rows-4 gap-4">
+    <img src="public/screenshots/manager__manager__projects.png" alt="Manager Projects" />
+    <img src="public/screenshots/manager__manager__places.png" alt="Manager Places" />
+    <img src="public/screenshots/manager__manager__places__placeId_projectId.png" alt="Manager Place" />
+    <img src="public/screenshots/manager__manager__projects__projectId.png" alt="Manager Project" />
+    <img src="public/screenshots/manager__manager__audits.png" alt="Manager Audits" />
+    <img src="public/screenshots/manager__manager__auditors.png" alt="Manager Auditor" />
+    <img src="public/screenshots/manager__manager__assignments.png" alt="Manager Assignment" />
+    <img src="public/screenshots/manager__settings.png" alt="Manager Settings" />
+  </div>
 </details>
 
 <details>
   <summary>Auditor Dashboard Pages</summary>
-
-  ![Auditor Execute Page](public/screenshots/auditor__auditor__execute__placeId_projectId.png)
-  ![Auditor Places Page](public/screenshots/auditor__auditor__places.png)
-  ![Auditor Reports Page](public/screenshots/auditor__auditor__reports.png)
-  ![Auditor Report](public/screenshots/auditor__auditor__reports__auditId.png)
-  ![Auditor Settings](public/screenshots/auditor__auditor__settings.png)
+  <div class="grid grid-cols-2 grid-rows-4 gap-4">
+    <img src="public/screenshots/auditor__auditor__execute__placeId_projectId.png" alt="Auditor Execute Page" />
+    <img src="public/screenshots/auditor__auditor__places.png" alt="Auditor Places Page" />
+    <img src="public/screenshots/auditor__auditor__reports.png" alt="Auditor Reports Page" />
+    <img src="public/screenshots/auditor__auditor__reports__auditId.png" alt="Auditor Report" />
+    <img src="public/screenshots/auditor__auditor__settings.png" alt="Auditor Settings" />
+  </div>
 </details>
 
 <details>
   <summary>Administrator Dashboard Pages</summary>
-  
-  ![Administrator Accounts](public/screenshots/admin__admin__accounts.png)
-  ![Administrator Projects](public/screenshots/admin__admin__projects.png)
-  ![Administrator Places](public/screenshots/admin__admin__places.png)
-  ![Administrator Audits](public/screenshots/admin__admin__audits.png)
-  ![Administrator Auditor](public/screenshots/admin__admin__auditors.png)
-  ![Administrator System](public/screenshots/admin__admin__system.png)
-  ![Administrator Settings](public/screenshots/admin__settings.png)
+  <div class="grid grid-cols-2 grid-rows-4 gap-4">
+    <img src="public/screenshots/admin__admin__accounts.png" alt="Administrator Accounts" />
+    <img src="public/screenshots/admin__admin__projects.png" alt="Administrator Projects" />
+    <img src="public/screenshots/admin__admin__places.png" alt="Administrator Places" />
+    <img src="public/screenshots/admin__admin__audits.png" alt="Administrator Audits" />
+    <img src="public/screenshots/admin__admin__auditors.png" alt="Administrator Auditor" />
+    <img src="public/screenshots/admin__admin__system.png" alt="Administrator System" />
+    <img src="public/screenshots/admin__settings.png" alt="Administrator Settings" />
+  </div>
 </details>
 
 ### RBAC roles
 
 - **Managers (full access)**:
-  - Manager dashboard shows aggregate stats + recent activity.
-  - Playspace audits surface **both** `audit_score` and `combined_score`.
-  - UI can request a **Manager Survey Link** for external place owners.
+    - Manager dashboard shows aggregate stats + recent activity.
+    - Playspace audits surface **both** `audit_score` and `combined_score`.
+    - UI can request a **Manager Survey Link** for external place owners.
 - **Auditors (limited access)**:
-  - Identified strictly by an alphanumeric `auditor_code` (no real names displayed).
-  - Can execute audits, auto-save progress, and view their own work.
-  - Cannot access `/manager` routes.
+    - Identified strictly by an alphanumeric `auditor_code` (no real names displayed).
+    - Can execute audits, auto-save progress, and view their own work.
+    - Cannot access `/manager` routes.
 
 ### Local setup (macOS + pnpm)
 
@@ -79,7 +84,7 @@ Run the dev server:
 pnpm dev
 ```
 
-Open the app at [`http://localhost:3000`](http://localhost:3000).
+Open the app at `[http://localhost:3000](http://localhost:3000)`.
 
 Other useful commands:
 
@@ -104,28 +109,28 @@ If not set, the frontend defaults to `http://127.0.0.1:8000`.
 This repo currently uses a **frontend-only demo login** that sets cookies in the browser to simulate an authenticated session.
 
 - **Cookie names** (see `src/lib/auth/role.ts`):
-  - `playspace_role`: `"manager"` or `"auditor"`
-  - `playspace_access_token`: bearer token (demo-generated for now)
-  - `playspace_auditor_code`: auditor-only identifier
+    - `playspace_role`: `"manager"` or `"auditor"`
+    - `playspace_access_token`: bearer token (demo-generated for now)
+    - `playspace_auditor_code`: auditor-only identifier
 
 The route guard is implemented in `middleware.ts` using those cookies:
 
-- `/manager/**` requires `playspace_role="manager"`
+- `/manager/`\*\* requires `playspace_role="manager"`
 - `/auditor/**` requires `playspace_role="auditor"`
 - `/settings` requires authentication (either role)
 
 ### App routes
 
 - **Public**
-  - `/login`
+    - `/login`
 - **Manager**
-  - `/manager/dashboard`
-  - `/manager/projects`
+    - `/manager/dashboard`
+    - `/manager/projects`
 - **Auditor**
-  - `/auditor/dashboard`
-  - `/auditor/execute/[placeId]`
+    - `/auditor/dashboard`
+    - `/auditor/execute/[placeId]`
 - **Shared**
-  - `/settings`
+    - `/settings`
 
 ### Role-based layout (sidebar)
 
@@ -154,7 +159,7 @@ Auto-save behavior:
 
 - Watches form values via React Hook Form.
 - Sends a debounced `PATCH` (900ms) with a **partial** payload to:
-  - `PATCH /playspace/places/:placeId/audits/draft`
+    - `PATCH /playspace/places/:placeId/audits/draft`
 
 ### Manager survey link (Playspace-specific)
 
@@ -162,7 +167,7 @@ The Manager dashboard includes a button that requests a “Manager Survey Link�
 
 - `POST /playspace/places/:placeId/manager-survey-link`
 - Expected response shape:
-  - `{ "survey_link": "https://..." }`
+    - `{ "survey_link": "https://..." }`
 
 ### Project structure
 
@@ -171,4 +176,3 @@ The Manager dashboard includes a button that requests a “Manager Survey Link�
 - `src/lib/auth` — role/session cookie helpers (server + browser)
 - `src/lib/api` — Axios client + interceptors
 - `src/components/app` — application shell components
-
