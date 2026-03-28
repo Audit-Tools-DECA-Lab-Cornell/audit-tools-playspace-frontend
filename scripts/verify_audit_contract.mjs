@@ -147,9 +147,9 @@ const sessionFixture = {
 			section_key: targetSection.section_key,
 			note: "Web draft note",
 			responses: {
-			[targetSection.questions[0].question_key]: {
-				quantity: "a_little_bit"
-			},
+				[targetSection.questions[0].question_key]: {
+					quantity: "a_little_bit"
+				},
 				[targetQuestion.question_key]: {
 					quantity: "a_lot",
 					[targetQuestion.scales[1].key]: targetQuestion.scales[1].options[1].key
