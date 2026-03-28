@@ -12,6 +12,7 @@ import {
 	buildNextQuestionAnswers,
 	getInstrumentSectionLocalProgress,
 	getPreAuditValues,
+	getVisiblePreAuditQuestions,
 	getVisibleSections,
 	isRequiredPreAuditComplete
 } from "@/lib/audit/selectors";
@@ -19,12 +20,14 @@ import { BackButton } from "@/components/dashboard/back-button";
 import { formatAuditCodeReference } from "@/components/dashboard/utils";
 import type {
 	ExecutionMode,
-	InstrumentQuestion,
+	QuestionResponsePayload,
 	InstrumentSection,
 	PlayspaceInstrument,
 	PreAuditQuestion
 } from "@/types/audit";
 import { AuditQuestionCard } from "@/components/audit/question-card";
+import { SectionQuestionTable } from "@/components/audit/section-question-table";
+import { useAuthSession } from "@/components/app/auth-session-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -41,7 +44,7 @@ type ExecutionModeSelection = ExecutionMode | "";
 
 interface SectionDraftState {
 	readonly note: string;
-	readonly responses: Record<string, Record<string, string>>;
+	readonly responses: Record<string, QuestionResponsePayload>;
 }
 
 interface SectionProgressRow {
@@ -51,6 +54,23 @@ interface SectionProgressRow {
 		readonly answeredQuestionCount: number;
 		readonly isComplete: boolean;
 	};
+}
+
+interface PromptSegment {
+	readonly text: string;
+	readonly bold: boolean;
+}
+
+interface PreambleLine {
+	readonly kind: "paragraph" | "ordered" | "bullet";
+	readonly marker: string | null;
+	readonly text: string;
+}
+
+interface ParsedPreambleBlock {
+	readonly headingLevel: 2 | 3;
+	readonly heading: string;
+	readonly lines: readonly PreambleLine[];
 }
 
 type ExecuteTranslator = (key: string, values?: Record<string, string | number>) => string;
@@ -99,7 +119,7 @@ function createSectionDrafts(
 		const responses = Object.fromEntries(
 			Object.entries(storedSection?.responses ?? {}).map(([questionKey, questionAnswers]) => [
 				questionKey,
-				{ ...questionAnswers }
+				cloneQuestionResponsePayload(questionAnswers)
 			])
 		);
 
@@ -110,6 +130,24 @@ function createSectionDrafts(
 	}
 
 	return drafts;
+}
+
+function cloneQuestionResponsePayload(value: QuestionResponsePayload): QuestionResponsePayload {
+	const next: QuestionResponsePayload = {};
+	for (const [answerKey, answerValue] of Object.entries(value)) {
+		if (typeof answerValue === "string" || answerValue === null) {
+			next[answerKey] = answerValue;
+			continue;
+		}
+
+		if (Array.isArray(answerValue)) {
+			next[answerKey] = [...answerValue];
+			continue;
+		}
+
+		next[answerKey] = { ...answerValue };
+	}
+	return next;
 }
 
 /**
@@ -128,12 +166,15 @@ function buildDraftPatchFromState(input: {
 			schema_version: input.schemaVersion,
 			meta: input.selectedMode ? { execution_mode: input.selectedMode } : null,
 			pre_audit: {
+				place_size: readSingleValue(input.preAuditValues.place_size),
+				current_users_0_5: readSingleValue(input.preAuditValues.current_users_0_5),
+				current_users_6_12: readSingleValue(input.preAuditValues.current_users_6_12),
+				current_users_13_17: readSingleValue(input.preAuditValues.current_users_13_17),
+				current_users_18_plus: readSingleValue(input.preAuditValues.current_users_18_plus),
+				playspace_busyness: readSingleValue(input.preAuditValues.playspace_busyness),
 				season: readSingleValue(input.preAuditValues.season),
 				weather_conditions: readMultiValue(input.preAuditValues.weather_conditions),
-				users_present: readMultiValue(input.preAuditValues.users_present),
-				user_count: readSingleValue(input.preAuditValues.user_count),
-				age_groups: readMultiValue(input.preAuditValues.age_groups),
-				place_size: readSingleValue(input.preAuditValues.place_size)
+				wind_conditions: readSingleValue(input.preAuditValues.wind_conditions)
 			},
 			sections: Object.fromEntries(
 				Object.entries(input.sectionDrafts).map(([sectionKey, draft]) => [
@@ -152,9 +193,18 @@ function buildDraftPatchFromState(input: {
 /**
  * Format audit timestamps and computed auto fields for display.
  */
-function formatAutoValue(questionKey: string, auditSession: AuditSession, t: ExecuteTranslator): string {
+function formatAutoValue(
+	questionKey: string,
+	auditSession: AuditSession,
+	auditorCode: string | null,
+	t: ExecuteTranslator
+): string {
 	const startedAt = new Date(auditSession.started_at);
 	const submittedAt = auditSession.submitted_at ? new Date(auditSession.submitted_at) : null;
+
+	if (questionKey === "auditor_code") {
+		return auditorCode ?? t("auditInfo.auditorCodePending");
+	}
 
 	if (questionKey === "audit_date") {
 		return startedAt.toLocaleDateString();
@@ -187,8 +237,78 @@ function getInitialActiveSectionKey(sectionRows: readonly SectionProgressRow[]):
 	return firstIncomplete?.section.section_key ?? sectionRows[0]?.section.section_key ?? null;
 }
 
+/**
+ * Parse `**bold**` prompt markers into renderable text segments.
+ */
+function parsePromptSegments(raw: string): PromptSegment[] {
+	const segments: PromptSegment[] = [];
+	const parts = raw.split("**");
+
+	for (let index = 0; index < parts.length; index += 1) {
+		const part = parts[index] ?? "";
+		if (part.length === 0) {
+			continue;
+		}
+
+		segments.push({ text: part, bold: index % 2 === 1 });
+	}
+
+	return segments;
+}
+
+/**
+ * Parse one markdown-like preamble block into headings and content lines.
+ */
+function parsePreambleBlock(rawBlock: string): ParsedPreambleBlock {
+	const lines = rawBlock.split("\n");
+	const headingLine = lines.shift() ?? "";
+	const headingLevel = headingLine.startsWith("### ") ? 3 : 2;
+	const heading = headingLine.replace(/^###\s+/, "").replace(/^##\s+/, "");
+	const parsedLines: PreambleLine[] = [];
+
+	for (const line of lines) {
+		const trimmedLine = line.trim();
+		if (trimmedLine.length === 0) {
+			continue;
+		}
+
+		const orderedMatch = /^(\d+\.)\s+(.*)$/.exec(trimmedLine);
+		if (orderedMatch !== null) {
+			parsedLines.push({
+				kind: "ordered",
+				marker: orderedMatch[1] ?? null,
+				text: orderedMatch[2] ?? ""
+			});
+			continue;
+		}
+
+		const bulletMatch = /^-\s+(.*)$/.exec(trimmedLine);
+		if (bulletMatch !== null) {
+			parsedLines.push({
+				kind: "bullet",
+				marker: "•",
+				text: bulletMatch[1] ?? ""
+			});
+			continue;
+		}
+
+		parsedLines.push({
+			kind: "paragraph",
+			marker: null,
+			text: trimmedLine
+		});
+	}
+
+	return {
+		headingLevel,
+		heading,
+		lines: parsedLines
+	};
+}
+
 export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFormProps>) {
 	const t = useTranslations("auditor.execute");
+	const authSession = useAuthSession();
 	const [selectedMode, setSelectedMode] = React.useState<ExecutionModeSelection>("");
 	const [activeSectionKey, setActiveSectionKey] = React.useState<string | null>(null);
 	const [session, setSession] = React.useState<AuditSession | null>(null);
@@ -336,9 +456,33 @@ export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFo
 	}, [buildDraftPatch, patchDraft, session]);
 
 	const executionMode = selectedMode === "" ? null : selectedMode;
+	const preambleBlocks = React.useMemo(() => {
+		return instrument.preamble.map(parsePreambleBlock);
+	}, [instrument]);
+	const auditInfoQuestions = React.useMemo(() => {
+		return instrument.pre_audit_questions.filter(question => question.page_key === "audit_info");
+	}, [instrument.pre_audit_questions]);
+	const spaceAuditQuestions = React.useMemo(() => {
+		return getVisiblePreAuditQuestions(
+			instrument.pre_audit_questions.filter(question => question.page_key === "space_setup"),
+			executionMode
+		);
+	}, [executionMode, instrument.pre_audit_questions]);
+	const matrixSpaceAuditQuestions = React.useMemo(() => {
+		return spaceAuditQuestions.filter(question => question.group_key === "current_users_matrix");
+	}, [spaceAuditQuestions]);
+	const standaloneSpaceAuditQuestions = React.useMemo(() => {
+		return spaceAuditQuestions.filter(question => question.group_key !== "current_users_matrix");
+	}, [spaceAuditQuestions]);
 	const visibleSections = React.useMemo(() => {
-		return getVisibleSections(instrument, executionMode);
-	}, [executionMode, instrument]);
+		return getVisibleSections(
+			instrument,
+			executionMode,
+			Object.fromEntries(
+				Object.entries(sectionDrafts).map(([sectionKey, draft]) => [sectionKey, draft.responses])
+			)
+		);
+	}, [executionMode, instrument, sectionDrafts]);
 
 	const sectionRows = React.useMemo<SectionProgressRow[]>(() => {
 		return visibleSections.map(section => ({
@@ -371,7 +515,11 @@ export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFo
 			? sectionRows[activeSectionIndex + 1]
 			: null;
 
-	const requiredPreAuditComplete = isRequiredPreAuditComplete(instrument.pre_audit_questions, preAuditValues);
+	const requiredPreAuditComplete = isRequiredPreAuditComplete(
+		instrument.pre_audit_questions,
+		preAuditValues,
+		executionMode
+	);
 	const answeredVisibleQuestions = sectionRows.reduce((totalAnswered, sectionRow) => {
 		return totalAnswered + sectionRow.progress.answeredQuestionCount;
 	}, 0);
@@ -391,6 +539,16 @@ export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFo
 			? t("submission.blockers.finishRemainingSections", { count: incompleteSectionCount })
 			: null
 	].filter((value): value is string => value !== null);
+	const activeSectionQuestionRows = React.useMemo(() => {
+		if (activeSection === null) {
+			return [];
+		}
+
+		return activeSection.section.questions.map(question => ({
+			question,
+			selectedAnswers: sectionDrafts[activeSection.section.section_key]?.responses[question.question_key] ?? {}
+		}));
+	}, [activeSection, sectionDrafts]);
 
 	function handleSaveNow() {
 		if (!session || isReadOnly) {
@@ -441,21 +599,13 @@ export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFo
 		});
 	}
 
-	function handleQuestionAnswer(
-		sectionKey: string,
-		question: InstrumentQuestion,
-		questionKey: string,
-		scaleKey: string,
-		optionKey: string
-	) {
+	function handleQuestionAnswer(sectionKey: string, questionKey: string, nextAnswers: QuestionResponsePayload) {
 		if (isReadOnly) {
 			return;
 		}
 
 		setSectionDrafts(currentDrafts => {
 			const currentSectionDraft = currentDrafts[sectionKey] ?? { note: "", responses: {} };
-			const currentAnswers = currentSectionDraft.responses[questionKey] ?? {};
-			const nextAnswers = buildNextQuestionAnswers(currentAnswers, question, scaleKey, optionKey);
 
 			return {
 				...currentDrafts,
@@ -563,144 +713,148 @@ export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFo
 
 			<Card>
 				<CardHeader>
-					<CardTitle>{t("overview.title")}</CardTitle>
+					<CardTitle>{t("setup.title")}</CardTitle>
 				</CardHeader>
-				<CardContent className="grid gap-4 lg:grid-cols-2">
-					<div className="space-y-2 text-sm text-muted-foreground">
-						<p>
-							{t("overview.auditCode")}{" "}
-							<code
-								title={session.audit_code}
-								className="rounded-md bg-muted/65 px-2 py-1 font-mono text-[11px] tracking-[0.04em] text-foreground/80">
-								{formatAuditCodeReference(session.audit_code)}
-							</code>
-						</p>
-						<p className="tabular-nums">
-							{t("overview.started", { value: new Date(session.started_at).toLocaleString() })}
-						</p>
-						<p>{`Project ${session.project_name}`}</p>
-					</div>
-					<div className="space-y-2 text-sm text-muted-foreground">
-						<p>
-							{t("overview.preAudit")}{" "}
-							<span className={requiredPreAuditComplete ? "text-foreground" : "text-muted-foreground"}>
-								{requiredPreAuditComplete ? t("common.complete") : t("common.incomplete")}
-							</span>
-						</p>
-						<p>
-							{t("overview.sections")}{" "}
-							<span className={readyToSubmit ? "text-foreground" : "text-muted-foreground"}>
-								{t("overview.sectionsComplete", {
-									completed: sectionRows.filter(sectionRow => sectionRow.progress.isComplete).length,
-									total: sectionRows.length
-								})}
-							</span>
-						</p>
-						<p>
-							{t("overview.readyToSubmit")}{" "}
-							<span className={readyToSubmit ? "text-foreground" : "text-muted-foreground"}>
-								{readyToSubmit ? t("common.yes") : t("common.notYet")}
-							</span>
-						</p>
-					</div>
-				</CardContent>
-			</Card>
-
-			<Card>
-				<CardHeader>
-					<CardTitle>{t("submission.title")}</CardTitle>
-				</CardHeader>
-				<CardContent className="space-y-3">
-					<p className="text-sm text-muted-foreground">
-						{readyToSubmit ? t("submission.readyDescription") : t("submission.incompleteDescription")}
-					</p>
-					{submissionBlockers.length > 0 ? (
-						<ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
-							{submissionBlockers.map(blocker => (
-								<li key={blocker}>{blocker}</li>
+				<CardContent className="space-y-4">
+					<p className="text-sm text-muted-foreground">{t("setup.subtitle")}</p>
+					<div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
+						<div className="space-y-4">
+							{preambleBlocks.map(block => (
+								<PreambleBlockCard key={`${block.headingLevel}:${block.heading}`} block={block} />
 							))}
-						</ul>
-					) : null}
-					<Badge variant={readyToSubmit ? "secondary" : "outline"}>
-						{readyToSubmit
-							? t("submission.readyBadge")
-							: t("submission.remainingBadge", { count: submissionBlockers.length })}
-					</Badge>
+						</div>
+						<div className="space-y-4">
+							<Card>
+								<CardHeader>
+									<CardTitle>{t("setup.roleTitle")}</CardTitle>
+								</CardHeader>
+								<CardContent className="space-y-3">
+									<p className="text-sm text-muted-foreground">{t("setup.roleQuestion")}</p>
+									<div className="grid gap-3">
+										{instrument.execution_modes
+											.filter(mode =>
+												session.allowed_execution_modes.includes(mode.key as ExecutionMode)
+											)
+											.map(mode => {
+												const isSelected = selectedMode === mode.key;
+
+												return (
+													<button
+														key={mode.key}
+														type="button"
+														disabled={isReadOnly}
+														onClick={() => {
+															setSelectedMode(mode.key as ExecutionMode);
+														}}
+														className={cn(
+															"rounded-card border p-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60",
+															isSelected
+																? "border-primary bg-primary/12 shadow-field"
+																: "border-action-outline-border bg-card hover:bg-secondary/60",
+															isReadOnly && "cursor-not-allowed opacity-70"
+														)}>
+														<p className="text-sm font-medium text-foreground">
+															{mode.label}
+														</p>
+														<p className="mt-2 text-sm text-muted-foreground">
+															{mode.description ?? t("executionMode.noDescription")}
+														</p>
+													</button>
+												);
+											})}
+									</div>
+								</CardContent>
+							</Card>
+						</div>
+					</div>
 				</CardContent>
 			</Card>
 
 			<Card>
 				<CardHeader>
-					<CardTitle>{t("executionMode.title")}</CardTitle>
+					<CardTitle>{t("auditInfo.title")}</CardTitle>
 				</CardHeader>
-				<CardContent className="grid gap-3 lg:grid-cols-3">
-					{instrument.execution_modes
-						.filter(mode => session.allowed_execution_modes.includes(mode.key as ExecutionMode))
-						.map(mode => {
-							const isSelected = selectedMode === mode.key;
-
-							return (
-								<button
-									key={mode.key}
-									type="button"
-									disabled={isReadOnly}
-									onClick={() => {
-										setSelectedMode(mode.key as ExecutionMode);
-									}}
-									className={cn(
-										"rounded-card border p-4 text-left transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60",
-										isSelected
-											? "border-primary bg-primary/12 shadow-field"
-											: "border-action-outline-border bg-card hover:bg-secondary/60",
-										isReadOnly && "cursor-not-allowed opacity-70"
-									)}>
-									<p className="text-xs font-semibold tracking-[0.08em] text-text-secondary">
-										{mode.key}
-									</p>
-									<p className="mt-2 text-sm font-medium text-foreground">{mode.label}</p>
-									<p className="mt-2 text-sm text-muted-foreground">
-										{mode.description ?? t("executionMode.noDescription")}
-									</p>
-								</button>
-							);
-						})}
-				</CardContent>
-			</Card>
-
-			<Card>
-				<CardHeader>
-					<CardTitle>{t("preAudit.title")}</CardTitle>
-				</CardHeader>
-				<CardContent className="grid gap-4 lg:grid-cols-2">
-					{instrument.pre_audit_questions.map(question => {
-						if (question.input_type === "auto_timestamp") {
-							return (
+				<CardContent className="space-y-4">
+					<p className="text-sm text-muted-foreground">{t("auditInfo.subtitle")}</p>
+					<div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_300px]">
+						<div className="grid gap-4 md:grid-cols-2">
+							{auditInfoQuestions.map(question => (
 								<AutoFieldCard
 									key={question.key}
 									question={question}
-									value={formatAutoValue(question.key, session, t)}
+									value={formatAutoValue(question.key, session, authSession?.auditorCode ?? null, t)}
 								/>
-							);
-						}
-
-						const questionValue = preAuditValues[question.key];
-						return (
-							<ChoiceFieldCard
-								key={question.key}
-								question={question}
-								value={questionValue}
-								disabled={isReadOnly}
-								onSingleSelect={optionKey => {
-									handlePreAuditSingleSelect(question.key, optionKey);
-								}}
-								onToggleSelect={optionKey => {
-									handlePreAuditToggleSelect(question.key, optionKey);
-								}}
-							/>
-						);
-					})}
+							))}
+						</div>
+						<div className="field-card">
+							<div className="field-card-body space-y-3">
+								<div className="space-y-1">
+									<h3 className="field-card-title">{t("auditInfo.summaryTitle")}</h3>
+									<p className="field-card-meta">{t("auditInfo.summaryDescription")}</p>
+								</div>
+								<div className="space-y-2 text-sm text-muted-foreground">
+									<p>
+										{t("auditInfo.auditCode", {
+											value: formatAuditCodeReference(session.audit_code)
+										})}
+									</p>
+									<p>{t("auditInfo.place", { value: session.place_name })}</p>
+									<p>{t("auditInfo.project", { value: session.project_name })}</p>
+								</div>
+							</div>
+						</div>
+					</div>
 				</CardContent>
 			</Card>
+
+			{executionMode === "survey" ? (
+				<Card>
+					<CardHeader>
+						<CardTitle>{t("spaceAudit.skippedTitle")}</CardTitle>
+					</CardHeader>
+					<CardContent>
+						<p className="text-sm text-muted-foreground">{t("spaceAudit.skippedDescription")}</p>
+					</CardContent>
+				</Card>
+			) : executionMode !== null ? (
+				<Card>
+					<CardHeader>
+						<CardTitle>{t("spaceAudit.title")}</CardTitle>
+					</CardHeader>
+					<CardContent className="space-y-4">
+						<p className="text-sm text-muted-foreground">{t("spaceAudit.subtitle")}</p>
+						{matrixSpaceAuditQuestions.length > 0 ? (
+							<MatrixPreAuditCard
+								questions={matrixSpaceAuditQuestions}
+								values={preAuditValues}
+								disabled={isReadOnly}
+								onSelectOption={(questionKey, optionKey) => {
+									handlePreAuditSingleSelect(questionKey, optionKey);
+								}}
+							/>
+						) : null}
+						<div className="grid gap-4 lg:grid-cols-2">
+							{standaloneSpaceAuditQuestions.map(question => {
+								const questionValue = preAuditValues[question.key];
+								return (
+									<ChoiceFieldCard
+										key={question.key}
+										question={question}
+										value={questionValue}
+										disabled={isReadOnly}
+										onSingleSelect={optionKey => {
+											handlePreAuditSingleSelect(question.key, optionKey);
+										}}
+										onToggleSelect={optionKey => {
+											handlePreAuditToggleSelect(question.key, optionKey);
+										}}
+									/>
+								);
+							})}
+						</div>
+					</CardContent>
+				</Card>
+			) : null}
 
 			<Card>
 				<CardHeader>
@@ -785,6 +939,29 @@ export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFo
 				</CardContent>
 			</Card>
 
+			<Card>
+				<CardHeader>
+					<CardTitle>{t("submission.title")}</CardTitle>
+				</CardHeader>
+				<CardContent className="space-y-3">
+					<p className="text-sm text-muted-foreground">
+						{readyToSubmit ? t("submission.readyDescription") : t("submission.incompleteDescription")}
+					</p>
+					{submissionBlockers.length > 0 ? (
+						<ul className="list-disc space-y-2 pl-5 text-sm text-muted-foreground">
+							{submissionBlockers.map(blocker => (
+								<li key={blocker}>{blocker}</li>
+							))}
+						</ul>
+					) : null}
+					<Badge variant={readyToSubmit ? "secondary" : "outline"}>
+						{readyToSubmit
+							? t("submission.readyBadge")
+							: t("submission.remainingBadge", { count: submissionBlockers.length })}
+					</Badge>
+				</CardContent>
+			</Card>
+
 			{activeSection ? (
 				<Card>
 					<CardHeader>
@@ -796,27 +973,62 @@ export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFo
 						</p>
 
 						<div className="space-y-4">
-							{activeSection.section.questions.map(question => (
-								<AuditQuestionCard
-									key={question.question_key}
-									question={question}
-									selectedAnswers={
-										sectionDrafts[activeSection.section.section_key]?.responses[
-											question.question_key
-										] ?? {}
-									}
+							<div
+								className={cn(
+									"hidden xl:block",
+									activeSection.section.questions.some(
+										question => question.question_type === "checklist"
+									)
+										? "xl:hidden"
+										: undefined
+								)}>
+								<SectionQuestionTable
+									rows={activeSectionQuestionRows}
 									disabled={isReadOnly}
-									onSelectAnswer={(questionKey, scaleKey, optionKey) => {
+									onSelectAnswer={(questionKey: string, scaleKey: string, optionKey: string) => {
+										const question = activeSection.section.questions.find(
+											currentQuestion => currentQuestion.question_key === questionKey
+										);
+										if (!question) {
+											return;
+										}
+
 										handleQuestionAnswer(
 											activeSection.section.section_key,
-											question,
 											questionKey,
-											scaleKey,
-											optionKey
+											buildNextQuestionAnswers(
+												activeSectionQuestionRows.find(
+													row => row.question.question_key === questionKey
+												)?.selectedAnswers ?? {},
+												question,
+												scaleKey,
+												optionKey
+											)
 										);
 									}}
 								/>
-							))}
+							</div>
+							<div className="space-y-4 xl:hidden">
+								{activeSection.section.questions.map(question => (
+									<AuditQuestionCard
+										key={question.question_key}
+										question={question}
+										selectedAnswers={
+											sectionDrafts[activeSection.section.section_key]?.responses[
+												question.question_key
+											] ?? {}
+										}
+										disabled={isReadOnly}
+										onChangeAnswers={(questionKey, nextAnswers) => {
+											handleQuestionAnswer(
+												activeSection.section.section_key,
+												questionKey,
+												nextAnswers
+											);
+										}}
+									/>
+								))}
+							</div>
 						</div>
 
 						<div className="space-y-2">
@@ -932,6 +1144,77 @@ function AutoFieldCard({ question, value }: Readonly<AutoFieldCardProps>) {
 	);
 }
 
+interface PreambleBlockCardProps {
+	readonly block: ParsedPreambleBlock;
+}
+
+/**
+ * Render one structured preamble block.
+ */
+function PreambleBlockCard({ block }: Readonly<PreambleBlockCardProps>) {
+	const isScaleBlock = block.headingLevel === 3;
+
+	return (
+		<div
+			className={cn(
+				"rounded-card border p-4",
+				isScaleBlock ? "border-primary/25 bg-primary/5" : "border-border bg-card"
+			)}>
+			<div className="space-y-3">
+				<h3 className={cn("font-semibold", isScaleBlock ? "text-primary" : "text-foreground")}>
+					{block.heading}
+				</h3>
+				<div className="space-y-2">
+					{block.lines.map((line, index) => {
+						if (line.kind === "paragraph") {
+							return (
+								<RichTextLine
+									key={`${block.heading}-${index.toString()}`}
+									text={line.text}
+									className="text-sm leading-6 text-muted-foreground"
+								/>
+							);
+						}
+
+						return (
+							<div
+								key={`${block.heading}-${index.toString()}`}
+								className="flex items-start gap-2 text-sm leading-6 text-muted-foreground">
+								<span className="min-w-4 font-semibold text-foreground">{line.marker}</span>
+								<RichTextLine text={line.text} className="flex-1" />
+							</div>
+						);
+					})}
+				</div>
+			</div>
+		</div>
+	);
+}
+
+interface RichTextLineProps {
+	readonly text: string;
+	readonly className?: string;
+}
+
+/**
+ * Render one line with inline bold markers preserved.
+ */
+function RichTextLine({ text, className }: Readonly<RichTextLineProps>) {
+	const segments = parsePromptSegments(text);
+
+	return (
+		<p className={cn("text-sm leading-6 text-muted-foreground", className)}>
+			{segments.map((segment, index) => (
+				<span
+					key={`${segment.text}-${index.toString()}`}
+					className={segment.bold ? "font-semibold text-foreground" : undefined}>
+					{segment.text}
+				</span>
+			))}
+		</p>
+	);
+}
+
 interface ChoiceFieldCardProps {
 	readonly question: PreAuditQuestion;
 	readonly value: string | string[] | undefined;
@@ -982,6 +1265,90 @@ function ChoiceFieldCard({
 						</Button>
 					);
 				})}
+			</div>
+		</FieldCard>
+	);
+}
+
+interface MatrixPreAuditCardProps {
+	readonly questions: readonly PreAuditQuestion[];
+	readonly values: Readonly<Record<string, string | string[]>>;
+	readonly disabled: boolean;
+	readonly onSelectOption: (questionKey: string, optionKey: string) => void;
+}
+
+/**
+ * Render the age-group matrix for the onsite setup step.
+ */
+function MatrixPreAuditCard({ questions, values, disabled, onSelectOption }: Readonly<MatrixPreAuditCardProps>) {
+	const t = useTranslations("auditor.execute.spaceAudit");
+	const matrixOptions = questions[0]?.options ?? [];
+
+	if (questions.length === 0) {
+		return null;
+	}
+
+	return (
+		<FieldCard title={t("matrixTitle")} description={t("matrixDescription")}>
+			<div className="overflow-x-auto">
+				<div
+					className="grid min-w-[720px] rounded-card border border-border"
+					style={{
+						gridTemplateColumns: [
+							"minmax(180px, 1.3fr)",
+							...matrixOptions.map(() => "minmax(120px, 1fr)")
+						].join(" ")
+					}}>
+					<div className="border-r border-border bg-secondary/50 px-4 py-3 text-center text-xs font-semibold uppercase tracking-[0.08em] text-text-secondary">
+						{t("matrixAgeColumn")}
+					</div>
+					{matrixOptions.map(option => (
+						<div
+							key={option.key}
+							className="border-r border-border bg-secondary/50 px-4 py-3 text-center text-xs font-semibold uppercase tracking-[0.08em] text-text-secondary last:border-r-0">
+							{option.label}
+						</div>
+					))}
+					{questions.map((question, rowIndex) => (
+						<React.Fragment key={question.key}>
+							<div
+								className={cn(
+									"border-r border-t border-border px-4 py-4",
+									rowIndex % 2 === 0 ? "bg-card" : "bg-secondary/20"
+								)}>
+								<p className="text-sm font-medium text-foreground">{question.label}</p>
+							</div>
+							{matrixOptions.map(option => {
+								const isSelected = values[question.key] === option.key;
+
+								return (
+									<div
+										key={`${question.key}.${option.key}`}
+										className={cn(
+											"border-r border-t border-border px-3 py-3 last:border-r-0",
+											rowIndex % 2 === 0 ? "bg-card" : "bg-secondary/20"
+										)}>
+										<Button
+											type="button"
+											variant="outline"
+											disabled={disabled}
+											className={cn(
+												"h-auto w-full justify-center whitespace-normal px-3 py-3 text-center",
+												isSelected
+													? "border-primary bg-primary/12 text-primary"
+													: "border-action-outline-border bg-background text-foreground hover:bg-secondary/60"
+											)}
+											onClick={() => {
+												onSelectOption(question.key, option.key);
+											}}>
+											{option.label}
+										</Button>
+									</div>
+								);
+							})}
+						</React.Fragment>
+					))}
+				</div>
 			</div>
 		</FieldCard>
 	);

@@ -6,7 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 
-import { playspaceApi } from "@/lib/api/playspace";
+import { playspaceApi, type AuditSession } from "@/lib/api/playspace";
 import { useLocalizedInstrument } from "@/lib/instrument-translations";
 import { BackButton } from "@/components/dashboard/back-button";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
@@ -63,6 +63,79 @@ function formatPreAuditValueList(
 		.join(", ");
 }
 
+/**
+ * Read one pre-audit question's stored value and format it for display.
+ */
+function getPreAuditDisplayValue(
+	preAuditQuestionByKey: Readonly<Record<string, PreAuditQuestion>>,
+	question: PreAuditQuestion,
+	audit: AuditSession,
+	notProvidedLabel: string
+): string {
+	switch (question.key) {
+		case "place_size":
+			return formatPreAuditValue(
+				preAuditQuestionByKey,
+				question.key,
+				audit.pre_audit.place_size,
+				notProvidedLabel
+			);
+		case "current_users_0_5":
+			return formatPreAuditValue(
+				preAuditQuestionByKey,
+				question.key,
+				audit.pre_audit.current_users_0_5,
+				notProvidedLabel
+			);
+		case "current_users_6_12":
+			return formatPreAuditValue(
+				preAuditQuestionByKey,
+				question.key,
+				audit.pre_audit.current_users_6_12,
+				notProvidedLabel
+			);
+		case "current_users_13_17":
+			return formatPreAuditValue(
+				preAuditQuestionByKey,
+				question.key,
+				audit.pre_audit.current_users_13_17,
+				notProvidedLabel
+			);
+		case "current_users_18_plus":
+			return formatPreAuditValue(
+				preAuditQuestionByKey,
+				question.key,
+				audit.pre_audit.current_users_18_plus,
+				notProvidedLabel
+			);
+		case "playspace_busyness":
+			return formatPreAuditValue(
+				preAuditQuestionByKey,
+				question.key,
+				audit.pre_audit.playspace_busyness,
+				notProvidedLabel
+			);
+		case "season":
+			return formatPreAuditValue(preAuditQuestionByKey, question.key, audit.pre_audit.season, notProvidedLabel);
+		case "weather_conditions":
+			return formatPreAuditValueList(
+				preAuditQuestionByKey,
+				question.key,
+				audit.pre_audit.weather_conditions,
+				notProvidedLabel
+			);
+		case "wind_conditions":
+			return formatPreAuditValue(
+				preAuditQuestionByKey,
+				question.key,
+				audit.pre_audit.wind_conditions,
+				notProvidedLabel
+			);
+		default:
+			return notProvidedLabel;
+	}
+}
+
 export default function AuditorReportDetailPage() {
 	const t = useTranslations("auditor.reportDetail");
 	const formatT = useTranslations("common.format");
@@ -86,6 +159,19 @@ export default function AuditorReportDetailPage() {
 			Record<string, PreAuditQuestion>
 		>;
 	}, [instrument]);
+	const visibleSetupQuestions = React.useMemo(() => {
+		return instrument.pre_audit_questions.filter(question => {
+			if (question.page_key !== "space_setup") {
+				return false;
+			}
+
+			if (audit?.meta.execution_mode === null) {
+				return true;
+			}
+
+			return audit ? question.visible_modes.includes(audit.meta.execution_mode) : false;
+		});
+	}, [audit, instrument.pre_audit_questions]);
 	const sectionRows = React.useMemo(() => {
 		return audit ? Object.values(audit.sections) : [];
 	}, [audit]);
@@ -243,66 +329,12 @@ export default function AuditorReportDetailPage() {
 					<CardTitle>{t("preAudit.title")}</CardTitle>
 				</CardHeader>
 				<CardContent className="grid gap-2 text-sm text-muted-foreground md:grid-cols-2">
-					<p>
-						{t("preAudit.season", {
-							value: formatPreAuditValue(
-								preAuditQuestionByKey,
-								"season",
-								audit.pre_audit.season,
-								t("preAudit.notProvided")
-							)
-						})}
-					</p>
-					<p>
-						{t("preAudit.userCount", {
-							value: formatPreAuditValue(
-								preAuditQuestionByKey,
-								"user_count",
-								audit.pre_audit.user_count,
-								t("preAudit.notProvided")
-							)
-						})}
-					</p>
-					<p>
-						{t("preAudit.placeSize", {
-							value: formatPreAuditValue(
-								preAuditQuestionByKey,
-								"place_size",
-								audit.pre_audit.place_size,
-								t("preAudit.notProvided")
-							)
-						})}
-					</p>
-					<p>
-						{t("preAudit.weather", {
-							value: formatPreAuditValueList(
-								preAuditQuestionByKey,
-								"weather_conditions",
-								audit.pre_audit.weather_conditions,
-								t("preAudit.notProvided")
-							)
-						})}
-					</p>
-					<p>
-						{t("preAudit.usersPresent", {
-							value: formatPreAuditValueList(
-								preAuditQuestionByKey,
-								"users_present",
-								audit.pre_audit.users_present,
-								t("preAudit.notProvided")
-							)
-						})}
-					</p>
-					<p>
-						{t("preAudit.ageGroups", {
-							value: formatPreAuditValueList(
-								preAuditQuestionByKey,
-								"age_groups",
-								audit.pre_audit.age_groups,
-								t("preAudit.notProvided")
-							)
-						})}
-					</p>
+					{visibleSetupQuestions.map(question => (
+						<p key={question.key}>
+							<span className="font-medium text-foreground">{question.label}: </span>
+							{getPreAuditDisplayValue(preAuditQuestionByKey, question, audit, t("preAudit.notProvided"))}
+						</p>
+					))}
 				</CardContent>
 			</Card>
 			<Card>

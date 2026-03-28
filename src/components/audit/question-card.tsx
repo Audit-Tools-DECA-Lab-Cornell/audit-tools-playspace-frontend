@@ -1,9 +1,10 @@
 "use client";
 
 import { Fragment } from "react";
+import { Textarea } from "@/components/ui/textarea";
 import { useTranslations } from "next-intl";
 
-import type { InstrumentQuestion, QuestionScale } from "@/types/audit";
+import type { InstrumentQuestion, QuestionResponsePayload, QuestionScale } from "@/types/audit";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
@@ -14,8 +15,8 @@ interface PromptSegment {
 
 export interface AuditQuestionCardProps {
 	question: InstrumentQuestion;
-	selectedAnswers: Record<string, string>;
-	onSelectAnswer: (questionKey: string, scaleKey: string, optionKey: string) => void;
+	selectedAnswers: QuestionResponsePayload;
+	onChangeAnswers: (questionKey: string, nextAnswers: QuestionResponsePayload) => void;
 	disabled?: boolean;
 }
 
@@ -43,7 +44,7 @@ function parsePromptSegments(raw: string): PromptSegment[] {
 export function AuditQuestionCard({
 	question,
 	selectedAnswers,
-	onSelectAnswer,
+	onChangeAnswers,
 	disabled = false
 }: Readonly<AuditQuestionCardProps>) {
 	const t = useTranslations("auditor.execute.questionCard");
@@ -52,6 +53,8 @@ export function AuditQuestionCard({
 	const selectedQuantityOption = quantityScale?.options.find(option => option.key === selectedQuantityKey);
 	const showFollowUpScales = selectedQuantityOption?.allows_follow_up_scales === true;
 	const promptSegments = parsePromptSegments(question.prompt);
+	const selectedChecklistOptionKeys = readChecklistOptionKeys(selectedAnswers);
+	const otherChecklistText = readChecklistOtherText(selectedAnswers);
 
 	return (
 		<div className="field-card">
@@ -69,24 +72,42 @@ export function AuditQuestionCard({
 					))}
 				</p>
 
-				{question.scales.map((scale, scaleIndex) => {
-					if (scaleIndex > 0 && !showFollowUpScales) {
-						return null;
-					}
+				{question.question_type === "checklist" ? (
+					<ChecklistSelector
+						question={question}
+						selectedOptionKeys={selectedChecklistOptionKeys}
+						otherText={otherChecklistText}
+						onChangeAnswers={onChangeAnswers}
+						disabled={disabled}
+					/>
+				) : (
+					<>
+						{question.scales.map((scale, scaleIndex) => {
+							if (scaleIndex > 0 && !showFollowUpScales) {
+								return null;
+							}
 
-					return (
-						<ScaleSelector
-							key={`${question.question_key}.${scale.key}`}
-							questionKey={question.question_key}
-							scale={scale}
-							selectedOptionKey={selectedAnswers[scale.key]}
-							onSelectAnswer={onSelectAnswer}
-							disabled={disabled}
-						/>
-					);
-				})}
+							const selectedScaleValue = selectedAnswers[scale.key];
 
-				{question.scales.length > 1 && !showFollowUpScales ? (
+							return (
+								<ScaleSelector
+									key={`${question.question_key}.${scale.key}`}
+									questionKey={question.question_key}
+									question={question}
+									scale={scale}
+									selectedOptionKey={
+										typeof selectedScaleValue === "string" ? selectedScaleValue : undefined
+									}
+									currentAnswers={selectedAnswers}
+									onChangeAnswers={onChangeAnswers}
+									disabled={disabled}
+								/>
+							);
+						})}
+					</>
+				)}
+
+				{question.question_type === "scaled" && question.scales.length > 1 && !showFollowUpScales ? (
 					<p className="text-xs text-muted-foreground">{t("followUpScalesHidden")}</p>
 				) : null}
 			</div>
@@ -96,9 +117,11 @@ export function AuditQuestionCard({
 
 interface ScaleSelectorProps {
 	readonly questionKey: string;
+	readonly question: InstrumentQuestion;
 	readonly scale: QuestionScale;
 	readonly selectedOptionKey: string | undefined;
-	readonly onSelectAnswer: (questionKey: string, scaleKey: string, optionKey: string) => void;
+	readonly currentAnswers: QuestionResponsePayload;
+	readonly onChangeAnswers: (questionKey: string, nextAnswers: QuestionResponsePayload) => void;
 	readonly disabled: boolean;
 }
 
@@ -107,9 +130,11 @@ interface ScaleSelectorProps {
  */
 function ScaleSelector({
 	questionKey,
+	question,
 	scale,
 	selectedOptionKey,
-	onSelectAnswer,
+	currentAnswers,
+	onChangeAnswers,
 	disabled
 }: Readonly<ScaleSelectorProps>) {
 	return (
@@ -136,7 +161,10 @@ function ScaleSelector({
 							)}
 							disabled={disabled}
 							onClick={() => {
-								onSelectAnswer(questionKey, scale.key, option.key);
+								onChangeAnswers(
+									questionKey,
+									buildNextScaledQuestionAnswers(currentAnswers, question, scale.key, option.key)
+								);
 							}}>
 							{option.label}
 						</Button>
@@ -145,4 +173,141 @@ function ScaleSelector({
 			</div>
 		</div>
 	);
+}
+
+interface ChecklistSelectorProps {
+	readonly question: InstrumentQuestion;
+	readonly selectedOptionKeys: readonly string[];
+	readonly otherText: string;
+	readonly onChangeAnswers: (questionKey: string, nextAnswers: QuestionResponsePayload) => void;
+	readonly disabled: boolean;
+}
+
+function ChecklistSelector({
+	question,
+	selectedOptionKeys,
+	otherText,
+	onChangeAnswers,
+	disabled
+}: Readonly<ChecklistSelectorProps>) {
+	return (
+		<div className="space-y-3 rounded-field border border-border/70 bg-secondary/40 p-4 md:p-5">
+			<div className="grid gap-2.5 sm:grid-cols-2">
+				{question.options.map(option => {
+					const isSelected = selectedOptionKeys.includes(option.key);
+
+					return (
+						<Button
+							key={`${question.question_key}.${option.key}`}
+							type="button"
+							variant="outline"
+							disabled={disabled}
+							className={cn(
+								"h-auto min-h-12 justify-center whitespace-normal rounded-field px-4 py-3 text-center leading-5",
+								isSelected
+									? "border-primary bg-primary text-primary-foreground hover:bg-primary/90"
+									: "border-action-outline-border bg-background text-foreground hover:border-foreground/35 hover:bg-secondary/70"
+							)}
+							onClick={() => {
+								onChangeAnswers(
+									question.question_key,
+									toggleChecklistOption(selectedOptionKeys, option.key, otherText)
+								);
+							}}>
+							{option.label}
+						</Button>
+					);
+				})}
+			</div>
+			{selectedOptionKeys.includes("other") ? (
+				<Textarea
+					rows={3}
+					disabled={disabled}
+					value={otherText}
+					onChange={event => {
+						onChangeAnswers(
+							question.question_key,
+							setChecklistOtherText(selectedOptionKeys, event.target.value)
+						);
+					}}
+					placeholder="Describe other"
+				/>
+			) : null}
+		</div>
+	);
+}
+
+function readChecklistOptionKeys(selectedAnswers: QuestionResponsePayload): string[] {
+	const selectedOptionKeys = selectedAnswers["selected_option_keys"];
+	if (!Array.isArray(selectedOptionKeys)) {
+		return [];
+	}
+
+	return selectedOptionKeys.filter((entry): entry is string => typeof entry === "string");
+}
+
+function readChecklistOtherText(selectedAnswers: QuestionResponsePayload): string {
+	const otherDetails = selectedAnswers["other_details"];
+	if (typeof otherDetails !== "object" || otherDetails === null || Array.isArray(otherDetails)) {
+		return "";
+	}
+
+	const text = otherDetails["text"];
+	return typeof text === "string" ? text : "";
+}
+
+function toggleChecklistOption(
+	selectedOptionKeys: readonly string[],
+	optionKey: string,
+	otherText: string
+): QuestionResponsePayload {
+	const nextSelectedOptionKeys = selectedOptionKeys.includes(optionKey)
+		? selectedOptionKeys.filter(currentKey => currentKey !== optionKey)
+		: [...selectedOptionKeys, optionKey];
+
+	const nextAnswers: QuestionResponsePayload = {
+		selected_option_keys: nextSelectedOptionKeys
+	};
+
+	if (nextSelectedOptionKeys.includes("other") && otherText.trim().length > 0) {
+		nextAnswers.other_details = { text: otherText };
+	}
+
+	return nextAnswers;
+}
+
+function setChecklistOtherText(selectedOptionKeys: readonly string[], nextText: string): QuestionResponsePayload {
+	const nextAnswers: QuestionResponsePayload = {
+		selected_option_keys: [...selectedOptionKeys]
+	};
+
+	if (nextText.trim().length > 0) {
+		nextAnswers.other_details = { text: nextText };
+	}
+
+	return nextAnswers;
+}
+
+function buildNextScaledQuestionAnswers(
+	currentAnswers: QuestionResponsePayload,
+	question: InstrumentQuestion,
+	scaleKey: string,
+	optionKey: string
+): QuestionResponsePayload {
+	const nextAnswers: QuestionResponsePayload = {
+		...currentAnswers,
+		[scaleKey]: optionKey
+	};
+
+	if (scaleKey !== "quantity") {
+		return nextAnswers;
+	}
+
+	const quantityScale = question.scales.find(scale => scale.key === "quantity");
+	const selectedOption = quantityScale?.options.find(option => option.key === optionKey);
+	if (selectedOption?.allows_follow_up_scales !== false) {
+		return nextAnswers;
+	}
+
+	return { quantity: optionKey };
 }

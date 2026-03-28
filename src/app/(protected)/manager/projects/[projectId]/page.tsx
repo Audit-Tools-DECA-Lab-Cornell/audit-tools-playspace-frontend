@@ -304,8 +304,6 @@ export default function ManagerProjectDetailPage({ params }: Readonly<ManagerPro
 							{
 								label: t("placesTable.actions.deletePlace"),
 								onSelect: () => {
-									console.log(place.id);
-									console.log(projectId);
 									setPlacePendingDelete({
 										id: place.id,
 										name: place.name

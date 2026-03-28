@@ -1214,6 +1214,22 @@
 				"title": "Execution Mode",
 				"noDescription": "No description."
 			},
+			"setup": {
+				"title": "Before You Begin",
+				"subtitle": "Review how the audit works, then choose the role that best matches how you will complete this session.",
+				"roleTitle": "Execution mode",
+				"roleQuestion": "What is your role with respect to this playspace?"
+			},
+			"auditInfo": {
+				"title": "Audit Information",
+				"subtitle": "Review the generated audit metadata before continuing with the onsite setup or section flow.",
+				"auditorCodePending": "Available after sign-in sync",
+				"summaryTitle": "Audit summary",
+				"summaryDescription": "These details are generated automatically from the current audit session.",
+				"auditCode": "Audit code: {value}",
+				"place": "Place: {value}",
+				"project": "Project: {value}"
+			},
 			"preAudit": {
 				"title": "Pre-Audit",
 				"auto": {
@@ -1221,6 +1237,14 @@
 					"calculatedOnSubmit": "Calculated on submit",
 					"minutes": "{count} minutes"
 				}
+			},
+			"spaceAudit": {
+				"title": "Space Audit Setup",
+				"subtitle": "Capture the onsite context that only an onsite auditor can answer before moving into the main section pages.",
+				"skippedTitle": "Space audit step skipped",
+				"skippedDescription": "This execution mode only includes the survey, so the onsite setup step is not required.",
+				"matrixTitle": "Describe users currently in the playspace",
+				"matrixDescription": "Use the matrix to record how many users from each age group are currently present."
 			},
 			"sections": {
 				"title": "Sections",
@@ -1243,6 +1267,18 @@
 			"questionCard": {
 				"thisPlayspace": "This playspace",
 				"followUpScalesHidden": "Follow-up scales stay hidden until the selected quantity option allows them."
+			},
+			"sectionTable": {
+				"intro": "On larger screens the question prompt stays on the left and the active scoring scales stay aligned in columns on the right.",
+				"itemColumn": "Question item",
+				"notAvailable": "Not used for this item.",
+				"followUpPending": "Choose a positive quantity answer to unlock this scale.",
+				"scaleColumns": {
+					"quantity": "Provision / Quantity",
+					"diversity": "Diversity",
+					"challenge": "Challenge",
+					"sociability": "Sociability"
+				}
 			},
 			"submittedCard": {
 				"title": "Audit submitted",

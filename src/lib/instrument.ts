@@ -14,64 +14,255 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 	instrument_key: "pvua_v5_2",
 	instrument_name: "Playspace Play Value and Usability Audit Tool",
 	instrument_version: "5.2",
-	current_sheet: "PVUA v5.2",
+	current_sheet: "PVUA v5.2_online version",
 	source_files: [],
 	preamble: [
-		"The Playspace Play Value and Usability Audit tool is structured in 22 domains. Each domain has between 2 and 12 items that describe a specific feature of the environment.",
-		"Each item is assessed through up to four scales: Quantity, Diversity, Sociability, and Challenge. Not all items include every scale.",
-		"Quantity is always answered first. When the quantity answer is a zero-like response such as No or Not applicable, the remaining scales stay hidden because they do not apply.",
-		"After each domain you can record notes or recommendations about changes that could improve the play value and usability of the playspace.",
-		"The tool supports two parts: an onsite audit of the physical environment and a survey about ecological and management aspects of the playspace."
+		"## How the tool is structured\nThe Playspace Play Value and Usability Audit tool is structured in 22 domains. Each domain has between 2 and 12 items. All items represent specific features or characteristics of the environment.",
+		"Each item is assessed through up to four scales: Provision, Diversity, Challenge Opportunities, and Sociability Support. Not all items include every scale.",
+		"Provision is always answered first. When the provision answer is a zero-like response such as No or Not applicable, the remaining scales stay hidden because they do not apply.",
+		"### 2. Diversity\nDiversity evaluates whether the provided items offer a variety of types, forms, or opportunities. In other words, whether they are not all the same.\n\n**Guiding question:** To what extent is diversity in this feature/environmental characteristic considered?\n\nExample: For 5 swings: Are they all different types (e.g. large swing, baby swing, basket swing, rope swing), or are they all identical?\n\n**It is your judgment to indicate if there is No diversity, Some diversity or A lot of diversity considered. You can only choose one!**",
+		"### 3. Challenge opportunities\nChallenge opportunities assess whether the feature provides opportunities with different levels of difficulty.\n\n**Guiding question:** To what extent does this feature/environmental characteristic offer different levels of challenge?\n\nExample: The swings provided should be examined and judged if they provide increasing challenging opportunities.\n\n**It is your judgment to indicate if the provided swings offer different levels of difficulty. You can only choose one!**",
+		"### 4. Sociability support\nSociability support assesses whether more than one child/person can use this feature/environmental characteristic together. It considers whether the feature can be used by more than one person at once, individually, in small groups, or in larger groups.\n\n**Guiding question:** Can more than one child (or person) use this feature together?\n\nExample: Can some of the swings be used alone? Can some be used in pairs? Can some be used in groups of children?\n\n**It is your judgment to indicate if they can be used alone, in pairs or in groups.**",
+		"## Open reflection\nThe open question gives you the possibility to write down some reflections. A guiding question will ask you to describe one or two aspects you recommend changing in the playspace to increase its play value and usability.",
+		"## Two parts of the audit\nThe Playspace Play Value and Usability Audit tool uses two methods for assessing a playspace:\n\n- **(A) Onsite Audit of the Physical Environment**\nThis part of the audit assesses aspects of the playspace that can only be examined onsite in the physical environment.\nIt requires being physically present at the playspace.\n\n- **(B) Survey of Ecological Aspects of the Playspace**\nThis part of the audit assesses information related to the history, management practices, and how weather and seasons influence playspace use.\nIt does not require being onsite.\nIt must be answered by someone familiar with the playspace's background and context.",
+		"## Before you continue\nBefore moving to the next section, you must decide which part(s) of the audit you will complete: A, B, or A & B.\n\nYour choice depends on how familiar you are with the playspace and what role you have."
 	],
 	execution_modes: [
 		{
 			key: "both",
-			label: "I am very familiar with the playspace and I am onsite.",
-			description: "Answer both the survey and the onsite audit items."
+			label: "I am both a playspace administrator/manager and an onsite auditor",
+			description: "This choice displays both survey and audit questions."
 		},
 		{
 			key: "survey",
-			label: "I am very familiar with the playspace but I am not onsite.",
-			description: "Answer only the survey items."
+			label: "I am an administrator or manager of the playspace",
+			description: "This choice displays only survey questions."
 		},
 		{
 			key: "audit",
-			label: "I am not familiar with the playspace but I am onsite.",
-			description: "Answer only the onsite audit items."
+			label: "I am an onsite auditor",
+			description: "This choice displays only audit questions."
 		}
 	],
 	pre_audit_questions: [
 		{
-			key: "audit_date",
-			label: "Date of the audit",
-			description: "Automatically generated when the audit session is created.",
+			key: "auditor_code",
+			label: "Auditor ID",
 			input_type: "auto_timestamp",
-			required: true,
-			options: []
+			required: false,
+			options: [],
+			page_key: "audit_info",
+			visible_modes: ["audit", "survey", "both"],
+			group_key: null
+		},
+		{
+			key: "audit_date",
+			label: "Date created",
+			input_type: "auto_timestamp",
+			required: false,
+			options: [],
+			page_key: "audit_info",
+			visible_modes: ["audit", "survey", "both"],
+			group_key: null
 		},
 		{
 			key: "started_at",
 			label: "Start time of the audit",
-			description: "Automatically generated when the audit session is created.",
 			input_type: "auto_timestamp",
-			required: true,
-			options: []
+			required: false,
+			options: [],
+			page_key: "audit_info",
+			visible_modes: ["audit", "survey", "both"],
+			group_key: null
 		},
 		{
 			key: "submitted_at",
 			label: "Finish time of the audit",
-			description: "Automatically generated when the audit is submitted.",
 			input_type: "auto_timestamp",
-			required: true,
-			options: []
+			required: false,
+			options: [],
+			page_key: "audit_info",
+			visible_modes: ["audit", "survey", "both"],
+			group_key: null
 		},
 		{
 			key: "total_minutes",
 			label: "Total time in minutes",
 			description: "Automatically calculated from the start and finish timestamps.",
 			input_type: "auto_timestamp",
+			required: false,
+			options: [],
+			page_key: "audit_info",
+			visible_modes: ["audit", "survey", "both"],
+			group_key: null
+		},
+		{
+			key: "place_size",
+			label: "How large is the playspace?",
+			description: null,
+			input_type: "single_select",
 			required: true,
-			options: []
+			options: [
+				{
+					key: "small",
+					label: "Small",
+					description:
+						"1 to 2 activity zones only; e.g. found in a small neighbourhood park or housing complex"
+				},
+				{
+					key: "medium",
+					label: "Medium",
+					description: "2 to 5 activity zones; e.g. found in a moderate sized park or small school yard"
+				},
+				{
+					key: "large",
+					label: "Large",
+					description: "6 to 10 activity zones; e.g. found in a large city park or large school yard"
+				},
+				{
+					key: "very_large",
+					label: "Very large",
+					description: "More than 10 activity zones; e.g. a large destination playspace"
+				}
+			],
+			page_key: "space_setup",
+			visible_modes: ["audit", "both"],
+			group_key: null
+		},
+		{
+			key: "current_users_0_5",
+			label: "0-5 years",
+			description: null,
+			input_type: "single_select",
+			required: true,
+			options: [
+				{
+					key: "none",
+					label: "None",
+					description: null
+				},
+				{
+					key: "a_few",
+					label: "A few",
+					description: null
+				},
+				{
+					key: "a_lot",
+					label: "A lot",
+					description: null
+				}
+			],
+			page_key: "space_setup",
+			visible_modes: ["audit", "both"],
+			group_key: "current_users_matrix"
+		},
+		{
+			key: "current_users_6_12",
+			label: "6-12 years",
+			description: null,
+			input_type: "single_select",
+			required: true,
+			options: [
+				{
+					key: "none",
+					label: "None",
+					description: null
+				},
+				{
+					key: "a_few",
+					label: "A few",
+					description: null
+				},
+				{
+					key: "a_lot",
+					label: "A lot",
+					description: null
+				}
+			],
+			page_key: "space_setup",
+			visible_modes: ["audit", "both"],
+			group_key: "current_users_matrix"
+		},
+		{
+			key: "current_users_13_17",
+			label: "13-17 yrs",
+			description: null,
+			input_type: "single_select",
+			required: true,
+			options: [
+				{
+					key: "none",
+					label: "None",
+					description: null
+				},
+				{
+					key: "a_few",
+					label: "A few",
+					description: null
+				},
+				{
+					key: "a_lot",
+					label: "A lot",
+					description: null
+				}
+			],
+			page_key: "space_setup",
+			visible_modes: ["audit", "both"],
+			group_key: "current_users_matrix"
+		},
+		{
+			key: "current_users_18_plus",
+			label: "Adults (18+ yrs)",
+			description: null,
+			input_type: "single_select",
+			required: true,
+			options: [
+				{
+					key: "none",
+					label: "None",
+					description: null
+				},
+				{
+					key: "a_few",
+					label: "A few",
+					description: null
+				},
+				{
+					key: "a_lot",
+					label: "A lot",
+					description: null
+				}
+			],
+			page_key: "space_setup",
+			visible_modes: ["audit", "both"],
+			group_key: "current_users_matrix"
+		},
+		{
+			key: "playspace_busyness",
+			label: "How busy is the playspace currently?",
+			description: null,
+			input_type: "single_select",
+			required: true,
+			options: [
+				{
+					key: "not_at_all_busy",
+					label: "Not at all busy",
+					description: null
+				},
+				{
+					key: "somewhat_busy",
+					label: "Somewhat busy",
+					description: null
+				},
+				{
+					key: "very_busy",
+					label: "Very busy",
+					description: null
+				}
+			],
+			page_key: "space_setup",
+			visible_modes: ["audit", "both"],
+			group_key: null
 		},
 		{
 			key: "season",
@@ -100,171 +291,133 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					label: "Winter",
 					description: null
 				}
-			]
+			],
+			page_key: "space_setup",
+			visible_modes: ["audit", "both"],
+			group_key: null
 		},
 		{
 			key: "weather_conditions",
-			label: "Weather condition at the time of the audit",
+			label: "Current weather conditions",
 			description: null,
 			input_type: "multi_select",
 			required: true,
 			options: [
 				{
-					key: "sunshine",
-					label: "Sunshine",
+					key: "full_sun",
+					label: "Full sun",
 					description: null
 				},
 				{
-					key: "cloudy",
-					label: "Cloudy",
+					key: "partial_sun_cloud",
+					label: "Partial sun/cloud",
 					description: null
 				},
 				{
-					key: "windy",
-					label: "Windy",
+					key: "cloudy_overcast",
+					label: "Cloudy/overcast",
 					description: null
 				},
 				{
-					key: "inclement_weather",
-					label: "Inclement weather",
+					key: "foggy_misty",
+					label: "Foggy/misty",
+					description: null
+				},
+				{
+					key: "light_rain",
+					label: "Light rain",
+					description: null
+				},
+				{
+					key: "moderate_rain",
+					label: "Moderate rain",
+					description: null
+				},
+				{
+					key: "light_snow",
+					label: "Light snow",
+					description: null
+				},
+				{
+					key: "moderate_snow",
+					label: "Moderate snow",
 					description: null
 				}
-			]
+			],
+			page_key: "space_setup",
+			visible_modes: ["audit", "both"],
+			group_key: null
 		},
 		{
-			key: "users_present",
-			label: "Users on the playspace at the time of the audit",
-			description: null,
-			input_type: "multi_select",
-			required: true,
-			options: [
-				{
-					key: "none",
-					label: "None",
-					description: null
-				},
-				{
-					key: "children",
-					label: "Children",
-					description: null
-				},
-				{
-					key: "adults",
-					label: "Adults",
-					description: null
-				}
-			]
-		},
-		{
-			key: "user_count",
-			label: "Amount of users",
+			key: "wind_conditions",
+			label: "Current wind conditions",
 			description: null,
 			input_type: "single_select",
 			required: true,
 			options: [
 				{
-					key: "none",
-					label: "None",
+					key: "no_wind",
+					label: "No wind",
 					description: null
 				},
 				{
-					key: "some",
-					label: "Some",
+					key: "light_wind",
+					label: "Light wind",
 					description: null
 				},
 				{
-					key: "a_lot",
-					label: "A lot",
+					key: "occasional_gusts",
+					label: "Occasional gusts",
+					description: null
+				},
+				{
+					key: "heavy_wind",
+					label: "Heavy wind",
 					description: null
 				}
-			]
-		},
-		{
-			key: "age_groups",
-			label: "Estimated children age groups using the playspace",
-			description: null,
-			input_type: "multi_select",
-			required: true,
-			options: [
-				{
-					key: "under_5",
-					label: "Under 5 years",
-					description: null
-				},
-				{
-					key: "age_6_10",
-					label: "6-10 year olds",
-					description: null
-				},
-				{
-					key: "age_11_plus",
-					label: "10+ year olds",
-					description: null
-				}
-			]
-		},
-		{
-			key: "place_size",
-			label: "Size of the playspace based on your estimate",
-			description: null,
-			input_type: "single_select",
-			required: true,
-			options: [
-				{
-					key: "small",
-					label: "Small",
-					description: null
-				},
-				{
-					key: "medium",
-					label: "Medium",
-					description: null
-				},
-				{
-					key: "large",
-					label: "Large",
-					description: null
-				}
-			]
+			],
+			page_key: "space_setup",
+			visible_modes: ["audit", "both"],
+			group_key: null
 		}
 	],
 	scale_guidance: [
 		{
 			key: "quantity",
-			title: "Quantity",
-			prompt: "In what quantity is this feature or environmental characteristic considered?",
+			title: "Provision",
+			prompt: "To what degree is this feature/environmental characteristic present or considered?",
 			description:
-				"Quantity refers to how many of a specific provision or environmental characteristic are available.",
+				"Provision refers to how present or considered the feature or environmental characteristic is.",
 			options: [
 				{
 					key: "no",
 					label: "No",
-					addition_value: 0.0,
-					boost_value: 0.0,
+					addition_value: 0,
+					boost_value: 0,
 					allows_follow_up_scales: false,
 					is_not_applicable: false
 				},
 				{
 					key: "some",
 					label: "Some",
-					addition_value: 1.0,
-					boost_value: 1.0,
+					addition_value: 1,
+					boost_value: 1,
 					allows_follow_up_scales: true,
 					is_not_applicable: false
 				},
 				{
 					key: "a_lot",
 					label: "A lot",
-					addition_value: 2.0,
-					boost_value: 2.0,
+					addition_value: 2,
+					boost_value: 2,
 					allows_follow_up_scales: true,
 					is_not_applicable: false
 				},
 				{
 					key: "not_applicable",
 					label: "Not applicable",
-					addition_value: 0.0,
-					boost_value: 0.0,
+					addition_value: 0,
+					boost_value: 0,
 					allows_follow_up_scales: false,
 					is_not_applicable: true
 				}
@@ -273,78 +426,38 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 		{
 			key: "diversity",
 			title: "Diversity",
-			prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+			prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 			description: "Diversity evaluates whether the provided items offer variety rather than all being the same.",
 			options: [
 				{
 					key: "not_applicable",
 					label: "Not applicable",
-					addition_value: 0.0,
-					boost_value: 1.0,
+					addition_value: 0,
+					boost_value: 1,
 					allows_follow_up_scales: false,
 					is_not_applicable: true
 				},
 				{
 					key: "no_diversity",
 					label: "No Diversity",
-					addition_value: 1.0,
-					boost_value: 1.0,
+					addition_value: 1,
+					boost_value: 1,
 					allows_follow_up_scales: false,
 					is_not_applicable: false
 				},
 				{
 					key: "some_diversity",
 					label: "Some Diversity",
-					addition_value: 2.0,
-					boost_value: 2.0,
+					addition_value: 2,
+					boost_value: 2,
 					allows_follow_up_scales: false,
 					is_not_applicable: false
 				},
 				{
 					key: "a_lot_of_diversity",
 					label: "A lot of Diversity",
-					addition_value: 3.0,
-					boost_value: 3.0,
-					allows_follow_up_scales: false,
-					is_not_applicable: false
-				}
-			]
-		},
-		{
-			key: "sociability",
-			title: "Sociability",
-			prompt: "Can more than one child or person use this feature together?",
-			description: "Sociability considers whether the feature can be used alone, in pairs, or in larger groups.",
-			options: [
-				{
-					key: "not_applicable",
-					label: "Not applicable",
-					addition_value: 0.0,
-					boost_value: 1.0,
-					allows_follow_up_scales: false,
-					is_not_applicable: true
-				},
-				{
-					key: "no",
-					label: "No",
-					addition_value: 1.0,
-					boost_value: 1.0,
-					allows_follow_up_scales: false,
-					is_not_applicable: false
-				},
-				{
-					key: "yes_a_pair",
-					label: "Yes - a pair",
-					addition_value: 2.0,
-					boost_value: 2.0,
-					allows_follow_up_scales: false,
-					is_not_applicable: false
-				},
-				{
-					key: "yes_more_than_two_children",
-					label: "Yes - more than two children",
-					addition_value: 3.0,
-					boost_value: 3.0,
+					addition_value: 3,
+					boost_value: 3,
 					allows_follow_up_scales: false,
 					is_not_applicable: false
 				}
@@ -352,40 +465,81 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 		},
 		{
 			key: "challenge",
-			title: "Challenge",
-			prompt: "To what extent does this feature or environmental characteristic provide different levels of challenge?",
+			title: "Challenge Opportunities",
+			prompt: "To what extent does this feature/environmental characteristic provide different levels of challenge?",
 			description:
-				"Challenge assesses whether the feature provides opportunities with different levels of difficulty.",
+				"Challenge Opportunities evaluate whether the feature offers different levels or ways to engage.",
 			options: [
 				{
 					key: "not_applicable",
 					label: "Not applicable",
-					addition_value: 0.0,
-					boost_value: 1.0,
+					addition_value: 0,
+					boost_value: 1,
 					allows_follow_up_scales: false,
 					is_not_applicable: true
 				},
 				{
 					key: "no_challenge",
 					label: "No Challenge",
-					addition_value: 1.0,
-					boost_value: 1.0,
+					addition_value: 1,
+					boost_value: 1,
 					allows_follow_up_scales: false,
 					is_not_applicable: false
 				},
 				{
 					key: "some_challenge",
 					label: "Some Challenge",
-					addition_value: 2.0,
-					boost_value: 2.0,
+					addition_value: 2,
+					boost_value: 2,
 					allows_follow_up_scales: false,
 					is_not_applicable: false
 				},
 				{
 					key: "a_lot_of_challenge",
 					label: "A lot of Challenge",
-					addition_value: 3.0,
-					boost_value: 3.0,
+					addition_value: 3,
+					boost_value: 3,
+					allows_follow_up_scales: false,
+					is_not_applicable: false
+				}
+			]
+		},
+		{
+			key: "sociability",
+			title: "Sociability Support",
+			prompt: "Can more than one child/person use this feature/environmental characteristic together?",
+			description:
+				"Sociability Support considers whether the feature can be used alone, in pairs, or in larger groups.",
+			options: [
+				{
+					key: "not_applicable",
+					label: "Not applicable",
+					addition_value: 0,
+					boost_value: 1,
+					allows_follow_up_scales: false,
+					is_not_applicable: true
+				},
+				{
+					key: "no",
+					label: "No",
+					addition_value: 1,
+					boost_value: 1,
+					allows_follow_up_scales: false,
+					is_not_applicable: false
+				},
+				{
+					key: "yes_a_pair",
+					label: "Yes - a pair",
+					addition_value: 2,
+					boost_value: 2,
+					allows_follow_up_scales: false,
+					is_not_applicable: false
+				},
+				{
+					key: "yes_more_than_two_children",
+					label: "Yes - more than two children",
+					addition_value: 3,
+					boost_value: 3,
 					allows_follow_up_scales: false,
 					is_not_applicable: false
 				}
@@ -408,79 +562,43 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					constructs: ["usability"],
 					domains: ["Playspace Character & Community"],
 					section_key: "section_1_playspace_character_community",
-					prompt: "was **developed or designed with the involvement of users** of the playspace (e.g. children; parents; community organizations)",
+					prompt: "was developed or designed with the involvement of children and/or youth",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_little_bit",
 									label: "A little bit",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
 							]
-						},
-						{
-							key: "diversity",
-							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no_diversity",
-									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "some_diversity",
-									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "a_lot_of_diversity",
-									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_1_2",
@@ -488,239 +606,131 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					constructs: ["usability"],
 					domains: ["Playspace Character & Community"],
 					section_key: "section_1_playspace_character_community",
-					prompt: "was **developed or designed specifically** to provide play opportunities** for one or more known underserved population** such as  girls, minorities, or children with diverse needs",
+					prompt: "was developed or designed with the involvement of other stakeholders (e.g. parents; community organizations; staff)",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_little_bit",
 									label: "A little bit",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
 							]
-						},
-						{
-							key: "diversity",
-							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no_diversity",
-									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "some_diversity",
-									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "a_lot_of_diversity",
-									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_1_3",
 					mode: "survey",
-					constructs: ["usability"],
+					constructs: ["usability", "play_value"],
 					domains: ["Playspace Character & Community"],
 					section_key: "section_1_playspace_character_community",
-					prompt: "** reflects cultural and historical aspects of the community** (e.g., local art/stories/heritage is represented; locally sourced materials are used)",
+					prompt: "is staffed by adults who are actively facilitating children's play (e.g. providing new opportunities in the environment for new/changing forms of play)",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_little_bit",
 									label: "A little bit",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
 							]
-						},
-						{
-							key: "diversity",
-							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no_diversity",
-									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "some_diversity",
-									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "a_lot_of_diversity",
-									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_1_4",
 					mode: "survey",
-					constructs: ["play_value"],
+					constructs: ["usability"],
 					domains: ["Playspace Character & Community"],
 					section_key: "section_1_playspace_character_community",
-					prompt: "**has** **unique or novel aspects/opportunities** that distinguish it from other playspaces (e.g., highly naturalized playground; spaces or features that can be shaped and manipulated by children; sculptural play features)",
+					prompt: "involves users of the playground (children and/or adults) in maintenance activities (e.g. landscaping; painting; adults living nearby keep an eye on the playspace)",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_little_bit",
 									label: "A little bit",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
 							]
-						},
-						{
-							key: "diversity",
-							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no_diversity",
-									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "some_diversity",
-									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "a_lot_of_diversity",
-									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_1_5",
@@ -728,79 +738,43 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					constructs: ["usability", "play_value"],
 					domains: ["Playspace Character & Community"],
 					section_key: "section_1_playspace_character_community",
-					prompt: "**is** **staffed by adults** **who  are actively facilitating children's play** (e.g. providing new opportunities in the environment for new /changing forms of play)",
+					prompt: "hosts community events",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_little_bit",
 									label: "A little bit",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
 							]
-						},
-						{
-							key: "diversity",
-							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no_diversity",
-									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "some_diversity",
-									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "a_lot_of_diversity",
-									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_1_6",
@@ -808,114 +782,78 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					constructs: ["usability"],
 					domains: ["Playspace Character & Community"],
 					section_key: "section_1_playspace_character_community",
-					prompt: "** involves users** of the playground (children and/or adults) **in maintenance activities** (e.g., in landscaping, painting; assigns adults living nearby to keep an eye on the playspace)",
+					prompt: "reflects cultural and historical aspects of the community (e.g. local art/stories/heritage is represented; locally sourced materials are used)",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_little_bit",
 									label: "A little bit",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
 							]
-						},
-						{
-							key: "diversity",
-							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no_diversity",
-									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "some_diversity",
-									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "a_lot_of_diversity",
-									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_1_7",
 					mode: "survey",
-					constructs: ["usability", "play_value"],
+					constructs: ["play_value"],
 					domains: ["Playspace Character & Community"],
 					section_key: "section_1_playspace_character_community",
-					prompt: "**hosts community events**",
+					prompt: "has unique or novel aspects/opportunities that distinguish it from other playspaces (e.g. highly naturalized playground; spaces or features that can be shaped and manipulated by children; sculptural play features)",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_little_bit",
 									label: "A little bit",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -924,43 +862,46 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				}
 			]
 		},
@@ -979,79 +920,43 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					constructs: ["usability"],
 					domains: ["Playspace Location & Connectivity"],
 					section_key: "section_2_playspace_location_connectivity",
-					prompt: "is **accessible by walking or biking paths **",
+					prompt: "has walking or biking paths leading to the playspace entrance(s)",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_little_bit",
 									label: "A little bit",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
 							]
-						},
-						{
-							key: "diversity",
-							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no_diversity",
-									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "some_diversity",
-									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "a_lot_of_diversity",
-									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_2_2",
@@ -1059,12 +964,12 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					constructs: ["usability"],
 					domains: ["Playspace Location & Connectivity"],
 					section_key: "section_2_playspace_location_connectivity",
-					prompt: "is **accessible through public transport **(e.g., there is a public transit stop at or near at least one entrance)",
+					prompt: "has parking for cars and bicycles close to the playspace",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
@@ -1075,63 +980,19 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 									is_not_applicable: false
 								},
 								{
-									key: "a_little_bit",
-									label: "A little bit",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: true,
-									is_not_applicable: false
-								},
-								{
-									key: "a_lot",
-									label: "A lot",
+									key: "yes",
+									label: "Yes",
 									addition_value: 2.0,
 									boost_value: 2.0,
-									allows_follow_up_scales: true,
-									is_not_applicable: false
-								}
-							]
-						},
-						{
-							key: "diversity",
-							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no_diversity",
-									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "some_diversity",
-									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "a_lot_of_diversity",
-									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_2_3",
@@ -1139,32 +1000,43 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					constructs: ["usability"],
 					domains: ["Playspace Location & Connectivity"],
 					section_key: "section_2_playspace_location_connectivity",
-					prompt: "is **located near to a residential area** (within 10 min walk)",
+					prompt: "is accessible through public transport (e.g. there is a public transit stop at or near at least one entrance)",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
-									key: "yes",
-									label: "Yes",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									key: "a_little_bit",
+									label: "A little bit",
+									addition_value: 1,
+									boost_value: 1,
+									allows_follow_up_scales: true,
+									is_not_applicable: false
+								},
+								{
+									key: "a_lot",
+									label: "A lot",
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_2_4",
@@ -1172,32 +1044,35 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					constructs: ["usability"],
 					domains: ["Playspace Location & Connectivity"],
 					section_key: "section_2_playspace_location_connectivity",
-					prompt: "is** located near to schools and/or childcare facilities **(within 10 min walk)",
+					prompt: "is located near to a residential area (within 10 min walk)",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "yes",
 									label: "Yes",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_2_5",
@@ -1205,79 +1080,35 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					constructs: ["usability"],
 					domains: ["Playspace Location & Connectivity"],
 					section_key: "section_2_playspace_location_connectivity",
-					prompt: "is **located near to or co-located with other public opportunities** that might be interesting/important to children and families (e.g., park space; community centre; library; amenities; community gathering places; museums; community garden; nature areas; coffee shop)",
+					prompt: "is located near to schools and/or childcare facilities (within 10 min walk)",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
-									key: "a_little_bit",
-									label: "A little bit",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									key: "yes",
+									label: "Yes",
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
-									is_not_applicable: false
-								},
-								{
-									key: "a_lot",
-									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: true,
-									is_not_applicable: false
-								}
-							]
-						},
-						{
-							key: "diversity",
-							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no_diversity",
-									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "some_diversity",
-									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "a_lot_of_diversity",
-									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_2_6",
@@ -1285,79 +1116,43 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					constructs: ["usability"],
 					domains: ["Playspace Location & Connectivity"],
 					section_key: "section_2_playspace_location_connectivity",
-					prompt: "is **embedded in or connected to a larger naturalized space** (e.g. forest; woodland; large garden; conservation area)",
+					prompt: "is located near to or co-located with other public opportunities that might be interesting/important to children and families (e.g. park space; community centre; library; amenities; community gathering places; museums; community garden; nature areas; coffee shop)",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_little_bit",
 									label: "A little bit",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
 							]
-						},
-						{
-							key: "diversity",
-							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no_diversity",
-									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "some_diversity",
-									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "a_lot_of_diversity",
-									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_2_7",
@@ -1365,32 +1160,79 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					constructs: ["usability"],
 					domains: ["Playspace Location & Connectivity"],
 					section_key: "section_2_playspace_location_connectivity",
-					prompt: "is **located directly adjacent to roads with heavy or fast traffic** without clear/safe crossing options [Note this item needs to be reversed scored]",
+					prompt: "is embedded in or connected to a larger naturalized space (e.g. forest; woodland; large garden; conservation area)",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 0,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "a_little_bit",
+									label: "A little bit",
+									addition_value: 1,
+									boost_value: 1,
+									allows_follow_up_scales: true,
+									is_not_applicable: false
+								},
+								{
+									key: "a_lot",
+									label: "A lot",
+									addition_value: 2,
+									boost_value: 2,
+									allows_follow_up_scales: true,
+									is_not_applicable: false
+								}
+							]
+						}
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
+				},
+				{
+					question_key: "q_2_8",
+					mode: "survey",
+					constructs: ["usability"],
+					domains: ["Playspace Location & Connectivity"],
+					section_key: "section_2_playspace_location_connectivity",
+					prompt: "is located directly adjacent to roads with heavy or fast traffic without fencing and clear/safe crossing options",
+					scales: [
+						{
+							key: "quantity",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
+							options: [
+								{
+									key: "no",
+									label: "No",
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "yes",
 									label: "Yes",
-									addition_value: 2.0,
-									boost_value: 0.0,
+									addition_value: 2,
+									boost_value: 0,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				}
 			]
 		},
@@ -1412,28 +1254,31 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "yes",
 									label: "Yes",
-									addition_value: 1.0,
-									boost_value: 0.0,
+									addition_value: 1,
+									boost_value: 0,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_3_2",
@@ -1445,28 +1290,31 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "yes",
 									label: "Yes",
-									addition_value: 1.0,
-									boost_value: 0.0,
+									addition_value: 1,
+									boost_value: 0,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_3_3",
@@ -1474,32 +1322,35 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					constructs: ["usability"],
 					domains: ["Playspace Rules & Restrictions"],
 					section_key: "section_3_playspace_rules_restrictions",
-					prompt: "**restricts children’s access by requiring adult supervision** (i.e., caregiver supervision is not mandatory, except perhaps for very young children; children can independently use the playspace)  [This item need to be reversed scored]",
+					prompt: "**restricts children\u2019s access by requiring adult supervision** (i.e., caregiver supervision is not mandatory, except perhaps for very young children; children can independently use the playspace)  [This item need to be reversed scored]",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "yes",
 									label: "Yes",
-									addition_value: 1.0,
-									boost_value: 0.0,
+									addition_value: 1,
+									boost_value: 0,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				}
 			]
 		},
@@ -1522,30 +1373,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_little_bit",
 									label: "A little bit",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -1554,43 +1405,46 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_4_2",
@@ -1602,30 +1456,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_little_bit",
 									label: "A little bit",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -1634,43 +1488,46 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_4_3",
@@ -1678,26 +1535,26 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					constructs: ["usability"],
 					domains: ["Playspace Information & Wayfinding"],
 					section_key: "section_4_playspace_information_wayfinding",
-					prompt: "has **accessible maps and/or signage ****at entrances** to the playspace that provide navigation and usage guidance  (e.g. positioned at an accessible height for wheelchair users; uses Braille text, pictographs and/or high colour contrast; info available via QR code ) a",
+					prompt: "has **accessible maps and/or signage ****at entrances** to the playspace that provide navigation and usage guidance\u00a0 (e.g. positioned at an accessible height for wheelchair users; uses Braille text, pictographs and/or high colour contrast; info available via QR code ) a",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "yes",
 									label: "Yes",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -1706,43 +1563,46 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_4_4",
@@ -1750,26 +1610,26 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					constructs: ["usability"],
 					domains: ["Playspace Information & Wayfinding"],
 					section_key: "section_4_playspace_information_wayfinding",
-					prompt: "has **child-friendly, easy to read/understand maps and/or signage ****at entrances** (e.g. positioned at a  height suitable for young children; uses simple language, symbols, and/or images)",
+					prompt: "has **child-friendly, easy to read/understand maps and/or signage ****at entrances** (e.g. positioned at a\u00a0 height suitable for young children; uses simple language, symbols, and/or images)",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "yes",
 									label: "Yes",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -1778,43 +1638,46 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_4_5",
@@ -1822,26 +1685,26 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					constructs: ["usability"],
 					domains: ["Playspace Information & Wayfinding"],
 					section_key: "section_4_playspace_information_wayfinding",
-					prompt: "has **accessible maps and/or signage ****distributed around the playspace** that provide navigation  and usage guidance  (e.g. positioned at an accessible height for wheelchair users; uses Braille text, pictographs and/or high colour contrast; info available via QR code ) a",
+					prompt: "has **accessible maps and/or signage ****distributed around the playspace** that provide navigation\u00a0 and usage guidance\u00a0 (e.g. positioned at an accessible height for wheelchair users; uses Braille text, pictographs and/or high colour contrast; info available via QR code ) a",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "yes",
 									label: "Yes",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -1850,43 +1713,46 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_4_6",
@@ -1894,26 +1760,26 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					constructs: ["usability"],
 					domains: ["Playspace Information & Wayfinding"],
 					section_key: "section_4_playspace_information_wayfinding",
-					prompt: "has **child-friendly, easy to read/understand maps and/or signage ****distributed around the playspace** (e.g. positioned at a  height suitable for young children; uses simple language, symbols, and/or images)a",
+					prompt: "has **child-friendly, easy to read/understand maps and/or signage ****distributed around the playspace** (e.g. positioned at a\u00a0 height suitable for young children; uses simple language, symbols, and/or images)a",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "yes",
 									label: "Yes",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -1922,43 +1788,46 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				}
 			]
 		},
@@ -1966,7 +1835,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 			section_key: "section_5_management_maintenance",
 			title: "Management & Maintenance",
 			description:
-				"Management and maintenance describe considerations that cater for safe and playable environment.",
+				"Management and Maintenance evaluates management and maintenance practices, as well as safety and cleanliness of the playspace throughout the year.",
 			instruction: "Read each statement and answer the questions. This playspace...",
 			notes_prompt:
 				"Any comments? Describe one or more recommendations to improve the management and maintenance of this playspace:",
@@ -1981,28 +1850,31 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "yes",
 									label: "Yes",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_5_2",
@@ -2014,36 +1886,39 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_little_bit",
 									label: "A little bit",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_5_3",
@@ -2055,36 +1930,39 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_little_bit",
 									label: "A little bit",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_5_4",
@@ -2096,28 +1974,31 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "yes",
 									label: "Yes",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_5_5",
@@ -2129,36 +2010,39 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_little_bit",
 									label: "A little bit",
-									addition_value: 1.0,
-									boost_value: 0.0,
+									addition_value: 1,
+									boost_value: 0,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 1.0,
+									addition_value: 2,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_5_6",
@@ -2170,28 +2054,31 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "yes",
 									label: "Yes",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_5_7",
@@ -2203,30 +2090,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 2.0,
-									boost_value: 0.0,
+									addition_value: 2,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_little_bit",
 									label: "A little bit",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -2235,43 +2122,46 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				}
 			]
 		},
@@ -2293,36 +2183,39 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_6_2",
@@ -2334,36 +2227,39 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_6_3",
@@ -2375,36 +2271,39 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_6_4",
@@ -2416,36 +2315,39 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_6_5",
@@ -2457,36 +2359,39 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				}
 			]
 		},
@@ -2494,7 +2399,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 			section_key: "section_7_boundaries_entrances",
 			title: "Boundaries & Entrances",
 			description:
-				"Boundaries & Entrances considers entry to and separation of playspaces. Boundaries are defined as clear borders that illustrate the edges of an area or define distinct activity zones - these can include fences, walls or hedgerows. Entrances are defined as the locations where people enter/exit playspaces or activity zones - these can be formal (e.g., gates) or informal (e.g., openings in boundaries or changes in ground surface).",
+				"Boundaries & Entrances considers entry to and separation of playspaces. Boundaries are clear borders that illustrate the edges of an area or define distinct activity zones, such as fences, walls, or hedgerows. Entrances are the locations where people enter or exit playspaces or activity zones, whether formal (e.g. gates) or informal (e.g. openings in boundaries or changes in ground surface). Not every playspace needs fencing depending on where the playspace is located and what is close to it (e.g. hazards in proximity). Fencing and lockable gates may contribute to caregivers\u2019 ease by helping them know their children are in a safe space to play (e.g. for families with younger children or children with disabilities).",
 			instruction: "Read each statement and answer the questions. This playspace...",
 			notes_prompt:
 				"Any comments? Describe one or more recommendations to improve the pathways of this playspaces:",
@@ -2509,36 +2414,39 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_7_2",
@@ -2550,36 +2458,39 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_7_3",
@@ -2591,36 +2502,47 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
-									key: "xx_no",
-									label: "=xx] No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									key: "not_applicable",
+									label: "Not applicable for playspace size/type",
+									addition_value: 0,
+									boost_value: 0,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "no",
+									label: "No",
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_7_4",
@@ -2632,36 +2554,39 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				}
 			]
 		},
@@ -2675,16 +2600,16 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 			questions: [
 				{
 					question_key: "q_8_1",
-					mode: "audit",
-					constructs: ["play_value"],
-					domains: ["Climate Protection & Adaptability"],
+					mode: "both",
+					constructs: ["play_value", "usability"],
+					domains: ["Accommodation with diverse needs"],
 					section_key: "section_8_pathways",
-					prompt: "has primary paths that **provide diverse ride/run/walk experiences** (e.g. straight and winding paths or loops; paths with waves or bumps; paths that go through tunnels or gardens/wooded areas)",
+					prompt: "has primary paths within the playspace that lead directly into each play area / feature that are solid and level surfaced, affording use by all users (including mobility devices)",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
@@ -2713,60 +2638,13 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 							]
 						},
 						{
-							key: "diversity",
-							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no_diversity",
-									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "some_diversity",
-									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "a_lot_of_diversity",
-									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
-						},
-						{
 							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
 							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
 								{
 									key: "no",
-									label: "No",
+									label: "No side by side use",
 									addition_value: 1.0,
 									boost_value: 1.0,
 									allows_follow_up_scales: false,
@@ -2774,7 +2652,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								},
 								{
 									key: "yes_a_pair",
-									label: "Yes - a pair",
+									label: "Yes - 2 users side by side",
 									addition_value: 2.0,
 									boost_value: 2.0,
 									allows_follow_up_scales: false,
@@ -2782,7 +2660,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								},
 								{
 									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
+									label: "Yes - 3+ users side by side",
 									addition_value: 3.0,
 									boost_value: 3.0,
 									allows_follow_up_scales: false,
@@ -2790,180 +2668,23 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_8_2",
 					mode: "audit",
-					constructs: ["usability", "play_value"],
-					domains: ["Accommodation with diverse needs"],
-					section_key: "section_8_pathways",
-					prompt: "has primary paths leading to each play area / feature that are **solid and level surfaced**, affording all users to walk/run/ride on (including mobility devices)",
-					scales: [
-						{
-							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
-							options: [
-								{
-									key: "no",
-									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "some",
-									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: true,
-									is_not_applicable: false
-								},
-								{
-									key: "a_lot",
-									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: true,
-									is_not_applicable: false
-								}
-							]
-						},
-						{
-							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no",
-									label: "No",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_a_pair",
-									label: "Yes - a pair",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
-						}
-					]
-				},
-				{
-					question_key: "q_8_3",
-					mode: "audit",
-					constructs: ["usability", "play_value"],
+					constructs: ["play_value"],
 					domains: ["Climate Protection & Adaptability"],
 					section_key: "section_8_pathways",
-					prompt: "has paths that are **wide enough for at least 2 people** to ride/run/walk side by side",
+					prompt: "has paths within the playspace that provide novel/playful ride/run/walk experiences (e.g. straight and winding paths or loops; paths with waves or bumps; paths that go through tunnels or gardens/wooded areas)",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
-							options: [
-								{
-									key: "no",
-									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "some",
-									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: true,
-									is_not_applicable: false
-								},
-								{
-									key: "a_lot",
-									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: true,
-									is_not_applicable: false
-								}
-							]
-						},
-						{
-							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no",
-									label: "No",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_a_pair",
-									label: "Yes - a pair",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
-						}
-					]
-				},
-				{
-					question_key: "q_8_4",
-					mode: "audit",
-					constructs: ["play_value"],
-					domains: ["Novelty score"],
-					section_key: "section_8_pathways",
-					prompt: "has secondary paths that provide **novel play routes **(e.g. lined up stumps; stepping stones through a garden or creek; play route through a willow tunnel or a play structure; a path mown in tall grass; a tunnel under a hill or berm; sensory-surface path)",
-					scales: [
-						{
-							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
@@ -2994,7 +2715,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
@@ -3032,8 +2753,88 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
+							options: [
+								{
+									key: "no",
+									label: "No side by side use",
+									addition_value: 1.0,
+									boost_value: 1.0,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "yes_a_pair",
+									label: "Yes - 2 users side by side",
+									addition_value: 2.0,
+									boost_value: 2.0,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "yes_more_than_two_children",
+									label: "Yes - 3+ users side by side",
+									addition_value: 3.0,
+									boost_value: 3.0,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								}
+							]
+						}
+					],
+					display_if: {
+						question_key: "q_8_1",
+						response_key: "quantity",
+						any_of_option_keys: ["some", "a_lot"]
+					},
+					question_type: "scaled",
+					options: [],
+					required: false
+				},
+				{
+					question_key: "q_8_3",
+					mode: "audit",
+					constructs: ["play_value"],
+					domains: ["Novelty score"],
+					section_key: "section_8_pathways",
+					prompt: "has secondary paths that provide novel play routes (e.g. lined up stumps; stepping stones through a garden or creek; play route through a willow tunnel or a play structure; a path mown in tall grass; a tunnel under a hill or berm; sensory-surface path)",
+					scales: [
+						{
+							key: "quantity",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
+							options: [
+								{
+									key: "no",
+									label: "No",
+									addition_value: 0.0,
+									boost_value: 0.0,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "some",
+									label: "Some",
+									addition_value: 1.0,
+									boost_value: 1.0,
+									allows_follow_up_scales: true,
+									is_not_applicable: false
+								},
+								{
+									key: "a_lot",
+									label: "A lot",
+									addition_value: 2.0,
+									boost_value: 2.0,
+									allows_follow_up_scales: true,
+									is_not_applicable: false
+								}
+							]
+						},
+						{
+							key: "diversity",
+							title: "Diversity",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
@@ -3044,8 +2845,39 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 									is_not_applicable: true
 								},
 								{
+									key: "no_diversity",
+									label: "No Diversity",
+									addition_value: 1.0,
+									boost_value: 1.0,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "some_diversity",
+									label: "Some Diversity",
+									addition_value: 2.0,
+									boost_value: 2.0,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "a_lot_of_diversity",
+									label: "A lot of Diversity",
+									addition_value: 3.0,
+									boost_value: 3.0,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								}
+							]
+						},
+						{
+							key: "sociability",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
+							options: [
+								{
 									key: "no",
-									label: "No",
+									label: "No side by side use",
 									addition_value: 1.0,
 									boost_value: 1.0,
 									allows_follow_up_scales: false,
@@ -3053,7 +2885,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								},
 								{
 									key: "yes_a_pair",
-									label: "Yes - a pair",
+									label: "Yes - 2 users side by side",
 									addition_value: 2.0,
 									boost_value: 2.0,
 									allows_follow_up_scales: false,
@@ -3061,7 +2893,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								},
 								{
 									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
+									label: "Yes - 3+ users side by side",
 									addition_value: 3.0,
 									boost_value: 3.0,
 									allows_follow_up_scales: false,
@@ -3069,7 +2901,10 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				}
 			]
 		},
@@ -3077,7 +2912,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 			section_key: "section_9_open_space",
 			title: "Open Space",
 			description:
-				"An open space is defined as an integrated area within or surrounding the playsapace with no play features, other built structures and no planting. Open spaces are multipurpose areas and are used flexibly, affording a diversity of opportunities such as running, walking, loose parts play (balls, hula hoops or natural elements and others), sitting or relaxing, picnics, playing in groups, …",
+				"An open space is defined as an integrated area within or surrounding the playsapace with no play features, other built structures and no planting. Open spaces are multipurpose areas and are used flexibly, affording a diversity of opportunities such as running, walking, loose parts play (balls, hula hoops or natural elements and others), sitting or relaxing, picnics, playing in groups, \u2026",
 			instruction: "Read each statement and answer the questions. This playspace...",
 			notes_prompt:
 				"Any comments? Describe one or more recommendations to improve the open spaces of this playspace:",
@@ -3092,30 +2927,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -3123,44 +2958,47 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no",
 									label: "No",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "yes_a_pair",
 									label: "Yes - a pair",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "yes_more_than_two_children",
 									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_9_2",
@@ -3172,30 +3010,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -3203,44 +3041,47 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no",
 									label: "No",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "yes_a_pair",
 									label: "Yes - a pair",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "yes_more_than_two_children",
 									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				}
 			]
 		},
@@ -3263,30 +3104,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -3295,37 +3136,37 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -3333,44 +3174,47 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no",
 									label: "No",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "yes_a_pair",
 									label: "Yes - a pair",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "yes_more_than_two_children",
 									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_10_2",
@@ -3378,34 +3222,34 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					constructs: ["play_value"],
 					domains: ["Enclosed & Bounded Spaces"],
 					section_key: "section_10_enclosed_bounded_spaces",
-					prompt: "has  enclosed or bounded spaces that also **afford the opportunity to look out from and observe** without being overly visible from the outside (e.g. playhouse with small windows; boat feature with portholes; grass hut with small door opening)",
+					prompt: "has\u00a0 enclosed or bounded spaces that also **afford the opportunity to look out from and observe** without being overly visible from the outside (e.g. playhouse with small windows; boat feature with portholes; grass hut with small door opening)",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -3414,37 +3258,37 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -3452,44 +3296,47 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no",
 									label: "No",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "yes_a_pair",
 									label: "Yes - a pair",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "yes_more_than_two_children",
 									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_10_3",
@@ -3501,30 +3348,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -3533,37 +3380,37 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -3571,44 +3418,47 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no",
 									label: "No",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "yes_a_pair",
 									label: "Yes - a pair",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "yes_more_than_two_children",
 									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				}
 			]
 		},
@@ -3631,30 +3481,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -3663,37 +3513,37 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -3701,44 +3551,47 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no",
 									label: "No",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "yes_a_pair",
 									label: "Yes - a pair",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "yes_more_than_two_children",
 									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_11_2",
@@ -3750,30 +3603,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -3782,43 +3635,46 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_11_3",
@@ -3830,30 +3686,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -3862,37 +3718,37 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -3900,44 +3756,47 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no",
 									label: "No",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "yes_a_pair",
 									label: "Yes - a pair",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "yes_more_than_two_children",
 									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				}
 			]
 		},
@@ -3960,30 +3819,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -3992,37 +3851,76 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								}
+							]
+						},
+						{
+							key: "challenge",
+							title: "Challenge Opportunities",
+							prompt: "To what extent does this feature/environmental characteristic provide different levels of challenge?",
+							options: [
+								{
+									key: "not_applicable",
+									label: "Not applicable",
+									addition_value: 0,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: true
+								},
+								{
+									key: "no_challenge",
+									label: "No Challenge",
+									addition_value: 1,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "some_challenge",
+									label: "Some Challenge",
+									addition_value: 2,
+									boost_value: 2,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "a_lot_of_challenge",
+									label: "A lot of Challenge",
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -4030,8 +3928,8 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
 							options: [
 								{
 									key: "not_applicable",
@@ -4051,7 +3949,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								},
 								{
 									key: "yes_a_pair",
-									label: "Yes - a pair",
+									label: "Yes - a pair side by side",
 									addition_value: 2.0,
 									boost_value: 2.0,
 									allows_follow_up_scales: false,
@@ -4059,46 +3957,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								},
 								{
 									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
-						},
-						{
-							key: "challenge",
-							title: "Challenge",
-							prompt: "To what extent does this feature or environmental characteristic provide different levels of challenge?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no_challenge",
-									label: "No Challenge",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "some_challenge",
-									label: "Some Challenge",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "a_lot_of_challenge",
-									label: "A lot of Challenge",
+									label: "Yes - more than 2 users side by side",
 									addition_value: 3.0,
 									boost_value: 3.0,
 									allows_follow_up_scales: false,
@@ -4106,7 +3965,10 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_12_2",
@@ -4114,34 +3976,34 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					constructs: ["play_value"],
 					domains: ["Manufactured Play Features"],
 					section_key: "section_12_manufactured_play_features",
-					prompt: "has manufactured play features which afford **sliding** opportunities (e.g. open slide, enclosed slide,  pipe slide, fire pole, zip wire, roller slide,...)",
+					prompt: "has manufactured play features which afford **sliding** opportunities (e.g. open slide, enclosed slide,\u00a0 pipe slide, fire pole, zip wire, roller slide,...)",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -4150,37 +4012,76 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								}
+							]
+						},
+						{
+							key: "challenge",
+							title: "Challenge Opportunities",
+							prompt: "To what extent does this feature/environmental characteristic provide different levels of challenge?",
+							options: [
+								{
+									key: "not_applicable",
+									label: "Not applicable",
+									addition_value: 0,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: true
+								},
+								{
+									key: "no_challenge",
+									label: "No Challenge",
+									addition_value: 1,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "some_challenge",
+									label: "Some Challenge",
+									addition_value: 2,
+									boost_value: 2,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "a_lot_of_challenge",
+									label: "A lot of Challenge",
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -4188,8 +4089,8 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
 							options: [
 								{
 									key: "not_applicable",
@@ -4209,7 +4110,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								},
 								{
 									key: "yes_a_pair",
-									label: "Yes - a pair",
+									label: "Yes - a pair side by side",
 									addition_value: 2.0,
 									boost_value: 2.0,
 									allows_follow_up_scales: false,
@@ -4217,46 +4118,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								},
 								{
 									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
-						},
-						{
-							key: "challenge",
-							title: "Challenge",
-							prompt: "To what extent does this feature or environmental characteristic provide different levels of challenge?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no_challenge",
-									label: "No Challenge",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "some_challenge",
-									label: "Some Challenge",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "a_lot_of_challenge",
-									label: "A lot of Challenge",
+									label: "Yes - more than 2 users side by side",
 									addition_value: 3.0,
 									boost_value: 3.0,
 									allows_follow_up_scales: false,
@@ -4264,7 +4126,10 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_12_3",
@@ -4272,34 +4137,34 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					constructs: ["play_value"],
 					domains: ["Manufactured Play Features"],
 					section_key: "section_12_manufactured_play_features",
-					prompt: "has manufactured play features which afford **climbing, dangling, and/or pulling one's self up**  (e.g. gymnastic rings; pull up bar; rock wall; climbing frame; ladder)",
+					prompt: "has manufactured play features which afford **climbing, dangling, and/or pulling one's self up**\u00a0 (e.g. gymnastic rings; pull up bar; rock wall; climbing frame; ladder)",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -4308,37 +4173,76 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								}
+							]
+						},
+						{
+							key: "challenge",
+							title: "Challenge Opportunities",
+							prompt: "To what extent does this feature/environmental characteristic provide different levels of challenge?",
+							options: [
+								{
+									key: "not_applicable",
+									label: "Not applicable",
+									addition_value: 0,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: true
+								},
+								{
+									key: "no_challenge",
+									label: "No Challenge",
+									addition_value: 1,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "some_challenge",
+									label: "Some Challenge",
+									addition_value: 2,
+									boost_value: 2,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "a_lot_of_challenge",
+									label: "A lot of Challenge",
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -4346,8 +4250,8 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
 							options: [
 								{
 									key: "not_applicable",
@@ -4367,7 +4271,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								},
 								{
 									key: "yes_a_pair",
-									label: "Yes - a pair",
+									label: "Yes - a pair side by side",
 									addition_value: 2.0,
 									boost_value: 2.0,
 									allows_follow_up_scales: false,
@@ -4375,46 +4279,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								},
 								{
 									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
-						},
-						{
-							key: "challenge",
-							title: "Challenge",
-							prompt: "To what extent does this feature or environmental characteristic provide different levels of challenge?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no_challenge",
-									label: "No Challenge",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "some_challenge",
-									label: "Some Challenge",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "a_lot_of_challenge",
-									label: "A lot of Challenge",
+									label: "Yes - more than 2 users side by side",
 									addition_value: 3.0,
 									boost_value: 3.0,
 									allows_follow_up_scales: false,
@@ -4422,7 +4287,10 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_12_4",
@@ -4434,30 +4302,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -4466,37 +4334,76 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								}
+							]
+						},
+						{
+							key: "challenge",
+							title: "Challenge Opportunities",
+							prompt: "To what extent does this feature/environmental characteristic provide different levels of challenge?",
+							options: [
+								{
+									key: "not_applicable",
+									label: "Not applicable",
+									addition_value: 0,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: true
+								},
+								{
+									key: "no_challenge",
+									label: "No Challenge",
+									addition_value: 1,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "some_challenge",
+									label: "Some Challenge",
+									addition_value: 2,
+									boost_value: 2,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "a_lot_of_challenge",
+									label: "A lot of Challenge",
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -4504,8 +4411,8 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
 							options: [
 								{
 									key: "not_applicable",
@@ -4525,7 +4432,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								},
 								{
 									key: "yes_a_pair",
-									label: "Yes - a pair",
+									label: "Yes - a pair side by side",
 									addition_value: 2.0,
 									boost_value: 2.0,
 									allows_follow_up_scales: false,
@@ -4533,46 +4440,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								},
 								{
 									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
-						},
-						{
-							key: "challenge",
-							title: "Challenge",
-							prompt: "To what extent does this feature or environmental characteristic provide different levels of challenge?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no_challenge",
-									label: "No Challenge",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "some_challenge",
-									label: "Some Challenge",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "a_lot_of_challenge",
-									label: "A lot of Challenge",
+									label: "Yes - more than 2 users side by side",
 									addition_value: 3.0,
 									boost_value: 3.0,
 									allows_follow_up_scales: false,
@@ -4580,7 +4448,10 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_12_5",
@@ -4588,34 +4459,34 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					constructs: ["play_value"],
 					domains: ["Manufactured Play Features"],
 					section_key: "section_12_manufactured_play_features",
-					prompt: "has manufactured play features which afford **balancing  **on or across (e.g. balance beam or logs; wobble board; shaky bridges; balancing ropes; narrow platforms)",
+					prompt: "has manufactured play features which afford **balancing\u00a0 **on or across (e.g. balance beam or logs; wobble board; shaky bridges; balancing ropes; narrow platforms)",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -4624,37 +4495,76 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								}
+							]
+						},
+						{
+							key: "challenge",
+							title: "Challenge Opportunities",
+							prompt: "To what extent does this feature/environmental characteristic provide different levels of challenge?",
+							options: [
+								{
+									key: "not_applicable",
+									label: "Not applicable",
+									addition_value: 0,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: true
+								},
+								{
+									key: "no_challenge",
+									label: "No Challenge",
+									addition_value: 1,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "some_challenge",
+									label: "Some Challenge",
+									addition_value: 2,
+									boost_value: 2,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "a_lot_of_challenge",
+									label: "A lot of Challenge",
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -4662,8 +4572,8 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
 							options: [
 								{
 									key: "not_applicable",
@@ -4683,7 +4593,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								},
 								{
 									key: "yes_a_pair",
-									label: "Yes - a pair",
+									label: "Yes - a pair side by side",
 									addition_value: 2.0,
 									boost_value: 2.0,
 									allows_follow_up_scales: false,
@@ -4691,46 +4601,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								},
 								{
 									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
-						},
-						{
-							key: "challenge",
-							title: "Challenge",
-							prompt: "To what extent does this feature or environmental characteristic provide different levels of challenge?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no_challenge",
-									label: "No Challenge",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "some_challenge",
-									label: "Some Challenge",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "a_lot_of_challenge",
-									label: "A lot of Challenge",
+									label: "Yes - more than 2 users side by side",
 									addition_value: 3.0,
 									boost_value: 3.0,
 									allows_follow_up_scales: false,
@@ -4738,7 +4609,10 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_12_6",
@@ -4750,30 +4624,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -4782,37 +4656,76 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								}
+							]
+						},
+						{
+							key: "challenge",
+							title: "Challenge Opportunities",
+							prompt: "To what extent does this feature/environmental characteristic provide different levels of challenge?",
+							options: [
+								{
+									key: "not_applicable",
+									label: "Not applicable",
+									addition_value: 0,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: true
+								},
+								{
+									key: "no_challenge",
+									label: "No Challenge",
+									addition_value: 1,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "some_challenge",
+									label: "Some Challenge",
+									addition_value: 2,
+									boost_value: 2,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "a_lot_of_challenge",
+									label: "A lot of Challenge",
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -4820,8 +4733,8 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
 							options: [
 								{
 									key: "not_applicable",
@@ -4841,7 +4754,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								},
 								{
 									key: "yes_a_pair",
-									label: "Yes - a pair",
+									label: "Yes - a pair side by side",
 									addition_value: 2.0,
 									boost_value: 2.0,
 									allows_follow_up_scales: false,
@@ -4849,46 +4762,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								},
 								{
 									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
-						},
-						{
-							key: "challenge",
-							title: "Challenge",
-							prompt: "To what extent does this feature or environmental characteristic provide different levels of challenge?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no_challenge",
-									label: "No Challenge",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "some_challenge",
-									label: "Some Challenge",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "a_lot_of_challenge",
-									label: "A lot of Challenge",
+									label: "Yes - more than 2 users side by side",
 									addition_value: 3.0,
 									boost_value: 3.0,
 									allows_follow_up_scales: false,
@@ -4896,7 +4770,10 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_12_7",
@@ -4904,34 +4781,34 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					constructs: ["play_value"],
 					domains: ["Manufactured Play Features"],
 					section_key: "section_12_manufactured_play_features",
-					prompt: "has manufactured play features which afford **crawling **in, on or through  (e.g. crawling net; tunnel)",
+					prompt: "has manufactured play features which afford **crawling **in, on or through\u00a0 (e.g. crawling net; tunnel)",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -4940,37 +4817,76 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								}
+							]
+						},
+						{
+							key: "challenge",
+							title: "Challenge Opportunities",
+							prompt: "To what extent does this feature/environmental characteristic provide different levels of challenge?",
+							options: [
+								{
+									key: "not_applicable",
+									label: "Not applicable",
+									addition_value: 0,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: true
+								},
+								{
+									key: "no_challenge",
+									label: "No Challenge",
+									addition_value: 1,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "some_challenge",
+									label: "Some Challenge",
+									addition_value: 2,
+									boost_value: 2,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "a_lot_of_challenge",
+									label: "A lot of Challenge",
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -4978,8 +4894,8 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
 							options: [
 								{
 									key: "not_applicable",
@@ -4999,7 +4915,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								},
 								{
 									key: "yes_a_pair",
-									label: "Yes - a pair",
+									label: "Yes - a pair side by side",
 									addition_value: 2.0,
 									boost_value: 2.0,
 									allows_follow_up_scales: false,
@@ -5007,46 +4923,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								},
 								{
 									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
-						},
-						{
-							key: "challenge",
-							title: "Challenge",
-							prompt: "To what extent does this feature or environmental characteristic provide different levels of challenge?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no_challenge",
-									label: "No Challenge",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "some_challenge",
-									label: "Some Challenge",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "a_lot_of_challenge",
-									label: "A lot of Challenge",
+									label: "Yes - more than 2 users side by side",
 									addition_value: 3.0,
 									boost_value: 3.0,
 									allows_follow_up_scales: false,
@@ -5054,7 +4931,10 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_12_8",
@@ -5066,30 +4946,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -5098,37 +4978,76 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								}
+							]
+						},
+						{
+							key: "challenge",
+							title: "Challenge Opportunities",
+							prompt: "To what extent does this feature/environmental characteristic provide different levels of challenge?",
+							options: [
+								{
+									key: "not_applicable",
+									label: "Not applicable",
+									addition_value: 0,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: true
+								},
+								{
+									key: "no_challenge",
+									label: "No Challenge",
+									addition_value: 1,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "some_challenge",
+									label: "Some Challenge",
+									addition_value: 2,
+									boost_value: 2,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "a_lot_of_challenge",
+									label: "A lot of Challenge",
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -5136,8 +5055,8 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
 							options: [
 								{
 									key: "not_applicable",
@@ -5157,7 +5076,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								},
 								{
 									key: "yes_a_pair",
-									label: "Yes - a pair",
+									label: "Yes - a pair side by side",
 									addition_value: 2.0,
 									boost_value: 2.0,
 									allows_follow_up_scales: false,
@@ -5165,46 +5084,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								},
 								{
 									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
-						},
-						{
-							key: "challenge",
-							title: "Challenge",
-							prompt: "To what extent does this feature or environmental characteristic provide different levels of challenge?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no_challenge",
-									label: "No Challenge",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "some_challenge",
-									label: "Some Challenge",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "a_lot_of_challenge",
-									label: "A lot of Challenge",
+									label: "Yes - more than 2 users side by side",
 									addition_value: 3.0,
 									boost_value: 3.0,
 									allows_follow_up_scales: false,
@@ -5212,7 +5092,10 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_12_9",
@@ -5220,34 +5103,34 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					constructs: ["play_value"],
 					domains: ["Manufactured Play Features"],
 					section_key: "section_12_manufactured_play_features",
-					prompt: "has manufactured play features which afford ** manipulation by pushing, sliding, turning, opening and/or closing things** (e.g steering wheel; operable windows or doors; play panel; pump; pulley; musical/sound equipment)",
+					prompt: "has manufactured play features which afford\u00a0** manipulation by pushing, sliding, turning, opening and/or closing things** (e.g steering wheel; operable windows or doors; play panel; pump; pulley; musical/sound equipment)",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -5256,37 +5139,76 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								}
+							]
+						},
+						{
+							key: "challenge",
+							title: "Challenge Opportunities",
+							prompt: "To what extent does this feature/environmental characteristic provide different levels of challenge?",
+							options: [
+								{
+									key: "not_applicable",
+									label: "Not applicable",
+									addition_value: 0,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: true
+								},
+								{
+									key: "no_challenge",
+									label: "No Challenge",
+									addition_value: 1,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "some_challenge",
+									label: "Some Challenge",
+									addition_value: 2,
+									boost_value: 2,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "a_lot_of_challenge",
+									label: "A lot of Challenge",
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -5294,8 +5216,8 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
 							options: [
 								{
 									key: "not_applicable",
@@ -5315,7 +5237,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								},
 								{
 									key: "yes_a_pair",
-									label: "Yes - a pair",
+									label: "Yes - a pair side by side",
 									addition_value: 2.0,
 									boost_value: 2.0,
 									allows_follow_up_scales: false,
@@ -5323,46 +5245,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								},
 								{
 									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
-						},
-						{
-							key: "challenge",
-							title: "Challenge",
-							prompt: "To what extent does this feature or environmental characteristic provide different levels of challenge?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no_challenge",
-									label: "No Challenge",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "some_challenge",
-									label: "Some Challenge",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "a_lot_of_challenge",
-									label: "A lot of Challenge",
+									label: "Yes - more than 2 users side by side",
 									addition_value: 3.0,
 									boost_value: 3.0,
 									allows_follow_up_scales: false,
@@ -5370,7 +5253,10 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_12_11",
@@ -5382,30 +5268,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -5414,37 +5300,76 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								}
+							]
+						},
+						{
+							key: "challenge",
+							title: "Challenge Opportunities",
+							prompt: "To what extent does this feature/environmental characteristic provide different levels of challenge?",
+							options: [
+								{
+									key: "not_applicable",
+									label: "Not applicable",
+									addition_value: 0,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: true
+								},
+								{
+									key: "no_challenge",
+									label: "No Challenge",
+									addition_value: 1,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "some_challenge",
+									label: "Some Challenge",
+									addition_value: 2,
+									boost_value: 2,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "a_lot_of_challenge",
+									label: "A lot of Challenge",
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -5452,8 +5377,8 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
 							options: [
 								{
 									key: "not_applicable",
@@ -5473,7 +5398,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								},
 								{
 									key: "yes_a_pair",
-									label: "Yes - a pair",
+									label: "Yes - a pair side by side",
 									addition_value: 2.0,
 									boost_value: 2.0,
 									allows_follow_up_scales: false,
@@ -5481,46 +5406,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								},
 								{
 									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
-						},
-						{
-							key: "challenge",
-							title: "Challenge",
-							prompt: "To what extent does this feature or environmental characteristic provide different levels of challenge?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no_challenge",
-									label: "No Challenge",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "some_challenge",
-									label: "Some Challenge",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "a_lot_of_challenge",
-									label: "A lot of Challenge",
+									label: "Yes - more than 2 users side by side",
 									addition_value: 3.0,
 									boost_value: 3.0,
 									allows_follow_up_scales: false,
@@ -5528,7 +5414,10 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_12_12",
@@ -5540,30 +5429,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -5572,37 +5461,76 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								}
+							]
+						},
+						{
+							key: "challenge",
+							title: "Challenge Opportunities",
+							prompt: "To what extent does this feature/environmental characteristic provide different levels of challenge?",
+							options: [
+								{
+									key: "not_applicable",
+									label: "Not applicable",
+									addition_value: 0,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: true
+								},
+								{
+									key: "no_challenge",
+									label: "No Challenge",
+									addition_value: 1,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "some_challenge",
+									label: "Some Challenge",
+									addition_value: 2,
+									boost_value: 2,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "a_lot_of_challenge",
+									label: "A lot of Challenge",
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -5610,8 +5538,8 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
 							options: [
 								{
 									key: "not_applicable",
@@ -5631,7 +5559,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								},
 								{
 									key: "yes_a_pair",
-									label: "Yes - a pair",
+									label: "Yes - a pair side by side",
 									addition_value: 2.0,
 									boost_value: 2.0,
 									allows_follow_up_scales: false,
@@ -5639,46 +5567,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								},
 								{
 									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
-						},
-						{
-							key: "challenge",
-							title: "Challenge",
-							prompt: "To what extent does this feature or environmental characteristic provide different levels of challenge?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no_challenge",
-									label: "No Challenge",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "some_challenge",
-									label: "Some Challenge",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "a_lot_of_challenge",
-									label: "A lot of Challenge",
+									label: "Yes - more than 2 users side by side",
 									addition_value: 3.0,
 									boost_value: 3.0,
 									allows_follow_up_scales: false,
@@ -5686,7 +5575,10 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				}
 			]
 		},
@@ -5696,7 +5588,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 			description:
 				"Natural Play Features can either be located in the playspace or surrounding the playspace. Natural environments include vegetation, shrubs, high grass, areas with trees, bushes, boulders, and rocks. Natural features afford a variety of play opportunities, including physical active play (e.g.,, climbing), exploring, sensory play, manipulating, and creating their own play (e.g.,, socio-dramatic play or imagination), resting, being alone, or gathering with other children.",
 			instruction:
-				"Important: Your r audit focuses on the natural play features provided and ment for play. Not the features to make the space look natural (e.g. trees that only are for shade but not climbing). Read each statement and answer the questions. This playspace...",
+				"Important: Your audit focuses on the natural play features provided and meant for play, NOT the features that are not accessible for play (e.g. trees that provide shade but are not accessible for climbing, sitting under, etc.). Read each statement and answer the questions. This playspace...",
 			notes_prompt:
 				"Any comments? Describe one or more recommendations to improve the natural play featuers of this playspace:",
 			questions: [
@@ -5710,30 +5602,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -5742,37 +5634,37 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -5780,44 +5672,47 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "challenge",
-							title: "Challenge",
-							prompt: "To what extent does this feature or environmental characteristic provide different levels of challenge?",
+							title: "Challenge Opportunities",
+							prompt: "To what extent does this feature/environmental characteristic provide different levels of challenge?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_challenge",
 									label: "No Challenge",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_challenge",
 									label: "Some Challenge",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_challenge",
 									label: "A lot of Challenge",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_13_2",
@@ -5829,30 +5724,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -5861,37 +5756,37 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -5899,44 +5794,47 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "challenge",
-							title: "Challenge",
-							prompt: "To what extent does this feature or environmental characteristic provide different levels of challenge?",
+							title: "Challenge Opportunities",
+							prompt: "To what extent does this feature/environmental characteristic provide different levels of challenge?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_challenge",
 									label: "No Challenge",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_challenge",
 									label: "Some Challenge",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_challenge",
 									label: "A lot of Challenge",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_13_3",
@@ -5948,30 +5846,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -5980,76 +5878,37 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
-						},
-						{
-							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no",
-									label: "No",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_a_pair",
-									label: "Yes - a pair",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -6057,44 +5916,86 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "challenge",
-							title: "Challenge",
-							prompt: "To what extent does this feature or environmental characteristic provide different levels of challenge?",
+							title: "Challenge Opportunities",
+							prompt: "To what extent does this feature/environmental characteristic provide different levels of challenge?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_challenge",
 									label: "No Challenge",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_challenge",
 									label: "Some Challenge",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_challenge",
 									label: "A lot of Challenge",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								}
+							]
+						},
+						{
+							key: "sociability",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
+							options: [
+								{
+									key: "not_applicable",
+									label: "Not applicable",
+									addition_value: 0,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: true
+								},
+								{
+									key: "no",
+									label: "No",
+									addition_value: 1,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "yes_a_pair",
+									label: "Yes - a pair",
+									addition_value: 2,
+									boost_value: 2,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "yes_more_than_two_children",
+									label: "Yes - more than two children",
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_13_4",
@@ -6106,30 +6007,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -6138,76 +6039,37 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
-						},
-						{
-							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no",
-									label: "No",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_a_pair",
-									label: "Yes - a pair",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -6215,44 +6077,86 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "challenge",
-							title: "Challenge",
-							prompt: "To what extent does this feature or environmental characteristic provide different levels of challenge?",
+							title: "Challenge Opportunities",
+							prompt: "To what extent does this feature/environmental characteristic provide different levels of challenge?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_challenge",
 									label: "No Challenge",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_challenge",
 									label: "Some Challenge",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_challenge",
 									label: "A lot of Challenge",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								}
+							]
+						},
+						{
+							key: "sociability",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
+							options: [
+								{
+									key: "not_applicable",
+									label: "Not applicable",
+									addition_value: 0,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: true
+								},
+								{
+									key: "no",
+									label: "No",
+									addition_value: 1,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "yes_a_pair",
+									label: "Yes - a pair",
+									addition_value: 2,
+									boost_value: 2,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "yes_more_than_two_children",
+									label: "Yes - more than two children",
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				}
 			]
 		},
@@ -6275,30 +6179,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -6307,43 +6211,134 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
+				},
+				{
+					question_key: "q_14_1_1",
+					mode: "audit",
+					constructs: [],
+					domains: ["Loose Manufactured Parts & Equipment"],
+					section_key: "section_14_loose_manufactured_parts_equipment",
+					prompt: "Check all small manufactured loose parts in this playspace",
+					question_type: "checklist",
+					required: false,
+					display_if: {
+						question_key: "q_14_1",
+						response_key: "quantity",
+						any_of_option_keys: ["some", "a_lot"]
+					},
+					options: [
+						{
+							key: "cups",
+							label: "Cups",
+							description: null
+						},
+						{
+							key: "buckets",
+							label: "Buckets",
+							description: null
+						},
+						{
+							key: "shovels",
+							label: "Shovels",
+							description: null
+						},
+						{
+							key: "small_tools",
+							label: "Small tools",
+							description: null
+						},
+						{
+							key: "funnels",
+							label: "Funnels",
+							description: null
+						},
+						{
+							key: "balls",
+							label: "Balls",
+							description: null
+						},
+						{
+							key: "light_ropes",
+							label: "Light ropes",
+							description: null
+						},
+						{
+							key: "fabrics",
+							label: "Fabrics",
+							description: null
+						},
+						{
+							key: "frisbees",
+							label: "Frisbees",
+							description: null
+						},
+						{
+							key: "hula_hoops",
+							label: "Hula hoops",
+							description: null
+						},
+						{
+							key: "rackets",
+							label: "Rackets",
+							description: null
+						},
+						{
+							key: "toy_cars_boats",
+							label: "Toy cars/boats",
+							description: null
+						},
+						{
+							key: "puppets",
+							label: "Puppets",
+							description: null
+						},
+						{
+							key: "other",
+							label: "Other, please describe",
+							description: null
+						}
+					],
+					scales: []
 				},
 				{
 					question_key: "q_14_2",
@@ -6355,30 +6350,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -6387,43 +6382,114 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
+				},
+				{
+					question_key: "q_14_2_1",
+					mode: "audit",
+					constructs: [],
+					domains: ["Loose Manufactured Parts & Equipment"],
+					section_key: "section_14_loose_manufactured_parts_equipment",
+					prompt: "Check all medium-sized manufactured loose parts in this playspace",
+					question_type: "checklist",
+					required: false,
+					display_if: {
+						question_key: "q_14_2",
+						response_key: "quantity",
+						any_of_option_keys: ["some", "a_lot"]
+					},
+					options: [
+						{
+							key: "boxes",
+							label: "Boxes",
+							description: null
+						},
+						{
+							key: "crates",
+							label: "Crates",
+							description: null
+						},
+						{
+							key: "construction_cones",
+							label: "Construction cones",
+							description: null
+						},
+						{
+							key: "pots_and_pans",
+							label: "Pots and pans",
+							description: null
+						},
+						{
+							key: "plastic_tubes_pvc_pipes",
+							label: "Plastic tubes/PVC pipes",
+							description: null
+						},
+						{
+							key: "larger_building_blocks",
+							label: "Larger building blocks",
+							description: null
+						},
+						{
+							key: "tools",
+							label: "Tools",
+							description: null
+						},
+						{
+							key: "larger_shovels_rakes",
+							label: "Larger shovels/rakes",
+							description: null
+						},
+						{
+							key: "heavy_ropes",
+							label: "Heavy ropes",
+							description: null
+						},
+						{
+							key: "other",
+							label: "Other, please describe",
+							description: null
+						}
+					],
+					scales: []
 				},
 				{
 					question_key: "q_14_3",
@@ -6435,8 +6501,8 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
@@ -6467,7 +6533,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
@@ -6504,48 +6570,9 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 							]
 						},
 						{
-							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no",
-									label: "No",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_a_pair",
-									label: "Yes - a pair",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
-						},
-						{
 							key: "challenge",
-							title: "Challenge",
-							prompt: "To what extent does this feature or environmental characteristic provide different levels of challenge?",
+							title: "Challenge Opportunities",
+							prompt: "To what extent does this feature/environmental characteristic provide different levels of challenge?",
 							options: [
 								{
 									key: "not_applicable",
@@ -6581,7 +6608,58 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
+				},
+				{
+					question_key: "q_14_3_1",
+					mode: "audit",
+					constructs: [],
+					domains: ["Loose Manufactured Parts & Equipment"],
+					section_key: "section_14_loose_manufactured_parts_equipment",
+					prompt: "Check all large manufactured loose parts in this playspace",
+					question_type: "checklist",
+					required: false,
+					display_if: {
+						question_key: "q_14_3",
+						response_key: "quantity",
+						any_of_option_keys: ["some", "a_lot"]
+					},
+					options: [
+						{
+							key: "tires",
+							label: "Tires",
+							description: null
+						},
+						{
+							key: "tree_stumps",
+							label: "Tree stumps",
+							description: null
+						},
+						{
+							key: "large_blocks_or_planks",
+							label: "Large blocks or planks",
+							description: null
+						},
+						{
+							key: "tables_or_chairs",
+							label: "Tables or chairs",
+							description: null
+						},
+						{
+							key: "movable_climbers",
+							label: "Movable climbers",
+							description: null
+						},
+						{
+							key: "other",
+							label: "Other, please describe",
+							description: null
+						}
+					],
+					scales: []
 				},
 				{
 					question_key: "q_14_4",
@@ -6593,8 +6671,8 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
@@ -6625,7 +6703,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
@@ -6662,48 +6740,9 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 							]
 						},
 						{
-							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no",
-									label: "No",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_a_pair",
-									label: "Yes - a pair",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
-						},
-						{
 							key: "challenge",
-							title: "Challenge",
-							prompt: "To what extent does this feature or environmental characteristic provide different levels of challenge?",
+							title: "Challenge Opportunities",
+							prompt: "To what extent does this feature/environmental characteristic provide different levels of challenge?",
 							options: [
 								{
 									key: "not_applicable",
@@ -6738,8 +6777,95 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 									is_not_applicable: false
 								}
 							]
+						},
+						{
+							key: "sociability",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
+							options: [
+								{
+									key: "no",
+									label: "No - for 1 user only",
+									addition_value: 1.0,
+									boost_value: 1.0,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "yes_a_pair",
+									label: "Yes - for 2 users only",
+									addition_value: 2.0,
+									boost_value: 2.0,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "yes_more_than_two_children",
+									label: "Yes - for 3+ users",
+									addition_value: 3.0,
+									boost_value: 3.0,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								}
+							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
+				},
+				{
+					question_key: "q_14_4_1",
+					mode: "audit",
+					constructs: [],
+					domains: ["Loose Manufactured Parts & Equipment"],
+					section_key: "section_14_loose_manufactured_parts_equipment",
+					prompt: "Check all (wheeled) ride-on equipment in this playspace",
+					question_type: "checklist",
+					required: false,
+					display_if: {
+						question_key: "q_14_4",
+						response_key: "quantity",
+						any_of_option_keys: ["some", "a_lot"]
+					},
+					options: [
+						{
+							key: "scooters",
+							label: "Scooters",
+							description: null
+						},
+						{
+							key: "bicycles_or_tricycles",
+							label: "Bicycles or tricycles",
+							description: null
+						},
+						{
+							key: "buggies",
+							label: "Buggies",
+							description: null
+						},
+						{
+							key: "skateboards",
+							label: "Skateboards",
+							description: null
+						},
+						{
+							key: "sled_toboggan",
+							label: "Sled/toboggan",
+							description: null
+						},
+						{
+							key: "bikes_balance_bikes",
+							label: "Bikes/balance bikes",
+							description: null
+						},
+						{
+							key: "other",
+							label: "Other, please describe",
+							description: null
+						}
+					],
+					scales: []
 				}
 			]
 		},
@@ -6747,7 +6873,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 			section_key: "section_15_loose_natural_parts_malleable_materials",
 			title: "Loose Natural Parts & Malleable Materials",
 			description:
-				"Loose Natural Parts & Malleable Materials include materials like earth, mud, sand, water or any natural parts like leaves, flowers, sticks, stones, cones, and others. Natural loose parts afford children to collect, arrange, create, built, dig, mix, explore, and are used them in socio-dramatic and creative play. Materials afford sensory opportunities and to mixing, digging, transporting, filling and emptying, building, …",
+				"Loose Natural Parts & Malleable Materials include materials like earth, mud, sand, water or any natural parts like leaves, flowers, sticks, stones, cones, and others. Natural loose parts afford children to collect, arrange, create, built, dig, mix, explore, and are used them in socio-dramatic and creative play. Materials afford sensory opportunities and to mixing, digging, transporting, filling and emptying, building, \u2026",
 			instruction: "Read each statement and answer the questions. This playspace...",
 			notes_prompt:
 				"Any comments? Describe one or more recommendations to improve the loose natrual parts and malleable materials of this playspace:",
@@ -6758,34 +6884,34 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					constructs: ["play_value"],
 					domains: ["Loose Natural Parts & Malleable Materials"],
 					section_key: "section_15_loose_natural_parts_malleable_materials",
-					prompt: "has **natural malleable materials availiable **(e.g. sand, gravel/pebbles, mulch, earth, mud, water, snow)",
+					prompt: "has natural malleable materials available (e.g. sand; gravel/pebbles; mulch; earth; mud; water; snow; might be ground surfaces)",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -6794,43 +6920,104 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
+				},
+				{
+					question_key: "q_15_1_1",
+					mode: "audit",
+					constructs: [],
+					domains: ["Loose Natural Parts & Malleable Materials"],
+					section_key: "section_15_loose_natural_parts_malleable_materials",
+					prompt: "Check all natural malleable materials in this playspace",
+					question_type: "checklist",
+					required: false,
+					display_if: {
+						question_key: "q_15_1",
+						response_key: "quantity",
+						any_of_option_keys: ["some", "a_lot"]
+					},
+					options: [
+						{
+							key: "sand",
+							label: "Sand",
+							description: null
+						},
+						{
+							key: "gravel_pebbles",
+							label: "Gravel/pebbles",
+							description: null
+						},
+						{
+							key: "mulch",
+							label: "Mulch",
+							description: null
+						},
+						{
+							key: "earth",
+							label: "Earth",
+							description: null
+						},
+						{
+							key: "mud",
+							label: "Mud",
+							description: null
+						},
+						{
+							key: "water",
+							label: "Water",
+							description: null
+						},
+						{
+							key: "snow",
+							label: "Snow",
+							description: null
+						},
+						{
+							key: "other",
+							label: "Other, please describe",
+							description: null
+						}
+					],
+					scales: []
 				},
 				{
 					question_key: "q_15_2",
@@ -6842,30 +7029,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -6874,43 +7061,46 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_15_3",
@@ -6922,30 +7112,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -6954,43 +7144,119 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
+				},
+				{
+					question_key: "q_15_3_1",
+					mode: "audit",
+					constructs: [],
+					domains: ["Loose Natural Parts & Malleable Materials"],
+					section_key: "section_15_loose_natural_parts_malleable_materials",
+					prompt: "Check all small natural loose parts in this playspace",
+					question_type: "checklist",
+					required: false,
+					display_if: {
+						question_key: "q_15_3",
+						response_key: "quantity",
+						any_of_option_keys: ["some", "a_lot"]
+					},
+					options: [
+						{
+							key: "leaves",
+							label: "Leaves",
+							description: null
+						},
+						{
+							key: "needles",
+							label: "Needles",
+							description: null
+						},
+						{
+							key: "bark_mulch",
+							label: "Bark/mulch",
+							description: null
+						},
+						{
+							key: "pinecones",
+							label: "Pinecones",
+							description: null
+						},
+						{
+							key: "seeds",
+							label: "Seeds",
+							description: null
+						},
+						{
+							key: "sticks_or_small_branches",
+							label: "Sticks or small branches",
+							description: null
+						},
+						{
+							key: "fruits",
+							label: "Fruits",
+							description: null
+						},
+						{
+							key: "shells",
+							label: "Shells",
+							description: null
+						},
+						{
+							key: "flowers",
+							label: "Flowers",
+							description: null
+						},
+						{
+							key: "snowballs",
+							label: "Snowballs",
+							description: null
+						},
+						{
+							key: "other",
+							label: "Other, please describe",
+							description: null
+						}
+					],
+					scales: []
 				},
 				{
 					question_key: "q_15_4",
@@ -7002,30 +7268,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -7034,43 +7300,94 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
+				},
+				{
+					question_key: "q_15_4_1",
+					mode: "audit",
+					constructs: [],
+					domains: ["Loose Natural Parts & Malleable Materials"],
+					section_key: "section_15_loose_natural_parts_malleable_materials",
+					prompt: "Check all medium-sized natural loose parts in this playspace",
+					question_type: "checklist",
+					required: false,
+					display_if: {
+						question_key: "q_15_4",
+						response_key: "quantity",
+						any_of_option_keys: ["some", "a_lot"]
+					},
+					options: [
+						{
+							key: "tree_cookies",
+							label: "Tree cookies",
+							description: null
+						},
+						{
+							key: "palm_sized_rocks",
+							label: "Palm-sized rocks",
+							description: null
+						},
+						{
+							key: "small_stumps",
+							label: "Small stumps",
+							description: null
+						},
+						{
+							key: "larger_branches",
+							label: "Larger branches",
+							description: null
+						},
+						{
+							key: "ice_chunks",
+							label: "Ice chunks",
+							description: null
+						},
+						{
+							key: "other",
+							label: "Other, please describe",
+							description: null
+						}
+					],
+					scales: []
 				},
 				{
 					question_key: "q_15_5",
@@ -7082,8 +7399,8 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
@@ -7114,7 +7431,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
@@ -7151,48 +7468,9 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 							]
 						},
 						{
-							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no",
-									label: "No",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_a_pair",
-									label: "Yes - a pair",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
-						},
-						{
 							key: "challenge",
-							title: "Challenge",
-							prompt: "To what extent does this feature or environmental characteristic provide different levels of challenge?",
+							title: "Challenge Opportunities",
+							prompt: "To what extent does this feature/environmental characteristic provide different levels of challenge?",
 							options: [
 								{
 									key: "not_applicable",
@@ -7228,40 +7506,53 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
-					question_key: "q_15_6",
-					mode: "survey",
-					constructs: ["usability", "play_value"],
-					domains: ["Play Space Rules & Restrictions"],
+					question_key: "q_15_5_1",
+					mode: "audit",
+					constructs: [],
+					domains: ["Loose Natural Parts & Malleable Materials"],
 					section_key: "section_15_loose_natural_parts_malleable_materials",
-					prompt: "children are **allowed to** **use loose parts and/or malleable material together and/o**r **move them from one play zone to another**",
-					scales: [
+					prompt: "Check all large natural loose parts in this playspace",
+					question_type: "checklist",
+					required: false,
+					display_if: {
+						question_key: "q_15_5",
+						response_key: "quantity",
+						any_of_option_keys: ["some", "a_lot"]
+					},
+					options: [
 						{
-							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
-							options: [
-								{
-									key: "no",
-									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes",
-									label: "Yes",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: true,
-									is_not_applicable: false
-								}
-							]
+							key: "wood_logs",
+							label: "Wood logs",
+							description: null
+						},
+						{
+							key: "large_branches",
+							label: "Large branches",
+							description: null
+						},
+						{
+							key: "heavier_rocks",
+							label: "Heavier rocks",
+							description: null
+						},
+						{
+							key: "large_tree_stumps",
+							label: "Large tree stumps",
+							description: null
+						},
+						{
+							key: "other",
+							label: "Other, please describe",
+							description: null
 						}
-					]
+					],
+					scales: []
 				}
 			]
 		},
@@ -7269,8 +7560,9 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 			section_key: "section_16_seating",
 			title: "Seating",
 			description:
-				"Seating is a supporting feature of playgrounds. More formal seating might be used more by adults who want to supervise children. More informal seating might be used by children for resting, sitting, observing others, linger or socialize with peers but also afford evolving of creative and imaginative play (examples of informal seating: platforms, tree logs, stumps, steps, low raised boundaries, rocks, picknick tables, seating in smaller spaces and in nature …)",
-			instruction: "Read each statement and answer the questions. This playspace...",
+				"Seating is a supporting feature of playgrounds. More formal seating might be used more by adults who want to supervise children. More informal seating might be used by children for resting, sitting, observing others, linger or socialize with peers but also afford evolving of creative and imaginative play (examples of informal seating: platforms, tree logs, stumps, steps, low raised boundaries, rocks, picknick tables, seating in smaller spaces and in nature \u2026)",
+			instruction:
+				"Answers about provision and diversity of seating should be considered against what is appropriate or expected for the size and/or type of playspace. Read each statement and answer the questions. This playspace...",
 			notes_prompt: "Any comments? Describe one or more recommendations to improve seating of this playspace:",
 			questions: [
 				{
@@ -7279,12 +7571,12 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					constructs: ["usability", "play_value"],
 					domains: ["Seating"],
 					section_key: "section_16_seating",
-					prompt: "provides opportunities to sit through** formal seating** (e.g. chairs; benches; stools; picnic tables)** and/or informal seating** (e.g. platforms/ledges; tree stumps; tree logs; boulders, low raised walls)",
+					prompt: "has opportunities to sit through formal seating (e.g. chairs; benches; stools; picnic tables)",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
@@ -7315,7 +7607,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
@@ -7350,47 +7642,59 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 									is_not_applicable: false
 								}
 							]
+						}
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
+				},
+				{
+					question_key: "q_16_1_1",
+					mode: "audit",
+					constructs: [],
+					domains: ["Seating"],
+					section_key: "section_16_seating",
+					prompt: "Check the formal seating you identified",
+					question_type: "checklist",
+					required: false,
+					display_if: {
+						question_key: "q_16_1",
+						response_key: "quantity",
+						any_of_option_keys: ["some", "a_lot"]
+					},
+					options: [
+						{
+							key: "chairs",
+							label: "Chairs",
+							description: null
 						},
 						{
-							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no",
-									label: "No",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_a_pair",
-									label: "Yes - a pair",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
+							key: "typical_park_benches",
+							label: "Typical park benches",
+							description: null
+						},
+						{
+							key: "stools",
+							label: "Stools",
+							description: null
+						},
+						{
+							key: "picnic_tables",
+							label: "Picnic tables",
+							description: null
+						},
+						{
+							key: "amphitheater_seating",
+							label: "Amphitheater seating",
+							description: null
+						},
+						{
+							key: "other",
+							label: "Other, please describe",
+							description: null
 						}
-					]
+					],
+					scales: []
 				},
 				{
 					question_key: "q_16_2",
@@ -7398,12 +7702,12 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					constructs: ["usability", "play_value"],
 					domains: ["Seating"],
 					section_key: "section_16_seating",
-					prompt: "seating is available within or **on the edges of primary play areas for easy observation** (by caregivers or other children)",
+					prompt: "has opportunities to sit through informal seating (e.g. platforms/ledges; tree stumps; tree logs; boulders; low raised walls; places to sit or lie down integrated in larger play structures such as hammocks, comfortable nets or tower platforms)",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
@@ -7434,7 +7738,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
@@ -7469,47 +7773,64 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 									is_not_applicable: false
 								}
 							]
+						}
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
+				},
+				{
+					question_key: "q_16_2_1",
+					mode: "audit",
+					constructs: [],
+					domains: ["Seating"],
+					section_key: "section_16_seating",
+					prompt: "Check the informal seating you identified",
+					question_type: "checklist",
+					required: false,
+					display_if: {
+						question_key: "q_16_2",
+						response_key: "quantity",
+						any_of_option_keys: ["some", "a_lot"]
+					},
+					options: [
+						{
+							key: "platforms_ledges",
+							label: "Platforms/ledges",
+							description: null
 						},
 						{
-							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no",
-									label: "No",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_a_pair",
-									label: "Yes - a pair",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
+							key: "tree_stumps",
+							label: "Tree stumps",
+							description: null
+						},
+						{
+							key: "tree_logs",
+							label: "Tree logs",
+							description: null
+						},
+						{
+							key: "boulders",
+							label: "Boulders",
+							description: null
+						},
+						{
+							key: "low_raised_walls",
+							label: "Low raised walls",
+							description: null
+						},
+						{
+							key: "integrated_sit_or_lie_features",
+							label: "Places to sit or lie down integrated in larger play structures such as hammocks, comfortable nets or tower platforms",
+							description: null
+						},
+						{
+							key: "other",
+							label: "Other, please describe",
+							description: null
 						}
-					]
+					],
+					scales: []
 				},
 				{
 					question_key: "q_16_3",
@@ -7517,12 +7838,12 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					constructs: ["usability", "play_value"],
 					domains: ["Seating"],
 					section_key: "section_16_seating",
-					prompt: "seating is **dispersed throughout playspace** (e.g. in small spaces; in natural areas; within play structures or features)",
+					prompt: "has seating available within or on the edges of primary play areas for easy observation (by caregivers or other children)",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
@@ -7549,47 +7870,11 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 									is_not_applicable: false
 								}
 							]
-						},
-						{
-							key: "diversity",
-							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no_diversity",
-									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "some_diversity",
-									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "a_lot_of_diversity",
-									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_16_4",
@@ -7597,12 +7882,12 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					constructs: ["usability", "play_value"],
 					domains: ["Seating"],
 					section_key: "section_16_seating",
-					prompt: "there is seating that provides opportunities to** sit and gather in small and larger groups** (e.g. 2-3 person bench; amphitheater; pavilion; picnic tables)",
+					prompt: "seating is well dispersed throughout the playspace (e.g. in small spaces; in natural areas; within play structures or features)",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
@@ -7614,7 +7899,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								},
 								{
 									key: "some",
-									label: "Some",
+									label: "Somewhat",
 									addition_value: 1.0,
 									boost_value: 1.0,
 									allows_follow_up_scales: true,
@@ -7629,86 +7914,11 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 									is_not_applicable: false
 								}
 							]
-						},
-						{
-							key: "diversity",
-							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no_diversity",
-									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "some_diversity",
-									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "a_lot_of_diversity",
-									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
-						},
-						{
-							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no",
-									label: "No",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_a_pair",
-									label: "Yes - a pair",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_16_5",
@@ -7716,12 +7926,12 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					constructs: ["usability", "play_value"],
 					domains: ["Seating"],
 					section_key: "section_16_seating",
-					prompt: "there is **seating designed to increase social interactions **(e.g., circular arrangement; arranged facing each other in close proximity; picnic table, amphytheater) *need more examples?",
+					prompt: "there is seating that provides opportunities to sit and gather in small and larger groups (e.g. 2-3 person bench; amphitheater; pavilion; picnic tables)",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
@@ -7748,99 +7958,24 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 									is_not_applicable: false
 								}
 							]
-						},
-						{
-							key: "diversity",
-							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no_diversity",
-									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "some_diversity",
-									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "a_lot_of_diversity",
-									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
-						},
-						{
-							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no",
-									label: "No",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_a_pair",
-									label: "Yes - a pair",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_16_6",
 					mode: "audit",
-					constructs: ["usability"],
+					constructs: ["usability", "play_value"],
 					domains: ["Seating"],
 					section_key: "section_16_seating",
-					prompt: "has **accessible tables and/or seating** (e.g. seats with backrests and/or armrests; space under tables for wheelchairs; affords transfer from mobility device to seating; solid surfacing adjacent to other seating for mobility devices/stroller)",
+					prompt: "there is seating designed to increase social interactions (e.g. circular arrangement; arranged facing each other in close proximity; picnic table; amphitheater)",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
@@ -7867,99 +8002,24 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 									is_not_applicable: false
 								}
 							]
-						},
-						{
-							key: "diversity",
-							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no_diversity",
-									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "some_diversity",
-									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "a_lot_of_diversity",
-									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
-						},
-						{
-							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no",
-									label: "No",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_a_pair",
-									label: "Yes - a pair",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_16_7",
 					mode: "audit",
-					constructs: ["play_value"],
+					constructs: ["usability"],
 					domains: ["Seating"],
 					section_key: "section_16_seating",
-					prompt: "there are **manufactured play features which afford laying or sitting on** (e.g. comfortable net; hammock; integrated seating in structure; platforms)",
+					prompt: "has accessible tables and/or seating (e.g. seats with backrests and armrests; space under tables for wheelchairs; affords transfer from mobility device to seating; solid surfacing adjacent to other seating for mobility devices/stroller)",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
@@ -7986,86 +8046,11 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 									is_not_applicable: false
 								}
 							]
-						},
-						{
-							key: "diversity",
-							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no_diversity",
-									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "some_diversity",
-									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "a_lot_of_diversity",
-									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
-						},
-						{
-							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no",
-									label: "No",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_a_pair",
-									label: "Yes - a pair",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				}
 			]
 		},
@@ -8088,36 +8073,47 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
-									key: "xx_no",
-									label: "=xx] No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									key: "not_applicable",
+									label: "Not applicable for playspace size/type",
+									addition_value: 0,
+									boost_value: 0,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "no",
+									label: "No",
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_17_2",
@@ -8129,36 +8125,47 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
-									key: "xx_no",
-									label: "=xx] No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									key: "not_applicable",
+									label: "Not applicable for playspace size/type",
+									addition_value: 0,
+									boost_value: 0,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "no",
+									label: "No",
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_17_3",
@@ -8170,36 +8177,47 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
-									key: "xx_no",
-									label: "=xx] No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									key: "not_applicable",
+									label: "Not applicable for playspace size/type",
+									addition_value: 0,
+									boost_value: 0,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "no",
+									label: "No",
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				}
 			]
 		},
@@ -8207,7 +8225,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 			section_key: "section_18_topography_surfaces",
 			title: "Topography & Surfaces",
 			description:
-				"Topography & Surfaces are identified as hills, slopes, depressions, and steps in the terrain. They affords a variety of play such as running, rolling down, rolling things down, driving, climbing, balancing, sledding, sliding, enjoyment of an outlook and experience hights, jumping/diving/rolling in/over puddles, …)",
+				"Topography & Surfaces are identified as hills, slopes, depressions, and steps in the terrain. They affords a variety of play such as running, rolling down, rolling things down, driving, climbing, balancing, sledding, sliding, enjoyment of an outlook and experience hights, jumping/diving/rolling in/over puddles, \u2026)",
 			instruction: "Read each statement and answer the questions. This playspace...",
 			notes_prompt:
 				"Any comments? Describe one or more recommendations to improve this playspace's topography and surfaces:",
@@ -8222,30 +8240,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -8254,37 +8272,37 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -8292,44 +8310,47 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "challenge",
-							title: "Challenge",
-							prompt: "To what extent does this feature or environmental characteristic provide different levels of challenge?",
+							title: "Challenge Opportunities",
+							prompt: "To what extent does this feature/environmental characteristic provide different levels of challenge?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_challenge",
 									label: "No Challenge",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_challenge",
 									label: "Some Challenge",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_challenge",
 									label: "A lot of Challenge",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_18_2",
@@ -8341,30 +8362,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -8373,43 +8394,46 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_18_3",
@@ -8421,30 +8445,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -8453,37 +8477,37 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -8491,44 +8515,47 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "challenge",
-							title: "Challenge",
-							prompt: "To what extent does this feature or environmental characteristic provide different levels of challenge?",
+							title: "Challenge Opportunities",
+							prompt: "To what extent does this feature/environmental characteristic provide different levels of challenge?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_challenge",
 									label: "No Challenge",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_challenge",
 									label: "Some Challenge",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_challenge",
 									label: "A lot of Challenge",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_18_4",
@@ -8540,30 +8567,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -8572,37 +8599,37 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -8610,44 +8637,47 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "challenge",
-							title: "Challenge",
-							prompt: "To what extent does this feature or environmental characteristic provide different levels of challenge?",
+							title: "Challenge Opportunities",
+							prompt: "To what extent does this feature/environmental characteristic provide different levels of challenge?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_challenge",
 									label: "No Challenge",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_challenge",
 									label: "Some Challenge",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_challenge",
 									label: "A lot of Challenge",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_18_5",
@@ -8659,30 +8689,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -8691,37 +8721,37 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -8729,44 +8759,47 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "challenge",
-							title: "Challenge",
-							prompt: "To what extent does this feature or environmental characteristic provide different levels of challenge?",
+							title: "Challenge Opportunities",
+							prompt: "To what extent does this feature/environmental characteristic provide different levels of challenge?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_challenge",
 									label: "No Challenge",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_challenge",
 									label: "Some Challenge",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_challenge",
 									label: "A lot of Challenge",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_18_6",
@@ -8778,30 +8811,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -8810,37 +8843,37 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -8848,44 +8881,47 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "challenge",
-							title: "Challenge",
-							prompt: "To what extent does this feature or environmental characteristic provide different levels of challenge?",
+							title: "Challenge Opportunities",
+							prompt: "To what extent does this feature/environmental characteristic provide different levels of challenge?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_challenge",
 									label: "No Challenge",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_challenge",
 									label: "Some Challenge",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_challenge",
 									label: "A lot of Challenge",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				}
 			]
 		},
@@ -8907,30 +8943,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -8939,76 +8975,37 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
-						},
-						{
-							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no",
-									label: "No",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_a_pair",
-									label: "Yes - a pair",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -9016,44 +9013,86 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "challenge",
-							title: "Challenge",
-							prompt: "To what extent does this feature or environmental characteristic provide different levels of challenge?",
+							title: "Challenge Opportunities",
+							prompt: "To what extent does this feature/environmental characteristic provide different levels of challenge?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_challenge",
 									label: "No Challenge",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_challenge",
 									label: "Some Challenge",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_challenge",
 									label: "A lot of Challenge",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								}
+							]
+						},
+						{
+							key: "sociability",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
+							options: [
+								{
+									key: "not_applicable",
+									label: "Not applicable",
+									addition_value: 0,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: true
+								},
+								{
+									key: "no",
+									label: "No",
+									addition_value: 1,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "yes_a_pair",
+									label: "Yes - a pair",
+									addition_value: 2,
+									boost_value: 2,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "yes_more_than_two_children",
+									label: "Yes - more than two children",
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_19_2",
@@ -9065,30 +9104,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -9097,76 +9136,37 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
-						},
-						{
-							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no",
-									label: "No",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_a_pair",
-									label: "Yes - a pair",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -9174,44 +9174,86 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "challenge",
-							title: "Challenge",
-							prompt: "To what extent does this feature or environmental characteristic provide different levels of challenge?",
+							title: "Challenge Opportunities",
+							prompt: "To what extent does this feature/environmental characteristic provide different levels of challenge?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_challenge",
 									label: "No Challenge",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_challenge",
 									label: "Some Challenge",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_challenge",
 									label: "A lot of Challenge",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								}
+							]
+						},
+						{
+							key: "sociability",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
+							options: [
+								{
+									key: "not_applicable",
+									label: "Not applicable",
+									addition_value: 0,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: true
+								},
+								{
+									key: "no",
+									label: "No",
+									addition_value: 1,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "yes_a_pair",
+									label: "Yes - a pair",
+									addition_value: 2,
+									boost_value: 2,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "yes_more_than_two_children",
+									label: "Yes - more than two children",
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_19_3",
@@ -9219,34 +9261,34 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					constructs: ["play_value"],
 					domains: ["Novelty"],
 					section_key: "section_19_novelty",
-					prompt: "has features that **make use of sunlight, changing natural light, and/or electronic lighting**—creating sensory and play opportunitites through light responive features (e.g. stained-glass panels; illuminated features; features that create patterned or moving shadows)",
+					prompt: "has features that **make use of sunlight, changing natural light, and/or electronic lighting**\u2014creating sensory and play opportunitites through light responive features (e.g. stained-glass panels; illuminated features; features that create patterned or moving shadows)",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -9255,37 +9297,37 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -9293,44 +9335,47 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no",
 									label: "No",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "yes_a_pair",
 									label: "Yes - a pair",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "yes_more_than_two_children",
 									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_19_4",
@@ -9342,30 +9387,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -9374,37 +9419,37 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -9412,44 +9457,47 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no",
 									label: "No",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "yes_a_pair",
 									label: "Yes - a pair",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "yes_more_than_two_children",
 									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_19_5",
@@ -9461,30 +9509,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -9493,76 +9541,37 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
-						},
-						{
-							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no",
-									label: "No",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_a_pair",
-									label: "Yes - a pair",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -9570,44 +9579,86 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "challenge",
-							title: "Challenge",
-							prompt: "To what extent does this feature or environmental characteristic provide different levels of challenge?",
+							title: "Challenge Opportunities",
+							prompt: "To what extent does this feature/environmental characteristic provide different levels of challenge?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_challenge",
 									label: "No Challenge",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_challenge",
 									label: "Some Challenge",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_challenge",
 									label: "A lot of Challenge",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								}
+							]
+						},
+						{
+							key: "sociability",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
+							options: [
+								{
+									key: "not_applicable",
+									label: "Not applicable",
+									addition_value: 0,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: true
+								},
+								{
+									key: "no",
+									label: "No",
+									addition_value: 1,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "yes_a_pair",
+									label: "Yes - a pair",
+									addition_value: 2,
+									boost_value: 2,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "yes_more_than_two_children",
+									label: "Yes - more than two children",
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_19_6",
@@ -9619,30 +9670,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -9651,76 +9702,37 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
-						},
-						{
-							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no",
-									label: "No",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_a_pair",
-									label: "Yes - a pair",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -9728,44 +9740,86 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "challenge",
-							title: "Challenge",
-							prompt: "To what extent does this feature or environmental characteristic provide different levels of challenge?",
+							title: "Challenge Opportunities",
+							prompt: "To what extent does this feature/environmental characteristic provide different levels of challenge?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_challenge",
 									label: "No Challenge",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_challenge",
 									label: "Some Challenge",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_challenge",
 									label: "A lot of Challenge",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								}
+							]
+						},
+						{
+							key: "sociability",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
+							options: [
+								{
+									key: "not_applicable",
+									label: "Not applicable",
+									addition_value: 0,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: true
+								},
+								{
+									key: "no",
+									label: "No",
+									addition_value: 1,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "yes_a_pair",
+									label: "Yes - a pair",
+									addition_value: 2,
+									boost_value: 2,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "yes_more_than_two_children",
+									label: "Yes - more than two children",
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_19_7",
@@ -9777,30 +9831,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -9809,43 +9863,46 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_19_8",
@@ -9857,30 +9914,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -9889,76 +9946,37 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
-						},
-						{
-							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no",
-									label: "No",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_a_pair",
-									label: "Yes - a pair",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -9966,44 +9984,86 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "challenge",
-							title: "Challenge",
-							prompt: "To what extent does this feature or environmental characteristic provide different levels of challenge?",
+							title: "Challenge Opportunities",
+							prompt: "To what extent does this feature/environmental characteristic provide different levels of challenge?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_challenge",
 									label: "No Challenge",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_challenge",
 									label: "Some Challenge",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_challenge",
 									label: "A lot of Challenge",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								}
+							]
+						},
+						{
+							key: "sociability",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
+							options: [
+								{
+									key: "not_applicable",
+									label: "Not applicable",
+									addition_value: 0,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: true
+								},
+								{
+									key: "no",
+									label: "No",
+									addition_value: 1,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "yes_a_pair",
+									label: "Yes - a pair",
+									addition_value: 2,
+									boost_value: 2,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "yes_more_than_two_children",
+									label: "Yes - more than two children",
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				}
 			]
 		},
@@ -10011,7 +10071,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 			section_key: "section_20_sensory_qualities_regulation",
 			title: "Sensory Qualities & Regulation",
 			description:
-				"Sensory Qualities & Regulation evaluates how well a space supports diverse sensory experiences that enhance engagement, comfort, and well‑being. It considers the presence of visual, auditory, olfactory, and tactile elements that create interest and stimulation—such as color accents, varied textures, sounds, pleasant smells, and interactive features. It also assesses whether the environment offers options for sensory retreat or reduced stimulation, as well as any persistent noise pollution (reverse‑coded), to ensure the space is supportive for individuals with varying sensory needs.",
+				"Sensory Qualities & Regulation evaluates how well a space supports diverse sensory experiences that enhance engagement, comfort, and well\u2011being. It considers the presence of visual, auditory, olfactory, and tactile elements that create interest and stimulation\u2014such as color accents, varied textures, sounds, pleasant smells, and interactive features. It also assesses whether the environment offers options for sensory retreat or reduced stimulation, as well as any persistent noise pollution (reverse\u2011coded), to ensure the space is supportive for individuals with varying sensory needs.",
 			instruction: "Read each statement and answer the questions. This playspace...",
 			notes_prompt:
 				"Any comments? Describe one or more recommendations to improve the sensory qualitites of this playspace:",
@@ -10026,30 +10086,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -10058,43 +10118,46 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_20_2",
@@ -10106,30 +10169,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -10138,43 +10201,46 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_20_3",
@@ -10186,30 +10252,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -10218,43 +10284,46 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_20_4",
@@ -10266,30 +10335,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -10298,37 +10367,37 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -10336,44 +10405,47 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no",
 									label: "No",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "yes_a_pair",
 									label: "Yes - a pair",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "yes_more_than_two_children",
 									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_20_5",
@@ -10385,30 +10457,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -10417,43 +10489,46 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_20_6",
@@ -10465,30 +10540,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -10497,37 +10572,37 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -10535,44 +10610,47 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no",
 									label: "No",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "yes_a_pair",
 									label: "Yes - a pair",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "yes_more_than_two_children",
 									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_20_7",
@@ -10584,30 +10662,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 2.0,
-									boost_value: 0.0,
+									addition_value: 2,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -10616,43 +10694,46 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				}
 			]
 		},
@@ -10675,75 +10756,39 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
 							]
-						},
-						{
-							key: "diversity",
-							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no_diversity",
-									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "some_diversity",
-									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "a_lot_of_diversity",
-									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_21_2",
@@ -10755,75 +10800,39 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
 							]
-						},
-						{
-							key: "diversity",
-							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no_diversity",
-									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "some_diversity",
-									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "a_lot_of_diversity",
-									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_21_3",
@@ -10831,12 +10840,12 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					constructs: ["usability"],
 					domains: ["Accommodating diverse abilities"],
 					section_key: "section_21_accommodating_diverse_abilities",
-					prompt: "has **accessible edges or points of access (flush or ramped) from the primary path to accessible play surfaces or directly onto play features**.",
+					prompt: "has manufactured play features with accessible access (e.g. features designed to accommodate users with mobility aids)",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
@@ -10864,7 +10873,10 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_21_4",
@@ -10872,12 +10884,12 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					constructs: ["usability"],
 					domains: ["Accommodating diverse abilities"],
 					section_key: "section_21_accommodating_diverse_abilities",
-					prompt: "has **accessible manufactured play features that are isolated** from other play areas nor behind fencing or visual barriers (e.g., fenced-in wheelchair swings) [needs reversed coded]",
+					prompt: "has accessible edges or points of access (flush or ramped) from the primary path to accessible play surfaces or directly onto play features",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
@@ -10905,7 +10917,15 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								}
 							]
 						}
-					]
+					],
+					display_if: {
+						question_key: "q_21_3",
+						response_key: "quantity",
+						any_of_option_keys: ["some", "a_lot"]
+					},
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_21_5",
@@ -10913,12 +10933,12 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					constructs: ["usability"],
 					domains: ["Accommodating diverse abilities"],
 					section_key: "section_21_accommodating_diverse_abilities",
-					prompt: "play features **support transitions in and out** (e.g., entry/exit ramps; ample space and/or platforms to transfer from a mobility device; slides with extended run-outs at the base for easy transfer)",
+					prompt: "has accessible manufactured play features that are isolated from other play areas, such as behind fencing or visual barriers (e.g. fenced-in wheelchair swings)",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
@@ -10945,47 +10965,16 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 									is_not_applicable: false
 								}
 							]
-						},
-						{
-							key: "diversity",
-							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no_diversity",
-									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "some_diversity",
-									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "a_lot_of_diversity",
-									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
 						}
-					]
+					],
+					display_if: {
+						question_key: "q_21_3",
+						response_key: "quantity",
+						any_of_option_keys: ["some", "a_lot"]
+					},
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_21_6",
@@ -10993,79 +10982,43 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					constructs: ["usability"],
 					domains: ["Accommodating diverse abilities"],
 					section_key: "section_21_accommodating_diverse_abilities",
-					prompt: "play features have **handrails and grips to assist with transitions** **and stability** that are easy to use for children with different abilities (e.g., located at various heights; in sizes and shapes suitable for different-sized hands)",
+					prompt: "play features support transitions in and out (e.g. entry/exit ramps; ample space and/or platforms to transfer from a mobility device; slides with extended run-outs at the base for easy transfer)",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
 							]
-						},
-						{
-							key: "diversity",
-							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no_diversity",
-									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "some_diversity",
-									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "a_lot_of_diversity",
-									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_21_7",
@@ -11073,79 +11026,43 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					constructs: ["usability"],
 					domains: ["Accommodating diverse abilities"],
 					section_key: "section_21_accommodating_diverse_abilities",
-					prompt: "play features allow for** use from diverse body positions**, providing appropriate support for children with different needs (e.g., options for sitting, standing, or lying down; seats or swings with full-body support, wide bases, and/or secure straps; footrests so feet do not have to dangle)",
+					prompt: "play features have handrails and grips to assist with transitions and stability that are easy to use for children with different abilities (e.g. located at various heights; in sizes and shapes suitable for different-sized hands)",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
 							]
-						},
-						{
-							key: "diversity",
-							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no_diversity",
-									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "some_diversity",
-									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "a_lot_of_diversity",
-									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_21_8",
@@ -11153,79 +11070,43 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					constructs: ["usability"],
 					domains: ["Accommodating diverse abilities"],
 					section_key: "section_21_accommodating_diverse_abilities",
-					prompt: 'has **accessible access to the highest points** and/or the "coolest" or most unique play features',
+					prompt: "play features allow for use from diverse body positions, providing appropriate support for children with different needs (e.g. options for sitting, standing, or lying down; seats or swings with full-body support, wide bases, and/or secure straps; footrests so feet do not have to dangle)",
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
 							]
-						},
-						{
-							key: "diversity",
-							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no_diversity",
-									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "some_diversity",
-									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "a_lot_of_diversity",
-									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_21_9",
@@ -11233,79 +11114,92 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					constructs: ["usability"],
 					domains: ["Accommodating diverse abilities"],
 					section_key: "section_21_accommodating_diverse_abilities",
-					prompt: "has clear,** tactile, and/or visual indicators** (e.g. color contrasts, material changes, or textured/dimpled surfaces, low raised boundaries) to define edges of paths or signal significant changes in height (e.g. edges of elevated platform) or transitions into new spaces (e.g. into the swing areas)",
+					prompt: 'highest points and/or the "coolest" / most unique play features are accessible via ramps or use of topography',
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some",
 									label: "Some",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
 							]
-						},
+						}
+					],
+					display_if: {
+						question_key: "q_21_3",
+						response_key: "quantity",
+						any_of_option_keys: ["some", "a_lot"]
+					},
+					question_type: "scaled",
+					options: [],
+					required: false
+				},
+				{
+					question_key: "q_21_10",
+					mode: "audit",
+					constructs: ["usability"],
+					domains: ["Accommodating diverse abilities"],
+					section_key: "section_21_accommodating_diverse_abilities",
+					prompt: "has clear tactile and/or visual indicators (e.g. color contrasts; material changes; textured or dimpled surfaces; low raised boundaries) to define edges of paths, signal significant changes in height, or indicate transitions into new spaces",
+					scales: [
 						{
-							key: "diversity",
-							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							key: "quantity",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no_diversity",
-									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									key: "no",
+									label: "No",
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
-									key: "some_diversity",
-									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
+									key: "some",
+									label: "Some",
+									addition_value: 1,
+									boost_value: 1,
+									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
-									key: "a_lot_of_diversity",
-									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
+									key: "a_lot",
+									label: "A lot",
+									addition_value: 2,
+									boost_value: 2,
+									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				}
 			]
 		},
@@ -11328,30 +11222,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_litle_bit",
 									label: "A litle bit",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -11360,76 +11254,37 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
-						},
-						{
-							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no",
-									label: "No",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_a_pair",
-									label: "Yes - a pair",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -11437,44 +11292,86 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "challenge",
-							title: "Challenge",
-							prompt: "To what extent does this feature or environmental characteristic provide different levels of challenge?",
+							title: "Challenge Opportunities",
+							prompt: "To what extent does this feature/environmental characteristic provide different levels of challenge?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_challenge",
 									label: "No Challenge",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_challenge",
 									label: "Some Challenge",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_challenge",
 									label: "A lot of Challenge",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								}
+							]
+						},
+						{
+							key: "sociability",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
+							options: [
+								{
+									key: "not_applicable",
+									label: "Not applicable",
+									addition_value: 0,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: true
+								},
+								{
+									key: "no",
+									label: "No",
+									addition_value: 1,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "yes_a_pair",
+									label: "Yes - a pair",
+									addition_value: 2,
+									boost_value: 2,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "yes_more_than_two_children",
+									label: "Yes - more than two children",
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_22_2",
@@ -11486,30 +11383,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_litle_bit",
 									label: "A litle bit",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -11518,76 +11415,37 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
-						},
-						{
-							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no",
-									label: "No",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_a_pair",
-									label: "Yes - a pair",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -11595,44 +11453,86 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "challenge",
-							title: "Challenge",
-							prompt: "To what extent does this feature or environmental characteristic provide different levels of challenge?",
+							title: "Challenge Opportunities",
+							prompt: "To what extent does this feature/environmental characteristic provide different levels of challenge?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_challenge",
 									label: "No Challenge",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_challenge",
 									label: "Some Challenge",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_challenge",
 									label: "A lot of Challenge",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								}
+							]
+						},
+						{
+							key: "sociability",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
+							options: [
+								{
+									key: "not_applicable",
+									label: "Not applicable",
+									addition_value: 0,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: true
+								},
+								{
+									key: "no",
+									label: "No",
+									addition_value: 1,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "yes_a_pair",
+									label: "Yes - a pair",
+									addition_value: 2,
+									boost_value: 2,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "yes_more_than_two_children",
+									label: "Yes - more than two children",
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_22_3",
@@ -11644,30 +11544,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_litle_bit",
 									label: "A litle bit",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -11676,76 +11576,37 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
-						},
-						{
-							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no",
-									label: "No",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_a_pair",
-									label: "Yes - a pair",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -11753,44 +11614,86 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "challenge",
-							title: "Challenge",
-							prompt: "To what extent does this feature or environmental characteristic provide different levels of challenge?",
+							title: "Challenge Opportunities",
+							prompt: "To what extent does this feature/environmental characteristic provide different levels of challenge?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_challenge",
 									label: "No Challenge",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_challenge",
 									label: "Some Challenge",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_challenge",
 									label: "A lot of Challenge",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								}
+							]
+						},
+						{
+							key: "sociability",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
+							options: [
+								{
+									key: "not_applicable",
+									label: "Not applicable",
+									addition_value: 0,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: true
+								},
+								{
+									key: "no",
+									label: "No",
+									addition_value: 1,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "yes_a_pair",
+									label: "Yes - a pair",
+									addition_value: 2,
+									boost_value: 2,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "yes_more_than_two_children",
+									label: "Yes - more than two children",
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_22_4",
@@ -11802,30 +11705,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_litle_bit",
 									label: "A litle bit",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -11834,76 +11737,37 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
-						},
-						{
-							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no",
-									label: "No",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_a_pair",
-									label: "Yes - a pair",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -11911,44 +11775,86 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "challenge",
-							title: "Challenge",
-							prompt: "To what extent does this feature or environmental characteristic provide different levels of challenge?",
+							title: "Challenge Opportunities",
+							prompt: "To what extent does this feature/environmental characteristic provide different levels of challenge?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_challenge",
 									label: "No Challenge",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_challenge",
 									label: "Some Challenge",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_challenge",
 									label: "A lot of Challenge",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								}
+							]
+						},
+						{
+							key: "sociability",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
+							options: [
+								{
+									key: "not_applicable",
+									label: "Not applicable",
+									addition_value: 0,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: true
+								},
+								{
+									key: "no",
+									label: "No",
+									addition_value: 1,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "yes_a_pair",
+									label: "Yes - a pair",
+									addition_value: 2,
+									boost_value: 2,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "yes_more_than_two_children",
+									label: "Yes - more than two children",
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_22_5",
@@ -11960,30 +11866,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_litle_bit",
 									label: "A litle bit",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -11992,76 +11898,37 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
-						},
-						{
-							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no",
-									label: "No",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_a_pair",
-									label: "Yes - a pair",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -12069,44 +11936,86 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "challenge",
-							title: "Challenge",
-							prompt: "To what extent does this feature or environmental characteristic provide different levels of challenge?",
+							title: "Challenge Opportunities",
+							prompt: "To what extent does this feature/environmental characteristic provide different levels of challenge?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_challenge",
 									label: "No Challenge",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_challenge",
 									label: "Some Challenge",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_challenge",
 									label: "A lot of Challenge",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								}
+							]
+						},
+						{
+							key: "sociability",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
+							options: [
+								{
+									key: "not_applicable",
+									label: "Not applicable",
+									addition_value: 0,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: true
+								},
+								{
+									key: "no",
+									label: "No",
+									addition_value: 1,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "yes_a_pair",
+									label: "Yes - a pair",
+									addition_value: 2,
+									boost_value: 2,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "yes_more_than_two_children",
+									label: "Yes - more than two children",
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_22_6",
@@ -12118,30 +12027,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_litle_bit",
 									label: "A litle bit",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -12150,76 +12059,37 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
-						},
-						{
-							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no",
-									label: "No",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_a_pair",
-									label: "Yes - a pair",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -12227,44 +12097,86 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "challenge",
-							title: "Challenge",
-							prompt: "To what extent does this feature or environmental characteristic provide different levels of challenge?",
+							title: "Challenge Opportunities",
+							prompt: "To what extent does this feature/environmental characteristic provide different levels of challenge?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_challenge",
 									label: "No Challenge",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_challenge",
 									label: "Some Challenge",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_challenge",
 									label: "A lot of Challenge",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								}
+							]
+						},
+						{
+							key: "sociability",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
+							options: [
+								{
+									key: "not_applicable",
+									label: "Not applicable",
+									addition_value: 0,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: true
+								},
+								{
+									key: "no",
+									label: "No",
+									addition_value: 1,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "yes_a_pair",
+									label: "Yes - a pair",
+									addition_value: 2,
+									boost_value: 2,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "yes_more_than_two_children",
+									label: "Yes - more than two children",
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				},
 				{
 					question_key: "q_22_7",
@@ -12276,30 +12188,30 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 					scales: [
 						{
 							key: "quantity",
-							title: "Quantity",
-							prompt: "In what quantity is this feature or environmental characteristic considered?",
+							title: "Provision",
+							prompt: "To what degree is this feature/environmental characteristic present or considered?",
 							options: [
 								{
 									key: "no",
 									label: "No",
-									addition_value: 0.0,
-									boost_value: 0.0,
+									addition_value: 0,
+									boost_value: 0,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_litle_bit",
 									label: "A litle bit",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot",
 									label: "A lot",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: true,
 									is_not_applicable: false
 								}
@@ -12308,76 +12220,37 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						{
 							key: "diversity",
 							title: "Diversity",
-							prompt: "To what extent is diversity in this feature or environmental characteristic considered?",
+							prompt: "To what extent is there diversity in the provision of this feature/environmental characteristic?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_diversity",
 									label: "No Diversity",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_diversity",
 									label: "Some Diversity",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_diversity",
 									label: "A lot of Diversity",
-									addition_value: 3.0,
-									boost_value: 3.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								}
-							]
-						},
-						{
-							key: "sociability",
-							title: "Sociability",
-							prompt: "Can more than one child or person use this feature together?",
-							options: [
-								{
-									key: "not_applicable",
-									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: true
-								},
-								{
-									key: "no",
-									label: "No",
-									addition_value: 1.0,
-									boost_value: 1.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_a_pair",
-									label: "Yes - a pair",
-									addition_value: 2.0,
-									boost_value: 2.0,
-									allows_follow_up_scales: false,
-									is_not_applicable: false
-								},
-								{
-									key: "yes_more_than_two_children",
-									label: "Yes - more than two children",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
@@ -12385,44 +12258,86 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 						},
 						{
 							key: "challenge",
-							title: "Challenge",
-							prompt: "To what extent does this feature or environmental characteristic provide different levels of challenge?",
+							title: "Challenge Opportunities",
+							prompt: "To what extent does this feature/environmental characteristic provide different levels of challenge?",
 							options: [
 								{
 									key: "not_applicable",
 									label: "Not applicable",
-									addition_value: 0.0,
-									boost_value: 1.0,
+									addition_value: 0,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: true
 								},
 								{
 									key: "no_challenge",
 									label: "No Challenge",
-									addition_value: 1.0,
-									boost_value: 1.0,
+									addition_value: 1,
+									boost_value: 1,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "some_challenge",
 									label: "Some Challenge",
-									addition_value: 2.0,
-									boost_value: 2.0,
+									addition_value: 2,
+									boost_value: 2,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								},
 								{
 									key: "a_lot_of_challenge",
 									label: "A lot of Challenge",
-									addition_value: 3.0,
-									boost_value: 3.0,
+									addition_value: 3,
+									boost_value: 3,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								}
+							]
+						},
+						{
+							key: "sociability",
+							title: "Sociability Support",
+							prompt: "Can more than one child/person use this feature/environmental characteristic together?",
+							options: [
+								{
+									key: "not_applicable",
+									label: "Not applicable",
+									addition_value: 0,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: true
+								},
+								{
+									key: "no",
+									label: "No",
+									addition_value: 1,
+									boost_value: 1,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "yes_a_pair",
+									label: "Yes - a pair",
+									addition_value: 2,
+									boost_value: 2,
+									allows_follow_up_scales: false,
+									is_not_applicable: false
+								},
+								{
+									key: "yes_more_than_two_children",
+									label: "Yes - more than two children",
+									addition_value: 3,
+									boost_value: 3,
 									allows_follow_up_scales: false,
 									is_not_applicable: false
 								}
 							]
 						}
-					]
+					],
+					question_type: "scaled",
+					options: [],
+					required: false
 				}
 			]
 		}

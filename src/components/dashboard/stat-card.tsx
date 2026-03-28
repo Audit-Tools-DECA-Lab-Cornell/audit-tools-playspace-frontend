@@ -25,12 +25,12 @@ export interface StatCardProps {
  */
 export function StatCard({ title, value, helper, tone = "neutral", valueClassName }: Readonly<StatCardProps>) {
 	return (
-		<Card className="relative gap-0 overflow-hidden border-border/80 bg-card/95">
+		<Card className="relative flex flex-col justify-between gap-6 overflow-hidden border-border/80 bg-card/95">
 			<div className={cn("absolute inset-x-0 top-0 h-1", toneClassesByTone[tone])} aria-hidden="true" />
-			<CardHeader className="gap-2 border-border/50 pt-5">
+			<CardHeader className="gap-2 border-border/50">
 				<CardTitle className="text-xs font-semibold tracking-[0.08em] text-text-secondary">{title}</CardTitle>
 			</CardHeader>
-			<CardContent className="space-y-2.5 pb-5">
+			<CardContent className="space-y-2.5">
 				<div
 					className={cn(
 						"max-w-full overflow-hidden text-ellipsis font-mono text-[2rem] font-semibold leading-none tracking-tight text-foreground tabular-nums md:text-[2.3rem]",

@@ -1,0 +1,215 @@
+"use client";
+
+import { Fragment } from "react";
+import { useTranslations } from "next-intl";
+
+import { Button } from "@/components/ui/button";
+import { getActiveScaleKeysForQuestion } from "@/lib/audit/selectors";
+import { cn } from "@/lib/utils";
+import type { InstrumentQuestion, QuestionResponsePayload, ScaleKey } from "@/types/audit";
+
+interface PromptSegment {
+	readonly text: string;
+	readonly bold: boolean;
+}
+
+interface QuestionTableRow {
+	readonly question: InstrumentQuestion;
+	readonly selectedAnswers: QuestionResponsePayload;
+}
+
+export interface SectionQuestionTableProps {
+	readonly rows: readonly QuestionTableRow[];
+	readonly disabled?: boolean;
+	readonly onSelectAnswer: (questionKey: string, scaleKey: string, optionKey: string) => void;
+}
+
+const SCALE_COLUMN_ORDER: readonly ScaleKey[] = ["quantity", "diversity", "challenge", "sociability"];
+
+/**
+ * Desktop and tablet matrix layout for audit questions.
+ */
+export function SectionQuestionTable({ rows, disabled = false, onSelectAnswer }: Readonly<SectionQuestionTableProps>) {
+	const t = useTranslations("auditor.execute.sectionTable");
+	const visibleScaleKeys = getVisibleScaleKeys(rows);
+
+	return (
+		<div className="space-y-4">
+			<p className="text-sm text-muted-foreground">{t("intro")}</p>
+			<div className="overflow-x-auto">
+				<div
+					className="grid min-w-[980px] rounded-card border border-border bg-card"
+					style={{
+						gridTemplateColumns: [
+							"minmax(320px, 1.8fr)",
+							...visibleScaleKeys.map(() => "minmax(170px, 1fr)")
+						].join(" ")
+					}}>
+					<div className="border-r border-border bg-secondary/50 px-4 py-3 text-center text-xs font-semibold uppercase tracking-[0.08em] text-text-secondary">
+						{t("itemColumn")}
+					</div>
+					{visibleScaleKeys.map(scaleKey => (
+						<div
+							key={scaleKey}
+							className="border-r border-border bg-secondary/50 px-4 py-3 text-center text-xs font-semibold uppercase tracking-[0.08em] text-text-secondary last:border-r-0">
+							{t(`scaleColumns.${scaleKey}`)}
+						</div>
+					))}
+
+					{rows.map((row, rowIndex) => {
+						const activeScaleKeys = getActiveScaleKeysForQuestion(row.question, row.selectedAnswers);
+
+						return (
+							<Fragment key={row.question.question_key}>
+								<div
+									className={cn(
+										"border-r border-t border-border px-4 py-4",
+										rowIndex % 2 === 0 ? "bg-card" : "bg-secondary/20"
+									)}>
+									<QuestionPrompt question={row.question} />
+								</div>
+								{visibleScaleKeys.map(scaleKey => {
+									const scale = row.question.scales.find(
+										currentScale => currentScale.key === scaleKey
+									);
+									const cellClassName = cn(
+										"border-r border-t border-border px-3 py-4 last:border-r-0",
+										rowIndex % 2 === 0 ? "bg-card" : "bg-secondary/20"
+									);
+
+									if (!scale) {
+										return (
+											<div
+												key={`${row.question.question_key}.${scaleKey}`}
+												className={cellClassName}>
+												<p className="text-sm text-muted-foreground">{t("notAvailable")}</p>
+											</div>
+										);
+									}
+
+									if (scaleKey !== "quantity" && !activeScaleKeys.includes(scaleKey)) {
+										return (
+											<div
+												key={`${row.question.question_key}.${scaleKey}`}
+												className={cellClassName}>
+												<p className="text-sm text-muted-foreground">{t("followUpPending")}</p>
+											</div>
+										);
+									}
+
+									return (
+										<div key={`${row.question.question_key}.${scaleKey}`} className={cellClassName}>
+											<div className="space-y-3">
+												<p className="text-xs leading-5 text-muted-foreground">
+													{scale.prompt}
+												</p>
+												<div className="space-y-2">
+													{scale.options.map(option => {
+														const isSelected =
+															typeof row.selectedAnswers[scale.key] === "string" &&
+															row.selectedAnswers[scale.key] === option.key;
+
+														return (
+															<Button
+																key={`${row.question.question_key}.${scale.key}.${option.key}`}
+																type="button"
+																variant="outline"
+																disabled={disabled}
+																className={cn(
+																	"h-auto w-full justify-start whitespace-normal rounded-field px-3 py-2 text-left leading-5",
+																	isSelected
+																		? "border-primary bg-primary/12 text-primary"
+																		: "border-action-outline-border bg-background text-foreground hover:bg-secondary/60"
+																)}
+																onClick={() => {
+																	onSelectAnswer(
+																		row.question.question_key,
+																		scale.key,
+																		option.key
+																	);
+																}}>
+																<span className="inline-flex items-center gap-2">
+																	<span
+																		className={cn(
+																			"size-4 rounded-full border-2",
+																			isSelected
+																				? "border-primary bg-primary"
+																				: "border-border bg-background"
+																		)}
+																	/>
+																	<span>{option.label}</span>
+																</span>
+															</Button>
+														);
+													})}
+												</div>
+											</div>
+										</div>
+									);
+								})}
+							</Fragment>
+						);
+					})}
+				</div>
+			</div>
+		</div>
+	);
+}
+
+interface QuestionPromptProps {
+	readonly question: InstrumentQuestion;
+}
+
+/**
+ * Render the left prompt cell for one matrix row.
+ */
+function QuestionPrompt({ question }: Readonly<QuestionPromptProps>) {
+	const t = useTranslations("auditor.execute.questionCard");
+	const promptSegments = parsePromptSegments(question.prompt);
+
+	return (
+		<div className="space-y-2">
+			<p className="text-xs font-semibold uppercase tracking-[0.08em] text-text-secondary">
+				{question.question_key}
+			</p>
+			<p className="text-sm leading-6 text-foreground">
+				<span className="block text-xs font-semibold uppercase tracking-[0.14em] text-primary">
+					{t("thisPlayspace")}
+				</span>
+				{promptSegments.map((segment, index) => (
+					<Fragment key={`${question.question_key}-${index.toString()}`}>
+						<span className={segment.bold ? "font-semibold text-primary" : undefined}>{segment.text}</span>
+					</Fragment>
+				))}
+			</p>
+		</div>
+	);
+}
+
+/**
+ * Parse `**bold**` prompt markers into renderable text segments.
+ */
+function parsePromptSegments(raw: string): PromptSegment[] {
+	const segments: PromptSegment[] = [];
+	const parts = raw.split("**");
+
+	for (let index = 0; index < parts.length; index += 1) {
+		const part = parts[index] ?? "";
+		if (part.length === 0) {
+			continue;
+		}
+
+		segments.push({ text: part, bold: index % 2 === 1 });
+	}
+
+	return segments;
+}
+
+/**
+ * Resolve the ordered scale columns that appear for this section.
+ */
+function getVisibleScaleKeys(rows: readonly QuestionTableRow[]): ScaleKey[] {
+	return SCALE_COLUMN_ORDER.filter(scaleKey => {
+		return rows.some(row => row.question.scales.some(scale => scale.key === scaleKey));
+	});
+}

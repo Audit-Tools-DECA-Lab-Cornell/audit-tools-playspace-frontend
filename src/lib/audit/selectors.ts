@@ -2,6 +2,7 @@ import type {
 	AuditSession,
 	ExecutionMode,
 	InstrumentQuestion,
+	QuestionResponsePayload,
 	InstrumentSection,
 	PlayspaceInstrument,
 	PreAuditQuestion,
@@ -19,7 +20,8 @@ export interface InstrumentSectionLocalProgress {
  */
 export function getVisibleSections(
 	instrument: PlayspaceInstrument,
-	executionMode: ExecutionMode | null
+	executionMode: ExecutionMode | null,
+	sectionResponsesBySection: Record<string, Record<string, QuestionResponsePayload>> = {}
 ): InstrumentSection[] {
 	if (executionMode === null) {
 		return [];
@@ -28,7 +30,11 @@ export function getVisibleSections(
 	return instrument.sections
 		.map(section => ({
 			...section,
-			questions: getVisibleQuestions(section.questions, executionMode)
+			questions: getVisibleQuestions(
+				section.questions,
+				executionMode,
+				sectionResponsesBySection[section.section_key] ?? {}
+			)
 		}))
 		.filter(section => section.questions.length > 0);
 }
@@ -38,13 +44,34 @@ export function getVisibleSections(
  */
 export function getVisibleQuestions(
 	questions: readonly InstrumentQuestion[],
-	executionMode: ExecutionMode
+	executionMode: ExecutionMode,
+	sectionResponses: Record<string, QuestionResponsePayload> = {}
 ): InstrumentQuestion[] {
-	if (executionMode === "both") {
-		return [...questions];
-	}
+	return questions.filter(question => {
+		if (executionMode !== "both" && question.mode !== "both" && question.mode !== executionMode) {
+			return false;
+		}
 
-	return questions.filter(question => question.mode === "both" || question.mode === executionMode);
+		if (question.display_if === null || question.display_if === undefined) {
+			return true;
+		}
+
+		const parentAnswers = sectionResponses[question.display_if.question_key];
+		if (parentAnswers === undefined) {
+			return false;
+		}
+
+		const selectedValue = parentAnswers[question.display_if.response_key];
+		if (typeof selectedValue === "string") {
+			return question.display_if.any_of_option_keys.includes(selectedValue);
+		}
+
+		if (Array.isArray(selectedValue)) {
+			return selectedValue.some(entry => question.display_if?.any_of_option_keys.includes(entry));
+		}
+
+		return false;
+	});
 }
 
 /**
@@ -52,13 +79,30 @@ export function getVisibleQuestions(
  */
 export function getPreAuditValues(auditSession: AuditSession): Record<string, string | string[]> {
 	return {
+		place_size: auditSession.pre_audit.place_size ?? "",
+		current_users_0_5: auditSession.pre_audit.current_users_0_5 ?? "",
+		current_users_6_12: auditSession.pre_audit.current_users_6_12 ?? "",
+		current_users_13_17: auditSession.pre_audit.current_users_13_17 ?? "",
+		current_users_18_plus: auditSession.pre_audit.current_users_18_plus ?? "",
+		playspace_busyness: auditSession.pre_audit.playspace_busyness ?? "",
 		season: auditSession.pre_audit.season ?? "",
 		weather_conditions: [...auditSession.pre_audit.weather_conditions],
-		users_present: [...auditSession.pre_audit.users_present],
-		user_count: auditSession.pre_audit.user_count ?? "",
-		age_groups: [...auditSession.pre_audit.age_groups],
-		place_size: auditSession.pre_audit.place_size ?? ""
+		wind_conditions: auditSession.pre_audit.wind_conditions ?? ""
 	};
+}
+
+/**
+ * Filter setup questions down to those visible for one execution mode.
+ */
+export function getVisiblePreAuditQuestions(
+	questions: readonly PreAuditQuestion[],
+	executionMode: ExecutionMode | null
+): PreAuditQuestion[] {
+	if (executionMode === null) {
+		return [...questions];
+	}
+
+	return questions.filter(question => question.visible_modes.includes(executionMode));
 }
 
 /**
@@ -68,7 +112,7 @@ export function getQuestionAnswers(
 	auditSession: AuditSession,
 	sectionKey: string,
 	questionKey: string
-): Record<string, string> {
+): QuestionResponsePayload {
 	return auditSession.sections[sectionKey]?.responses[questionKey] ?? {};
 }
 
@@ -77,9 +121,9 @@ export function getQuestionAnswers(
  */
 export function getActiveScaleKeysForQuestion(
 	question: InstrumentQuestion,
-	selectedAnswers: Record<string, string>
+	selectedAnswers: QuestionResponsePayload
 ): readonly string[] {
-	if (question.scales.length === 0) {
+	if (question.question_type !== "scaled" || question.scales.length === 0) {
 		return [];
 	}
 
@@ -110,8 +154,13 @@ export function getActiveScaleKeysForQuestion(
  */
 export function isInstrumentQuestionComplete(
 	question: InstrumentQuestion,
-	selectedAnswers: Record<string, string>
+	selectedAnswers: QuestionResponsePayload
 ): boolean {
+	if (question.question_type === "checklist") {
+		const selectedOptionKeys = selectedAnswers["selected_option_keys"];
+		return Array.isArray(selectedOptionKeys) && selectedOptionKeys.length > 0;
+	}
+
 	if (question.scales.length === 0) {
 		return false;
 	}
@@ -132,12 +181,13 @@ export function isInstrumentQuestionComplete(
  */
 export function getInstrumentSectionLocalProgress(
 	section: InstrumentSection,
-	responses: Record<string, Record<string, string>>
+	responses: Record<string, QuestionResponsePayload>
 ): InstrumentSectionLocalProgress {
-	const visibleQuestionCount = section.questions.length;
+	const completionQuestions = section.questions.filter(question => question.required);
+	const visibleQuestionCount = completionQuestions.length;
 	let answeredQuestionCount = 0;
 
-	for (const question of section.questions) {
+	for (const question of completionQuestions) {
 		const selectedAnswers = responses[question.question_key] ?? {};
 		if (isInstrumentQuestionComplete(question, selectedAnswers)) {
 			answeredQuestionCount += 1;
@@ -147,7 +197,7 @@ export function getInstrumentSectionLocalProgress(
 	return {
 		visibleQuestionCount,
 		answeredQuestionCount,
-		isComplete: visibleQuestionCount > 0 && answeredQuestionCount === visibleQuestionCount
+		isComplete: visibleQuestionCount === 0 || answeredQuestionCount === visibleQuestionCount
 	};
 }
 
@@ -175,21 +225,28 @@ export function isPreAuditQuestionComplete(question: PreAuditQuestion, value: st
  */
 export function isRequiredPreAuditComplete(
 	questions: readonly PreAuditQuestion[],
-	values: Record<string, string | string[]>
+	values: Record<string, string | string[]>,
+	executionMode: ExecutionMode | null
 ): boolean {
-	return questions.every(question => isPreAuditQuestionComplete(question, values[question.key]));
+	if (executionMode === null) {
+		return false;
+	}
+
+	return getVisiblePreAuditQuestions(questions, executionMode).every(question =>
+		isPreAuditQuestionComplete(question, values[question.key])
+	);
 }
 
 /**
  * Apply one option selection and clear gated follow-up answers when needed.
  */
 export function buildNextQuestionAnswers(
-	currentAnswers: Record<string, string>,
+	currentAnswers: QuestionResponsePayload,
 	question: { readonly scales: readonly QuestionScale[] },
 	scaleKey: string,
 	optionKey: string
-): Record<string, string> {
-	const nextAnswers: Record<string, string> = {
+): QuestionResponsePayload {
+	const nextAnswers: QuestionResponsePayload = {
 		...currentAnswers,
 		[scaleKey]: optionKey
 	};

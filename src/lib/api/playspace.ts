@@ -396,17 +396,29 @@ const auditMetaSchema = z.object({
 });
 
 const auditPreAuditSchema = z.object({
+	place_size: z.string().nullable(),
+	current_users_0_5: z.string().nullable(),
+	current_users_6_12: z.string().nullable(),
+	current_users_13_17: z.string().nullable(),
+	current_users_18_plus: z.string().nullable(),
+	playspace_busyness: z.string().nullable(),
 	season: z.string().nullable(),
 	weather_conditions: z.array(z.string()),
-	users_present: z.array(z.string()),
-	user_count: z.string().nullable(),
-	age_groups: z.array(z.string()),
-	place_size: z.string().nullable()
+	wind_conditions: z.string().nullable()
 });
+
+const questionResponseValueSchema = z.union([
+	z.string(),
+	z.array(z.string()),
+	z.record(z.string(), z.string()),
+	z.null()
+]);
+
+const questionResponsePayloadSchema = z.record(z.string(), questionResponseValueSchema);
 
 const auditSectionStateSchema = z.object({
 	section_key: z.string(),
-	responses: z.record(z.string(), z.record(z.string(), z.string())),
+	responses: z.record(z.string(), questionResponsePayloadSchema),
 	note: z.string().nullable()
 });
 
@@ -498,12 +510,15 @@ const auditAggregateWriteSchema = z.object({
 		.optional(),
 	pre_audit: z
 		.object({
+			place_size: z.string().nullable().optional(),
+			current_users_0_5: z.string().nullable().optional(),
+			current_users_6_12: z.string().nullable().optional(),
+			current_users_13_17: z.string().nullable().optional(),
+			current_users_18_plus: z.string().nullable().optional(),
+			playspace_busyness: z.string().nullable().optional(),
 			season: z.string().nullable().optional(),
 			weather_conditions: z.array(z.string()).optional(),
-			users_present: z.array(z.string()).optional(),
-			user_count: z.string().nullable().optional(),
-			age_groups: z.array(z.string()).optional(),
-			place_size: z.string().nullable().optional()
+			wind_conditions: z.string().nullable().optional()
 		})
 		.nullable()
 		.optional(),
@@ -511,7 +526,7 @@ const auditAggregateWriteSchema = z.object({
 		.record(
 			z.string(),
 			z.object({
-				responses: z.record(z.string(), z.record(z.string(), z.string())).default({}),
+				responses: z.record(z.string(), questionResponsePayloadSchema).default({}),
 				note: z.string().nullable().optional()
 			})
 		)
@@ -529,12 +544,15 @@ const auditDraftPatchSchema = z.object({
 		.optional(),
 	pre_audit: z
 		.object({
+			place_size: z.string().nullable().optional(),
+			current_users_0_5: z.string().nullable().optional(),
+			current_users_6_12: z.string().nullable().optional(),
+			current_users_13_17: z.string().nullable().optional(),
+			current_users_18_plus: z.string().nullable().optional(),
+			playspace_busyness: z.string().nullable().optional(),
 			season: z.string().nullable().optional(),
 			weather_conditions: z.array(z.string()).optional(),
-			users_present: z.array(z.string()).optional(),
-			user_count: z.string().nullable().optional(),
-			age_groups: z.array(z.string()).optional(),
-			place_size: z.string().nullable().optional()
+			wind_conditions: z.string().nullable().optional()
 		})
 		.nullable()
 		.optional(),
@@ -542,7 +560,7 @@ const auditDraftPatchSchema = z.object({
 		.record(
 			z.string(),
 			z.object({
-				responses: z.record(z.string(), z.record(z.string(), z.string())).default({}),
+				responses: z.record(z.string(), questionResponsePayloadSchema).default({}),
 				note: z.string().nullable().optional()
 			})
 		)
