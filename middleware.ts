@@ -26,7 +26,7 @@ export function middleware(request: NextRequest) {
 	const pathname = request.nextUrl.pathname;
 	const auth = getAuthState(request);
 
-	if (pathname.startsWith("/login")) {
+	if (pathname.startsWith("/login") || pathname.startsWith("/signup")) {
 		if (!auth.isAuthenticated || !auth.role) return NextResponse.next();
 		const dashboardPath =
 			auth.role === "admin"
@@ -73,5 +73,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-	matcher: ["/login", "/admin/:path*", "/manager/:path*", "/auditor/:path*", "/settings/:path*"]
+	matcher: ["/login", "/signup", "/admin/:path*", "/manager/:path*", "/auditor/:path*", "/settings/:path*"]
 };

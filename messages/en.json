@@ -429,26 +429,26 @@
 		}
 	},
 	"login": {
-		"validation": {
-			"auditorCodeAlphanumeric": "Auditor code must be alphanumeric.",
-			"auditorCodeInvalid": "Auditor code is invalid."
-		},
 		"fields": {
 			"email": "Email",
-			"password": "Password",
-			"auditorCode": "Auditor code"
+			"password": "Password"
 		},
 		"actions": {
 			"signIn": "Sign in",
-			"signingIn": "Signing in...",
-			"continue": "Continue",
-			"continuing": "Continuing..."
+			"signingIn": "Signing in..."
 		},
+		"errors": {
+			"unknownRole": "Unrecognized account type returned by the server.",
+			"unexpected": "Something went wrong. Please try again."
+		},
+		"noAccount": "Don't have an account?",
+		"signUpLink": "Sign up",
+		"demoPasswordHint": "Demo password:",
 		"admin": {
 			"title": "Administrator sign in",
 			"description": "Global oversight across accounts, projects, places, and audit activity.",
 			"emailPlaceholder": "admin@company.com",
-			"demoLabel": "Demo admin:"
+			"demoLabel": "Demo admin: playspace.admin@example.org"
 		},
 		"manager": {
 			"title": "Manager sign in",
@@ -459,11 +459,36 @@
 		},
 		"auditor": {
 			"title": "Auditor sign in",
-			"description": "Limited access: execute assigned audits using your auditor code.",
-			"codePlaceholder": "A1B2C3",
-			"note": "Auditors are identified strictly by code. No real names are displayed in the UI.",
-			"demoLabel": "Try demo codes:"
+			"description": "Assigned audits and place-level execution.",
+			"emailPlaceholder": "auditor@company.com",
+			"demoLabel": "Sign up as auditor or use seeded accounts."
 		}
+	},
+	"signup": {
+		"title": "Create an account",
+		"description": "Sign up to get started with Playspace.",
+		"emailPlaceholder": "manager@example.org",
+		"namePlaceholder": "Your full name",
+		"fields": {
+			"name": "Full name",
+			"email": "Email",
+			"password": "Password",
+			"accountType": "Account type"
+		},
+		"accountTypes": {
+			"manager": "Manager",
+			"auditor": "Auditor"
+		},
+		"actions": {
+			"createAccount": "Create account",
+			"creatingAccount": "Creating account..."
+		},
+		"errors": {
+			"unknownRole": "Unrecognized account type returned by the server.",
+			"unexpected": "Something went wrong. Please try again."
+		},
+		"hasAccount": "Already have an account?",
+		"signInLink": "Sign in"
 	},
 	"manager": {
 		"dashboard": {

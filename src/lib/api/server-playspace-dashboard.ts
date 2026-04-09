@@ -147,10 +147,7 @@ async function fetchServerValidatedJson<TValue>(path: string, schema: z.ZodType<
 		method: "GET",
 		headers: {
 			Accept: "application/json",
-			Authorization: `Bearer ${session.accessToken}`,
-			"x-demo-role": session.role,
-			...(session.accountId ? { "x-demo-account-id": session.accountId } : {}),
-			...(session.auditorCode ? { "x-demo-auditor-code": session.auditorCode } : {})
+			Authorization: `Bearer ${session.accessToken}`
 		},
 		cache: "no-store"
 	});

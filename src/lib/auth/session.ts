@@ -8,4 +8,6 @@ export interface AuthSession {
 	accessToken: string;
 	accountId: string | null;
 	auditorCode: string | null;
+	userName: string | null;
+	userEmail: string | null;
 }

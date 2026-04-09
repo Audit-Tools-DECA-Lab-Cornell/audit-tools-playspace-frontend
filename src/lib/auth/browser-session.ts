@@ -46,15 +46,19 @@ export function getBrowserAuthSession(): BrowserAuthSession | null {
 
 	const accountId = getCookieValue(AUTH_COOKIE_NAMES.accountId);
 	const auditorCode = role === "auditor" ? getCookieValue(AUTH_COOKIE_NAMES.auditorCode) || null : null;
+	const userName = getCookieValue(AUTH_COOKIE_NAMES.userName);
+	const userEmail = getCookieValue(AUTH_COOKIE_NAMES.userEmail);
 
-	return { role, accessToken, accountId, auditorCode };
+	return { role, accessToken, accountId, auditorCode, userName, userEmail };
 }
 
 export function setBrowserAuthSession(input: {
 	role: UserRole;
 	accessToken: string;
 	accountId?: string | null;
-	auditorCode?: string;
+	auditorCode?: string | null;
+	userName?: string | null;
+	userEmail?: string | null;
 }) {
 	// 8 hours
 	const maxAgeSeconds = 60 * 60 * 8;
@@ -76,6 +80,18 @@ export function setBrowserAuthSession(input: {
 	} else {
 		clearCookie(AUTH_COOKIE_NAMES.auditorCode);
 	}
+
+	if (input.userName && input.userName.trim().length > 0) {
+		setCookieValue(AUTH_COOKIE_NAMES.userName, input.userName, maxAgeSeconds);
+	} else {
+		clearCookie(AUTH_COOKIE_NAMES.userName);
+	}
+
+	if (input.userEmail && input.userEmail.trim().length > 0) {
+		setCookieValue(AUTH_COOKIE_NAMES.userEmail, input.userEmail, maxAgeSeconds);
+	} else {
+		clearCookie(AUTH_COOKIE_NAMES.userEmail);
+	}
 }
 
 export function clearBrowserAuthSession() {
@@ -83,4 +99,6 @@ export function clearBrowserAuthSession() {
 	clearCookie(AUTH_COOKIE_NAMES.accessToken);
 	clearCookie(AUTH_COOKIE_NAMES.accountId);
 	clearCookie(AUTH_COOKIE_NAMES.auditorCode);
+	clearCookie(AUTH_COOKIE_NAMES.userName);
+	clearCookie(AUTH_COOKIE_NAMES.userEmail);
 }

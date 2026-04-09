@@ -429,41 +429,66 @@
 		}
 	},
 	"login": {
-		"validation": {
-			"auditorCodeAlphanumeric": "Der Auditor-Code muss alphanumerisch sein.",
-			"auditorCodeInvalid": "Der Auditor-Code ist ungültig."
-		},
 		"fields": {
 			"email": "E-Mail",
-			"password": "Passwort",
-			"auditorCode": "Auditor-Code"
+			"password": "Passwort"
 		},
 		"actions": {
 			"signIn": "Anmelden",
-			"signingIn": "Anmeldung läuft...",
-			"continue": "Weiter",
-			"continuing": "Weiterleitung läuft..."
+			"signingIn": "Anmeldung läuft..."
 		},
+		"errors": {
+			"unknownRole": "Unbekannter Kontotyp vom Server zurückgegeben.",
+			"unexpected": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
+		},
+		"noAccount": "Noch kein Konto?",
+		"signUpLink": "Registrieren",
+		"demoPasswordHint": "Demo-Passwort:",
 		"admin": {
 			"title": "Anmeldung für Administratoren",
 			"description": "Überblick über alle Konten, Projekte, Orte und Audit-Aktivitäten.",
-			"emailPlaceholder": "admin@company.com",
-			"demoLabel": "Demo-Administrator:"
+			"emailPlaceholder": "admin@firma.com",
+			"demoLabel": "Demo-Admin: playspace.admin@example.org"
 		},
 		"manager": {
 			"title": "Anmeldung für Manager",
 			"description": "Dashboard mit vollem Zugriff: Projekte, Orte, Auditoren und kombinierte Scores.",
-			"emailPlaceholder": "manager@company.com",
+			"emailPlaceholder": "manager@firma.com",
 			"demoLabel": "Demo-Manager:",
 			"demoOr": "oder"
 		},
 		"auditor": {
 			"title": "Anmeldung für Auditoren",
-			"description": "Eingeschränkter Zugriff: Führen Sie zugewiesene Audits mit Ihrem Auditor-Code aus.",
-			"codePlaceholder": "A1B2C3",
-			"note": "Auditoren werden ausschließlich über den Code identifiziert. In der Benutzeroberfläche werden keine echten Namen angezeigt.",
-			"demoLabel": "Demo-Codes testen:"
+			"description": "Zugewiesene Audits und Ausführung auf Ortsebene.",
+			"emailPlaceholder": "auditor@firma.com",
+			"demoLabel": "Als Auditor registrieren oder Seed-Konten verwenden."
 		}
+	},
+	"signup": {
+		"title": "Konto erstellen",
+		"description": "Registrieren Sie sich, um mit Playspace zu starten.",
+		"emailPlaceholder": "sie@firma.com",
+		"namePlaceholder": "Ihr vollständiger Name",
+		"fields": {
+			"name": "Vollständiger Name",
+			"email": "E-Mail",
+			"password": "Passwort",
+			"accountType": "Kontotyp"
+		},
+		"accountTypes": {
+			"manager": "Manager",
+			"auditor": "Auditor"
+		},
+		"actions": {
+			"createAccount": "Konto erstellen",
+			"creatingAccount": "Konto wird erstellt..."
+		},
+		"errors": {
+			"unknownRole": "Unbekannter Kontotyp vom Server zurückgegeben.",
+			"unexpected": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
+		},
+		"hasAccount": "Bereits ein Konto?",
+		"signInLink": "Anmelden"
 	},
 	"manager": {
 		"dashboard": {

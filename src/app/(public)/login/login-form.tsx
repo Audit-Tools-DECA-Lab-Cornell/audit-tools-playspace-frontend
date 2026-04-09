@@ -1,36 +1,27 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 import { z } from "zod";
 
+import type { AuthResponse } from "@/lib/auth/auth-api";
+import { loginWithCredentials } from "@/lib/auth/auth-api";
 import { setBrowserAuthSession } from "@/lib/auth/browser-session";
-import { resolveAdminAccountId, resolveManagerAccountId } from "@/lib/auth/demo-identities";
-import type { UserRole } from "@/lib/auth/role";
+import { mapAccountTypeToRole, type UserRole } from "@/lib/auth/role";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 
-const adminLoginSchema = z.object({
+const loginSchema = z.object({
 	email: z.email(),
 	password: z.string().min(8)
 });
 
-type AdminLoginValues = z.infer<typeof adminLoginSchema>;
-
-const managerLoginSchema = z.object({
-	email: z.email(),
-	password: z.string().min(8)
-});
-
-type ManagerLoginValues = z.infer<typeof managerLoginSchema>;
-
-interface AuditorLoginValues {
-	auditorCode: string;
-}
+type LoginValues = z.infer<typeof loginSchema>;
 
 type FormSubmitHandler = NonNullable<React.ComponentProps<"form">["onSubmit"]>;
 
@@ -56,11 +47,19 @@ function getRedirectAfterLogin(role: UserRole, nextParam: string | null): string
 	return getDefaultDashboard(role);
 }
 
-function createDemoAccessToken(): string {
-	if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-		return crypto.randomUUID();
-	}
-	return `demo_${Date.now()}`;
+function applyAuthResponse(authResponse: AuthResponse): UserRole | null {
+	const role = mapAccountTypeToRole(authResponse.user.account_type);
+	if (!role) return null;
+
+	setBrowserAuthSession({
+		role,
+		accessToken: authResponse.access_token,
+		accountId: authResponse.user.account_id,
+		userName: authResponse.user.name,
+		userEmail: authResponse.user.email
+	});
+
+	return role;
 }
 
 export interface LoginFormProps {
@@ -71,9 +70,6 @@ interface PendingButtonLabelProps {
 	label: string;
 }
 
-/**
- * Renders the compact loading treatment for the active submit button.
- */
 function PendingButtonLabel({ label }: Readonly<PendingButtonLabelProps>) {
 	return (
 		<>
@@ -86,320 +82,232 @@ function PendingButtonLabel({ label }: Readonly<PendingButtonLabelProps>) {
 	);
 }
 
-export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
+interface RoleLoginCardProps {
+	roleKey: string;
+	title: string;
+	description: string;
+	emailPlaceholder: string;
+	demoHint: React.ReactNode;
+	demoPassword: string;
+	nextParam: string | null;
+	disabled: boolean;
+	onLoginStart: () => void;
+	onLoginEnd: () => void;
+}
+
+function RoleLoginCard({
+	roleKey,
+	title,
+	description,
+	emailPlaceholder,
+	demoHint,
+	demoPassword,
+	nextParam,
+	disabled,
+	onLoginStart,
+	onLoginEnd
+}: Readonly<RoleLoginCardProps>) {
 	const router = useRouter();
 	const t = useTranslations("login");
-	const [isNavigating, startNavigation] = React.useTransition();
-	const [activeLoginRole, setActiveLoginRole] = React.useState<UserRole | null>(null);
-	const [adminValues, setAdminValues] = React.useState<AdminLoginValues>({
-		email: "",
-		password: ""
-	});
-	const [adminErrors, setAdminErrors] = React.useState<Partial<Record<keyof AdminLoginValues, string>>>({});
-	const [managerValues, setManagerValues] = React.useState<ManagerLoginValues>({
-		email: "",
-		password: ""
-	});
-	const [managerErrors, setManagerErrors] = React.useState<Partial<Record<keyof ManagerLoginValues, string>>>({});
-	const [auditorValues, setAuditorValues] = React.useState<AuditorLoginValues>({
-		auditorCode: ""
-	});
-	const [auditorErrors, setAuditorErrors] = React.useState<Partial<Record<keyof AuditorLoginValues, string>>>({});
+	const [values, setValues] = React.useState<LoginValues>({ email: "", password: "" });
+	const [fieldErrors, setFieldErrors] = React.useState<Partial<Record<keyof LoginValues, string>>>({});
+	const [serverError, setServerError] = React.useState<string | null>(null);
+	const [showPasswordHint, setShowPasswordHint] = React.useState(false);
+	const [isSubmitting, setIsSubmitting] = React.useState(false);
 
-	const auditorLoginSchema = React.useMemo(() => {
-		return z.object({
-			auditorCode: z.string().regex(/^[a-zA-Z0-9-_]+$/, {
-				message: t("validation.auditorCodeAlphanumeric")
-			})
-		});
-	}, [t]);
+	const handleSubmit: FormSubmitHandler = async event => {
+		event.preventDefault();
+		setServerError(null);
 
-	const isAdminPending = isNavigating && activeLoginRole === "admin";
-	const isManagerPending = isNavigating && activeLoginRole === "manager";
-	const isAuditorPending = isNavigating && activeLoginRole === "auditor";
+		const parsed = loginSchema.safeParse(values);
+		if (!parsed.success) {
+			const nextErrors: Partial<Record<keyof LoginValues, string>> = {};
+			const emailIssue = parsed.error.issues.find(issue => issue.path[0] === "email");
+			const passwordIssue = parsed.error.issues.find(issue => issue.path[0] === "password");
+			if (emailIssue?.message) nextErrors.email = emailIssue.message;
+			if (passwordIssue?.message) nextErrors.password = passwordIssue.message;
+			setFieldErrors(nextErrors);
+			return;
+		}
 
-	/**
-	 * Preserves the active submit button while the post-login route transition begins.
-	 */
-	const startRedirectAfterLogin = React.useCallback(
-		(role: UserRole) => {
-			const redirectPath = getRedirectAfterLogin(role, nextParam);
-			setActiveLoginRole(role);
-			startNavigation(() => {
-				router.push(redirectPath);
-			});
-		},
-		[nextParam, router, startNavigation]
+		setFieldErrors({});
+		setIsSubmitting(true);
+		onLoginStart();
+
+		try {
+			const authResponse = await loginWithCredentials(parsed.data.email, parsed.data.password);
+			const role = applyAuthResponse(authResponse);
+
+			if (!role) {
+				setServerError(t("errors.unknownRole"));
+				setIsSubmitting(false);
+				onLoginEnd();
+				return;
+			}
+
+			const redirectPath = getRedirectAfterLogin(role, nextParam ?? null);
+			router.push(redirectPath);
+		} catch (error) {
+			setServerError(error instanceof Error ? error.message : t("errors.unexpected"));
+			setShowPasswordHint(true);
+			setIsSubmitting(false);
+			onLoginEnd();
+		}
+	};
+
+	return (
+		<Card>
+			<CardHeader>
+				<CardTitle>{title}</CardTitle>
+				<CardDescription>{description}</CardDescription>
+			</CardHeader>
+			<CardContent>
+				<form className="grid gap-4" onSubmit={handleSubmit}>
+					{serverError ? (
+						<div className="rounded-md border border-destructive/50 bg-destructive/10 px-3 py-2 text-sm text-destructive">
+							{serverError}
+							<br />
+							<span className="text-xs text-muted-foreground">
+								Use email: <span className="font-mono">{emailPlaceholder}</span> and password: <span className="font-mono">{demoPassword}</span> to login.
+							</span>
+						</div>
+					) : null}
+
+					<div className="grid gap-2">
+						<Label htmlFor={`${roleKey}_email`}>{t("fields.email")}</Label>
+						<Input
+							id={`${roleKey}_email`}
+							type="email"
+							autoComplete="email"
+							placeholder={emailPlaceholder}
+							value={values.email}
+							onChange={event => {
+								const nextEmail = event.target.value;
+								setValues(current => ({ ...current, email: nextEmail }));
+								setFieldErrors(current => ({ ...current, email: undefined }));
+								setServerError(null);
+							}}
+						/>
+						{fieldErrors.email ? (
+							<p className="text-sm text-destructive">{fieldErrors.email}</p>
+						) : null}
+					</div>
+
+					<div className="grid gap-2">
+						<Label htmlFor={`${roleKey}_password`}>{t("fields.password")}</Label>
+						<Input
+							id={`${roleKey}_password`}
+							type="password"
+							autoComplete="current-password"
+							value={values.password}
+							onChange={event => {
+								const nextPassword = event.target.value;
+								setValues(current => ({ ...current, password: nextPassword }));
+								setFieldErrors(current => ({ ...current, password: undefined }));
+								setServerError(null);
+							}}
+						/>
+						{fieldErrors.password ? (
+							<p className="text-sm text-destructive">{fieldErrors.password}</p>
+						) : null}
+					</div>
+
+					<Button type="submit" disabled={disabled || isSubmitting} aria-busy={isSubmitting}>
+						{isSubmitting ? (
+							<PendingButtonLabel label={t("actions.signingIn")} />
+						) : (
+							t("actions.signIn")
+						)}
+					</Button>
+				</form>
+
+				<Separator className="my-6" />
+
+				<div className="space-y-1">
+					{demoHint}
+					{showPasswordHint ? (
+						<p className="text-xs font-medium text-amber-600 dark:text-amber-400">
+							{t("demoPasswordHint")}{" "}
+							<span className="font-mono">{demoPassword}</span>
+						</p>
+					) : null}
+				</div>
+			</CardContent>
+		</Card>
 	);
+}
 
-	const handleAdminSubmit: FormSubmitHandler = event => {
-		event.preventDefault();
-
-		const parsedValues = adminLoginSchema.safeParse(adminValues);
-		if (!parsedValues.success) {
-			const nextErrors: Partial<Record<keyof AdminLoginValues, string>> = {};
-			const emailIssue = parsedValues.error.issues.find(issue => issue.path[0] === "email");
-			const passwordIssue = parsedValues.error.issues.find(issue => issue.path[0] === "password");
-
-			if (emailIssue?.message) {
-				nextErrors.email = emailIssue.message;
-			}
-			if (passwordIssue?.message) {
-				nextErrors.password = passwordIssue.message;
-			}
-			setAdminErrors(nextErrors);
-			return;
-		}
-
-		setAdminErrors({});
-		setBrowserAuthSession({
-			role: "admin",
-			accessToken: createDemoAccessToken(),
-			accountId: resolveAdminAccountId()
-		});
-		startRedirectAfterLogin("admin");
-	};
-
-	const handleManagerSubmit: FormSubmitHandler = event => {
-		event.preventDefault();
-
-		const parsedValues = managerLoginSchema.safeParse(managerValues);
-		if (!parsedValues.success) {
-			const nextErrors: Partial<Record<keyof ManagerLoginValues, string>> = {};
-			const emailIssue = parsedValues.error.issues.find(issue => issue.path[0] === "email");
-			const passwordIssue = parsedValues.error.issues.find(issue => issue.path[0] === "password");
-
-			if (emailIssue?.message) {
-				nextErrors.email = emailIssue.message;
-			}
-			if (passwordIssue?.message) {
-				nextErrors.password = passwordIssue.message;
-			}
-
-			setManagerErrors(nextErrors);
-			return;
-		}
-
-		setManagerErrors({});
-		setBrowserAuthSession({
-			role: "manager",
-			accessToken: createDemoAccessToken(),
-			accountId: resolveManagerAccountId(parsedValues.data.email)
-		});
-		startRedirectAfterLogin("manager");
-	};
-
-	const handleAuditorSubmit: FormSubmitHandler = event => {
-		event.preventDefault();
-
-		const parsedValues = auditorLoginSchema.safeParse(auditorValues);
-		if (!parsedValues.success) {
-			const auditorCodeIssue = parsedValues.error.issues.find(issue => issue.path[0] === "auditorCode");
-			setAuditorErrors({
-				auditorCode: auditorCodeIssue?.message ?? t("validation.auditorCodeInvalid")
-			});
-			return;
-		}
-
-		setAuditorErrors({});
-		setBrowserAuthSession({
-			role: "auditor",
-			accessToken: createDemoAccessToken(),
-			auditorCode: parsedValues.data.auditorCode
-		});
-		startRedirectAfterLogin("auditor");
-	};
+export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
+	const t = useTranslations("login");
+	const [activeCard, setActiveCard] = React.useState<string | null>(null);
 
 	return (
 		<div className="min-h-dvh bg-background">
 			<div className="mx-auto flex min-h-dvh w-full max-w-5xl items-center px-4 py-10">
-				<div className="grid w-full gap-6 lg:grid-cols-3">
-					<Card>
-						<CardHeader>
-							<CardTitle>{t("admin.title")}</CardTitle>
-							<CardDescription>{t("admin.description")}</CardDescription>
-						</CardHeader>
-						<CardContent>
-							<form className="grid gap-4" onSubmit={handleAdminSubmit}>
-								<div className="grid gap-2">
-									<Label htmlFor="admin_email">{t("fields.email")}</Label>
-									<Input
-										id="admin_email"
-										type="email"
-										autoComplete="email"
-										placeholder={t("admin.emailPlaceholder")}
-										value={adminValues.email}
-										onChange={event => {
-											const nextEmail = event.target.value;
-											setAdminValues(currentValues => ({
-												...currentValues,
-												email: nextEmail
-											}));
-											setAdminErrors(currentErrors => ({
-												...currentErrors,
-												email: undefined
-											}));
-										}}
-									/>
-									{adminErrors.email ? (
-										<p className="text-sm text-destructive">{adminErrors.email}</p>
-									) : null}
-								</div>
-
-								<div className="grid gap-2">
-									<Label htmlFor="admin_password">{t("fields.password")}</Label>
-									<Input
-										id="admin_password"
-										type="password"
-										autoComplete="current-password"
-										value={adminValues.password}
-										onChange={event => {
-											const nextPassword = event.target.value;
-											setAdminValues(currentValues => ({
-												...currentValues,
-												password: nextPassword
-											}));
-											setAdminErrors(currentErrors => ({
-												...currentErrors,
-												password: undefined
-											}));
-										}}
-									/>
-									{adminErrors.password ? (
-										<p className="text-sm text-destructive">{adminErrors.password}</p>
-									) : null}
-								</div>
-
-								<Button type="submit" disabled={isNavigating} aria-busy={isAdminPending}>
-									{isAdminPending ? (
-										<PendingButtonLabel label={t("actions.signingIn")} />
-									) : (
-										t("actions.signIn")
-									)}
-								</Button>
+				<div className="w-full space-y-6">
+					<div className="grid w-full gap-6 lg:grid-cols-3">
+						<RoleLoginCard
+							roleKey="admin"
+							title={t("admin.title")}
+							description={t("admin.description")}
+							emailPlaceholder={t("admin.emailPlaceholder")}
+							demoPassword="DemoPass123!"
+							demoHint={
 								<p className="text-xs text-muted-foreground">
 									{t("admin.demoLabel")}{" "}
 									<span className="font-mono">playspace.admin@example.org</span>
 								</p>
-							</form>
-						</CardContent>
-					</Card>
+							}
+							nextParam={nextParam}
+							disabled={activeCard !== null && activeCard !== "admin"}
+							onLoginStart={() => setActiveCard("admin")}
+							onLoginEnd={() => setActiveCard(null)}
+						/>
 
-					<Card>
-						<CardHeader>
-							<CardTitle>{t("manager.title")}</CardTitle>
-							<CardDescription>{t("manager.description")}</CardDescription>
-						</CardHeader>
-						<CardContent>
-							<form className="grid gap-4" onSubmit={handleManagerSubmit}>
-								<div className="grid gap-2">
-									<Label htmlFor="manager_email">{t("fields.email")}</Label>
-									<Input
-										id="manager_email"
-										type="email"
-										autoComplete="email"
-										placeholder={t("manager.emailPlaceholder")}
-										value={managerValues.email}
-										onChange={event => {
-											const nextEmail = event.target.value;
-											setManagerValues(currentValues => ({
-												...currentValues,
-												email: nextEmail
-											}));
-											setManagerErrors(currentErrors => ({
-												...currentErrors,
-												email: undefined
-											}));
-										}}
-									/>
-									{managerErrors.email ? (
-										<p className="text-sm text-destructive">{managerErrors.email}</p>
-									) : null}
-								</div>
-
-								<div className="grid gap-2">
-									<Label htmlFor="manager_password">{t("fields.password")}</Label>
-									<Input
-										id="manager_password"
-										type="password"
-										autoComplete="current-password"
-										value={managerValues.password}
-										onChange={event => {
-											const nextPassword = event.target.value;
-											setManagerValues(currentValues => ({
-												...currentValues,
-												password: nextPassword
-											}));
-											setManagerErrors(currentErrors => ({
-												...currentErrors,
-												password: undefined
-											}));
-										}}
-									/>
-									{managerErrors.password ? (
-										<p className="text-sm text-destructive">{managerErrors.password}</p>
-									) : null}
-								</div>
-
-								<Button type="submit" disabled={isNavigating} aria-busy={isManagerPending}>
-									{isManagerPending ? (
-										<PendingButtonLabel label={t("actions.signingIn")} />
-									) : (
-										t("actions.signIn")
-									)}
-								</Button>
+						<RoleLoginCard
+							roleKey="manager"
+							title={t("manager.title")}
+							description={t("manager.description")}
+							emailPlaceholder={t("manager.emailPlaceholder")}
+							demoPassword="DemoPass123!"
+							demoHint={
 								<p className="text-xs text-muted-foreground">
-									{t("manager.demoLabel")} <span className="font-mono">manager@example.org</span>{" "}
+									{t("manager.demoLabel")}{" "}
+									<span className="font-mono">manager@example.org</span>{" "}
 									{t("manager.demoOr")}{" "}
 									<span className="font-mono">canterbury.manager@example.org</span>
 								</p>
-							</form>
-						</CardContent>
-					</Card>
+							}
+							nextParam={nextParam}
+							disabled={activeCard !== null && activeCard !== "manager"}
+							onLoginStart={() => setActiveCard("manager")}
+							onLoginEnd={() => setActiveCard(null)}
+						/>
 
-					<Card>
-						<CardHeader>
-							<CardTitle>{t("auditor.title")}</CardTitle>
-							<CardDescription>{t("auditor.description")}</CardDescription>
-						</CardHeader>
-						<CardContent>
-							<form className="grid gap-4" onSubmit={handleAuditorSubmit}>
-								<div className="grid gap-2">
-									<Label htmlFor="auditor_code">{t("fields.auditorCode")}</Label>
-									<Input
-										id="auditor_code"
-										autoComplete="off"
-										placeholder={t("auditor.codePlaceholder")}
-										value={auditorValues.auditorCode}
-										onChange={event => {
-											const nextAuditorCode = event.target.value;
-											setAuditorValues({ auditorCode: nextAuditorCode });
-											setAuditorErrors({ auditorCode: undefined });
-										}}
-									/>
-									{auditorErrors.auditorCode ? (
-										<p className="text-sm text-destructive">{auditorErrors.auditorCode}</p>
-									) : null}
-								</div>
+						<RoleLoginCard
+							roleKey="auditor"
+							title={t("auditor.title")}
+							description={t("auditor.description")}
+							emailPlaceholder={t("auditor.emailPlaceholder")}
+							demoPassword="DemoPass123!"
+							demoHint={
+								<p className="text-xs text-muted-foreground">
+									{t("auditor.demoLabel")}
+								</p>
+							}
+							nextParam={nextParam}
+							disabled={activeCard !== null && activeCard !== "auditor"}
+							onLoginStart={() => setActiveCard("auditor")}
+							onLoginEnd={() => setActiveCard(null)}
+						/>
+					</div>
 
-								<Button type="submit" disabled={isNavigating} aria-busy={isAuditorPending}>
-									{isAuditorPending ? (
-										<PendingButtonLabel label={t("actions.continuing")} />
-									) : (
-										t("actions.continue")
-									)}
-								</Button>
-							</form>
-
-							<Separator className="my-6" />
-
-							<p className="text-sm text-muted-foreground">{t("auditor.note")}</p>
-							<p className="text-xs text-muted-foreground">
-								{t("auditor.demoLabel")} <span className="font-mono">AKL-01</span>,{" "}
-								<span className="font-mono">AKL-02</span>, or <span className="font-mono">CHC-01</span>
-							</p>
-						</CardContent>
-					</Card>
+					<div className="text-center text-sm text-muted-foreground">
+						{t("noAccount")}{" "}
+						<Link href="/signup" className="font-medium text-primary underline-offset-4 hover:underline">
+							{t("signUpLink")}
+						</Link>
+					</div>
 				</div>
 			</div>
 		</div>

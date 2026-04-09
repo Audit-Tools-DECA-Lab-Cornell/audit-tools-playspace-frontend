@@ -36,6 +36,8 @@ import {
 export interface AppShellProps {
 	role: UserRole;
 	auditorCode: string | null;
+	userName: string | null;
+	userEmail: string | null;
 	children: React.ReactNode;
 }
 
@@ -108,13 +110,19 @@ function NavLinks({ items, onNavigate }: Readonly<{ items: NavItem[]; onNavigate
 	);
 }
 
-function UserMenu({ role, auditorCode }: Readonly<{ role: UserRole; auditorCode: string | null }>) {
+function UserMenu({
+	role,
+	auditorCode,
+	userName,
+	userEmail
+}: Readonly<{ role: UserRole; auditorCode: string | null; userName: string | null; userEmail: string | null }>) {
 	const router = useRouter();
 	const t = useTranslations("shell.userMenu");
 	const commonT = useTranslations("common.roles");
 
-	const label =
-		role === "auditor"
+	const label = userName
+		? userName
+		: role === "auditor"
 			? auditorCode
 				? t("auditorWithCode", { code: auditorCode })
 				: commonT("auditor")
@@ -131,7 +139,10 @@ function UserMenu({ role, auditorCode }: Readonly<{ role: UserRole; auditorCode:
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="end" className="w-56">
-				<DropdownMenuLabel>{t("accountLabel")}</DropdownMenuLabel>
+				<DropdownMenuLabel className="flex flex-col gap-1">
+					<span className="text-lg font-semibold tracking-normal">{userName ?? t("accountLabel")}</span>
+					{userEmail ? <span className="text-xs font-normal text-muted-foreground">{userEmail}</span> : null}
+				</DropdownMenuLabel>
 				<DropdownMenuSeparator />
 				<DropdownMenuItem asChild>
 					<Link href="/settings" className="flex items-center gap-2">
@@ -154,7 +165,7 @@ function UserMenu({ role, auditorCode }: Readonly<{ role: UserRole; auditorCode:
 	);
 }
 
-export function AppShell({ role, auditorCode, children }: Readonly<AppShellProps>) {
+export function AppShell({ role, auditorCode, userName, userEmail, children }: Readonly<AppShellProps>) {
 	const navigationT = useTranslations("shell.navigation");
 	const shellT = useTranslations("shell");
 	const roleT = useTranslations("common.workspace");
@@ -217,7 +228,7 @@ export function AppShell({ role, auditorCode, children }: Readonly<AppShellProps
 
 							<div className="text-sm font-semibold md:hidden">{shellT("mobileBrand")}</div>
 							<div className="flex-1" />
-							<UserMenu role={role} auditorCode={auditorCode} />
+							<UserMenu role={role} auditorCode={auditorCode} userName={userName} userEmail={userEmail} />
 						</div>
 					</header>
 

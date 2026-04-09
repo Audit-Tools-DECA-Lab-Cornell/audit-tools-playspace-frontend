@@ -18,6 +18,8 @@ export async function getServerAuthSession(): Promise<ServerAuthSession | null> 
 	if (!role || !accessToken) return null;
 
 	const auditorCode = role === "auditor" ? (cookieStore.get(AUTH_COOKIE_NAMES.auditorCode)?.value ?? null) : null;
+	const userName = cookieStore.get(AUTH_COOKIE_NAMES.userName)?.value ?? null;
+	const userEmail = cookieStore.get(AUTH_COOKIE_NAMES.userEmail)?.value ?? null;
 
-	return { role, accessToken, accountId, auditorCode };
+	return { role, accessToken, accountId, auditorCode, userName, userEmail };
 }

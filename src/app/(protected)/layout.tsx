@@ -10,7 +10,11 @@ export default async function ProtectedLayout({ children }: Readonly<{ children:
 
 	return (
 		<AuthSessionProvider initialSession={session}>
-			<AppShell role={session.role} auditorCode={session.auditorCode}>
+			<AppShell
+				role={session.role}
+				auditorCode={session.auditorCode}
+				userName={session.userName}
+				userEmail={session.userEmail}>
 				{children}
 			</AppShell>
 		</AuthSessionProvider>

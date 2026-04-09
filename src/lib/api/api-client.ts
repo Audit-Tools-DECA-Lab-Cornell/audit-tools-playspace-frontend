@@ -48,18 +48,6 @@ function attachAuthToken(config: InternalAxiosRequestConfig) {
 	if (accessToken) {
 		headers.set("Authorization", `Bearer ${accessToken}`);
 	}
-	const role = getCookieValue(AUTH_COOKIE_NAMES.role);
-	if (role) {
-		headers.set("x-demo-role", role);
-	}
-	const accountId = getCookieValue(AUTH_COOKIE_NAMES.accountId);
-	if (accountId) {
-		headers.set("x-demo-account-id", accountId);
-	}
-	const auditorCode = getCookieValue(AUTH_COOKIE_NAMES.auditorCode);
-	if (auditorCode) {
-		headers.set("x-demo-auditor-code", auditorCode);
-	}
 	config.headers = headers;
 	return config;
 }
@@ -68,10 +56,9 @@ function handleUnauthorized(error: AxiosError) {
 	if (globalThis.window === undefined) return;
 	if (error.response?.status !== 401) return;
 
-	clearCookie(AUTH_COOKIE_NAMES.role);
-	clearCookie(AUTH_COOKIE_NAMES.accessToken);
-	clearCookie(AUTH_COOKIE_NAMES.accountId);
-	clearCookie(AUTH_COOKIE_NAMES.auditorCode);
+	for (const name of Object.values(AUTH_COOKIE_NAMES)) {
+		clearCookie(name);
+	}
 
 	globalThis.window.location.assign("/login");
 }
