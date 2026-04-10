@@ -11235,7 +11235,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								},
 								{
 									key: "a_litle_bit",
-									label: "A litle bit",
+									label: "A little bit",
 									addition_value: 1,
 									boost_value: 1,
 									allows_follow_up_scales: true,
@@ -11396,7 +11396,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								},
 								{
 									key: "a_litle_bit",
-									label: "A litle bit",
+									label: "A little bit",
 									addition_value: 1,
 									boost_value: 1,
 									allows_follow_up_scales: true,
@@ -11557,7 +11557,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								},
 								{
 									key: "a_litle_bit",
-									label: "A litle bit",
+									label: "A little bit",
 									addition_value: 1,
 									boost_value: 1,
 									allows_follow_up_scales: true,
@@ -11718,7 +11718,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								},
 								{
 									key: "a_litle_bit",
-									label: "A litle bit",
+									label: "A little bit",
 									addition_value: 1,
 									boost_value: 1,
 									allows_follow_up_scales: true,
@@ -11879,7 +11879,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								},
 								{
 									key: "a_litle_bit",
-									label: "A litle bit",
+									label: "A little bit",
 									addition_value: 1,
 									boost_value: 1,
 									allows_follow_up_scales: true,
@@ -12040,7 +12040,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								},
 								{
 									key: "a_litle_bit",
-									label: "A litle bit",
+									label: "A little bit",
 									addition_value: 1,
 									boost_value: 1,
 									allows_follow_up_scales: true,
@@ -12201,7 +12201,7 @@ export const BASE_PLAYSPACE_INSTRUMENT: PlayspaceInstrument = {
 								},
 								{
 									key: "a_litle_bit",
-									label: "A litle bit",
+									label: "A little bit",
 									addition_value: 1,
 									boost_value: 1,
 									allows_follow_up_scales: true,
