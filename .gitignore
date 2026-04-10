@@ -44,6 +44,7 @@ next-env.d.ts
 skills-lock.json
 .agents/
 .worktrees/
+.cline/
 
 .DS_Store
 
