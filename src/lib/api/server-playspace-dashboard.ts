@@ -7,15 +7,15 @@ const projectStatusSchema = z.enum(["planned", "active", "completed"]);
 const auditStatusSchema = z.enum(["IN_PROGRESS", "PAUSED", "SUBMITTED"]);
 
 const managerProfileSchema = z.object({
-	id: z.string().uuid(),
-	account_id: z.string().uuid(),
+	id: z.uuid(),
+	account_id: z.uuid(),
 	full_name: z.string(),
-	email: z.string().email(),
+	email: z.email(),
 	phone: z.string().nullable(),
 	position: z.string().nullable(),
 	organization: z.string().nullable(),
 	is_primary: z.boolean(),
-	created_at: z.string().datetime()
+	created_at: z.iso.datetime()
 });
 
 const accountStatsSchema = z.object({
@@ -26,18 +26,18 @@ const accountStatsSchema = z.object({
 });
 
 const recentActivitySchema = z.object({
-	audit_id: z.string().uuid(),
+	audit_id: z.uuid(),
 	audit_code: z.string(),
-	project_id: z.string().uuid(),
+	project_id: z.uuid(),
 	project_name: z.string(),
-	place_id: z.string().uuid(),
+	place_id: z.uuid(),
 	place_name: z.string(),
 	completed_at: z.string().datetime(),
 	score: z.number().nullable()
 });
 
 const accountDetailSchema = z.object({
-	id: z.string().uuid(),
+	id: z.uuid(),
 	name: z.string(),
 	email: z.string().email(),
 	account_type: accountTypeSchema,
@@ -48,13 +48,13 @@ const accountDetailSchema = z.object({
 });
 
 const projectSummarySchema = z.object({
-	id: z.string().uuid(),
-	account_id: z.string().uuid(),
+	id: z.uuid(),
+	account_id: z.uuid(),
 	name: z.string(),
 	overview: z.string().nullable(),
 	place_types: z.array(z.string()),
-	start_date: z.string().date().nullable(),
-	end_date: z.string().date().nullable(),
+	start_date: z.iso.date().nullable(),
+	end_date: z.iso.date().nullable(),
 	status: projectStatusSchema,
 	places_count: z.number().int().nonnegative(),
 	auditors_count: z.number().int().nonnegative(),
@@ -63,18 +63,18 @@ const projectSummarySchema = z.object({
 });
 
 const auditorSummarySchema = z.object({
-	id: z.string().uuid(),
-	account_id: z.string().uuid(),
+	id: z.uuid(),
+	account_id: z.uuid(),
 	auditor_code: z.string(),
 	full_name: z.string(),
-	email: z.string().email().nullable(),
+	email: z.email().nullable(),
 	age_range: z.string().nullable(),
 	gender: z.string().nullable(),
 	country: z.string().nullable(),
 	role: z.string().nullable(),
 	assignments_count: z.number().int().nonnegative(),
 	completed_audits: z.number().int().nonnegative(),
-	last_active_at: z.string().datetime().nullable()
+	last_active_at: z.iso.datetime().nullable()
 });
 
 const adminOverviewSchema = z.object({
@@ -88,18 +88,18 @@ const adminOverviewSchema = z.object({
 });
 
 const adminAuditRowSchema = z.object({
-	audit_id: z.string().uuid(),
+	audit_id: z.uuid(),
 	audit_code: z.string(),
 	status: auditStatusSchema,
-	account_id: z.string().uuid(),
+	account_id: z.uuid(),
 	account_name: z.string(),
-	project_id: z.string().uuid(),
+	project_id: z.uuid(),
 	project_name: z.string(),
-	place_id: z.string().uuid(),
+	place_id: z.uuid(),
 	place_name: z.string(),
 	auditor_code: z.string(),
-	started_at: z.string().datetime(),
-	submitted_at: z.string().datetime().nullable(),
+	started_at: z.iso.datetime(),
+	submitted_at: z.iso.datetime().nullable(),
 	summary_score: z.number().nullable()
 });
 
@@ -173,6 +173,46 @@ export type ServerAdminDashboardData = Readonly<{
 	latestAudits: z.infer<typeof adminAuditRowSchema>[];
 }>;
 
+const auditorPlaceSchema = z.object({
+	place_id: z.uuid(),
+	place_name: z.string(),
+	place_type: z.string().nullable(),
+	project_id: z.uuid(),
+	project_name: z.string(),
+	city: z.string().nullable(),
+	province: z.string().nullable(),
+	country: z.string().nullable(),
+	audit_status: auditStatusSchema.nullable(),
+	audit_id: z.uuid().nullable(),
+	started_at: z.iso.datetime().nullable(),
+	submitted_at: z.iso.datetime().nullable(),
+	summary_score: z.number().nullable(),
+	score_totals: z
+		.object({
+			quantity_total: z.number(),
+			diversity_total: z.number(),
+			challenge_total: z.number(),
+			sociability_total: z.number(),
+			play_value_total: z.number(),
+			usability_total: z.number()
+		})
+		.nullable(),
+	progress_percent: z.number().nullable()
+});
+
+const auditorDashboardSummarySchema = z.object({
+	total_assigned_places: z.number().int().nonnegative(),
+	in_progress_audits: z.number().int().nonnegative(),
+	submitted_audits: z.number().int().nonnegative(),
+	pending_places: z.number().int().nonnegative(),
+	average_submitted_score: z.number().nullable()
+});
+
+export type ServerAuditorDashboardData = Readonly<{
+	summary: z.infer<typeof auditorDashboardSummarySchema>;
+	places: z.infer<typeof auditorPlaceSchema>[];
+}>;
+
 /**
  * Fetch the manager dashboard payloads on the server so the page can render without a client-side request waterfall.
  */
@@ -216,5 +256,23 @@ export async function getServerAdminDashboardData(): Promise<ServerAdminDashboar
 	return {
 		overview,
 		latestAudits: auditsPage.items
+	};
+}
+
+/**
+ * Fetch the auditor dashboard payloads on the server so the page can render without a client-side request waterfall.
+ */
+export async function getServerAuditorDashboardData(): Promise<ServerAuditorDashboardData> {
+	const [summary, placesPage] = await Promise.all([
+		fetchServerValidatedJson("/playspace/auditor/me/dashboard-summary", auditorDashboardSummarySchema),
+		fetchServerValidatedJson(
+			"/playspace/auditor/me/places?page=1&page_size=5&sort=place_name",
+			paginatedResponseSchema(auditorPlaceSchema)
+		)
+	]);
+
+	return {
+		summary,
+		places: placesPage.items
 	};
 }

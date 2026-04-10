@@ -88,6 +88,7 @@ interface RoleLoginCardProps {
 	description: string;
 	emailPlaceholder: string;
 	demoHint: React.ReactNode;
+	demoEmail: string;
 	demoPassword: string;
 	nextParam: string | null;
 	disabled: boolean;
@@ -101,6 +102,7 @@ function RoleLoginCard({
 	description,
 	emailPlaceholder,
 	demoHint,
+	demoEmail,
 	demoPassword,
 	nextParam,
 	disabled,
@@ -168,7 +170,7 @@ function RoleLoginCard({
 							{serverError}
 							<br />
 							<span className="text-xs text-muted-foreground">
-								Use email: <span className="font-mono">{emailPlaceholder}</span> and password: <span className="font-mono">{demoPassword}</span> to login.
+								<span className="text-primary">Use Email:</span> <span className="font-mono">{demoEmail}</span> and <span className="text-primary">Password:</span> <span className="font-mono">{demoPassword}</span> to login.
 							</span>
 						</div>
 					) : null}
@@ -251,10 +253,11 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 							title={t("admin.title")}
 							description={t("admin.description")}
 							emailPlaceholder={t("admin.emailPlaceholder")}
+							demoEmail="playspace.admin@example.org"
 							demoPassword="DemoPass123!"
 							demoHint={
 								<p className="text-xs text-muted-foreground">
-									{t("admin.demoLabel")}{" "}
+									<span className="text-amber-600 dark:text-amber-400">{t("admin.demoLabel")}</span>{" "}
 									<span className="font-mono">playspace.admin@example.org</span>
 								</p>
 							}
@@ -269,10 +272,11 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 							title={t("manager.title")}
 							description={t("manager.description")}
 							emailPlaceholder={t("manager.emailPlaceholder")}
+							demoEmail="manager@example.org"
 							demoPassword="DemoPass123!"
 							demoHint={
 								<p className="text-xs text-muted-foreground">
-									{t("manager.demoLabel")}{" "}
+									<span className="text-amber-600 dark:text-amber-400">{t("manager.demoLabel")}</span>{" "}
 									<span className="font-mono">manager@example.org</span>{" "}
 									{t("manager.demoOr")}{" "}
 									<span className="font-mono">canterbury.manager@example.org</span>
@@ -289,10 +293,12 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 							title={t("auditor.title")}
 							description={t("auditor.description")}
 							emailPlaceholder={t("auditor.emailPlaceholder")}
+							demoEmail="talia.cooper@example.org"
 							demoPassword="DemoPass123!"
 							demoHint={
 								<p className="text-xs text-muted-foreground">
-									{t("auditor.demoLabel")}
+									<span className="text-amber-600 dark:text-amber-400">{t("auditor.demoLabel")}</span>{" "}
+									<span className="font-mono">talia.cooper@example.org</span>
 								</p>
 							}
 							nextParam={nextParam}

@@ -448,7 +448,7 @@
 			"title": "Anmeldung für Administratoren",
 			"description": "Überblick über alle Konten, Projekte, Orte und Audit-Aktivitäten.",
 			"emailPlaceholder": "admin@firma.com",
-			"demoLabel": "Demo-Admin: playspace.admin@example.org"
+			"demoLabel": "Demo-Admin:"
 		},
 		"manager": {
 			"title": "Anmeldung für Manager",

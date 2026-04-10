@@ -448,7 +448,7 @@
 			"title": "Administrator sign in",
 			"description": "Global oversight across accounts, projects, places, and audit activity.",
 			"emailPlaceholder": "admin@company.com",
-			"demoLabel": "Demo admin: playspace.admin@example.org"
+			"demoLabel": "Demo admin:"
 		},
 		"manager": {
 			"title": "Manager sign in",
