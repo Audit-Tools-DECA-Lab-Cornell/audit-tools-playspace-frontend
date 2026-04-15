@@ -4,19 +4,17 @@ import { chromium } from "playwright";
 import { Stagehand, type V3Env } from "@browserbasehq/stagehand";
 import { attachBugCollectors } from "./helpers/bugCollector";
 
-test(
-	"ai exploratory spreadsheet run",
-	async ({ page }, testInfo) => {
-		const bugs = attachBugCollectors(page);
+test("ai exploratory spreadsheet run", {}, async ({ page }, testInfo) => {
+	const bugs = attachBugCollectors(page);
 
-		await page.goto("/admin/instruments");
-		await page
-			.getByRole("button", { name: /edit duplicate/i })
-			.first()
-			.click();
-		await page.getByRole("tab", { name: /editable spreadsheet/i }).click();
+	await page.goto("/admin/instruments");
+	await page
+		.getByRole("button", { name: /edit duplicate/i })
+		.first()
+		.click();
+	await page.getByRole("tab", { name: /editable spreadsheet/i }).click();
 
-		const charter = `
+	const charter = `
   Explore the editable spreadsheet aggressively.
   Try search, section/type/mode filters, fullscreen, inline prompt edits,
   question key edits, mode changes, construct changes, and section metadata edits.
@@ -26,12 +24,10 @@ test(
   broken layout, stuck edit state, missing save, or console/request failure.
   `;
 
-		// Replace this block with your chosen agent.
-		// Example pattern:
-		const agent = new Stagehand({ env: { OPENAI_API_KEY: process.env.OPENAI_API_KEY } as V3Env });
-		await agent.act(charter);
+	// Replace this block with your chosen agent.
+	// Example pattern:
+	const agent = new Stagehand({ env: { OPENAI_API_KEY: process.env.OPENAI_API_KEY } as unknown as V3Env });
+	await agent.act(charter);
 
-		await bugs.flush(testInfo);
-	},
-	{ tags: ["exploratory"] }
-);
+	await bugs.flush(testInfo);
+});
