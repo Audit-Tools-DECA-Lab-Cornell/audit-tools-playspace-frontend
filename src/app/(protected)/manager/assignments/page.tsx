@@ -10,7 +10,6 @@ import { playspaceApi, type AuditorSummary } from "@/lib/api/playspace";
 import {
 	AssignmentComposerPanel,
 	type AssignmentFieldErrors,
-	type AssignmentScope,
 	type AssignmentSummaryState
 } from "@/components/dashboard/assignment-composer-panel";
 import { useAuthSession } from "@/components/app/auth-session-provider";
@@ -21,6 +20,7 @@ import { formatDateTimeLabel } from "@/components/dashboard/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { cn } from "@/lib/utils";
@@ -58,7 +58,9 @@ interface AuditorListPickerProps {
 	readonly disabled?: boolean;
 	readonly emailPendingLabel: string;
 	readonly selectedLabel: string;
-	readonly selectedAuditorId: string;
+	readonly selectAllLabel: string;
+	readonly deselectAllLabel: string;
+	readonly selectedAuditorIds: readonly string[];
 	readonly searchQuery: string;
 	readonly searchLabel: string;
 	readonly searchPlaceholder: string;
@@ -68,7 +70,8 @@ interface AuditorListPickerProps {
 	readonly helperText: string;
 	readonly clearLabel: string;
 	readonly onSearchQueryChange: (nextValue: string) => void;
-	readonly onSelectAuditor: (nextValue: string) => void;
+	readonly onToggleAuditor: (nextValue: string) => void;
+	readonly onToggleAllAuditors: (nextValue: boolean) => void;
 	readonly onClearSelection: () => void;
 	readonly errorText?: string;
 }
@@ -78,7 +81,9 @@ function AuditorListPicker({
 	disabled = false,
 	emailPendingLabel,
 	selectedLabel,
-	selectedAuditorId,
+	selectAllLabel,
+	deselectAllLabel,
+	selectedAuditorIds,
 	searchQuery,
 	searchLabel,
 	searchPlaceholder,
@@ -88,10 +93,14 @@ function AuditorListPicker({
 	helperText,
 	clearLabel,
 	onSearchQueryChange,
-	onSelectAuditor,
+	onToggleAuditor,
+	onToggleAllAuditors,
 	onClearSelection,
 	errorText
 }: Readonly<AuditorListPickerProps>) {
+	const allSelected = auditors.length > 0 && auditors.every(auditor => selectedAuditorIds.includes(auditor.id));
+	const someSelected = auditors.some(auditor => selectedAuditorIds.includes(auditor.id)) && !allSelected;
+
 	return (
 		<>
 			<div className="grid gap-2">
@@ -107,7 +116,26 @@ function AuditorListPicker({
 					}}
 					placeholder={searchPlaceholder}
 				/>
-				<p className="text-sm text-muted-foreground">{searchResultsText}</p>
+				<div className="flex items-center justify-between gap-2">
+					<p className="text-sm text-muted-foreground">{searchResultsText}</p>
+					{auditors.length > 0 ? (
+						<div className="flex items-center gap-2">
+							<Checkbox
+								id="select_all_auditors"
+								checked={allSelected ? true : someSelected ? "indeterminate" : false}
+								onCheckedChange={checked => {
+									onToggleAllAuditors(checked === true);
+								}}
+								disabled={disabled}
+							/>
+							<Label
+								htmlFor="select_all_auditors"
+								className="text-xs font-medium cursor-pointer leading-none">
+								{allSelected ? deselectAllLabel : selectAllLabel}
+							</Label>
+						</div>
+					) : null}
+				</div>
 			</div>
 			<div className="grid gap-2">
 				<Label>{pickerLabel}</Label>
@@ -117,35 +145,46 @@ function AuditorListPicker({
 					) : (
 						<div className="grid divide-y divide-border/60">
 							{auditors.map(auditor => {
-								const isSelected = auditor.id === selectedAuditorId;
+								const isSelected = selectedAuditorIds.includes(auditor.id);
 								return (
-									<button
+									<div
 										key={auditor.id}
-										type="button"
 										className={cn(
-											"grid gap-1 px-4 py-3 text-left transition-colors disabled:cursor-not-allowed disabled:opacity-60",
-											isSelected ? "bg-primary/10" : "hover:bg-muted/40"
-										)}
-										disabled={disabled}
-										onClick={() => {
-											onSelectAuditor(auditor.id);
-										}}>
-										<div className="flex flex-wrap items-center gap-2">
-											<Badge variant="outline" className="font-mono text-primary">
-												{auditor.auditor_code}
-											</Badge>
-											{auditor.role ? (
-												<Badge variant="secondary" style={{ textTransform: "capitalize" }}>
-													{auditor.role}
+											"flex items-center gap-3 px-4 py-3 text-left transition-colors",
+											isSelected ? "bg-primary/5" : "hover:bg-muted/40"
+										)}>
+										<Checkbox
+											id={`auditor_${auditor.id}`}
+											checked={isSelected}
+											onCheckedChange={() => {
+												onToggleAuditor(auditor.id);
+											}}
+											disabled={disabled}
+										/>
+										<button
+											type="button"
+											className="grid flex-1 gap-1 text-left disabled:cursor-not-allowed"
+											disabled={disabled}
+											onClick={() => {
+												onToggleAuditor(auditor.id);
+											}}>
+											<div className="flex flex-wrap items-center gap-2">
+												<Badge variant="outline" className="font-mono text-primary">
+													{auditor.auditor_code}
 												</Badge>
-											) : null}
-											{isSelected ? <Badge variant="outline">{selectedLabel}</Badge> : null}
-										</div>
-										<p className="font-medium text-foreground">{auditor.full_name}</p>
-										<p className="text-sm text-muted-foreground">
-											{auditor.email ?? emailPendingLabel}
-										</p>
-									</button>
+												{auditor.role ? (
+													<Badge variant="secondary" style={{ textTransform: "capitalize" }}>
+														{auditor.role}
+													</Badge>
+												) : null}
+												{isSelected ? <Badge variant="outline">{selectedLabel}</Badge> : null}
+											</div>
+											<p className="font-medium text-foreground">{auditor.full_name}</p>
+											<p className="text-sm text-muted-foreground">
+												{auditor.email ?? emailPendingLabel}
+											</p>
+										</button>
+									</div>
 								);
 							})}
 						</div>
@@ -157,8 +196,8 @@ function AuditorListPicker({
 					) : (
 						<p className="text-sm text-muted-foreground">{helperText}</p>
 					)}
-					{selectedAuditorId.trim().length > 0 ? (
-						<Button type="button" variant="ghost" onClick={onClearSelection} disabled={disabled}>
+					{selectedAuditorIds.length > 0 ? (
+						<Button type="button" variant="ghost" size="sm" onClick={onClearSelection} disabled={disabled}>
 							{clearLabel}
 						</Button>
 					) : null}
@@ -177,10 +216,9 @@ export default function ManagerAssignmentsPage() {
 	const router = useRouter();
 	const searchParams = useSearchParams();
 	const accountId = session?.role === "manager" ? session.accountId : null;
-	const [selectedAuditorId, setSelectedAuditorId] = React.useState("");
-	const [scope, setScope] = React.useState<AssignmentScope>("project");
+	const [selectedAuditorIds, setSelectedAuditorIds] = React.useState<string[]>([]);
 	const [selectedProjectId, setSelectedProjectId] = React.useState("");
-	const [selectedPlaceId, setSelectedPlaceId] = React.useState("");
+	const [selectedPlaceIds, setSelectedPlaceIds] = React.useState<string[]>([]);
 	const [auditorSearchQuery, setAuditorSearchQuery] = React.useState("");
 	const [fieldErrors, setFieldErrors] = React.useState<AssignmentFieldErrors>({});
 	const [formError, setFormError] = React.useState<string | null>(null);
@@ -201,24 +239,22 @@ export default function ManagerAssignmentsPage() {
 	 * Reset the inline composer back to its default blank state.
 	 */
 	const resetComposer = React.useCallback(() => {
-		setScope("project");
 		setSelectedProjectId("");
-		setSelectedPlaceId("");
+		setSelectedPlaceIds([]);
 		setFieldErrors({});
 		setFormError(null);
 		setCreateSuccessMessage(null);
 	}, []);
 
 	/**
-	 * Keep the page URL synchronized with the currently selected auditor.
+	 * Keep the page URL synchronized with the currently selected auditor (only for single selection).
 	 */
 	const syncAuditorSelectionInUrl = React.useCallback(
-		(nextAuditorId: string) => {
-			const normalizedAuditorId = nextAuditorId.trim();
+		(nextAuditorIds: string[]) => {
 			const nextSearchParams = new URLSearchParams(searchParams.toString());
 
-			if (normalizedAuditorId.length > 0) {
-				nextSearchParams.set("auditorId", normalizedAuditorId);
+			if (nextAuditorIds.length === 1) {
+				nextSearchParams.set("auditorId", nextAuditorIds[0]);
 			} else {
 				nextSearchParams.delete("auditorId");
 			}
@@ -255,39 +291,46 @@ export default function ManagerAssignmentsPage() {
 		queryFn: () => playspaceApi.projects.places(selectedProjectId),
 		enabled: selectedProjectId.trim().length > 0
 	});
+
+	const focusedAuditorId = selectedAuditorIds.length === 1 ? selectedAuditorIds[0] : "";
+
 	const assignmentsQuery = useQuery({
-		queryKey: ["playspace", "manager", "assignments", "rows", selectedAuditorId],
-		queryFn: () => playspaceApi.assignments.list(selectedAuditorId),
-		enabled: selectedAuditorId.trim().length > 0
+		queryKey: ["playspace", "manager", "assignments", "rows", focusedAuditorId],
+		queryFn: () => playspaceApi.assignments.list(focusedAuditorId),
+		enabled: focusedAuditorId.length > 0
 	});
 
 	const createAssignment = useMutation({
 		mutationFn: async (input: {
-			readonly auditorId: string;
+			readonly auditorIds: readonly string[];
 			readonly projectId: string;
-			readonly placeId: string | null;
+			readonly placeIds: readonly string[];
 		}) => {
-			return playspaceApi.assignments.create(input.auditorId, {
+			return playspaceApi.assignments.bulkCreate({
 				project_id: input.projectId,
-				place_id: input.placeId
+				auditor_profile_ids: [...input.auditorIds],
+				place_ids: [...input.placeIds]
 			});
 		},
 		onSuccess: async (_data, variables) => {
 			setListError(null);
-			await queryClient.invalidateQueries({
-				queryKey: ["playspace", "manager", "assignments", "rows", variables.auditorId]
-			});
+			
+			// Invalidate queries for all affected auditors
+			await Promise.all(
+				variables.auditorIds.map(auditorId => 
+					queryClient.invalidateQueries({
+						queryKey: ["playspace", "manager", "assignments", "rows", auditorId]
+					})
+				)
+			);
 
-			if (selectedAuditorId === variables.auditorId) {
-				const createdAuditor = auditors.find(auditor => auditor.id === variables.auditorId) ?? null;
-				resetComposer();
-				setCreateSuccessMessage(
-					createdAuditor
-						? t("composer.createSuccessWithAuditor", { name: createdAuditor.full_name })
-						: t("composer.createSuccess")
-				);
-				scopeTriggerRef.current?.focus();
-			}
+			resetComposer();
+			setCreateSuccessMessage(
+				variables.auditorIds.length === 1 
+					? t("composer.createSuccess") 
+					: t("composer.bulkCreateSuccess", { count: variables.auditorIds.length })
+			);
+			scopeTriggerRef.current?.focus();
 		},
 		onError: error => {
 			setCreateSuccessMessage(null);
@@ -297,9 +340,6 @@ export default function ManagerAssignmentsPage() {
 
 	const deleteAssignment = useMutation({
 		mutationFn: async (input: { readonly assignmentId: string; readonly auditorId: string }) => {
-			if (input.auditorId.trim().length === 0) {
-				throw new Error(t("errors.selectAuditorBeforeDelete"));
-			}
 			return playspaceApi.assignments.delete(input.auditorId, input.assignmentId);
 		},
 		onSuccess: async (_data, variables) => {
@@ -323,7 +363,7 @@ export default function ManagerAssignmentsPage() {
 		: assignmentsQuery.isError
 			? "error"
 			: "ready";
-	const selectedAuditor = auditors.find(auditor => auditor.id === selectedAuditorId) ?? null;
+	const selectedAuditors = auditors.filter(auditor => selectedAuditorIds.includes(auditor.id));
 	const queryAuditorId = searchParams.get("auditorId")?.trim() ?? "";
 	const filteredAuditors = filterAuditors(auditors, auditorSearchQuery);
 
@@ -340,64 +380,76 @@ export default function ManagerAssignmentsPage() {
 
 		const matchingAuditor = auditors.find(auditor => auditor.id === queryAuditorId) ?? null;
 		if (matchingAuditor) {
-			setSelectedAuditorId(matchingAuditor.id);
+			setSelectedAuditorIds([matchingAuditor.id]);
 			return;
 		}
 
-		syncAuditorSelectionInUrl("");
+		syncAuditorSelectionInUrl([]);
 	}, [auditors, auditorsQuery.isLoading, queryAuditorId, syncAuditorSelectionInUrl]);
 
 	React.useEffect(() => {
-		if (!hasInitializedSelectionFromQueryRef.current || selectedAuditorId === queryAuditorId) {
+		if (!hasInitializedSelectionFromQueryRef.current) {
 			return;
 		}
 
-		syncAuditorSelectionInUrl(selectedAuditorId);
-	}, [queryAuditorId, selectedAuditorId, syncAuditorSelectionInUrl]);
+		// Only sync if single selection matches or changes
+		if (selectedAuditorIds.length === 1 && selectedAuditorIds[0] === queryAuditorId) {
+			return;
+		}
+		
+		if (selectedAuditorIds.length !== 1 && queryAuditorId === "") {
+			return;
+		}
+
+		syncAuditorSelectionInUrl(selectedAuditorIds);
+	}, [queryAuditorId, selectedAuditorIds, syncAuditorSelectionInUrl]);
 
 	const isSelectionLocked = createAssignment.isPending || deleteAssignment.isPending;
 
-	const handleSelectAuditor = React.useCallback(
+	const handleToggleAuditor = React.useCallback(
 		(nextValue: string) => {
-			if (nextValue === selectedAuditorId) {
-				return;
-			}
-
-			setSelectedAuditorId(nextValue);
+			setSelectedAuditorIds(current => {
+				if (current.includes(nextValue)) {
+					return current.filter(id => id !== nextValue);
+				}
+				return [...current, nextValue];
+			});
 			setAssignmentPendingDelete(null);
 			setListError(null);
-			resetComposer();
+			setCreateSuccessMessage(null);
 		},
-		[resetComposer, selectedAuditorId]
+		[]
+	);
+
+	const handleToggleAllAuditors = React.useCallback(
+		(selected: boolean) => {
+			if (selected) {
+				setSelectedAuditorIds(filteredAuditors.map(a => a.id));
+			} else {
+				setSelectedAuditorIds([]);
+			}
+			setAssignmentPendingDelete(null);
+			setListError(null);
+			setCreateSuccessMessage(null);
+		},
+		[filteredAuditors]
 	);
 
 	const handleClearSelection = React.useCallback(() => {
-		if (selectedAuditorId.trim().length === 0) {
+		if (selectedAuditorIds.length === 0) {
 			return;
 		}
 
-		setSelectedAuditorId("");
+		setSelectedAuditorIds([]);
 		setAssignmentPendingDelete(null);
 		setListError(null);
 		resetComposer();
-	}, [resetComposer, selectedAuditorId]);
-
-	const handleScopeChange = React.useCallback(
-		(nextValue: AssignmentScope) => {
-			setScope(nextValue);
-			setSelectedPlaceId("");
-			clearFieldError("projectId");
-			clearFieldError("placeId");
-			setFormError(null);
-			setCreateSuccessMessage(null);
-		},
-		[clearFieldError]
-	);
+	}, [resetComposer, selectedAuditorIds.length]);
 
 	const handleProjectChange = React.useCallback(
 		(nextValue: string) => {
 			setSelectedProjectId(nextValue);
-			setSelectedPlaceId("");
+			setSelectedPlaceIds([]);
 			clearFieldError("projectId");
 			clearFieldError("placeId");
 			setFormError(null);
@@ -406,14 +458,33 @@ export default function ManagerAssignmentsPage() {
 		[clearFieldError]
 	);
 
-	const handlePlaceChange = React.useCallback(
+	const handleTogglePlace = React.useCallback(
 		(nextValue: string) => {
-			setSelectedPlaceId(nextValue);
+			setSelectedPlaceIds(current => {
+				if (current.includes(nextValue)) {
+					return current.filter(id => id !== nextValue);
+				}
+				return [...current, nextValue];
+			});
 			clearFieldError("placeId");
 			setFormError(null);
 			setCreateSuccessMessage(null);
 		},
 		[clearFieldError]
+	);
+
+	const handleToggleAllPlaces = React.useCallback(
+		(selected: boolean) => {
+			if (selected) {
+				setSelectedPlaceIds(places.map(p => p.id));
+			} else {
+				setSelectedPlaceIds([]);
+			}
+			clearFieldError("placeId");
+			setFormError(null);
+			setCreateSuccessMessage(null);
+		},
+		[clearFieldError, places]
 	);
 
 	const handleResetComposer = React.useCallback(() => {
@@ -478,14 +549,12 @@ export default function ManagerAssignmentsPage() {
 
 	function handleCreateAssignment() {
 		const nextFieldErrors: AssignmentFieldErrors = {};
-		const normalizedAuditorId = selectedAuditorId.trim();
 
 		if (selectedProjectId.trim().length === 0) {
-			nextFieldErrors.projectId =
-				scope === "place" ? t("validation.projectRequiredForPlace") : t("validation.projectRequired");
+			nextFieldErrors.projectId = t("validation.projectRequired");
 		}
 
-		if (scope === "place" && selectedPlaceId.trim().length === 0) {
+		if (selectedPlaceIds.length === 0) {
 			nextFieldErrors.placeId = t("validation.placeRequired");
 		}
 
@@ -493,7 +562,7 @@ export default function ManagerAssignmentsPage() {
 		setFormError(null);
 		setCreateSuccessMessage(null);
 
-		if (normalizedAuditorId.length === 0) {
+		if (selectedAuditorIds.length === 0) {
 			setFormError(t("errors.selectAuditorBeforeCreate"));
 			return;
 		}
@@ -503,9 +572,9 @@ export default function ManagerAssignmentsPage() {
 		}
 
 		createAssignment.mutate({
-			auditorId: normalizedAuditorId,
+			auditorIds: selectedAuditorIds,
 			projectId: selectedProjectId,
-			placeId: scope === "project" ? null : selectedPlaceId
+			placeIds: selectedPlaceIds
 		});
 	}
 
@@ -538,7 +607,9 @@ export default function ManagerAssignmentsPage() {
 							disabled={isSelectionLocked}
 							emailPendingLabel={t("auditorFocus.emailPending")}
 							selectedLabel={t("auditorFocus.selected")}
-							selectedAuditorId={selectedAuditorId}
+							selectAllLabel={t("actions.selectAll")}
+							deselectAllLabel={t("actions.deselectAll")}
+							selectedAuditorIds={selectedAuditorIds}
 							searchQuery={auditorSearchQuery}
 							searchLabel={t("auditorFocus.searchLabel")}
 							searchPlaceholder={t("auditorFocus.searchPlaceholder")}
@@ -548,7 +619,8 @@ export default function ManagerAssignmentsPage() {
 							helperText={t("auditorFocus.auditorHelp")}
 							clearLabel={t("actions.clear")}
 							onSearchQueryChange={setAuditorSearchQuery}
-							onSelectAuditor={handleSelectAuditor}
+							onToggleAuditor={handleToggleAuditor}
+							onToggleAllAuditors={handleToggleAllAuditors}
 							onClearSelection={handleClearSelection}
 						/>
 						<div className="rounded-field border border-border/70 bg-muted/35 p-4">
@@ -562,7 +634,7 @@ export default function ManagerAssignmentsPage() {
 					</div>
 
 					<div className="rounded-field border border-border bg-card p-4">
-						{selectedAuditor ? (
+						{selectedAuditorIds.length > 0 ? (
 							<AssignmentComposerPanel
 								assignmentsCount={assignments.length}
 								assignmentsSummaryState={assignmentsSummaryState}
@@ -571,16 +643,15 @@ export default function ManagerAssignmentsPage() {
 								isPending={createAssignment.isPending}
 								places={places}
 								projects={projects}
-								scope={scope}
 								scopeTriggerRef={scopeTriggerRef}
-								selectedAuditor={selectedAuditor}
-								selectedPlaceId={selectedPlaceId}
+								selectedAuditors={selectedAuditors}
+								selectedPlaceIds={selectedPlaceIds}
 								selectedProjectId={selectedProjectId}
 								successMessage={createSuccessMessage}
-								onPlaceChange={handlePlaceChange}
+								onPlaceToggle={handleTogglePlace}
+								onPlaceToggleAll={handleToggleAllPlaces}
 								onProjectChange={handleProjectChange}
 								onReset={handleResetComposer}
-								onScopeChange={handleScopeChange}
 								onSubmit={handleCreateAssignment}
 							/>
 						) : (
@@ -591,15 +662,15 @@ export default function ManagerAssignmentsPage() {
 								</div>
 								<div className="grid gap-3 sm:grid-cols-2">
 									<div className="rounded-field border border-border/70 bg-muted/35 p-4">
-										<p className="font-medium text-foreground">{t("preview.projectScopeTitle")}</p>
+										<p className="font-medium text-foreground">{t("preview.bulkSelectionTitle")}</p>
 										<p className="mt-2 text-sm text-muted-foreground">
-											{t("preview.projectScopeDescription")}
+											{t("preview.bulkSelectionDescription")}
 										</p>
 									</div>
 									<div className="rounded-field border border-border/70 bg-muted/35 p-4">
-										<p className="font-medium text-foreground">{t("preview.placeScopeTitle")}</p>
+										<p className="font-medium text-foreground">{t("preview.selectAllTitle")}</p>
 										<p className="mt-2 text-sm text-muted-foreground">
-											{t("preview.placeScopeDescription")}
+											{t("preview.selectAllDescription")}
 										</p>
 									</div>
 								</div>
@@ -622,12 +693,16 @@ export default function ManagerAssignmentsPage() {
 							{listError}
 						</p>
 					) : null}
-					{selectedAuditorId.trim().length === 0 ? (
+					{selectedAuditorIds.length !== 1 ? (
 						<div className="grid gap-4 rounded-field border border-dashed border-border p-4 lg:grid-cols-[minmax(0,1fr)_minmax(260px,0.9fr)]">
 							<div className="space-y-2">
-								<p className="font-medium text-foreground">{t("coverage.selectAuditorTitle")}</p>
+								<p className="font-medium text-foreground">
+									{selectedAuditorIds.length === 0 ? t("coverage.selectAuditorTitle") : t("coverage.multipleAuditorsTitle")}
+								</p>
 								<p className="text-sm text-muted-foreground">
-									{t("coverage.selectAuditorDescription")}
+									{selectedAuditorIds.length === 0 
+										? t("coverage.selectAuditorDescription")
+										: t("coverage.multipleAuditorsDescription")}
 								</p>
 							</div>
 							<div className="rounded-field border border-border/70 bg-muted/35 p-4">
@@ -653,8 +728,8 @@ export default function ManagerAssignmentsPage() {
 							<div className="space-y-2">
 								<p className="font-medium text-foreground">{t("coverage.emptyTitle")}</p>
 								<p className="text-sm text-muted-foreground">
-									{selectedAuditor
-										? t("coverage.emptyDescriptionWithAuditor", { name: selectedAuditor.full_name })
+									{selectedAuditors.length === 1
+										? t("coverage.emptyDescriptionWithAuditor", { name: selectedAuditors[0].full_name })
 										: t("coverage.emptyDescription")}
 								</p>
 							</div>
@@ -668,18 +743,9 @@ export default function ManagerAssignmentsPage() {
 					) : (
 						assignments.map(assignment => {
 							const scopeName = assignment.scope_name;
-							const scopeLabel =
-								assignment.scope_type === "place"
-									? t("assignment.placeScope")
-									: t("assignment.projectScope");
-							const deleteScopeLabel =
-								assignment.scope_type === "place" ? t("assignment.place") : t("assignment.project");
-							const scopeHref =
-								assignment.place_id !== null
-									? `/manager/places/${encodeURIComponent(assignment.place_id)}?projectId=${encodeURIComponent(assignment.project_id)}`
-									: assignment.project_id !== null
-										? `/manager/projects/${encodeURIComponent(assignment.project_id)}`
-										: null;
+							const scopeLabel = t("assignment.placeScope");
+							const deleteScopeLabel = t("assignment.place");
+							const scopeHref = `/manager/places/${encodeURIComponent(assignment.place_id)}?projectId=${encodeURIComponent(assignment.project_id)}`;
 
 							return (
 								<div
@@ -688,9 +754,7 @@ export default function ManagerAssignmentsPage() {
 									<div className="space-y-1">
 										<p className="font-medium text-foreground">{scopeName}</p>
 										<p className="text-xs text-muted-foreground">
-											{assignment.scope_type === "place"
-												? `${assignment.project_name} · ${scopeLabel}`
-												: scopeLabel}
+											{`${assignment.project_name} · ${scopeLabel}`}
 										</p>
 										<p className="text-xs text-muted-foreground">
 											{t("assignment.assignedAt", {
@@ -700,19 +764,11 @@ export default function ManagerAssignmentsPage() {
 									</div>
 									<div className="flex flex-wrap items-center gap-2">
 										<Badge variant="outline" className="font-medium">
-											{assignment.scope_type === "place"
-												? t("assignment.projectAndPlaceScopeLabel")
-												: t("assignment.projectOnlyScopeLabel")}
+											{t("assignment.projectAndPlaceScopeLabel")}
 										</Badge>
-										{scopeHref ? (
-											<Button asChild type="button" variant="outline">
-												<Link href={scopeHref}>
-													{assignment.scope_type === "place"
-														? t("assignment.openPlace")
-														: t("assignment.openProject")}
-												</Link>
-											</Button>
-										) : null}
+										<Button asChild type="button" variant="outline">
+											<Link href={scopeHref}>{t("assignment.openPlace")}</Link>
+										</Button>
 										<Button
 											type="button"
 											variant="outline"
@@ -752,13 +808,13 @@ export default function ManagerAssignmentsPage() {
 				confirmLabel={t("confirmDelete.confirmLabel")}
 				isPending={deleteAssignment.isPending}
 				onConfirm={() => {
-					if (!assignmentPendingDelete || selectedAuditorId.trim().length === 0) {
+					if (!assignmentPendingDelete || selectedAuditorIds.length !== 1) {
 						return;
 					}
 
 					deleteAssignment.mutate({
 						assignmentId: assignmentPendingDelete.id,
-						auditorId: selectedAuditorId
+						auditorId: selectedAuditorIds[0]
 					});
 				}}
 			/>

@@ -1040,7 +1040,9 @@
 				"delete": "Löschen",
 				"cancel": "Abbrechen",
 				"creating": "Wird erstellt...",
-				"createAssignment": "Zuweisung erstellen"
+				"createAssignment": "Zuweisung erstellen",
+				"selectAll": "Alle auswählen",
+				"deselectAll": "Alle abwählen"
 			},
 			"validation": {
 				"auditorRequired": "Wählen Sie vor dem Erstellen einer Zuweisung einen Prüfer aus.",
@@ -1078,7 +1080,8 @@
 				"loadedAssignments": "{count} geladene Zuweisung{count, plural, one {} other {en}}",
 				"loadingAssignments": "Zuweisungen werden geladen",
 				"assignmentsUnavailable": "Zuweisungen nicht verfügbar",
-				"completedAudits": "{count} abgeschlossene Prüfungen"
+				"completedAudits": "{count} abgeschlossene Prüfungen",
+				"multipleSelected": "Mehrere Prüfer ausgewählt"
 			},
 			"preview": {
 				"title": "Zuweisung einrichten",
@@ -1087,12 +1090,18 @@
 				"projectScopeDescription": "Gewähren Sie Zugriff auf alle Standorte in einem Projekt, wenn der Prüfer eine größere Abdeckung benötigt.",
 				"placeScopeTitle": "Standortumfang",
 				"placeScopeDescription": "Gewähren Sie Zugriff auf einen einzelnen Standort, wenn Sie eine engere Feldsteuerung benötigen.",
+				"bulkSelectionTitle": "Massenauswahl",
+				"bulkSelectionDescription": "Wählen Sie mehrere Prüfer und Orte aus, um sie alle auf einmal zuzuweisen.",
+				"selectAllTitle": "Projektweit",
+				"selectAllDescription": "Weisen Sie alle Orte eines Projekts einfach mit der Option „Alle auswählen zu.",
 				"openAuditors": "Prüfer öffnen"
 			},
 			"coverage": {
 				"title": "Zuweisungsabdeckung",
 				"selectAuditorTitle": "Wählen Sie einen Prüfer aus, um Zuweisungen zu laden",
 				"selectAuditorDescription": "Dieses Feld zeigt, worauf der ausgewählte Prüfer derzeit zugreifen kann, einschließlich Projektumfang, Standortumfang und direkter Verknüpfungen zum zugrunde liegenden Datensatz.",
+				"multipleAuditorsTitle": "Mehrere Prüfer ausgewählt",
+				"multipleAuditorsDescription": "Wählen Sie genau einen Prüfer aus, um dessen aktuelle Zuweisungsabdeckung anzuzeigen.",
 				"whatAppearsTitle": "Was hier angezeigt wird",
 				"whatAppears": {
 					"projectAndPlaceCoverage": "Aktuelle Projekt- und Standortabdeckung",
@@ -1126,8 +1135,11 @@
 			"composer": {
 				"title": "Zuweisung erstellen",
 				"description": "Gewähren Sie dem ausgewählten Prüfer Projekt- oder Standortzugriff und prüfen Sie die neue Abdeckung anschließend unten.",
+				"descriptionBulk": "Orte werden {count} ausgewählten Prüfern zugewiesen.",
+				"auditorsSelectedCount": "{count} Prüfer ausgewählt",
 				"createSuccess": "Die Zuweisung wurde erstellt. Das Formular ist für die nächste Zugriffsänderung bereit.",
-				"createSuccessWithAuditor": "Die Zuweisung für {name} wurde erstellt. Das Formular ist für die nächste Zugriffsänderung bereit."
+				"createSuccessWithAuditor": "Die Zuweisung für {name} wurde erstellt. Das Formular ist für die nächste Zugriffsänderung bereit.",
+				"bulkCreateSuccess": "Zuweisungen für {count} Prüfer wurden erfolgreich erstellt."
 			},
 			"sheet": {
 				"title": "Zuweisung erstellen",
@@ -1151,7 +1163,8 @@
 				"selectProjectFirst": "Wählen Sie zuerst ein Projekt aus",
 				"places": "Orte",
 				"selectProjectFirstHelp": "Wählen Sie zuerst ein Projekt aus, um dessen Orte zu laden.",
-				"placeHelp": "Wählen Sie den einen Ort aus, den diese Zuweisung abdecken soll.",
+				"placeHelp": "Wählen Sie einen oder mehrere Orte zum Zuweisen aus.",
+				"noPlacesForProject": "Keine Orte für dieses Projekt gefunden.",
 				"placeOptionalHelp": "Die Ortsauswahl ist nur für den Ortsumfang erforderlich.",
 				"capabilitiesTitle": "Berechtigungen",
 				"capabilitiesDescription": "Wählen Sie aus, was der Prüfer innerhalb des ausgewählten Umfangs tun kann.",

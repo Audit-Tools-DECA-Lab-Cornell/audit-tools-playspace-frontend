@@ -1040,7 +1040,9 @@
 				"delete": "Delete",
 				"cancel": "Cancel",
 				"creating": "Creating...",
-				"createAssignment": "Create assignment"
+				"createAssignment": "Create assignment",
+				"selectAll": "Select all",
+				"deselectAll": "Deselect all"
 			},
 			"validation": {
 				"auditorRequired": "Select an auditor before creating an assignment.",
@@ -1078,7 +1080,8 @@
 				"loadedAssignments": "{count} loaded assignment{count, plural, one {} other {s}}",
 				"loadingAssignments": "Loading assignments",
 				"assignmentsUnavailable": "Assignments unavailable",
-				"completedAudits": "{count} completed audits"
+				"completedAudits": "{count} completed audits",
+				"multipleSelected": "Multiple auditors selected"
 			},
 			"preview": {
 				"title": "Assignment setup",
@@ -1087,12 +1090,18 @@
 				"projectScopeDescription": "Grant access across every place in a project when the auditor needs wider coverage.",
 				"placeScopeTitle": "Place scope",
 				"placeScopeDescription": "Grant access to one location when you need tighter field control.",
+				"bulkSelectionTitle": "Bulk selection",
+				"bulkSelectionDescription": "Select multiple auditors and places to assign them all at once.",
+				"selectAllTitle": "Project-wide",
+				"selectAllDescription": "Easily assign all places in a project with the \"Select all\" option.",
 				"openAuditors": "Open auditors"
 			},
 			"coverage": {
 				"title": "Assignment coverage",
 				"selectAuditorTitle": "Select an auditor to load assignments",
 				"selectAuditorDescription": "This panel shows what the selected auditor can currently access, including project scope, place scope, and direct links back to the underlying record.",
+				"multipleAuditorsTitle": "Multiple auditors selected",
+				"multipleAuditorsDescription": "Select exactly one auditor to see their current assignment coverage.",
 				"whatAppearsTitle": "What appears here",
 				"whatAppears": {
 					"projectAndPlaceCoverage": "Current project and place coverage",
@@ -1126,8 +1135,11 @@
 			"composer": {
 				"title": "Create assignment",
 				"description": "Grant project or place access for the selected auditor, then verify the new coverage below.",
+				"descriptionBulk": "Assigning places to {count} selected auditors.",
+				"auditorsSelectedCount": "{count} Auditors Selected",
 				"createSuccess": "Assignment created. The form is ready for another access change.",
-				"createSuccessWithAuditor": "Assignment created for {name}. The form is ready for another access change."
+				"createSuccessWithAuditor": "Assignment created for {name}. The form is ready for another access change.",
+				"bulkCreateSuccess": "Successfully created assignments for {count} auditors."
 			},
 			"sheet": {
 				"title": "Create assignment",
@@ -1151,7 +1163,8 @@
 				"selectProjectFirst": "Select a project first",
 				"places": "Places",
 				"selectProjectFirstHelp": "Select a project first to load its places.",
-				"placeHelp": "Choose the one place this assignment should cover.",
+				"placeHelp": "Select one or more places to assign.",
+				"noPlacesForProject": "No places found for this project.",
 				"placeOptionalHelp": "Place selection is only required for place scope.",
 				"capabilitiesTitle": "Capabilities",
 				"capabilitiesDescription": "Choose what the auditor can do inside the selected scope.",

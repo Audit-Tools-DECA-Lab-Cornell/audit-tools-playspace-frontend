@@ -219,18 +219,24 @@ const assignmentSchema = z.object({
 	id: z.string().uuid(),
 	auditor_profile_id: z.string().uuid(),
 	project_id: z.string().uuid(),
-	place_id: z.string().uuid().nullable(),
-	scope_type: z.enum(["project", "place"]),
+	place_id: z.string().uuid(),
+	scope_type: z.literal("place"),
 	scope_id: z.string().uuid(),
 	scope_name: z.string(),
 	project_name: z.string(),
-	place_name: z.string().nullable(),
+	place_name: z.string(),
 	assigned_at: z.string().datetime()
 });
 
 const assignmentWriteSchema = z.object({
 	project_id: z.string().uuid(),
-	place_id: z.string().uuid().nullable().optional()
+	place_id: z.string().uuid()
+});
+
+const bulkAssignmentWriteSchema = z.object({
+	project_id: z.string().uuid(),
+	auditor_profile_ids: z.array(z.string().uuid()),
+	place_ids: z.array(z.string().uuid())
 });
 
 const placeDetailSchema = z.object({
@@ -711,6 +717,7 @@ export type ManagerAuditRow = z.infer<typeof managerAuditRowSchema>;
 export type ManagerAuditsList = z.infer<typeof managerAuditsListSchema>;
 export type Assignment = z.infer<typeof assignmentSchema>;
 export type AssignmentWrite = z.infer<typeof assignmentWriteSchema>;
+export type BulkAssignmentWrite = z.infer<typeof bulkAssignmentWriteSchema>;
 export type PlaceDetail = z.infer<typeof placeDetailSchema>;
 export type AccountManagementResponse = z.infer<typeof accountManagementResponseSchema>;
 export type AuditorProfileDetail = z.infer<typeof auditorProfileDetailSchema>;
@@ -1055,7 +1062,14 @@ export const playspaceApi = {
 				{
 					method: "DELETE"
 				}
-			)
+			),
+		bulkCreate: async (payload: BulkAssignmentWrite): Promise<{ created_count: number }> => {
+			const parsedPayload = bulkAssignmentWriteSchema.parse(payload);
+			return fetchValidatedJson("/playspace/bulk-assignments", z.object({ created_count: z.number() }), {
+				method: "POST",
+				body: JSON.stringify(parsedPayload)
+			});
+		}
 	},
 	auditor: {
 		assignedPlaces: async (query: AuditorPlacesQuery = {}): Promise<PaginatedResponse<AuditorPlace>> =>
