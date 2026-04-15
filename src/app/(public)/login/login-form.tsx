@@ -182,6 +182,7 @@ function RoleLoginCard({
 						<Label htmlFor={`${roleKey}_email`}>{t("fields.email")}</Label>
 						<Input
 							id={`${roleKey}_email`}
+							data-testid={`${roleKey}-email-input`}
 							type="email"
 							autoComplete="email"
 							placeholder={emailPlaceholder}
@@ -200,6 +201,7 @@ function RoleLoginCard({
 						<Label htmlFor={`${roleKey}_password`}>{t("fields.password")}</Label>
 						<Input
 							id={`${roleKey}_password`}
+							data-testid={`${roleKey}-password-input`}
 							type="password"
 							autoComplete="current-password"
 							value={values.password}
@@ -215,7 +217,11 @@ function RoleLoginCard({
 						) : null}
 					</div>
 
-					<Button type="submit" disabled={disabled || isSubmitting} aria-busy={isSubmitting}>
+					<Button
+						type="submit"
+						disabled={disabled || isSubmitting}
+						aria-busy={isSubmitting}
+						data-testid={`${roleKey}-submit-button`}>
 						{isSubmitting ? <PendingButtonLabel label={t("actions.signingIn")} /> : t("actions.signIn")}
 					</Button>
 				</form>

@@ -7,7 +7,11 @@ import {
 	Check,
 	CheckCircle2,
 	ChevronDown,
+	Download,
 	Eye,
+	FileJson,
+	FileSpreadsheet,
+	FileText,
 	GitBranch,
 	ListChecks,
 	Maximize2,
@@ -22,6 +26,7 @@ import {
 	X
 } from "lucide-react";
 
+import { exportInstrument } from "@/lib/export/instrument";
 import { playspaceApi } from "@/lib/api/playspace";
 import type {
 	ChoiceOption,
@@ -49,6 +54,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger
+} from "@/components/ui/dropdown-menu";
 import {
 	Dialog,
 	DialogContent,
@@ -98,15 +109,11 @@ function formatSectionKey(key: string): string {
 }
 
 /**
- * Parse a question key like "q_1_7" into { section: 1, number: 7 }.
- * Falls back to null when the format doesn't match.
+ * Convert raw instrument question keys into a human-readable audit label.
  */
-function parseQuestionKey(key: string): { section: number; number: number } | null {
-	const match = key.match(/^q_(\d+)_(\d+)$/);
-	if (match) {
-		return { section: Number(match[1]), number: Number(match[2]) };
-	}
-	return null;
+function formatQuestionKey(questionKey: string): string {
+	const sections = questionKey.slice(2).split("_"); // Remove "q_" prefix
+	return `Q ${sections.map(section => section.toUpperCase()).join(".")}`;
 }
 
 function countTotalQuestions(sections: InstrumentSection[]): number {
@@ -292,15 +299,19 @@ export default function AdminInstrumentsPage() {
 	});
 
 	const publishMutation = useMutation({
-		mutationFn: (params: { version: string; content: InstrumentContent; activate: boolean }) =>
-			playspaceApi.admin.instruments.create(
+		mutationFn: async (params: { version: string; content: InstrumentContent; activate: boolean }) => {
+			await playspaceApi.admin.instruments.create(
 				{
 					instrument_key: "pvua_v5_2",
 					instrument_version: params.version,
 					content: params.content as Parameters<typeof playspaceApi.admin.instruments.create>[0]["content"]
 				},
 				params.activate
-			),
+			);
+			setShowUploadDialog(false);
+			setEditingContent(null);
+			setEditingSourceVersion("");
+		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: QUERY_KEY });
 			setEditingContent(null);
@@ -387,6 +398,9 @@ export default function AdminInstrumentsPage() {
 								<div key={instrument.id} className="rounded-lg border border-border bg-card/60 p-4">
 									<div className="flex flex-wrap items-center justify-between gap-3">
 										<div className="space-y-1">
+											<div className="text-sm font-semibold">
+												{instrument.content.en.instrument_name}
+											</div>
 											<div className="flex items-center gap-2">
 												<span className="font-mono text-sm font-semibold">
 													v{instrument.instrument_version}
@@ -417,6 +431,7 @@ export default function AdminInstrumentsPage() {
 											<Button
 												variant="outline"
 												size="sm"
+												data-testid="edit-duplicate-button"
 												onClick={() =>
 													handleStartEditing(
 														instrument.content as InstrumentContent,
@@ -438,7 +453,10 @@ export default function AdminInstrumentsPage() {
 									</div>
 
 									{expandedVersionId === instrument.id && (
-										<InstrumentContentViewer content={instrument.content as InstrumentContent} />
+										<InstrumentContentViewer
+											content={instrument.content as InstrumentContent}
+											version={instrument.instrument_version}
+										/>
 									)}
 								</div>
 							))}
@@ -524,7 +542,7 @@ function UploadDialog({
 	const t = useTranslations("admin.instruments");
 	const fileInputRef = useRef<HTMLInputElement>(null);
 	const [version, setVersion] = useState("");
-	const [lang, setLang] = useState("en");
+	const [lang, setLang] = useState<string | string[]>(["en"]);
 	const [parsed, setParsed] = useState<Record<string, unknown> | null>(null);
 	const [parseError, setParseError] = useState<string | null>(null);
 
@@ -553,7 +571,13 @@ function UploadDialog({
 
 	function handleSubmit(activate: boolean) {
 		if (!parsed || version.trim().length === 0) return;
-		onUpload(version.trim(), { [lang]: parsed } as unknown as InstrumentContent, activate);
+		const content =
+			typeof lang === "string"
+				? { [lang]: parsed as unknown as PlayspaceInstrument }
+				: (Object.fromEntries(
+						Object.entries(parsed).map(([k, v]) => [k, v as unknown as PlayspaceInstrument])
+					) as unknown as InstrumentContent);
+		onUpload(version.trim(), content, activate);
 	}
 
 	function handleClose() {
@@ -587,7 +611,14 @@ function UploadDialog({
 					</div>
 					<div className="space-y-2">
 						<Label htmlFor="upload-lang">{t("upload.languageLabel")}</Label>
-						<Input id="upload-lang" placeholder="en" value={lang} onChange={e => setLang(e.target.value)} />
+						<Input
+							id="upload-lang"
+							placeholder="en"
+							value={lang}
+							onChange={e =>
+								setLang(e.target.value.includes(",") ? e.target.value.split(",") : e.target.value)
+							}
+						/>
 					</div>
 					<div className="space-y-2">
 						<Label>{t("upload.fileLabel")}</Label>
@@ -654,7 +685,7 @@ function UploadDialog({
 /*  Instrument Content Viewer (read-only, richly formatted)                    */
 /* -------------------------------------------------------------------------- */
 
-function InstrumentContentViewer({ content }: Readonly<{ content: InstrumentContent }>) {
+function InstrumentContentViewer({ content, version }: Readonly<{ content: InstrumentContent; version: string }>) {
 	const t = useTranslations("admin.instruments.content");
 	const languages = Object.keys(content);
 	const [activeLang, setActiveLang] = useState(languages[0] ?? "en");
@@ -677,25 +708,52 @@ function InstrumentContentViewer({ content }: Readonly<{ content: InstrumentCont
 
 	return (
 		<div className="mt-4 space-y-5 border-t border-border pt-4">
-			{/* Language switcher */}
-			<div className="flex items-center gap-2">
-				<span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-					{t("languages")}:
-				</span>
-				{languages.map(lang => (
-					<Button
-						key={lang}
-						variant={activeLang === lang ? "default" : "outline"}
-						size="sm"
-						onClick={() => setActiveLang(lang)}>
-						{lang.toUpperCase()}
-					</Button>
-				))}
+			{/* Language switcher & Export */}
+			<div className="flex items-center justify-between">
+				<div className="flex items-center gap-2">
+					<span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+						{t("languages")}:
+					</span>
+					{languages.map(lang => (
+						<Button
+							key={lang}
+							variant={activeLang === lang ? "default" : "outline"}
+							size="sm"
+							onClick={() => setActiveLang(lang)}>
+							{lang.toUpperCase()}
+						</Button>
+					))}
+				</div>
+				<DropdownMenu>
+					<DropdownMenuTrigger asChild>
+						<Button variant="outline" size="sm">
+							<Download className="mr-2 h-4 w-4" />
+							Export
+						</Button>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent align="end" className="w-40">
+						<DropdownMenuItem onClick={() => exportInstrument(content, version, "pdf", activeLang)}>
+							<FileText className="mr-2 h-4 w-4 text-muted-foreground" />
+							PDF
+						</DropdownMenuItem>
+						<DropdownMenuItem onClick={() => exportInstrument(content, version, "xlsx", activeLang)}>
+							<FileSpreadsheet className="mr-2 h-4 w-4 text-muted-foreground" />
+							Excel (.xlsx)
+						</DropdownMenuItem>
+						<DropdownMenuItem onClick={() => exportInstrument(content, version, "csv", activeLang)}>
+							<FileSpreadsheet className="mr-2 h-4 w-4 text-muted-foreground" />
+							CSV
+						</DropdownMenuItem>
+						<DropdownMenuItem onClick={() => exportInstrument(content, version, "json", activeLang)}>
+							<FileJson className="mr-2 h-4 w-4 text-muted-foreground" />
+							JSON
+						</DropdownMenuItem>
+					</DropdownMenuContent>
+				</DropdownMenu>
 			</div>
 
 			{/* Summary stats */}
 			<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-				<StatBox label={t("instrumentName")} textValue={instrument.instrument_name} />
 				<StatBox label={t("sections")} value={sections.length} />
 				<StatBox label={t("totalQuestions")} value={totalQuestions} />
 				<StatBox label={t("preAudit")} value={preAuditQuestions.length} />
@@ -709,7 +767,9 @@ function InstrumentContentViewer({ content }: Readonly<{ content: InstrumentCont
 					<TabsTrigger value="sections">
 						{t("sections")} ({sections.length})
 					</TabsTrigger>
-					<TabsTrigger value="spreadsheet">{t("spreadsheet")}</TabsTrigger>
+					<TabsTrigger value="spreadsheet" data-testid="spreadsheet-tab">
+						{t("spreadsheet")}
+					</TabsTrigger>
 					<TabsTrigger value="preAudit">
 						{t("preAudit")} ({preAuditQuestions.length})
 					</TabsTrigger>
@@ -768,7 +828,7 @@ function InstrumentContentViewer({ content }: Readonly<{ content: InstrumentCont
 					<ViewerSectionAccordion sections={sections} scaleGuidanceMap={scaleGuidanceMap} />
 				</TabsContent>
 
-				<TabsContent value="spreadsheet">
+				<TabsContent value="spreadsheet" data-testid="spreadsheet-content">
 					<SpreadsheetView sections={sections} scaleGuidanceMap={scaleGuidanceMap} />
 				</TabsContent>
 
@@ -887,10 +947,57 @@ interface SpreadsheetRow {
 	hasCustomScales: boolean;
 }
 
-interface EditingCell {
-	rowKey: string;
-	field: string;
-	draft: string;
+function EditableCellInput({
+	initialValue,
+	onCommit,
+	onCancel
+}: {
+	initialValue: string;
+	onCommit: (value: string) => void;
+	onCancel: () => void;
+}) {
+	const [draft, setDraft] = useState(initialValue);
+
+	function handleKeyDown(e: React.KeyboardEvent) {
+		if (e.key === "Enter" && !e.shiftKey) {
+			e.preventDefault();
+			onCommit(draft);
+		} else if (e.key === "Escape") {
+			onCancel();
+		}
+	}
+
+	return (
+		<div className="flex flex-col gap-1" data-testid={`editable-input`}>
+			<textarea
+				className="w-full rounded border border-primary bg-background px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-primary resize-y min-h-[40px]"
+				value={draft}
+				onChange={e => setDraft(e.target.value)}
+				onKeyDown={handleKeyDown}
+				autoFocus
+				rows={Math.max(2, Math.ceil(draft.length / 60))}
+				data-testid="editable-cell-textarea"
+			/>
+			<div className="flex items-center gap-1">
+				<Button
+					variant="ghost"
+					size="icon"
+					className="h-5 w-5"
+					onClick={() => onCommit(draft)}
+					data-testid="editable-cell-save">
+					<Check className="h-3 w-3 text-primary" />
+				</Button>
+				<Button
+					variant="ghost"
+					size="icon"
+					className="h-5 w-5"
+					onClick={onCancel}
+					data-testid="editable-cell-cancel">
+					<X className="h-3 w-3 text-muted-foreground" />
+				</Button>
+			</div>
+		</div>
+	);
 }
 
 function SpreadsheetView({
@@ -901,7 +1008,7 @@ function SpreadsheetView({
 }: Readonly<{
 	sections: InstrumentSection[];
 	scaleGuidanceMap: Map<string, ScaleDefinition>;
-	onEditQuestion?: (sectionIndex: number, questionIndex: number, field: string, value: string) => void;
+	onEditQuestion?: (sectionIndex: number, questionIndex: number, field: string, value: string | string[]) => void;
 	onEditSection?: (sectionIndex: number, field: string, value: string | null) => void;
 }>) {
 	const t = useTranslations("admin.instruments.content");
@@ -912,7 +1019,7 @@ function SpreadsheetView({
 	const [typeFilter, setTypeFilter] = useState<string>("__all__");
 	const [modeFilter, setModeFilter] = useState<string>("__all__");
 	const [isFullscreen, setIsFullscreen] = useState(false);
-	const [editing, setEditing] = useState<EditingCell | null>(null);
+	const [editingKey, setEditingKey] = useState<{ rowKey: string; field: string } | null>(null);
 
 	const allRows: SpreadsheetRow[] = useMemo(() => {
 		const rows: SpreadsheetRow[] = [];
@@ -920,10 +1027,7 @@ function SpreadsheetView({
 			const section = sections[si];
 			for (let qi = 0; qi < section.questions.length; qi++) {
 				const question = section.questions[qi];
-				const parsed = parseQuestionKey(question.question_key);
-				const questionLabel = parsed
-					? t("questionNumber", { section: parsed.section, number: parsed.number })
-					: question.question_key;
+				const questionLabel = formatQuestionKey(question.question_key);
 				const questionType = question.question_type ?? "scaled";
 
 				const hasCustomScales = question.scales.some(scale => {
@@ -964,74 +1068,42 @@ function SpreadsheetView({
 		});
 	}, [allRows, search, sectionFilter, typeFilter, modeFilter]);
 
-	function startEdit(rowKey: string, field: string, currentValue: string) {
-		if (!editable) return;
-		setEditing({ rowKey, field, draft: currentValue });
-	}
-
-	function commitEdit() {
-		if (!editing || !editable) return;
-		const { rowKey, field, draft } = editing;
-
-		if (rowKey.startsWith("section-")) {
-			const sectionIndex = Number(rowKey.split("-")[1]);
-			onEditSection(sectionIndex, field, draft || null);
-		} else if (rowKey.startsWith("q-")) {
-			const parts = rowKey.split("-");
-			const sectionIndex = Number(parts[1]);
-			const questionIndex = Number(parts[2]);
-			onEditQuestion(sectionIndex, questionIndex, field, draft);
-		}
-		setEditing(null);
-	}
-
-	function cancelEdit() {
-		setEditing(null);
-	}
-
-	function handleCellKeyDown(e: React.KeyboardEvent) {
-		if (e.key === "Enter" && !e.shiftKey) {
-			e.preventDefault();
-			commitEdit();
-		} else if (e.key === "Escape") {
-			cancelEdit();
-		}
-	}
-
 	function renderEditableCell(rowKey: string, field: string, value: string, className?: string) {
-		const isActive = editing?.rowKey === rowKey && editing?.field === field;
+		const isActive = editingKey?.rowKey === rowKey && editingKey?.field === field;
 
 		if (isActive) {
 			return (
-				<div className="flex flex-col gap-1">
-					<textarea
-						className="w-full rounded border border-primary bg-background px-2 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-primary resize-y min-h-[40px]"
-						value={editing.draft}
-						onChange={e => setEditing({ ...editing, draft: e.target.value })}
-						onKeyDown={handleCellKeyDown}
-						autoFocus
-						rows={Math.max(2, Math.ceil(value.length / 60))}
-					/>
-					<div className="flex items-center gap-1">
-						<Button variant="ghost" size="icon" className="h-5 w-5" onClick={commitEdit}>
-							<Check className="h-3 w-3 text-primary" />
-						</Button>
-						<Button variant="ghost" size="icon" className="h-5 w-5" onClick={cancelEdit}>
-							<X className="h-3 w-3 text-muted-foreground" />
-						</Button>
-					</div>
-				</div>
+				<EditableCellInput
+					initialValue={value}
+					onCommit={draft => {
+						if (rowKey.startsWith("section-")) {
+							const sectionIndex = Number(rowKey.split("-")[1]);
+							onEditSection?.(sectionIndex, field, draft || null);
+						} else if (rowKey.startsWith("q-")) {
+							const parts = rowKey.split("-");
+							const sectionIndex = Number(parts[1]);
+							const questionIndex = Number(parts[2]);
+							onEditQuestion?.(sectionIndex, questionIndex, field, draft);
+						}
+						setEditingKey(null);
+					}}
+					onCancel={() => setEditingKey(null)}
+				/>
 			);
 		}
 
 		return (
 			<div
 				className={`group/cell relative ${editable ? "cursor-pointer rounded px-1 -mx-1 hover:bg-accent/50 transition-colors" : ""} ${className ?? ""}`}
+				data-testid={`editable-cell-${rowKey}-${field}`}
 				onClick={() => {
-					if (editable) startEdit(rowKey, field, value);
+					if (editable) setEditingKey({ rowKey, field });
 				}}
 				onKeyDown={e => {
-					if (editable && (e.key === "Enter" || e.key === " ")) startEdit(rowKey, field, value);
+					if (editable && (e.key === "Enter" || e.key === " ")) {
+						e.preventDefault();
+						setEditingKey({ rowKey, field });
+					}
 				}}
 				role={editable ? "button" : undefined}
 				tabIndex={editable ? 0 : undefined}>
@@ -1055,6 +1127,7 @@ function SpreadsheetView({
 							placeholder={t("search")}
 							value={search}
 							onChange={e => setSearch(e.target.value)}
+							data-testid="spreadsheet-search"
 						/>
 
 						<Select value={sectionFilter} onValueChange={setSectionFilter}>
@@ -1107,6 +1180,7 @@ function SpreadsheetView({
 							variant="ghost"
 							size="icon"
 							className="shrink-0"
+							data-testid="spreadsheet-fullscreen-toggle"
 							onClick={() => setIsFullscreen(!isFullscreen)}
 							title={isFullscreen ? t("exitFullscreen") : t("fullscreen")}>
 							{isFullscreen ? <Minimize2 className="h-4 w-4" /> : <Maximize2 className="h-4 w-4" />}
@@ -1118,179 +1192,400 @@ function SpreadsheetView({
 	);
 
 	const table = (
-		<div className={isFullscreen ? "flex-1 overflow-auto" : ""}>
+		<div className={isFullscreen ? "flex-1 overflow-auto" : ""} data-testid="spreadsheet-table-container">
 			<Card className={`overflow-hidden ${isFullscreen ? "border-0 rounded-none shadow-none" : ""}`}>
-				<Table>
+				<Table data-testid="spreadsheet-table">
 					<TableHeader>
 						<TableRow>
-							<TableHead className="w-[70px] sticky left-0 z-10 bg-muted/90">#</TableHead>
-							<TableHead className="w-[360px]">{t("section")}</TableHead>
-							<TableHead className="min-w-[300px]">{t("prompt")}</TableHead>
-							<TableHead className="w-[100px]">{t("questionType")}</TableHead>
-							<TableHead className="w-[100px]">{t("mode")}</TableHead>
-							<TableHead className="w-[130px]">{t("constructs")}</TableHead>
-							<TableHead className="w-[60px]">{t("required")}</TableHead>
-							<TableHead className="w-[200px]">{t("scalesCol")}</TableHead>
-							<TableHead className="w-[200px]">{t("conditionCol")}</TableHead>
+							<TableHead className="w-[70px] sticky left-0 z-10 bg-muted/90" data-testid="col-header-id">
+								#
+							</TableHead>
+							<TableHead className="w-[360px]" data-testid="col-header-section">
+								{t("section")}
+							</TableHead>
+							<TableHead className="min-w-[300px] max-w-[700px]" data-testid="col-header-prompt">
+								{t("prompt")}
+							</TableHead>
+							<TableHead className="w-[100px]" data-testid="col-header-type">
+								{t("questionType")}
+							</TableHead>
+							<TableHead className="w-[100px]" data-testid="col-header-mode">
+								{t("mode")}
+							</TableHead>
+							<TableHead className="w-[130px]" data-testid="col-header-constructs">
+								{t("constructs")}
+							</TableHead>
+							<TableHead className="w-[60px]" data-testid="col-header-required">
+								{t("required")}
+							</TableHead>
+							<TableHead className="w-[200px]" data-testid="col-header-scales">
+								{t("scalesCol")}
+							</TableHead>
+							<TableHead className="w-[200px]" data-testid="col-header-conditions">
+								{t("conditionCol")}
+							</TableHead>
 						</TableRow>
 					</TableHeader>
-					<TableBody>
+					<TableBody data-testid="spreadsheet-table-body">
 						{filteredRows.length === 0 ? (
 							<TableRow>
-								<TableCell colSpan={9} className="text-center text-sm text-muted-foreground py-12">
+								<TableCell
+									colSpan={9}
+									className="text-center text-sm text-muted-foreground py-12"
+									data-testid="spreadsheet-no-results">
 									{t("noResults")}
 								</TableCell>
 							</TableRow>
 						) : (
-							filteredRows.map(row => {
-								const q = row.question;
-								const isChecklist = row.questionType === "checklist";
-								const qKey = `q-${row.sectionIndex}-${row.questionIndex}`;
-								const sKey = `section-${row.sectionIndex}`;
+							(() => {
+								const rendered: React.ReactNode[] = [];
+								let lastSectionIndex = -1;
 
-								return (
-									<TableRow key={`${row.sectionKey}-${q.question_key}`}>
-										<TableCell className="font-mono text-xs tabular-nums text-muted-foreground sticky left-0 z-10 bg-background">
-											{editable
-												? renderEditableCell(
-														qKey,
-														"question_key",
-														q.question_key,
-														"font-mono text-xs"
-													)
-												: row.questionLabel}
-										</TableCell>
+								for (const row of filteredRows) {
+									if (row.sectionIndex !== lastSectionIndex) {
+										lastSectionIndex = row.sectionIndex;
+										const sKey = `section-${row.sectionIndex}`;
+										rendered.push(
+											<TableRow
+												key={`section-header-${row.sectionKey}`}
+												className="bg-muted/30"
+												data-testid={`row-section-${row.sectionIndex}`}>
+												<TableCell className="font-mono text-xs tabular-nums text-muted-foreground sticky left-0 z-10 bg-muted/30 border-r border-border/50">
+													<span
+														data-testid={`badge-section-${row.sectionIndex}`}
+														className="text-xs text-muted-foreground rounded-sm border border-b-black font-bold px-1.5 py-1 text-nowrap">
+														{String(t("section") + " " + (row.sectionIndex + 1))}
+													</span>
+												</TableCell>
+												<TableCell
+													className="align-top font-medium"
+													data-testid={`cell-section-title-${row.sectionIndex}`}>
+													{editable ? (
+														renderEditableCell(sKey, "title", row.sectionTitle, "text-sm")
+													) : (
+														<span className="text-sm">{row.sectionTitle}</span>
+													)}
+												</TableCell>
+												<TableCell
+													className="align-top max-w-[700px]"
+													data-testid={`cell-section-details-${row.sectionIndex}`}>
+													<div className="space-y-4 py-1">
+														<div data-testid={`section-description-${row.sectionIndex}`}>
+															<div className="text-sm font-semibold text-muted-foreground mb-1 uppercase tracking-wider">
+																Description
+															</div>
+															{editable ? (
+																renderEditableCell(
+																	sKey,
+																	"description",
+																	sections[row.sectionIndex]?.description || "",
+																	"text-sm text-muted-foreground max-w-[700px]"
+																)
+															) : (
+																<span className="text-xs text-muted-foreground">
+																	{sections[row.sectionIndex]?.description ||
+																		"No description"}
+																</span>
+															)}
+														</div>
 
-										<TableCell>
-											<span className="text-xs leading-tight">
-												<Badge
-													variant="outline"
-													className="mb-0.5 font-mono text-[10px] tabular-nums">
-													{row.sectionIndex + 1}
-												</Badge>
-												<br />
+														<div data-testid={`section-instruction-${row.sectionIndex}`}>
+															<div className="text-sm font-semibold text-muted-foreground mb-1 uppercase tracking-wider">
+																Instruction
+															</div>
+															{editable ? (
+																renderEditableCell(
+																	sKey,
+																	"instruction",
+																	sections[row.sectionIndex]?.instruction || "",
+																	"text-xs text-muted-foreground max-w-[700px]"
+																)
+															) : (
+																<span className="text-xs text-muted-foreground">
+																	{sections[row.sectionIndex]?.instruction ||
+																		"No instruction"}
+																</span>
+															)}
+														</div>
+
+														<div data-testid={`section-notes_prompt-${row.sectionIndex}`}>
+															<div className="text-sm font-semibold text-muted-foreground mb-1 uppercase tracking-wider">
+																Notes Prompt
+															</div>
+															{editable ? (
+																renderEditableCell(
+																	sKey,
+																	"notes_prompt",
+																	sections[row.sectionIndex]?.notes_prompt || "",
+																	"text-xs text-muted-foreground max-w-[700px]"
+																)
+															) : (
+																<span className="text-xs text-muted-foreground">
+																	{sections[row.sectionIndex]?.notes_prompt ||
+																		"No notes prompt"}
+																</span>
+															)}
+														</div>
+													</div>
+												</TableCell>
+												<TableCell colSpan={6} />
+											</TableRow>
+										);
+									}
+
+									const q = row.question;
+									const isChecklist = row.questionType === "checklist";
+									const qKey = `q-${row.sectionIndex}-${row.questionIndex}`;
+
+									rendered.push(
+										<TableRow
+											key={`${row.sectionKey}-${q.question_key}`}
+											data-testid={`row-question-${row.sectionIndex}-${row.questionIndex}`}>
+											<TableCell
+												className="font-mono text-xs tabular-nums text-muted-foreground sticky left-0 z-10 bg-background border-r border-border/50"
+												data-testid={`cell-question-key-${row.sectionIndex}-${row.questionIndex}`}>
+												{editable
+													? renderEditableCell(
+															qKey,
+															"question_key",
+															row.questionLabel,
+															"font-mono text-xs"
+														)
+													: row.questionLabel}
+											</TableCell>
+
+											<TableCell
+												className="opacity-40"
+												data-testid={`cell-question-empty-${row.sectionIndex}-${row.questionIndex}`}>
+												<span className="text-[10px] uppercase tracking-wider pl-2 text-muted-foreground">
+													&mdash;
+												</span>
+											</TableCell>
+
+											<TableCell
+												data-testid={`cell-question-prompt-${row.sectionIndex}-${row.questionIndex}`}>
 												{editable ? (
 													renderEditableCell(
-														sKey,
-														"title",
-														row.sectionTitle,
-														"text-xs text-muted-foreground"
+														qKey,
+														"prompt",
+														q.prompt,
+														"text-sm flex-wrap max-w-[700px]"
 													)
 												) : (
-													<span className="text-muted-foreground">{row.sectionTitle}</span>
+													<p className="text-sm">{renderInlineMarkdown(q.prompt)}</p>
 												)}
-											</span>
-										</TableCell>
-
-										<TableCell>
-											{editable ? (
-												renderEditableCell(
-													qKey,
-													"prompt",
-													q.prompt,
-													"text-sm flex-wrap max-w-[700px]"
-												)
-											) : (
-												<p className="text-sm">{renderInlineMarkdown(q.prompt)}</p>
-											)}
-											{isChecklist && q.options.length > 0 && (
-												<div className="mt-1.5 flex flex-wrap gap-1 max-w-[700px]">
-													{q.options.map(opt => (
-														<span
-															key={opt.key}
-															className="inline-flex items-center rounded-full border border-border/60 bg-muted/40 px-1.5 py-0.5 text-[10px]">
-															<CheckCircle2 className="mr-0.5 h-2.5 w-2.5 text-muted-foreground" />
-															{opt.label}
-														</span>
-													))}
-												</div>
-											)}
-										</TableCell>
-
-										<TableCell>
-											<Badge
-												variant={isChecklist ? "secondary" : "default"}
-												className="gap-1 text-[10px]">
-												{isChecklist ? (
-													<ListChecks className="h-3 w-3" />
-												) : (
-													<Ruler className="h-3 w-3" />
-												)}
-												{t.has(`questionTypes.${row.questionType}`)
-													? t(`questionTypes.${row.questionType}`)
-													: row.questionType}
-											</Badge>
-										</TableCell>
-
-										<TableCell>
-											<Badge variant="outline" className="text-[10px]">
-												{t.has(`modes.${q.mode}`) ? t(`modes.${q.mode}`) : q.mode}
-											</Badge>
-										</TableCell>
-
-										<TableCell>
-											<div className="flex flex-wrap gap-1">
-												{q.constructs.map(c => (
-													<Badge key={c} variant="secondary" className="text-[10px]">
-														{t.has(`constructLabels.${c}`) ? t(`constructLabels.${c}`) : c}
-													</Badge>
-												))}
-											</div>
-										</TableCell>
-
-										<TableCell className="text-xs text-center">
-											{q.required !== false ? t("yes") : t("no")}
-										</TableCell>
-
-										<TableCell>
-											{q.scales.length > 0 ? (
-												<div className="flex flex-wrap gap-1">
-													{q.scales.map(scale => {
-														const defaultScale = scaleGuidanceMap.get(scale.key);
-														const customized = isScaleCustomized(scale, defaultScale);
-
-														return (
+												{isChecklist && q.options.length > 0 && (
+													<div
+														className="mt-1.5 flex flex-wrap gap-1 max-w-[700px]"
+														data-testid={`question-options-${row.sectionIndex}-${row.questionIndex}`}>
+														{q.options.map(opt => (
 															<span
-																key={scale.key}
-																className="inline-flex items-center gap-0.5">
-																<ScaleKeyBadge scaleKey={scale.key} />
-																{customized && (
-																	<Badge
-																		variant="outline"
-																		className="border-accent-terracotta/40 bg-accent-terracotta/10 text-accent-terracotta text-[9px] px-1 py-0">
-																		{t("customBadge")}
-																	</Badge>
-																)}
+																key={opt.key}
+																className="inline-flex items-center rounded-full border border-border/60 bg-muted/40 px-1.5 py-0.5 text-[10px]"
+																data-testid={`question-option-${opt.key}`}>
+																<CheckCircle2 className="mr-0.5 h-2.5 w-2.5 text-muted-foreground" />
+																{opt.label}
 															</span>
-														);
-													})}
-												</div>
-											) : (
-												<span className="text-xs text-muted-foreground">{t("noScales")}</span>
-											)}
-										</TableCell>
+														))}
+													</div>
+												)}
+											</TableCell>
 
-										<TableCell>
-											{q.display_if ? (
-												<div className="text-[10px] leading-relaxed">
-													<span className="font-medium text-status-warning">
-														{q.display_if.question_key}
+											<TableCell
+												data-testid={`cell-question-type-${row.sectionIndex}-${row.questionIndex}`}>
+												<Badge
+													variant={isChecklist ? "secondary" : "default"}
+													className="gap-1 text-[10px]"
+													data-testid={`badge-question-type-${row.questionType}`}>
+													{isChecklist ? (
+														<ListChecks className="h-3 w-3" />
+													) : (
+														<Ruler className="h-3 w-3" />
+													)}
+													{t.has(`questionTypes.${row.questionType}`)
+														? t(`questionTypes.${row.questionType}`)
+														: row.questionType}
+												</Badge>
+											</TableCell>
+
+											<TableCell
+												data-testid={`cell-question-mode-${row.sectionIndex}-${row.questionIndex}`}>
+												{editable && onEditQuestion ? (
+													<Select
+														value={q.mode}
+														onValueChange={v =>
+															onEditQuestion(
+																row.sectionIndex,
+																row.questionIndex,
+																"mode",
+																v
+															)
+														}>
+														<SelectTrigger
+															className="h-7 w-full text-[10px]"
+															data-testid={`select-mode-${row.sectionIndex}-${row.questionIndex}`}>
+															<SelectValue />
+														</SelectTrigger>
+														<SelectContent>
+															{MODE_OPTIONS.map(m => (
+																<SelectItem
+																	key={m}
+																	value={m}
+																	className="text-xs"
+																	data-testid={`select-mode-item-${m}`}>
+																	{t.has(`modes.${m}`) ? t(`modes.${m}`) : m}
+																</SelectItem>
+															))}
+														</SelectContent>
+													</Select>
+												) : (
+													<Badge
+														variant="outline"
+														className="text-[10px]"
+														data-testid={`badge-question-mode-${q.mode}`}>
+														{t.has(`modes.${q.mode}`) ? t(`modes.${q.mode}`) : q.mode}
+													</Badge>
+												)}
+											</TableCell>
+
+											<TableCell
+												data-testid={`cell-question-constructs-${row.sectionIndex}-${row.questionIndex}`}>
+												{editable && onEditQuestion ? (
+													<Select
+														value={
+															q.constructs.length === 2 ? "both" : (q.constructs[0] ?? "")
+														}
+														onValueChange={v => {
+															if (v === "both") {
+																onEditQuestion(
+																	row.sectionIndex,
+																	row.questionIndex,
+																	"constructs",
+																	["play_value", "usability"]
+																);
+															} else {
+																onEditQuestion(
+																	row.sectionIndex,
+																	row.questionIndex,
+																	"constructs",
+																	[v]
+																);
+															}
+														}}>
+														<SelectTrigger
+															className="h-7 w-full text-[10px]"
+															data-testid={`select-construct-${row.sectionIndex}-${row.questionIndex}`}>
+															<SelectValue />
+														</SelectTrigger>
+														<SelectContent>
+															<SelectItem
+																value="play_value"
+																className="text-xs"
+																data-testid="select-construct-item-play_value">
+																Play Value
+															</SelectItem>
+															<SelectItem
+																value="usability"
+																className="text-xs"
+																data-testid="select-construct-item-usability">
+																Usability
+															</SelectItem>
+															<SelectItem
+																value="both"
+																className="text-xs"
+																data-testid="select-construct-item-both">
+																Both
+															</SelectItem>
+														</SelectContent>
+													</Select>
+												) : (
+													<div className="flex flex-wrap gap-1">
+														{q.constructs.map(c => (
+															<Badge
+																key={c}
+																variant="secondary"
+																className="text-[10px]"
+																data-testid={`badge-construct-${c}`}>
+																{t.has(`constructLabels.${c}`)
+																	? t(`constructLabels.${c}`)
+																	: c}
+															</Badge>
+														))}
+													</div>
+												)}
+											</TableCell>
+
+											<TableCell
+												className="text-xs text-center"
+												data-testid={`cell-question-required-${row.sectionIndex}-${row.questionIndex}`}>
+												{q.required !== false ? t("yes") : t("no")}
+											</TableCell>
+
+											<TableCell
+												data-testid={`cell-question-scales-${row.sectionIndex}-${row.questionIndex}`}>
+												{q.scales.length > 0 ? (
+													<div className="flex flex-wrap gap-1">
+														{q.scales.map(scale => {
+															const defaultScale = scaleGuidanceMap.get(scale.key);
+															const customized = isScaleCustomized(scale, defaultScale);
+
+															return (
+																<span
+																	key={scale.key}
+																	className="inline-flex items-center gap-0.5"
+																	data-testid={`scale-item-${scale.key}`}>
+																	<ScaleKeyBadge scaleKey={scale.key} />
+																	{customized && (
+																		<Badge
+																			variant="outline"
+																			className="border-accent-terracotta/40 bg-accent-terracotta/10 text-accent-terracotta text-[9px] px-1 py-0"
+																			data-testid={`badge-custom-scale-${scale.key}`}>
+																			{t("customBadge")}
+																		</Badge>
+																	)}
+																</span>
+															);
+														})}
+													</div>
+												) : (
+													<span
+														className="text-xs text-muted-foreground"
+														data-testid={`no-scales-${row.sectionIndex}-${row.questionIndex}`}>
+														{t("noScales")}
 													</span>
-													<span className="text-muted-foreground">
-														{" "}
-														({q.display_if.response_key}) ={" "}
+												)}
+											</TableCell>
+
+											<TableCell
+												data-testid={`cell-question-condition-${row.sectionIndex}-${row.questionIndex}`}>
+												{q.display_if ? (
+													<div
+														className="text-[10px] leading-relaxed"
+														data-testid={`display-condition-${row.sectionIndex}-${row.questionIndex}`}>
+														<span className="font-medium text-status-warning">
+															{q.display_if.question_key}
+														</span>
+														<span className="text-muted-foreground">
+															{" "}
+															({q.display_if.response_key}) ={" "}
+														</span>
+														<span className="font-mono">
+															{q.display_if.any_of_option_keys.join(", ")}
+														</span>
+													</div>
+												) : (
+													<span
+														className="text-xs text-muted-foreground"
+														data-testid={`no-condition-${row.sectionIndex}-${row.questionIndex}`}>
+														&mdash;
 													</span>
-													<span className="font-mono">
-														{q.display_if.any_of_option_keys.join(", ")}
-													</span>
-												</div>
-											) : (
-												<span className="text-xs text-muted-foreground">&mdash;</span>
-											)}
-										</TableCell>
-									</TableRow>
-								);
-							})
+												)}
+											</TableCell>
+										</TableRow>
+									);
+								}
+								return rendered;
+							})()
 						)}
 					</TableBody>
 				</Table>
@@ -1468,10 +1763,7 @@ function ViewerQuestionCard({
 	scaleGuidanceMap: Map<string, ScaleDefinition>;
 }>) {
 	const t = useTranslations("admin.instruments.content");
-	const parsed = parseQuestionKey(question.question_key);
-	const questionLabel = parsed
-		? t("questionNumber", { section: parsed.section, number: parsed.number })
-		: question.question_key;
+	const questionLabel = formatQuestionKey(question.question_key);
 	const questionType = question.question_type ?? "scaled";
 	const isChecklist = questionType === "checklist";
 
@@ -1659,6 +1951,8 @@ function ScaleKeyBadge({ scaleKey }: Readonly<{ scaleKey: string }>) {
 /*  Instrument Editor (full CRUD, tabbed)                                      */
 /* -------------------------------------------------------------------------- */
 
+import diff from "microdiff";
+
 interface InstrumentEditorProps {
 	readonly content: InstrumentContent;
 	readonly sourceVersion: string;
@@ -1681,6 +1975,12 @@ function InstrumentEditor({ content, sourceVersion, isPending, onPublish, onCanc
 	const [publishActivate, setPublishActivate] = useState(true);
 
 	const instrument = draft[activeLang] ?? null;
+
+	const differences = useMemo(() => {
+		return diff(content, draft);
+	}, [content, draft]);
+
+	const changesCount = differences.length;
 
 	const updateInstrument = useCallback(
 		(updater: (inst: PlayspaceInstrument) => void) => {
@@ -1725,29 +2025,69 @@ function InstrumentEditor({ content, sourceVersion, isPending, onPublish, onCanc
 							}}>
 							{t("editor.saveDraft")}
 						</Button>
-						<Button
-							size="sm"
-							disabled={isPending}
-							onClick={() => {
-								setPublishActivate(true);
-								setShowPublishDialog(true);
-							}}>
-							{t("editor.publish")}
-						</Button>
+						<div className="relative inline-block">
+							<Button
+								size="sm"
+								disabled={isPending}
+								onClick={() => {
+									setPublishActivate(true);
+									setShowPublishDialog(true);
+								}}>
+								{t("editor.publish")}
+							</Button>
+							{changesCount > 0 && (
+								<Badge
+									className="absolute -top-2 -right-2 px-1.5 py-0 min-w-[20px] h-5 flex items-center justify-center text-[10px] pointer-events-none z-10 shadow-sm"
+									variant="destructive">
+									{changesCount}
+								</Badge>
+							)}
+						</div>
 					</div>
 				}
 			/>
 
 			{/* Language tabs */}
-			<Tabs value={activeLang} onValueChange={setActiveLang}>
-				<TabsList>
-					{languages.map(lang => (
-						<TabsTrigger key={lang} value={lang}>
-							{lang.toUpperCase()}
-						</TabsTrigger>
-					))}
-				</TabsList>
+			<div className="flex items-center justify-between">
+				<Tabs value={activeLang} onValueChange={setActiveLang}>
+					<TabsList>
+						{languages.map(lang => (
+							<TabsTrigger key={lang} value={lang}>
+								{lang.toUpperCase()}
+							</TabsTrigger>
+						))}
+					</TabsList>
+				</Tabs>
 
+				<DropdownMenu>
+					<DropdownMenuTrigger asChild>
+						<Button variant="outline" size="sm">
+							<Download className="mr-2 h-4 w-4" />
+							Export
+						</Button>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent align="end" className="w-40">
+						<DropdownMenuItem onClick={() => exportInstrument(draft, newVersion, "pdf", activeLang)}>
+							<FileText className="mr-2 h-4 w-4 text-muted-foreground" />
+							PDF
+						</DropdownMenuItem>
+						<DropdownMenuItem onClick={() => exportInstrument(draft, newVersion, "xlsx", activeLang)}>
+							<FileSpreadsheet className="mr-2 h-4 w-4 text-muted-foreground" />
+							Excel (.xlsx)
+						</DropdownMenuItem>
+						<DropdownMenuItem onClick={() => exportInstrument(draft, newVersion, "csv", activeLang)}>
+							<FileSpreadsheet className="mr-2 h-4 w-4 text-muted-foreground" />
+							CSV
+						</DropdownMenuItem>
+						<DropdownMenuItem onClick={() => exportInstrument(draft, newVersion, "json", activeLang)}>
+							<FileJson className="mr-2 h-4 w-4 text-muted-foreground" />
+							JSON
+						</DropdownMenuItem>
+					</DropdownMenuContent>
+				</DropdownMenu>
+			</div>
+
+			<Tabs value={activeLang} onValueChange={setActiveLang}>
 				{languages.map(lang => (
 					<TabsContent key={lang} value={lang}>
 						{instrument && activeLang === lang ? (
@@ -1760,7 +2100,9 @@ function InstrumentEditor({ content, sourceVersion, isPending, onPublish, onCanc
 									<TabsTrigger value="scaleGuidance">{ct("scaleGuidance")}</TabsTrigger>
 									<TabsTrigger value="preAudit">{ct("preAudit")}</TabsTrigger>
 									<TabsTrigger value="sections">{ct("sections")}</TabsTrigger>
-									<TabsTrigger value="spreadsheet">{ct("editableSpreadsheet")}</TabsTrigger>
+									<TabsTrigger value="spreadsheet" data-testid="spreadsheet-tab">
+										{ct("editableSpreadsheet")}
+									</TabsTrigger>
 								</TabsList>
 
 								<TabsContent value="preamble">
@@ -1819,7 +2161,7 @@ function InstrumentEditor({ content, sourceVersion, isPending, onPublish, onCanc
 									/>
 								</TabsContent>
 
-								<TabsContent value="spreadsheet">
+								<TabsContent value="spreadsheet" data-testid="spreadsheet-content">
 									<SpreadsheetView
 										sections={instrument.sections ?? []}
 										scaleGuidanceMap={buildScaleGuidanceMap(instrument.scale_guidance ?? [])}
@@ -1829,8 +2171,12 @@ function InstrumentEditor({ content, sourceVersion, isPending, onPublish, onCanc
 												if (!section) return;
 												const q = section.questions[qi];
 												if (!q) return;
-												if (field === "prompt") q.prompt = value;
-												else if (field === "question_key") q.question_key = value;
+												if (field === "prompt") q.prompt = value as string;
+												else if (field === "question_key") q.question_key = value as string;
+												else if (field === "mode")
+													q.mode = value as "audit" | "survey" | "both";
+												else if (field === "constructs")
+													q.constructs = value as ("usability" | "play_value")[];
 											});
 										}}
 										onEditSection={(si, field, value) => {
@@ -1854,13 +2200,71 @@ function InstrumentEditor({ content, sourceVersion, isPending, onPublish, onCanc
 			</Tabs>
 
 			<Dialog open={showPublishDialog} onOpenChange={setShowPublishDialog}>
-				<DialogContent>
+				<DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
 					<DialogHeader>
 						<DialogTitle>{publishActivate ? t("editor.publishTitle") : t("editor.draftTitle")}</DialogTitle>
 						<DialogDescription>
 							{publishActivate ? t("editor.publishConfirm") : t("editor.draftConfirm")}
 						</DialogDescription>
 					</DialogHeader>
+
+					{differences.length > 0 ? (
+						<div className="space-y-3 py-4 border-y border-border/50 bg-muted/20 p-4 rounded-md">
+							<h4 className="text-sm font-semibold mb-2">Detected Changes ({changesCount})</h4>
+							<div className="space-y-2 max-h-[40vh] overflow-y-auto pr-2">
+								{differences.map((d, i) => (
+									<div
+										key={i}
+										className="text-xs border border-border/50 rounded-md p-2 bg-background">
+										<div className="flex items-center gap-2 mb-1.5 border-b border-border/30 pb-1">
+											<Badge
+												variant={
+													d.type === "CREATE"
+														? "default"
+														: d.type === "REMOVE"
+															? "destructive"
+															: "secondary"
+												}
+												className="text-[10px] px-1.5 py-0 h-4">
+												{d.type}
+											</Badge>
+											<span className="font-mono text-muted-foreground break-all">
+												{d.path.join(" → ")}
+											</span>
+										</div>
+										<div className="grid grid-cols-2 gap-2 mt-2">
+											{(d.type === "CHANGE" || d.type === "REMOVE") && (
+												<div className="rounded-md border border-destructive/30 bg-destructive/10 p-1.5">
+													<div className="text-[9px] font-semibold text-destructive/80 mb-1 uppercase tracking-wider">
+														Before
+													</div>
+													<div className="text-destructive/90 wrap-break-word whitespace-pre-wrap">
+														{JSON.stringify(d.oldValue, null, 2)}
+													</div>
+												</div>
+											)}
+											{(d.type === "CHANGE" || d.type === "CREATE") && (
+												<div
+													className={`rounded-md border border-status-success-border bg-status-success-surface p-1.5 ${d.type === "CREATE" ? "col-span-2" : ""}`}>
+													<div className="text-[9px] font-semibold text-status-success mb-1 uppercase tracking-wider">
+														After
+													</div>
+													<div className="text-foreground wrap-break-word whitespace-pre-wrap">
+														{JSON.stringify(d.value, null, 2)}
+													</div>
+												</div>
+											)}
+										</div>
+									</div>
+								))}
+							</div>
+						</div>
+					) : (
+						<div className="py-4 border-y border-border/50 bg-muted/20 p-4 rounded-md text-center">
+							<p className="text-sm text-muted-foreground">No changes detected.</p>
+						</div>
+					)}
+
 					<div className="space-y-2 py-2">
 						<Label htmlFor="new-version">{t("editor.newVersionLabel")}</Label>
 						<Input id="new-version" value={newVersion} onChange={e => setNewVersion(e.target.value)} />
@@ -2734,10 +3138,7 @@ function QuestionEditor({
 }>) {
 	const t = useTranslations("admin.instruments.content");
 	const [expanded, setExpanded] = useState(false);
-	const parsed = parseQuestionKey(question.question_key);
-	const questionLabel = parsed
-		? t("questionNumber", { section: parsed.section, number: parsed.number })
-		: question.question_key;
+	const questionLabel = formatQuestionKey(question.question_key);
 	const questionType = question.question_type ?? "scaled";
 	const isChecklist = questionType === "checklist";
 
@@ -2783,7 +3184,6 @@ function QuestionEditor({
 							const defaultScale = scaleGuidanceMap.get(scale.key);
 							const customized = isScaleCustomized(scale, defaultScale);
 							if (!customized) return null;
-							console.log(scale.key, "hi", defaultScale?.options, scale.options);
 							return (
 								<Badge
 									key={`custom-${scale.key}`}
@@ -3210,7 +3610,7 @@ function StatBox({ label, value, textValue }: Readonly<{ label: string; value?: 
 			<p className="text-xs font-semibold text-muted-foreground">{label}</p>
 			{textValue !== undefined ? (
 				<p
-					className="mt-0.5 text-xl text-foreground font-medium no-scrollbar overflow-x-scroll whitespace-nowrap"
+					className="mt-0.5 text-xl text-primary font-bold no-scrollbar overflow-x-scroll whitespace-nowrap"
 					title={textValue}>
 					{textValue}
 				</p>
