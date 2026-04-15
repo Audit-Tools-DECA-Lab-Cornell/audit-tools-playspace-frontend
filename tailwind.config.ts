@@ -4,9 +4,9 @@ const config = {
 	theme: {
 		extend: {
 			borderRadius: {
-				field: "8px",
-				card: "12px",
-				pill: "999px"
+				field: "6px",
+				card: "8px",
+				pill: "14px"
 			},
 			boxShadow: {
 				accent: "0 0 14px rgba(197, 138, 92, 0.12)",

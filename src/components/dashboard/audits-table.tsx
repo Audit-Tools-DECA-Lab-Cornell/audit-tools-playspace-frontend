@@ -109,7 +109,7 @@ function AuditIdentityCell({
 			<div className="flex flex-wrap items-center gap-2">
 				<code
 					title={auditCode}
-					className="rounded-sm bg-secondary px-2 py-1 font-mono text-[11px] tracking-[0.04em] text-foreground">
+					className="rounded-sm bg-secondary px-2 py-1 font-mono text-[13px] tracking-[0.04em] text-foreground">
 					{formatAuditCodeReference(auditCode)}
 				</code>
 				<Button

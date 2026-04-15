@@ -360,7 +360,7 @@ export function DataTableToolbar<TData>({
 										<React.Fragment key={config.columnId}>
 											{configIndex > 0 ? <DropdownMenuSeparator /> : null}
 											<div className="space-y-1.5">
-												<DropdownMenuLabel className="px-2 py-1 text-[11px]">
+												<DropdownMenuLabel className="px-2 py-1 text-[13px]">
 													{config.title}
 												</DropdownMenuLabel>
 												{config.options.length > 0 ? (

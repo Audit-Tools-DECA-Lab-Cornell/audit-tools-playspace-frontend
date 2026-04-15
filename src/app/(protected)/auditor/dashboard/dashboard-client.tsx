@@ -24,11 +24,7 @@ export interface AuditorDashboardClientProps {
 	errorMessage?: string | null;
 }
 
-export function AuditorDashboardClient({
-	summary,
-	places,
-	errorMessage
-}: Readonly<AuditorDashboardClientProps>) {
+export function AuditorDashboardClient({ summary, places, errorMessage }: Readonly<AuditorDashboardClientProps>) {
 	const t = useTranslations("auditor.dashboard");
 	const formatT = useTranslations("common.format");
 

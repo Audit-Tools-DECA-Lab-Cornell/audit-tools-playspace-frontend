@@ -7,6 +7,7 @@ import * as React from "react";
 import {
 	ChevronDown,
 	ClipboardList,
+	FileText,
 	FolderKanban,
 	LayoutDashboard,
 	LogOut,
@@ -58,6 +59,7 @@ function getNavItems(role: UserRole, t: NavigationTranslator): NavItem[] {
 			{ label: t("places"), href: "/admin/places", icon: MapPin },
 			{ label: t("auditors"), href: "/admin/auditors", icon: Users },
 			{ label: t("audits"), href: "/admin/audits", icon: ClipboardList },
+			{ label: t("instruments"), href: "/admin/instruments", icon: FileText },
 			{ label: t("system"), href: "/admin/system", icon: Settings },
 			{ label: t("settings"), href: "/settings", icon: Settings }
 		];
@@ -139,9 +141,15 @@ function UserMenu({
 				</Button>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="end" className="w-56">
-				<DropdownMenuLabel className="flex flex-col gap-1">
-					<span className="text-lg font-semibold tracking-normal">{userName ?? t("accountLabel")}</span>
-					{userEmail ? <span className="text-xs font-normal text-muted-foreground">{userEmail}</span> : null}
+				<DropdownMenuLabel className="flex flex-col gap-1 flex-1">
+					<span className="text-lg flex-1 overflow-x-scroll font-semibold no-scrollbar whitespace-nowrap">
+						{userName ?? t("accountLabel")}
+					</span>
+					{userEmail ? (
+						<span className="text-xs font-normal flex-1 overflow-x-scroll no-scrollbar whitespace-nowrap text-muted-foreground">
+							{userEmail}
+						</span>
+					) : null}
 				</DropdownMenuLabel>
 				<DropdownMenuSeparator />
 				<DropdownMenuItem asChild>
@@ -188,7 +196,7 @@ export function AppShell({ role, auditorCode, userName, userEmail, children }: R
 									<span className="text-sm text-muted-foreground">{shellT("productTagline")}</span>
 								</div>
 							</div>
-							<div className="inline-flex w-fit rounded-pill border border-primary/30 bg-primary/10 px-3 py-1 text-(length:--workspace-label-size) font-semibold tracking-(--workspace-label-tracking) text-primary uppercase">
+							<div className="inline-flex w-fit rounded-lg border border-primary/30 bg-primary/10 px-3 py-1 text-(length:--workspace-label-size) font-semibold tracking-(--workspace-label-tracking) text-primary uppercase">
 								{roleLabel}
 							</div>
 						</div>

@@ -341,7 +341,7 @@ export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFo
 			incomingSession.meta.execution_mode ??
 			(incomingSession.allowed_execution_modes.length === 1 ? incomingSession.allowed_execution_modes[0] : "");
 		const nextPreAuditValues = getPreAuditValues(incomingSession);
-		const nextSectionDrafts = createSectionDrafts(incomingSession, instrument);
+		const nextSectionDrafts = createSectionDrafts(incomingSession, instrument!);
 
 		initializedAuditIdRef.current = incomingSession.audit_id;
 		const initialPatch = buildDraftPatchFromState({
@@ -457,17 +457,17 @@ export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFo
 
 	const executionMode = selectedMode === "" ? null : selectedMode;
 	const preambleBlocks = React.useMemo(() => {
-		return instrument.preamble.map(parsePreambleBlock);
+		return instrument?.preamble.map(parsePreambleBlock) ?? [];
 	}, [instrument]);
 	const auditInfoQuestions = React.useMemo(() => {
-		return instrument.pre_audit_questions.filter(question => question.page_key === "audit_info");
-	}, [instrument.pre_audit_questions]);
+		return instrument?.pre_audit_questions.filter(question => question.page_key === "audit_info") ?? [];
+	}, [instrument?.pre_audit_questions]);
 	const spaceAuditQuestions = React.useMemo(() => {
 		return getVisiblePreAuditQuestions(
-			instrument.pre_audit_questions.filter(question => question.page_key === "space_setup"),
+			instrument?.pre_audit_questions.filter(question => question.page_key === "space_setup") ?? [],
 			executionMode
 		);
-	}, [executionMode, instrument.pre_audit_questions]);
+	}, [executionMode, instrument?.pre_audit_questions]);
 	const matrixSpaceAuditQuestions = React.useMemo(() => {
 		return spaceAuditQuestions.filter(question => question.group_key === "current_users_matrix");
 	}, [spaceAuditQuestions]);
@@ -476,13 +476,13 @@ export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFo
 	}, [spaceAuditQuestions]);
 	const visibleSections = React.useMemo(() => {
 		return getVisibleSections(
-			instrument,
+			instrument!,
 			executionMode,
 			Object.fromEntries(
 				Object.entries(sectionDrafts).map(([sectionKey, draft]) => [sectionKey, draft.responses])
 			)
 		);
-	}, [executionMode, instrument, sectionDrafts]);
+	}, [executionMode, instrument!, sectionDrafts, instrument]);
 
 	const sectionRows = React.useMemo<SectionProgressRow[]>(() => {
 		return visibleSections.map(section => ({
@@ -516,7 +516,7 @@ export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFo
 			: null;
 
 	const requiredPreAuditComplete = isRequiredPreAuditComplete(
-		instrument.pre_audit_questions,
+		instrument?.pre_audit_questions ?? [],
 		preAuditValues,
 		executionMode
 	);
@@ -655,6 +655,10 @@ export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFo
 		);
 	}
 
+	if (createOrResumeQuery.data && !instrument) {
+		return <div className="h-40 animate-pulse rounded-card border border-border bg-card" />;
+	}
+
 	if (!session) {
 		return <div className="h-64 animate-pulse rounded-card border border-border bg-card" />;
 	}
@@ -731,7 +735,7 @@ export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFo
 								<CardContent className="space-y-3">
 									<p className="text-sm text-muted-foreground">{t("setup.roleQuestion")}</p>
 									<div className="grid gap-3">
-										{instrument.execution_modes
+										{instrument?.execution_modes
 											.filter(mode =>
 												session.allowed_execution_modes.includes(mode.key as ExecutionMode)
 											)

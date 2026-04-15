@@ -150,17 +150,19 @@ export default function AuditorReportDetailPage() {
 	const audit = auditQuery.data ?? null;
 	const instrument = useLocalizedInstrument(audit?.instrument ?? null);
 	const sectionTitleByKey = React.useMemo(() => {
+		if (!instrument) return {} as Readonly<Record<string, string>>;
 		return Object.fromEntries(instrument.sections.map(section => [section.section_key, section.title])) as Readonly<
 			Record<string, string>
 		>;
 	}, [instrument]);
 	const preAuditQuestionByKey = React.useMemo(() => {
+		if (!instrument) return {} as Readonly<Record<string, PreAuditQuestion>>;
 		return Object.fromEntries(instrument.pre_audit_questions.map(question => [question.key, question])) as Readonly<
 			Record<string, PreAuditQuestion>
 		>;
 	}, [instrument]);
 	const visibleSetupQuestions = React.useMemo(() => {
-		return instrument.pre_audit_questions.filter(question => {
+		return instrument?.pre_audit_questions.filter(question => {
 			if (question.page_key !== "space_setup") {
 				return false;
 			}
@@ -171,7 +173,7 @@ export default function AuditorReportDetailPage() {
 
 			return audit ? question.visible_modes.includes(audit.meta.execution_mode) : false;
 		});
-	}, [audit, instrument.pre_audit_questions]);
+	}, [audit, instrument?.pre_audit_questions]);
 	const sectionRows = React.useMemo(() => {
 		return audit ? Object.values(audit.sections) : [];
 	}, [audit]);
@@ -329,7 +331,7 @@ export default function AuditorReportDetailPage() {
 					<CardTitle>{t("preAudit.title")}</CardTitle>
 				</CardHeader>
 				<CardContent className="grid gap-2 text-sm text-muted-foreground md:grid-cols-2">
-					{visibleSetupQuestions.map(question => (
+					{visibleSetupQuestions?.map(question => (
 						<p key={question.key}>
 							<span className="font-medium text-foreground">{question.label}: </span>
 							{getPreAuditDisplayValue(preAuditQuestionByKey, question, audit, t("preAudit.notProvided"))}
@@ -406,7 +408,7 @@ export default function AuditorReportDetailPage() {
 																section.section_key}
 														</p>
 														{showSectionCodes ? (
-															<code className="inline-flex rounded-md bg-muted/65 px-2 py-1 font-mono text-[11px] tracking-[0.04em] text-foreground/80">
+															<code className="inline-flex rounded-md bg-muted/65 px-2 py-1 font-mono text-[13px] tracking-[0.04em] text-foreground/80">
 																{section.section_key}
 															</code>
 														) : null}

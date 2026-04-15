@@ -357,7 +357,7 @@ function ChoiceCardGroup<TValue extends string>({
 								onChange(option.value);
 							}}
 							className={cn(
-								"inline-flex min-h-10 items-center gap-2 rounded-pill border px-4 py-2.5 text-left text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60",
+								"inline-flex min-h-10 items-center gap-2 rounded-lg border px-4 py-2.5 text-left text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/60",
 								isSelected
 									? "border-primary bg-primary/10 shadow-field"
 									: "border-border bg-card text-muted-foreground hover:bg-secondary/50 hover:text-foreground"
@@ -404,7 +404,7 @@ function PreferenceToggleRow({
 	return (
 		<div className="flex flex-col gap-4 rounded-card border border-border/70 bg-card p-4 sm:flex-row sm:items-center sm:justify-between">
 			<div className="flex items-start gap-3">
-				<div className="rounded-pill bg-secondary p-2">
+				<div className="rounded-lg bg-secondary p-2">
 					<Icon className="h-4 w-4 text-primary" aria-hidden="true" />
 				</div>
 				<div className="space-y-1">

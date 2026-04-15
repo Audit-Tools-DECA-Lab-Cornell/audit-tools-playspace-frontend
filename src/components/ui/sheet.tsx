@@ -56,13 +56,13 @@ function SheetContent({
 				className={cn(
 					"fixed z-50 flex max-h-dvh flex-col gap-4 overflow-hidden bg-background shadow-lift transition ease-in-out overscroll-contain data-[state=closed]:animate-out data-[state=closed]:duration-300 data-[state=open]:animate-in data-[state=open]:duration-500",
 					side === "right" &&
-						"inset-y-0 right-0 h-dvh w-full max-w-[28rem] border-l border-border/80 data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right",
+						"inset-y-0 right-0 h-dvh w-full max-w-[28rem] border-l border-border data-[state=closed]:slide-out-to-right data-[state=open]:slide-in-from-right",
 					side === "left" &&
-						"inset-y-0 left-0 h-dvh w-full max-w-[28rem] border-r border-border/80 data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left",
+						"inset-y-0 left-0 h-dvh w-full max-w-[28rem] border-r border-border data-[state=closed]:slide-out-to-left data-[state=open]:slide-in-from-left",
 					side === "top" &&
-						"inset-x-0 top-0 h-auto max-h-[75dvh] border-b border-border/80 data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top md:max-h-[32rem]",
+						"inset-x-0 top-0 h-auto max-h-[75dvh] border-b border-border data-[state=closed]:slide-out-to-top data-[state=open]:slide-in-from-top md:max-h-[32rem]",
 					side === "bottom" &&
-						"inset-x-0 bottom-0 h-auto max-h-[75dvh] border-t border-border/80 data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom md:max-h-[32rem]",
+						"inset-x-0 bottom-0 h-auto max-h-[75dvh] border-t border-border data-[state=closed]:slide-out-to-bottom data-[state=open]:slide-in-from-bottom md:max-h-[32rem]",
 					className
 				)}
 				{...props}>

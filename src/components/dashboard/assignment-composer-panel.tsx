@@ -94,7 +94,7 @@ export function AssignmentComposerPanel({
 				<div className="rounded-field border border-border/70 bg-muted/35 p-4">
 					<div className="space-y-1">
 						<p className="font-medium text-foreground">{selectedAuditor.full_name}</p>
-						<code className="inline-flex rounded-md bg-background/80 px-2 py-1 font-mono text-[11px] tracking-[0.04em] text-foreground/80">
+						<code className="inline-flex rounded-md bg-background/80 px-2 py-1 font-mono text-[13px] tracking-[0.04em] text-foreground/80">
 							{selectedAuditor.auditor_code}
 						</code>
 					</div>

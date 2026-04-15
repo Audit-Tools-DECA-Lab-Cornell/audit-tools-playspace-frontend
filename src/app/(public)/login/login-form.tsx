@@ -170,7 +170,10 @@ function RoleLoginCard({
 							{serverError}
 							<br />
 							<span className="text-xs text-muted-foreground">
-								<span className="text-primary">Use Email:</span> <span className="font-mono">{demoEmail}</span> and <span className="text-primary">Password:</span> <span className="font-mono">{demoPassword}</span> to login.
+								<span className="text-primary">Use Email:</span>{" "}
+								<span className="font-mono">{demoEmail}</span> and{" "}
+								<span className="text-primary">Password:</span>{" "}
+								<span className="font-mono">{demoPassword}</span> to login.
 							</span>
 						</div>
 					) : null}
@@ -190,9 +193,7 @@ function RoleLoginCard({
 								setServerError(null);
 							}}
 						/>
-						{fieldErrors.email ? (
-							<p className="text-sm text-destructive">{fieldErrors.email}</p>
-						) : null}
+						{fieldErrors.email ? <p className="text-sm text-destructive">{fieldErrors.email}</p> : null}
 					</div>
 
 					<div className="grid gap-2">
@@ -215,11 +216,7 @@ function RoleLoginCard({
 					</div>
 
 					<Button type="submit" disabled={disabled || isSubmitting} aria-busy={isSubmitting}>
-						{isSubmitting ? (
-							<PendingButtonLabel label={t("actions.signingIn")} />
-						) : (
-							t("actions.signIn")
-						)}
+						{isSubmitting ? <PendingButtonLabel label={t("actions.signingIn")} /> : t("actions.signIn")}
 					</Button>
 				</form>
 
@@ -229,8 +226,7 @@ function RoleLoginCard({
 					{demoHint}
 					{showPasswordHint ? (
 						<p className="text-xs font-medium text-amber-600 dark:text-amber-400">
-							{t("demoPasswordHint")}{" "}
-							<span className="font-mono">{demoPassword}</span>
+							{t("demoPasswordHint")} <span className="font-mono">{demoPassword}</span>
 						</p>
 					) : null}
 				</div>
@@ -277,8 +273,7 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 							demoHint={
 								<p className="text-xs text-muted-foreground">
 									<span className="text-amber-600 dark:text-amber-400">{t("manager.demoLabel")}</span>{" "}
-									<span className="font-mono">manager@example.org</span>{" "}
-									{t("manager.demoOr")}{" "}
+									<span className="font-mono">manager@example.org</span> {t("manager.demoOr")}{" "}
 									<span className="font-mono">canterbury.manager@example.org</span>
 								</p>
 							}

@@ -3,8 +3,7 @@
 import { isAxiosError } from "axios";
 import { z } from "zod";
 import { api } from "@/lib/api/api-client";
-import { BASE_PLAYSPACE_INSTRUMENT } from "@/lib/instrument";
-import { playspaceInstrumentSchema } from "@/types/audit";
+import { playspaceInstrumentSchema, type PlayspaceInstrument } from "@/types/audit";
 
 const accountTypeSchema = z.enum(["ADMIN", "MANAGER", "AUDITOR"]);
 const projectStatusSchema = z.enum(["planned", "active", "completed"]);
@@ -470,7 +469,7 @@ const auditSessionSchema = z
 		status: auditStatusSchema,
 		instrument_key: z.string(),
 		instrument_version: z.string(),
-		instrument: playspaceInstrumentSchema.optional().default(BASE_PLAYSPACE_INSTRUMENT),
+		instrument: playspaceInstrumentSchema.optional(),
 		schema_version: z.number().int().positive().optional().default(1),
 		revision: z.number().int().nonnegative().optional().default(0),
 		aggregate: auditAggregateSchema.optional(),
@@ -651,11 +650,38 @@ const adminAuditRowSchema = z.object({
 	summary_score: z.number().nullable()
 });
 
+const instrumentContentSchema = z.object({
+	en: playspaceInstrumentSchema,
+	de: playspaceInstrumentSchema.nullable().optional(),
+	hi: playspaceInstrumentSchema.nullable().optional()
+});
+
 const adminSystemSchema = z.object({
 	instrument_key: z.string(),
 	instrument_name: z.string(),
 	instrument_version: z.string(),
-	generated_at: z.string().datetime()
+	generated_at: z.string().datetime(),
+	instrument: instrumentContentSchema
+});
+
+const instrumentResponseSchema = z.object({
+	id: z.string().uuid(),
+	instrument_key: z.string(),
+	instrument_version: z.string(),
+	is_active: z.boolean(),
+	content: instrumentContentSchema,
+	created_at: z.string().datetime(),
+	updated_at: z.string().datetime()
+});
+
+const instrumentCreateRequestSchema = z.object({
+	instrument_key: z.string().min(1),
+	instrument_version: z.string().min(1),
+	content: instrumentContentSchema
+});
+
+const instrumentUpdateRequestSchema = z.object({
+	is_active: z.boolean().optional()
 });
 
 function paginatedResponseSchema<TItem extends z.ZodTypeAny>(itemSchema: TItem) {
@@ -1056,6 +1082,11 @@ export const playspaceApi = {
 			),
 		dashboardSummary: async (): Promise<AuditorDashboardSummary> =>
 			fetchValidatedJson("/playspace/auditor/me/dashboard-summary", auditorDashboardSummarySchema),
+		fetchInstrument: async (instrumentKey: string, lang: string = "en"): Promise<PlayspaceInstrument> =>
+			fetchValidatedJson(
+				`/playspace/instruments/active/${encodeURIComponent(instrumentKey)}${buildQueryString({ lang })}`,
+				playspaceInstrumentSchema
+			),
 		createOrResumeAudit: async (
 			placeId: string,
 			projectId: string,
@@ -1177,6 +1208,41 @@ export const playspaceApi = {
 	admin: {
 		overview: async (): Promise<AdminOverview> =>
 			fetchValidatedJson("/playspace/admin/overview", adminOverviewSchema),
+		instruments: {
+			list: async (instrumentKey: string = "pvua_v5_2"): Promise<z.infer<typeof instrumentResponseSchema>[]> =>
+				fetchValidatedJson(
+					`/playspace/admin/instruments${buildQueryString({ instrument_key: instrumentKey })}`,
+					z.array(instrumentResponseSchema)
+				),
+			create: async (
+				payload: z.infer<typeof instrumentCreateRequestSchema>,
+				activate: boolean = true
+			): Promise<z.infer<typeof instrumentResponseSchema>> => {
+				const parsedPayload = instrumentCreateRequestSchema.parse(payload);
+				return fetchValidatedJson(
+					`/playspace/admin/instruments${buildQueryString({ activate: String(activate) })}`,
+					instrumentResponseSchema,
+					{
+						method: "POST",
+						body: JSON.stringify(parsedPayload)
+					}
+				);
+			},
+			update: async (
+				instrumentId: string,
+				payload: z.infer<typeof instrumentUpdateRequestSchema>
+			): Promise<z.infer<typeof instrumentResponseSchema>> => {
+				const parsedPayload = instrumentUpdateRequestSchema.parse(payload);
+				return fetchValidatedJson(
+					`/playspace/admin/instruments/${encodeURIComponent(instrumentId)}`,
+					instrumentResponseSchema,
+					{
+						method: "PATCH",
+						body: JSON.stringify(parsedPayload)
+					}
+				);
+			}
+		},
 		accounts: async (query: AdminAccountsQuery = {}): Promise<PaginatedResponse<AdminAccountRow>> =>
 			fetchValidatedJson(
 				`/playspace/admin/accounts${buildQueryString({

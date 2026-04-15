@@ -109,7 +109,7 @@ export function AdminDashboardClient({ overview, latestAudits, errorMessage }: R
 									<div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
 										<code
 											title={audit.audit_code}
-											className="rounded-md bg-muted/65 px-2 py-1 font-mono text-[11px] tracking-[0.04em] text-foreground/80">
+											className="rounded-md bg-muted/65 px-2 py-1 font-mono text-[13px] tracking-[0.04em] text-foreground/80">
 											{formatAuditCodeReference(audit.audit_code)}
 										</code>
 										<span>

@@ -40,6 +40,7 @@ interface DesignSystemPalette {
 	readonly statusInfoSurface: string;
 	readonly statusInfoBorder: string;
 	readonly primaryForeground: string;
+	readonly inputBorder: string;
 	readonly actionOutlineBorder: string;
 	readonly tableRowHover: string;
 	readonly statAccentNeutral: string;
@@ -61,13 +62,13 @@ export const DESIGN_SYSTEM = {
 		default: 1
 	},
 	radii: {
-		sm: "6px",
-		md: "10px",
-		lg: "14px",
-		xl: "18px",
-		"2xl": "22px",
-		"3xl": "26px",
-		"4xl": "30px"
+		sm: "4px",
+		md: "6px",
+		lg: "8px",
+		xl: "10px",
+		"2xl": "12px",
+		"3xl": "14px",
+		"4xl": "16px"
 	},
 	typography: {
 		sectionTitle: {
@@ -78,12 +79,12 @@ export const DESIGN_SYSTEM = {
 			weight: "600"
 		},
 		eyebrow: {
-			size: "0.6875rem",
+			size: "0.75rem",
 			tracking: "0.12em",
 			weight: "600"
 		},
 		workspaceLabel: {
-			size: "0.6875rem",
+			size: "0.75rem",
 			tracking: "0.08em",
 			weight: "600"
 		}
@@ -148,7 +149,8 @@ export const DESIGN_SYSTEM = {
 				statusInfoSurface: "rgba(123, 144, 184, 0.14)",
 				statusInfoBorder: "rgba(123, 144, 184, 0.28)",
 				primaryForeground: "#ffffff",
-				actionOutlineBorder: "rgba(47, 39, 34, 0.14)",
+				inputBorder: "#c4b8ad",
+				actionOutlineBorder: "rgba(47, 39, 34, 0.22)",
 				tableRowHover: "rgba(47, 39, 34, 0.04)",
 				statAccentNeutral: "rgba(47, 39, 34, 0.12)"
 			},
@@ -184,7 +186,8 @@ export const DESIGN_SYSTEM = {
 				statusInfoSurface: "rgba(22, 58, 112, 0.16)",
 				statusInfoBorder: "rgba(22, 58, 112, 0.32)",
 				primaryForeground: "#ffffff",
-				actionOutlineBorder: "rgba(17, 17, 17, 0.28)",
+				inputBorder: "#8a8078",
+				actionOutlineBorder: "rgba(17, 17, 17, 0.36)",
 				tableRowHover: "rgba(17, 17, 17, 0.08)",
 				statAccentNeutral: "rgba(17, 17, 17, 0.2)"
 			}
@@ -222,7 +225,8 @@ export const DESIGN_SYSTEM = {
 				statusInfoSurface: "rgba(123, 144, 184, 0.16)",
 				statusInfoBorder: "rgba(123, 144, 184, 0.3)",
 				primaryForeground: "#ffffff",
-				actionOutlineBorder: "rgba(235, 227, 215, 0.22)",
+				inputBorder: "#5a524c",
+				actionOutlineBorder: "rgba(235, 227, 215, 0.30)",
 				tableRowHover: "rgba(255, 255, 255, 0.06)",
 				statAccentNeutral: "rgba(235, 227, 215, 0.16)"
 			},
@@ -258,7 +262,8 @@ export const DESIGN_SYSTEM = {
 				statusInfoSurface: "rgba(168, 194, 245, 0.18)",
 				statusInfoBorder: "rgba(168, 194, 245, 0.36)",
 				primaryForeground: "#000000",
-				actionOutlineBorder: "rgba(255, 255, 255, 0.34)",
+				inputBorder: "#a0a0a0",
+				actionOutlineBorder: "rgba(255, 255, 255, 0.42)",
 				tableRowHover: "rgba(255, 255, 255, 0.1)",
 				statAccentNeutral: "rgba(255, 255, 255, 0.22)"
 			}
@@ -281,7 +286,7 @@ export function getDesignSystemCssVariables(input: Readonly<DesignSystemVariable
 	const fontScale = clampDesignSystemFontScale(input.fontScale ?? DESIGN_SYSTEM.fontScale.default);
 
 	return {
-		"--radius": "10px",
+		"--radius": "6px",
 		"--app-font-scale": String(fontScale),
 		"--font-body-stack": input.dyslexicFont ? DESIGN_SYSTEM.fonts.dyslexicStack : DESIGN_SYSTEM.fonts.body.stack,
 		"--font-heading-stack": input.dyslexicFont
@@ -343,7 +348,8 @@ export function getDesignSystemCssVariables(input: Readonly<DesignSystemVariable
 		"--accent-foreground": palette.textPrimary,
 		"--destructive": palette.statusDanger,
 		"--border": palette.edge,
-		"--input": palette.surfaceSunken,
+		"--input": palette.surface,
+		"--input-border": palette.inputBorder,
 		"--ring": palette.focus,
 		"--chart-1": palette.accentTerracotta,
 		"--chart-2": palette.statusSuccess,

@@ -14,4 +14,3 @@ export default async function AuditorDashboardPage() {
 
 	return <AuditorDashboardClient {...(dashboardData ?? {})} errorMessage={errorMessage} />;
 }
- 

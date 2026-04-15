@@ -11,15 +11,9 @@ import type {
 	ScaleKey,
 	ScaleOption
 } from "@/types/audit";
-import { BASE_PLAYSPACE_INSTRUMENT } from "@/lib/instrument";
 import { resolveSupportedLanguage, type ResolvedLanguage } from "@/i18n/config";
 
-import { enInstrumentTranslations } from "@/lib/enInstrument";
 import { usePreferences } from "@/components/app/preferences-provider";
-// import { deInstrumentTranslations } from "@/lib/i18n/locales/de/instrument";
-// import { frInstrumentTranslations } from "@/lib/i18n/locales/fr/instrument";
-// import { hiInstrumentTranslations } from "@/lib/i18n/locales/hi/instrument";
-// import { jaInstrumentTranslations } from "@/lib/i18n/locales/ja/instrument";
 
 /**
  * Supported instrument translation locales.
@@ -86,13 +80,11 @@ export type InstrumentTranslations = Readonly<{
 	sections?: Readonly<Record<string, InstrumentSectionTranslation>>;
 }>;
 
-const INSTRUMENT_TRANSLATIONS_BY_LOCALE: Readonly<Partial<Record<InstrumentLocale, InstrumentTranslations>>> = {
-	en: enInstrumentTranslations
-	// de: deInstrumentTranslations,
-	// fr: frInstrumentTranslations,
-	// hi: hiInstrumentTranslations,
-	// ja: jaInstrumentTranslations,
-};
+/**
+ * Static translation maps are no longer used. Translations are now served
+ * by the backend as part of the instrument JSONB content, keyed by language.
+ * The localizeInstrument function is retained for any client-side overlay needs.
+ */
 
 /**
  * Normalize any i18n language tag to an instrument locale.
@@ -300,11 +292,16 @@ function localizeInstrumentSection(
 /**
  * Resolve the compact translation bundle for a given language tag.
  *
- * @param languageTag Current i18n language tag.
- * @returns The best matching compact translation bundle.
+ * With the centralized instrument system, translations are served from the
+ * backend per-language. This function returns an empty bundle so that the
+ * localizeInstrument helper passes through the already-localized content
+ * from the API without overwriting it.
+ *
+ * @param _languageTag Current i18n language tag (unused -- kept for API compat).
+ * @returns An empty translation bundle.
  */
-export function getInstrumentTranslations(languageTag: string | undefined): InstrumentTranslations {
-	return INSTRUMENT_TRANSLATIONS_BY_LOCALE[normalizeInstrumentLocale(languageTag)] ?? enInstrumentTranslations;
+export function getInstrumentTranslations(_languageTag: string | undefined): InstrumentTranslations {
+	return {};
 }
 
 /**
@@ -343,17 +340,22 @@ export function localizeInstrument(
 /**
  * Read the fully localized instrument for the active i18n language.
  *
- * The hook subscribes to the `instrument` namespace so callers react to language changes
- * without requiring screen files to know about the translation bundle internals.
+ * The instrument is now fetched from the backend already localized. This hook
+ * passes through the provided instrument or returns null when none is available.
  *
- * @returns The localized playspace instrument for the active language.
+ * @param baseInstrumentOverride Instrument fetched from the API.
+ * @returns The instrument for rendering, or null when not yet loaded.
  */
-export function useLocalizedInstrument(baseInstrumentOverride?: PlayspaceInstrument | null): PlayspaceInstrument {
+export function useLocalizedInstrument(
+	baseInstrumentOverride?: PlayspaceInstrument | null
+): PlayspaceInstrument | null {
 	const activeLanguage = usePreferences().resolvedLanguage;
 
 	return useMemo(() => {
+		if (!baseInstrumentOverride) {
+			return null;
+		}
 		const translations = getInstrumentTranslations(activeLanguage);
-		const baseInstrument = baseInstrumentOverride ?? BASE_PLAYSPACE_INSTRUMENT;
-		return localizeInstrument(baseInstrument, translations);
+		return localizeInstrument(baseInstrumentOverride, translations);
 	}, [activeLanguage, baseInstrumentOverride]);
 }

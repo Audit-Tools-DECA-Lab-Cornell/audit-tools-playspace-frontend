@@ -185,7 +185,7 @@ export function ManagerDashboardClient({
 									<div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
 										<code
 											title={activity.audit_code}
-											className="rounded-sm bg-muted-foreground px-1 py-1 font-mono text-[11px] tracking-[0.04em] text-secondary">
+											className="rounded-sm bg-muted-foreground px-1 py-1 font-mono text-[13px] tracking-[0.04em] text-secondary">
 											{formatAuditCodeReference(activity.audit_code)}
 										</code>
 										<span>{formatDateTimeLabel(activity.completed_at, formatT)}</span>
