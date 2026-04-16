@@ -237,9 +237,9 @@ export function AppShell({ role, auditorCode, userName, userEmail, children }: R
 										setIsSidebarCollapsed(prev => !prev);
 									}}>
 									{isSidebarCollapsed ? (
-										<PanelLeftOpen className="size-6" aria-hidden="true" />
+										<PanelLeftOpen className="size-5" aria-hidden="true" />
 									) : (
-										<PanelLeftClose className="size-6" aria-hidden="true" />
+										<PanelLeftClose className="size-5" aria-hidden="true" />
 									)}
 								</Button>
 							</div>
@@ -264,9 +264,9 @@ export function AppShell({ role, auditorCode, userName, userEmail, children }: R
 										setIsSidebarCollapsed(prev => !prev);
 									}}>
 									{isSidebarCollapsed ? (
-										<PanelLeftOpen className="size-6" aria-hidden="true" />
+										<PanelLeftOpen className="size-5" aria-hidden="true" />
 									) : (
-										<PanelLeftClose className="size-6" aria-hidden="true" />
+										<PanelLeftClose className="size-5" aria-hidden="true" />
 									)}
 								</Button>
 							</div>
