@@ -122,11 +122,17 @@ const placeSummarySchema = z.object({
 
 const scoreTotalsSchema = z.object({
 	provision_total: z.number(),
+	provision_total_max: z.number(),
 	diversity_total: z.number(),
+	diversity_total_max: z.number(),
 	challenge_total: z.number(),
+	challenge_total_max: z.number(),
 	sociability_total: z.number(),
+	sociability_total_max: z.number(),
 	play_value_total: z.number(),
-	usability_total: z.number()
+	play_value_total_max: z.number(),
+	usability_total: z.number(),
+	usability_total_max: z.number()
 });
 
 const placeAuditHistoryItemSchema = z.object({

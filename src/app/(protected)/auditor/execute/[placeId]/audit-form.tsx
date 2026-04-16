@@ -340,6 +340,7 @@ export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFo
 			incomingSession.selected_execution_mode ??
 			incomingSession.meta.execution_mode ??
 			(incomingSession.allowed_execution_modes.length === 1 ? incomingSession.allowed_execution_modes[0] : "");
+
 		const nextPreAuditValues = getPreAuditValues(incomingSession);
 		const nextSectionDrafts = createSectionDrafts(incomingSession, instrument!);
 
