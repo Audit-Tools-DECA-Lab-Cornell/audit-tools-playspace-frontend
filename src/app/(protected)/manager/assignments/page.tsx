@@ -314,10 +314,10 @@ export default function ManagerAssignmentsPage() {
 		},
 		onSuccess: async (_data, variables) => {
 			setListError(null);
-			
+
 			// Invalidate queries for all affected auditors
 			await Promise.all(
-				variables.auditorIds.map(auditorId => 
+				variables.auditorIds.map(auditorId =>
 					queryClient.invalidateQueries({
 						queryKey: ["playspace", "manager", "assignments", "rows", auditorId]
 					})
@@ -326,8 +326,8 @@ export default function ManagerAssignmentsPage() {
 
 			resetComposer();
 			setCreateSuccessMessage(
-				variables.auditorIds.length === 1 
-					? t("composer.createSuccess") 
+				variables.auditorIds.length === 1
+					? t("composer.createSuccess")
 					: t("composer.bulkCreateSuccess", { count: variables.auditorIds.length })
 			);
 			scopeTriggerRef.current?.focus();
@@ -396,7 +396,7 @@ export default function ManagerAssignmentsPage() {
 		if (selectedAuditorIds.length === 1 && selectedAuditorIds[0] === queryAuditorId) {
 			return;
 		}
-		
+
 		if (selectedAuditorIds.length !== 1 && queryAuditorId === "") {
 			return;
 		}
@@ -406,20 +406,17 @@ export default function ManagerAssignmentsPage() {
 
 	const isSelectionLocked = createAssignment.isPending || deleteAssignment.isPending;
 
-	const handleToggleAuditor = React.useCallback(
-		(nextValue: string) => {
-			setSelectedAuditorIds(current => {
-				if (current.includes(nextValue)) {
-					return current.filter(id => id !== nextValue);
-				}
-				return [...current, nextValue];
-			});
-			setAssignmentPendingDelete(null);
-			setListError(null);
-			setCreateSuccessMessage(null);
-		},
-		[]
-	);
+	const handleToggleAuditor = React.useCallback((nextValue: string) => {
+		setSelectedAuditorIds(current => {
+			if (current.includes(nextValue)) {
+				return current.filter(id => id !== nextValue);
+			}
+			return [...current, nextValue];
+		});
+		setAssignmentPendingDelete(null);
+		setListError(null);
+		setCreateSuccessMessage(null);
+	}, []);
 
 	const handleToggleAllAuditors = React.useCallback(
 		(selected: boolean) => {
@@ -697,10 +694,12 @@ export default function ManagerAssignmentsPage() {
 						<div className="grid gap-4 rounded-field border border-dashed border-border p-4 lg:grid-cols-[minmax(0,1fr)_minmax(260px,0.9fr)]">
 							<div className="space-y-2">
 								<p className="font-medium text-foreground">
-									{selectedAuditorIds.length === 0 ? t("coverage.selectAuditorTitle") : t("coverage.multipleAuditorsTitle")}
+									{selectedAuditorIds.length === 0
+										? t("coverage.selectAuditorTitle")
+										: t("coverage.multipleAuditorsTitle")}
 								</p>
 								<p className="text-sm text-muted-foreground">
-									{selectedAuditorIds.length === 0 
+									{selectedAuditorIds.length === 0
 										? t("coverage.selectAuditorDescription")
 										: t("coverage.multipleAuditorsDescription")}
 								</p>
@@ -729,7 +728,9 @@ export default function ManagerAssignmentsPage() {
 								<p className="font-medium text-foreground">{t("coverage.emptyTitle")}</p>
 								<p className="text-sm text-muted-foreground">
 									{selectedAuditors.length === 1
-										? t("coverage.emptyDescriptionWithAuditor", { name: selectedAuditors[0].full_name })
+										? t("coverage.emptyDescriptionWithAuditor", {
+												name: selectedAuditors[0].full_name
+											})
 										: t("coverage.emptyDescription")}
 								</p>
 							</div>

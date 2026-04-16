@@ -127,15 +127,15 @@ export function getActiveScaleKeysForQuestion(
 		return [];
 	}
 
-	const quantityScale = question.scales[0];
-	if (quantityScale === undefined) {
+	const provisionScale = question.scales[0];
+	if (provisionScale === undefined) {
 		return [];
 	}
 
-	const selectedQuantityKey = selectedAnswers[quantityScale.key];
-	const selectedQuantityOption = quantityScale.options.find(option => option.key === selectedQuantityKey);
-	const showFollowUpScales = selectedQuantityOption?.allows_follow_up_scales === true;
-	const keys: string[] = [quantityScale.key];
+	const selectedProvisionKey = selectedAnswers[provisionScale.key];
+	const selectedProvisionOption = provisionScale.options.find(option => option.key === selectedProvisionKey);
+	const showFollowUpScales = selectedProvisionOption?.allows_follow_up_scales === true;
+	const keys: string[] = [provisionScale.key];
 
 	if (showFollowUpScales) {
 		for (let index = 1; index < question.scales.length; index += 1) {
@@ -251,15 +251,15 @@ export function buildNextQuestionAnswers(
 		[scaleKey]: optionKey
 	};
 
-	if (scaleKey !== "quantity") {
+	if (scaleKey !== "provision") {
 		return nextAnswers;
 	}
 
-	const quantityScale = question.scales.find(scale => scale.key === "quantity");
-	const selectedOption = quantityScale?.options.find(option => option.key === optionKey);
+	const provisionScale = question.scales.find(scale => scale.key === "provision");
+	const selectedOption = provisionScale?.options.find(option => option.key === optionKey);
 	if (selectedOption?.allows_follow_up_scales !== false) {
 		return nextAnswers;
 	}
 
-	return { quantity: optionKey };
+	return { provision: optionKey };
 }

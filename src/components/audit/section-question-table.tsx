@@ -24,7 +24,7 @@ export interface SectionQuestionTableProps {
 	readonly onSelectAnswer: (questionKey: string, scaleKey: string, optionKey: string) => void;
 }
 
-const SCALE_COLUMN_ORDER: readonly ScaleKey[] = ["quantity", "diversity", "challenge", "sociability"];
+const SCALE_COLUMN_ORDER: readonly ScaleKey[] = ["provision", "diversity", "challenge", "sociability"];
 
 /**
  * Desktop and tablet matrix layout for audit questions.
@@ -87,7 +87,7 @@ export function SectionQuestionTable({ rows, disabled = false, onSelectAnswer }:
 										);
 									}
 
-									if (scaleKey !== "quantity" && !activeScaleKeys.includes(scaleKey)) {
+									if (scaleKey !== "provision" && !activeScaleKeys.includes(scaleKey)) {
 										return (
 											<div
 												key={`${row.question.question_key}.${scaleKey}`}

@@ -189,7 +189,7 @@ const auditorPlaceSchema = z.object({
 	summary_score: z.number().nullable(),
 	score_totals: z
 		.object({
-			quantity_total: z.number(),
+			provision_total: z.number(),
 			diversity_total: z.number(),
 			challenge_total: z.number(),
 			sociability_total: z.number(),

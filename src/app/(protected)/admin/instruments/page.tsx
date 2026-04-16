@@ -77,7 +77,7 @@ const QUERY_KEY = ["playspace", "admin", "instruments"] as const;
 
 type InstrumentContent = Record<string, PlayspaceInstrument>;
 
-const SCALE_KEY_OPTIONS = ["quantity", "diversity", "challenge", "sociability"] as const;
+const SCALE_KEY_OPTIONS = ["provision", "diversity", "challenge", "sociability"] as const;
 const CONSTRUCT_OPTIONS = ["play_value", "usability"] as const;
 const MODE_OPTIONS = ["audit", "survey", "both"] as const;
 const QUESTION_TYPE_OPTIONS = ["scaled", "checklist"] as const;
@@ -208,8 +208,8 @@ function makeDefaultChoiceOption(): ChoiceOption {
 
 function makeDefaultQuestionScale(): QuestionScale {
 	return {
-		key: "quantity",
-		title: "Quantity",
+		key: "provision",
+		title: "Provision",
 		prompt: "How many?",
 		options: [makeDefaultScaleOption()]
 	};
@@ -244,7 +244,7 @@ function makeDefaultSection(index: number): InstrumentSection {
 
 function makeDefaultScaleDefinition(): ScaleDefinition {
 	return {
-		key: "quantity",
+		key: "provision",
 		title: "New Scale",
 		prompt: "Scale prompt",
 		description: "Scale description",
@@ -1928,7 +1928,7 @@ function DisplayConditionBadge({ condition }: Readonly<{ condition: QuestionDisp
 /* -------------------------------------------------------------------------- */
 
 const SCALE_COLORS: Record<string, string> = {
-	quantity: "border-accent-slate/40 bg-accent-slate/10 text-accent-slate",
+	provision: "border-accent-slate/40 bg-accent-slate/10 text-accent-slate",
 	diversity: "border-accent-moss/40 bg-accent-moss/10 text-accent-moss",
 	challenge: "border-accent-terracotta/40 bg-accent-terracotta/10 text-accent-terracotta",
 	sociability: "border-accent-violet/40 bg-accent-violet/10 text-accent-violet"
@@ -3384,7 +3384,7 @@ function DisplayConditionEditor({
 			<Button
 				variant="outline"
 				size="sm"
-				onClick={() => onChange({ question_key: "", response_key: "quantity", any_of_option_keys: [] })}>
+				onClick={() => onChange({ question_key: "", response_key: "provision", any_of_option_keys: [] })}>
 				<GitBranch className="mr-1.5 h-3.5 w-3.5" />
 				{t("setCondition")}
 			</Button>

@@ -7,6 +7,15 @@ import ts from "typescript";
 
 const require = createRequire(import.meta.url);
 const REPO_ROOT = path.resolve(import.meta.dirname, "..");
+const BACKEND_INSTRUMENT_PATH = path.resolve(
+	REPO_ROOT,
+	"..",
+	"audit-tools-backend",
+	"app",
+	"products",
+	"playspace",
+	"pvua_v5_2.instrument.json"
+);
 const MODULE_CACHE = new Map();
 
 function resolveTsModulePath(fromFilePath, moduleSpecifier) {
@@ -62,13 +71,17 @@ function loadTsModule(filePath) {
 	return module.exports;
 }
 
+function loadJsonFile(filePath) {
+	return JSON.parse(readFileSync(path.resolve(filePath), "utf8"));
+}
+
 function assert(condition, message) {
 	if (!condition) {
 		throw new Error(message);
 	}
 }
 
-const { BASE_PLAYSPACE_INSTRUMENT } = loadTsModule(path.resolve(REPO_ROOT, "src/lib/instrument.ts"));
+const { BASE_PLAYSPACE_INSTRUMENT } = { BASE_PLAYSPACE_INSTRUMENT: loadJsonFile(BACKEND_INSTRUMENT_PATH) };
 const { auditDraftPatchSchema, auditDraftSaveSchema, auditSessionSchema } = loadTsModule(
 	path.resolve(REPO_ROOT, "src/types/audit.ts")
 );
@@ -117,10 +130,10 @@ const sessionFixture = {
 				note: "Web draft note",
 				responses: {
 					[targetSection.questions[0].question_key]: {
-						quantity: "a_little_bit"
+						provision: "a_little_bit"
 					},
 					[targetQuestion.question_key]: {
-						quantity: "a_lot",
+						provision: "a_lot",
 						[targetQuestion.scales[1].key]: targetQuestion.scales[1].options[1].key
 					}
 				}
@@ -148,10 +161,10 @@ const sessionFixture = {
 			note: "Web draft note",
 			responses: {
 				[targetSection.questions[0].question_key]: {
-					quantity: "a_little_bit"
+					provision: "a_little_bit"
 				},
 				[targetQuestion.question_key]: {
-					quantity: "a_lot",
+					provision: "a_lot",
 					[targetQuestion.scales[1].key]: targetQuestion.scales[1].options[1].key
 				}
 			}
@@ -203,16 +216,16 @@ assert(sectionProgress.answeredQuestionCount > 0, "Expected non-zero local progr
 
 const collapsedAnswers = buildNextQuestionAnswers(
 	{
-		quantity: "a_lot",
+		provision: "a_lot",
 		[targetQuestion.scales[1].key]: targetQuestion.scales[1].options[1].key
 	},
 	targetQuestion,
-	"quantity",
+	"provision",
 	"no"
 );
 assert(
-	Object.keys(collapsedAnswers).length === 1 && collapsedAnswers.quantity === "no",
-	"Expected quantity=no to clear follow-up selections."
+	Object.keys(collapsedAnswers).length === 1 && collapsedAnswers.provision === "no",
+	"Expected provision=no to clear follow-up selections."
 );
 
 const parsedDraftPatch = auditDraftPatchSchema.parse({

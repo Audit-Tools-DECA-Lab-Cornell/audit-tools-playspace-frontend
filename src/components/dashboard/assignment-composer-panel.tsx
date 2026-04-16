@@ -94,11 +94,11 @@ export function AssignmentComposerPanel({
 			<div className="space-y-3">
 				<div className="space-y-1">
 					<p className="font-medium text-foreground">{t("composer.title")}</p>
-				<p className="text-sm text-muted-foreground">
-					{selectedAuditors.length > 1 
-						? t("composer.descriptionBulk", { count: selectedAuditors.length })
-						: t("composer.description")}
-				</p>
+					<p className="text-sm text-muted-foreground">
+						{selectedAuditors.length > 1
+							? t("composer.descriptionBulk", { count: selectedAuditors.length })
+							: t("composer.description")}
+					</p>
 				</div>
 				<div className="rounded-field border border-border/70 bg-muted/35 p-4">
 					<div className="space-y-1">
@@ -111,8 +111,8 @@ export function AssignmentComposerPanel({
 							</>
 						) : (
 							<p className="font-medium text-foreground">
-							{t("composer.auditorsSelectedCount", { count: selectedAuditors.length })}
-						</p>
+								{t("composer.auditorsSelectedCount", { count: selectedAuditors.length })}
+							</p>
 						)}
 					</div>
 					<div className="mt-3 flex flex-wrap gap-2">
@@ -183,11 +183,12 @@ export function AssignmentComposerPanel({
 							</div>
 						) : null}
 					</div>
-					
-					<div className={cn(
-						"max-h-64 overflow-y-auto rounded-field border border-border bg-card",
-						selectedProjectId.trim().length === 0 && "opacity-50 grayscale pointer-events-none"
-					)}>
+
+					<div
+						className={cn(
+							"max-h-64 overflow-y-auto rounded-field border border-border bg-card",
+							selectedProjectId.trim().length === 0 && "opacity-50 grayscale pointer-events-none"
+						)}>
 						{selectedProjectId.trim().length === 0 ? (
 							<p className="px-4 py-3 text-sm text-muted-foreground">{t("sheet.selectProjectFirst")}</p>
 						) : places.length === 0 ? (
@@ -211,9 +212,7 @@ export function AssignmentComposerPanel({
 												}}
 												disabled={isPending}
 											/>
-											<Label
-												htmlFor={`place_${place.id}`}
-												className="flex-1 cursor-pointer py-1">
+											<Label htmlFor={`place_${place.id}`} className="flex-1 cursor-pointer py-1">
 												<p className="font-medium text-sm text-foreground">{place.name}</p>
 												{place.city || place.place_type ? (
 													<p className="text-xs text-muted-foreground">
@@ -227,7 +226,7 @@ export function AssignmentComposerPanel({
 							</div>
 						)}
 					</div>
-					
+
 					{fieldErrors.placeId ? (
 						<p className="text-sm text-destructive">{fieldErrors.placeId}</p>
 					) : (
@@ -255,9 +254,14 @@ export function AssignmentComposerPanel({
 				<Button type="button" variant="outline" onClick={onReset} disabled={isPending}>
 					{t("actions.reset")}
 				</Button>
-				<Button 
-					type="button" 
-					disabled={isPending || selectedAuditors.length === 0 || selectedProjectId.trim().length === 0 || selectedPlaceIds.length === 0} 
+				<Button
+					type="button"
+					disabled={
+						isPending ||
+						selectedAuditors.length === 0 ||
+						selectedProjectId.trim().length === 0 ||
+						selectedPlaceIds.length === 0
+					}
 					onClick={onSubmit}>
 					{isPending ? t("actions.creating") : t("actions.createAssignment")}
 				</Button>

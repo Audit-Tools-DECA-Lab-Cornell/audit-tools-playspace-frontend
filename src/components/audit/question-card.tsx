@@ -48,10 +48,10 @@ export function AuditQuestionCard({
 	disabled = false
 }: Readonly<AuditQuestionCardProps>) {
 	const t = useTranslations("auditor.execute.questionCard");
-	const quantityScale = question.scales[0];
-	const selectedQuantityKey = quantityScale && selectedAnswers[quantityScale.key];
-	const selectedQuantityOption = quantityScale?.options.find(option => option.key === selectedQuantityKey);
-	const showFollowUpScales = selectedQuantityOption?.allows_follow_up_scales === true;
+	const provisionScale = question.scales[0];
+	const selectedProvisionKey = provisionScale && selectedAnswers[provisionScale.key];
+	const selectedProvisionOption = provisionScale?.options.find(option => option.key === selectedProvisionKey);
+	const showFollowUpScales = selectedProvisionOption?.allows_follow_up_scales === true;
 	const promptSegments = parsePromptSegments(question.prompt);
 	const selectedChecklistOptionKeys = readChecklistOptionKeys(selectedAnswers);
 	const otherChecklistText = readChecklistOtherText(selectedAnswers);
@@ -299,15 +299,15 @@ function buildNextScaledQuestionAnswers(
 		[scaleKey]: optionKey
 	};
 
-	if (scaleKey !== "quantity") {
+	if (scaleKey !== "provision") {
 		return nextAnswers;
 	}
 
-	const quantityScale = question.scales.find(scale => scale.key === "quantity");
-	const selectedOption = quantityScale?.options.find(option => option.key === optionKey);
+	const provisionScale = question.scales.find(scale => scale.key === "provision");
+	const selectedOption = provisionScale?.options.find(option => option.key === optionKey);
 	if (selectedOption?.allows_follow_up_scales !== false) {
 		return nextAnswers;
 	}
 
-	return { quantity: optionKey };
+	return { provision: optionKey };
 }
