@@ -13,6 +13,8 @@ import {
 	LogOut,
 	MapPin,
 	Menu,
+	PanelLeftClose,
+	PanelLeftOpen,
 	Settings,
 	Shield,
 	Users,
@@ -33,6 +35,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
+import Image from "next/image";
 
 export interface AppShellProps {
 	role: UserRole;
@@ -85,7 +88,11 @@ function getNavItems(role: UserRole, t: NavigationTranslator): NavItem[] {
 	];
 }
 
-function NavLinks({ items, onNavigate }: Readonly<{ items: NavItem[]; onNavigate?: () => void }>) {
+function NavLinks({
+	items,
+	onNavigate,
+	isCollapsed = false
+}: Readonly<{ items: NavItem[]; onNavigate?: () => void; isCollapsed?: boolean }>) {
 	const pathname = usePathname();
 
 	return (
@@ -99,12 +106,14 @@ function NavLinks({ items, onNavigate }: Readonly<{ items: NavItem[]; onNavigate
 						key={item.href}
 						href={item.href}
 						onClick={onNavigate}
+						title={isCollapsed ? item.label : undefined}
 						className={cn(
 							"flex min-h-11 items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-muted-foreground transition-all hover:bg-accent hover:text-foreground",
+							isCollapsed && "mx-auto size-11 min-h-0 justify-center rounded-lg p-0",
 							isActive && "bg-accent text-foreground shadow-field"
 						)}>
-						<Icon className="h-4 w-4" aria-hidden="true" />
-						<span className="leading-5">{item.label}</span>
+						<Icon className="size-5" aria-hidden="true" />
+						<span className={cn("leading-5", isCollapsed && "sr-only")}>{item.label}</span>
 					</Link>
 				);
 			})}
@@ -177,35 +186,101 @@ export function AppShell({ role, auditorCode, userName, userEmail, children }: R
 	const navigationT = useTranslations("shell.navigation");
 	const shellT = useTranslations("shell");
 	const roleT = useTranslations("common.workspace");
+	const [isSidebarCollapsed, setIsSidebarCollapsed] = React.useState<boolean>(false);
 	const navItems = getNavItems(role, navigationT);
 	const roleLabel =
 		role === "admin" ? roleT("administrator") : role === "manager" ? roleT("manager") : roleT("auditor");
 
 	return (
 		<div className="min-h-dvh bg-background">
-			<div className="mx-auto grid w-full grid-cols-1 md:grid-cols-[280px_1fr] xl:grid-cols-[296px_1fr]">
-				<aside className="hidden border-r border-sidebar-border bg-sidebar/90 md:block">
+			<div
+				className={cn(
+					"mx-auto grid w-full grid-cols-1",
+					isSidebarCollapsed ? "md:grid-cols-[84px_1fr]" : "md:grid-cols-[280px_1fr] xl:grid-cols-[296px_1fr]"
+				)}>
+				<aside className="hidden border-r border-sidebar-border bg-sidebar/90 transition-all md:block">
 					<div className="flex h-dvh flex-col">
-						<div className="space-y-3 px-5 py-5">
-							<div className="flex items-center gap-3">
-								<div className="flex size-10 items-center justify-center rounded-xl bg-primary text-sm font-semibold text-primary-foreground shadow-accent">
-									PA
+						<div
+							className={cn(
+								"space-y-3 px-5 pt-5 pb-2",
+								isSidebarCollapsed && "space-y-2 px-5 pt-5 pb-2.5"
+							)}>
+							<div
+								className={cn(
+									"flex items-start gap-3 relative",
+									isSidebarCollapsed ? "justify-between" : "justify-between"
+								)}>
+								<div className="flex min-w-0 items-center gap-3">
+									<div className="flex size-10 items-center justify-end ml-0.5 shadow-focus">
+										<Image src="/icon.png" alt="Playspace Audit Tools" width={40} height={40} />
+									</div>
+									<div className={cn("grid", isSidebarCollapsed && "hidden")}>
+										<span className="text-base font-semibold leading-5">
+											{shellT("productName")}
+										</span>
+										<span className="text-sm text-muted-foreground">
+											{shellT("productTagline")}
+										</span>
+									</div>
 								</div>
-								<div className="grid">
-									<span className="text-base font-semibold leading-5">{shellT("productName")}</span>
-									<span className="text-sm text-muted-foreground">{shellT("productTagline")}</span>
-								</div>
+								<Button
+									type="button"
+									variant="ghost"
+									size="icon"
+									className={cn(
+										"shrink-0 size-11 flex px-4 absolute -right-2.5 top-5 z-10 items-center rounded-xl transition-all hover:bg-accent",
+										isSidebarCollapsed && "hidden"
+									)}
+									aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+									title={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+									onClick={() => {
+										setIsSidebarCollapsed(prev => !prev);
+									}}>
+									{isSidebarCollapsed ? (
+										<PanelLeftOpen className="size-6" aria-hidden="true" />
+									) : (
+										<PanelLeftClose className="size-6" aria-hidden="true" />
+									)}
+								</Button>
 							</div>
-							<div className="inline-flex w-fit rounded-lg border border-primary/30 bg-primary/10 px-3 py-1 text-(length:--workspace-label-size) font-semibold tracking-(--workspace-label-tracking) text-primary uppercase">
+							<div
+								className={cn(
+									"inline-flex w-fit rounded-lg border border-primary/30 bg-primary/10 px-3 py-1 text-(length:--workspace-label-size) font-semibold tracking-(--workspace-label-tracking) text-primary uppercase",
+									isSidebarCollapsed && "sr-only"
+								)}>
 								{roleLabel}
+							</div>
+							<div className={cn("flex", isSidebarCollapsed ? "justify-center" : "hidden")}>
+								<Button
+									type="button"
+									variant="ghost"
+									size="icon"
+									className={cn(
+										"shrink-0 size-11 flex  items-center rounded-xl transition-all hover:bg-accent"
+									)}
+									aria-label={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+									title={isSidebarCollapsed ? "Expand sidebar" : "Collapse sidebar"}
+									onClick={() => {
+										setIsSidebarCollapsed(prev => !prev);
+									}}>
+									{isSidebarCollapsed ? (
+										<PanelLeftOpen className="size-6" aria-hidden="true" />
+									) : (
+										<PanelLeftClose className="size-6" aria-hidden="true" />
+									)}
+								</Button>
 							</div>
 						</div>
 						<Separator />
-						<div className="flex-1 overflow-auto p-3">
-							<p className="px-3 pb-2 text-(length:--workspace-label-size) font-semibold tracking-(--workspace-label-tracking) text-text-secondary uppercase">
+						<div className={cn("flex-1 overflow-auto p-3", isSidebarCollapsed && "px-2")}>
+							<p
+								className={cn(
+									"px-3 pb-2 text-(length:--workspace-label-size) font-semibold tracking-(--workspace-label-tracking) text-text-secondary uppercase",
+									isSidebarCollapsed && "sr-only"
+								)}>
 								{shellT("workspaceLabel")}
 							</p>
-							<NavLinks items={navItems} />
+							<NavLinks items={navItems} isCollapsed={isSidebarCollapsed} />
 						</div>
 					</div>
 				</aside>
