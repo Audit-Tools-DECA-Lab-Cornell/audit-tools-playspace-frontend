@@ -13,10 +13,22 @@ import { EmptyState } from "@/components/dashboard/empty-state";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import { Badge } from "@/components/ui/badge";
 
 export default function AdminReportsPage() {
 	const t = useTranslations("admin.reports");
 	const session = useAuthSession();
+	const [selectedAuditId, setSelectedAuditId] = React.useState<string | null>(null);
+
+	const auditDetailsQuery = useQuery({
+		queryKey: ["playspace", "audit", selectedAuditId],
+		queryFn: async () => {
+			if (!selectedAuditId) throw new Error("No audit selected");
+			return playspaceApi.auditor.getAudit(selectedAuditId);
+		},
+		enabled: !!selectedAuditId,
+	});
 
 	const reportsQuery = useQuery({
 		queryKey: ["playspace", "admin", "reports"],
@@ -133,19 +145,50 @@ export default function AdminReportsPage() {
 				pageSize={10}
 				emptyMessage="No submitted audit reports yet."
 				onRowClick={(row) => {
-					// For now, navigate to a placeholder detail page
-					window.location.href = `/admin/audits/${row.id}/report`;
+					setSelectedAuditId(row.id);
 				}}
 				getRowActions={(row) => [
 					{
 						label: "View Report",
-						onSelect: () => {
-							window.location.href = `/admin/audits/${row.id}/report`;
-						},
+						onSelect: () => setSelectedAuditId(row.id),
 						icon: FileTextIcon,
 					},
 				]}
 			/>
+			<Sheet open={!!selectedAuditId} onOpenChange={(open) => !open && setSelectedAuditId(null)}>
+				<SheetContent side="right" className="w-full sm:max-w-3xl">
+					{auditDetailsQuery.isLoading && <div className="p-8 text-center">Loading audit details...</div>}
+					{auditDetailsQuery.isError && <div className="p-8 text-center text-destructive">Error loading audit details.</div>}
+					{auditDetailsQuery.data && (
+						<div className="space-y-6">
+							<SheetHeader>
+								<SheetTitle>Audit Report: {auditDetailsQuery.data.audit_code}</SheetTitle>
+								<SheetDescription>
+									{auditDetailsQuery.data.place_name} • {auditDetailsQuery.data.project_name}
+								</SheetDescription>
+							</SheetHeader>
+							<div className="grid gap-4">
+								<div>
+									<h4 className="font-medium">Auditor</h4>
+									<p className="text-sm">{auditDetailsQuery.data.auditor_code}</p>
+								</div>
+								<div>
+									<h4 className="font-medium">Status</h4>
+									<Badge variant={auditDetailsQuery.data.status === "SUBMITTED" ? "default" : "secondary"}>
+										{auditDetailsQuery.data.status}
+									</Badge>
+								</div>
+								<div>
+									<h4 className="font-medium">Scores</h4>
+									<pre className="text-xs bg-muted p-3 rounded overflow-auto">
+										{JSON.stringify(auditDetailsQuery.data.scores, null, 2)}
+									</pre>
+								</div>
+							</div>
+						</div>
+					)}
+				</SheetContent>
+			</Sheet>
 		</div>
 	);
 }
