@@ -10,6 +10,7 @@ const projectStatusSchema = z.enum(["planned", "active", "completed"]);
 const placeStatusSchema = z.enum(["not_started", "in_progress", "submitted"]);
 const auditStatusSchema = z.enum(["IN_PROGRESS", "PAUSED", "SUBMITTED"]);
 const executionModeSchema = z.enum(["audit", "survey", "both"]);
+const playspaceTypeSchema = z.enum(["Public Playspace", "Pre-School Playspace", "Nature Playspace", "Neighborhood Playspace", "Waterfront Playspace", "School Playspace"]);
 
 const managerProfileSchema = z.object({
 	id: z.string().uuid(),
@@ -57,7 +58,7 @@ const projectSummarySchema = z.object({
 	account_id: z.string().uuid(),
 	name: z.string(),
 	overview: z.string().nullable(),
-	place_types: z.array(z.string()),
+	place_types: z.array(playspaceTypeSchema),
 	start_date: z.string().date().nullable(),
 	end_date: z.string().date().nullable(),
 	status: projectStatusSchema,
@@ -72,7 +73,7 @@ const projectDetailSchema = z.object({
 	account_id: z.string().uuid(),
 	name: z.string(),
 	overview: z.string().nullable(),
-	place_types: z.array(z.string()),
+	place_types: z.array(playspaceTypeSchema),
 	start_date: z.string().date().nullable(),
 	end_date: z.string().date().nullable(),
 	est_places: z.number().int().nonnegative().nullable(),
@@ -113,7 +114,7 @@ const placeSummarySchema = z.object({
 	city: z.string().nullable(),
 	province: z.string().nullable(),
 	country: z.string().nullable(),
-	place_type: z.string().nullable(),
+	place_type: playspaceTypeSchema.nullable(),
 	status: placeStatusSchema,
 	audits_completed: z.number().int().nonnegative(),
 	average_score: z.number().nullable(),
@@ -175,7 +176,7 @@ const managerPlaceRowSchema = z.object({
 	city: z.string().nullable(),
 	province: z.string().nullable(),
 	country: z.string().nullable(),
-	place_type: z.string().nullable(),
+	place_type: playspaceTypeSchema.nullable(),
 	status: placeStatusSchema,
 	audits_completed: z.number().int().nonnegative(),
 	average_score: z.number().nullable(),
@@ -253,7 +254,7 @@ const placeDetailSchema = z.object({
 	city: z.string().nullable(),
 	province: z.string().nullable(),
 	country: z.string().nullable(),
-	place_type: z.string().nullable(),
+	place_type: playspaceTypeSchema.nullable(),
 	lat: z.number().nullable(),
 	lng: z.number().nullable(),
 	start_date: z.string().date().nullable(),
@@ -317,7 +318,7 @@ const placeCreateRequestSchema = z.object({
 	city: z.string().nullable().optional(),
 	province: z.string().nullable().optional(),
 	country: z.string().nullable().optional(),
-	place_type: z.string().nullable().optional(),
+	place_type: playspaceTypeSchema.nullable().optional(),
 	lat: z.number().nullable().optional(),
 	lng: z.number().nullable().optional(),
 	start_date: z.string().date().nullable().optional(),
@@ -332,7 +333,7 @@ const placeUpdateRequestSchema = z.object({
 	city: z.string().nullable().optional(),
 	province: z.string().nullable().optional(),
 	country: z.string().nullable().optional(),
-	place_type: z.string().nullable().optional(),
+	place_type: playspaceTypeSchema.nullable().optional(),
 	lat: z.number().nullable().optional(),
 	lng: z.number().nullable().optional(),
 	start_date: z.string().date().nullable().optional(),
@@ -364,7 +365,7 @@ const auditorUpdateRequestSchema = z.object({
 const auditorPlaceSchema = z.object({
 	place_id: z.string().uuid(),
 	place_name: z.string(),
-	place_type: z.string().nullable(),
+	place_type: playspaceTypeSchema.nullable(),
 	project_id: z.string().uuid(),
 	project_name: z.string(),
 	city: z.string().nullable(),
@@ -476,7 +477,7 @@ const auditSessionSchema = z
 		project_name: z.string(),
 		place_id: z.string().uuid(),
 		place_name: z.string(),
-		place_type: z.string().nullable(),
+		place_type: playspaceTypeSchema.nullable(),
 		allowed_execution_modes: z.array(executionModeSchema),
 		selected_execution_mode: executionModeSchema.nullable(),
 		status: auditStatusSchema,
