@@ -3,11 +3,11 @@
 import Link from "next/link";
 import { useQuery } from "@tanstack/react-query";
 import type { ColumnDef, ColumnFiltersState, PaginationState, SortingState } from "@tanstack/react-table";
-import { FolderKanbanIcon, MapPinnedIcon } from "lucide-react";
+import { FolderKanbanIcon, MapPinnedIcon, FilterIcon, XIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 
-import { playspaceApi, type ManagerPlaceRow } from "@/lib/api/playspace";
+import { playspaceApi, type ManagerPlaceRow, type AuditorSummary } from "@/lib/api/playspace";
 import { useAuthSession } from "@/components/app/auth-session-provider";
 import { DataTable, getMultiValueFilterFn } from "@/components/dashboard/data-table";
 import { DataTableColumnHeader } from "@/components/dashboard/data-table-column-header";
@@ -30,6 +30,10 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 
 function getErrorMessage(error: unknown, fallbackMessage: string): string {
@@ -51,6 +55,70 @@ const MANAGER_PLACES_SKELETON_IDS = [
 	"manager-places-skeleton-4"
 ] as const;
 
+interface FilterPopoverProps {
+	title: string;
+	options: Array<{ label: string; value: string }>;
+	selectedValues: string[];
+	onChange: (values: string[]) => void;
+}
+function FilterPopover({ title, options, selectedValues, onChange }: FilterPopoverProps) {
+	return (
+		<Popover>
+			<PopoverTrigger asChild>
+				<Button variant="outline" size="sm" className="gap-2">
+					<FilterIcon className="size-3.5" />
+					{title}
+					{selectedValues.length > 0 && (
+						<Badge variant="secondary" className="ml-1 rounded-sm px-1.5 font-mono text-xs">
+							{selectedValues.length}
+						</Badge>
+					)}
+				</Button>
+			</PopoverTrigger>
+			<PopoverContent className="w-64 p-3" align="start">
+				<div className="space-y-3">
+					<div className="flex items-center justify-between">
+						<h4 className="text-sm font-medium">{title}</h4>
+						{selectedValues.length > 0 && (
+							<Button
+								type="button"
+								variant="ghost"
+								size="sm"
+								className="h-auto p-0 text-xs text-muted-foreground"
+								onClick={() => onChange([])}>
+								Clear
+							</Button>
+						)}
+					</div>
+					<Separator />
+					<div className="max-h-60 space-y-2 overflow-y-auto">
+						{options.map(option => (
+							<div key={option.value} className="flex items-center gap-2">
+								<Checkbox
+									id={`filter-${title}-${option.value}`}
+									checked={selectedValues.includes(option.value)}
+									onCheckedChange={checked => {
+										if (checked) {
+											onChange([...selectedValues, option.value]);
+										} else {
+											onChange(selectedValues.filter(v => v !== option.value));
+										}
+									}}
+								/>
+								<Label
+									htmlFor={`filter-${title}-${option.value}`}
+									className="text-sm font-normal leading-none">
+									{option.label}
+								</Label>
+							</div>
+						))}
+					</div>
+				</div>
+			</PopoverContent>
+		</Popover>
+	);
+}
+
 export default function ManagerPlacesPage() {
 	const t = useTranslations("manager.places");
 	const formatT = useTranslations("common.format");
@@ -62,10 +130,13 @@ export default function ManagerPlacesPage() {
 		pageIndex: 0,
 		pageSize: 10
 	});
+	const [selectedProjectIds, setSelectedProjectIds] = React.useState<string[]>([]);
+	const [selectedAuditorIds, setSelectedAuditorIds] = React.useState<string[]>([]);
+
 	const searchValue = getTextColumnFilterValue(columnFilters, "name");
-	const selectedProjectIds = getMultiValueColumnFilter(columnFilters, "project_id");
 	const selectedStatuses = getMultiValueColumnFilter(columnFilters, "status").filter(isManagerPlaceStatus);
 	const selectedProjectIdsKey = selectedProjectIds.join("|");
+	const selectedAuditorIdsKey = selectedAuditorIds.join("|");
 	const selectedStatusesKey = selectedStatuses.join("|");
 	const sortParam = toBackendSortParam(sorting);
 
@@ -78,7 +149,7 @@ export default function ManagerPlacesPage() {
 						pageIndex: 0
 					};
 		});
-	}, [searchValue, selectedProjectIdsKey, selectedStatusesKey, sortParam]);
+	}, [searchValue, selectedProjectIdsKey, selectedAuditorIdsKey, selectedStatusesKey, sortParam]);
 
 	const projectsQuery = useQuery({
 		queryKey: ["playspace", "manager", "places", "projects", accountId],
@@ -88,6 +159,17 @@ export default function ManagerPlacesPage() {
 			}
 
 			return playspaceApi.accounts.projects(accountId);
+		},
+		enabled: accountId !== null
+	});
+
+	const auditorsQuery = useQuery({
+		queryKey: ["playspace", "manager", "auditors", accountId],
+		queryFn: async () => {
+			if (!accountId) {
+				throw new Error(t("errors.accountContextUnavailable"));
+			}
+			return playspaceApi.accounts.auditors(accountId);
 		},
 		enabled: accountId !== null
 	});
@@ -103,6 +185,7 @@ export default function ManagerPlacesPage() {
 			searchValue,
 			sortParam,
 			selectedProjectIds,
+			selectedAuditorIds,
 			selectedStatuses
 		],
 		queryFn: async () => {
@@ -116,6 +199,7 @@ export default function ManagerPlacesPage() {
 				search: searchValue,
 				sort: sortParam,
 				projectIds: selectedProjectIds,
+				auditorIds: selectedAuditorIds,
 				statuses: selectedStatuses
 			});
 		},
@@ -138,6 +222,17 @@ export default function ManagerPlacesPage() {
 			pageIndex: maxPageIndex
 		}));
 	}, [pagination.pageIndex, placesQuery.data]);
+
+	const projectOptions = React.useMemo(() => {
+		return (projectsQuery.data ?? []).map(p => ({ label: p.name, value: p.id }));
+	}, [projectsQuery.data]);
+
+	const auditorOptions = React.useMemo(() => {
+		return (auditorsQuery.data ?? []).map((a: AuditorSummary) => ({
+			label: `${a.auditor_code} · ${a.full_name}`,
+			value: a.id
+		}));
+	}, [auditorsQuery.data]);
 
 	const columns = React.useMemo<ColumnDef<ManagerPlaceRow>[]>(
 		() => [
@@ -359,6 +454,34 @@ export default function ManagerPlacesPage() {
 					tone="info"
 				/>
 			</div>
+			<div className="flex flex-wrap items-center gap-2 pb-4">
+				<FilterPopover
+					title="Projects"
+					options={projectOptions}
+					selectedValues={selectedProjectIds}
+					onChange={setSelectedProjectIds}
+				/>
+				<FilterPopover
+					title="Auditors"
+					options={auditorOptions}
+					selectedValues={selectedAuditorIds}
+					onChange={setSelectedAuditorIds}
+				/>
+				{(selectedProjectIds.length > 0 || selectedAuditorIds.length > 0) && (
+					<Button
+						type="button"
+						variant="ghost"
+						size="sm"
+						className="gap-1.5"
+						onClick={() => {
+							setSelectedProjectIds([]);
+							setSelectedAuditorIds([]);
+						}}>
+						<XIcon className="size-3.5" />
+						Clear filters
+					</Button>
+				)}
+			</div>
 			<DataTable
 				title={t("table.title")}
 				description={t("table.description")}
@@ -367,17 +490,6 @@ export default function ManagerPlacesPage() {
 				searchColumnId="name"
 				searchPlaceholder={t("table.searchPlaceholder")}
 				filterConfigs={[
-					{
-						columnId: "project_id",
-						title: t("table.columns.project"),
-						options: projects
-							.slice()
-							.sort((left, right) => left.name.localeCompare(right.name))
-							.map(project => ({
-								label: project.name,
-								value: project.id
-							}))
-					},
 					{
 						columnId: "status",
 						title: t("table.columns.status"),

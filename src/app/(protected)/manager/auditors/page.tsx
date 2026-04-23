@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ClipboardListIcon, PencilLineIcon, PlusIcon, Trash2Icon } from "lucide-react";
+import { ClipboardListIcon, FileTextIcon, PencilLineIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import * as React from "react";
 
 import { playspaceApi } from "@/lib/api/playspace";
@@ -148,10 +148,18 @@ export default function ManagerAuditorsPage() {
 				description="Manage roster identity, workload, and assignment operations from a single workspace."
 				breadcrumbs={[{ label: "Dashboard", href: "/manager/dashboard" }, { label: "Auditors" }]}
 				actions={
-					<Button type="button" className="gap-2" onClick={() => setIsCreateDialogOpen(true)}>
-						<PlusIcon className="size-4" />
-						<span>New auditor</span>
-					</Button>
+					<div className="flex gap-2">
+						<Button type="button" variant="outline" className="gap-2" asChild>
+							<a href="/manager/auditors/reports">
+								<FileTextIcon className="size-4" />
+								<span>View Reports</span>
+							</a>
+						</Button>
+						<Button type="button" className="gap-2" onClick={() => setIsCreateDialogOpen(true)}>
+							<PlusIcon className="size-4" />
+							<span>New auditor</span>
+						</Button>
+					</div>
 				}
 			/>
 			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">

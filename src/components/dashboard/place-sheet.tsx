@@ -9,15 +9,26 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Sheet, SheetContent, SheetDescription, SheetFooter, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 import { toNullableInteger, toNullableNumber, toNullableString } from "./form-utils";
 import { getValidationMessage, getZodFieldErrors } from "./tanstack-form-utils";
 
 const WHOLE_NUMBER_PATTERN = /^\d+$/;
 
+const PLACE_TYPE_OPTIONS = [
+	"Playground",
+	"Park",
+	"Schoolyard",
+	"Community Center",
+	"Sports Field",
+	"Other"
+] as const;
+
 const placeSheetSchema = z
 	.object({
 		name: z.string().trim().min(1, "Place name is required."),
+		address: z.string(),
 		placeType: z.string(),
 		city: z.string(),
 		province: z.string(),
@@ -112,6 +123,7 @@ function validatePlaceValues(
 function getDefaultValues(initialValues?: PlaceSheetInitialValues): PlaceSheetFormValues {
 	return {
 		name: initialValues?.name ?? "",
+		address: "",
 		placeType: initialValues?.placeType ?? "",
 		city: initialValues?.city ?? "",
 		province: initialValues?.province ?? "",
@@ -148,6 +160,7 @@ export function PlaceSheet({
 	onSubmit
 }: Readonly<PlaceSheetProps>) {
 	const [submitError, setSubmitError] = React.useState<string | null>(null);
+	const [isGeocoding, setIsGeocoding] = React.useState(false);
 	const initialName = initialValues?.name ?? "";
 	const initialPlaceType = initialValues?.placeType ?? "";
 	const initialCity = initialValues?.city ?? "";
@@ -225,6 +238,49 @@ export function PlaceSheet({
 		setSubmitError(null);
 	}, [defaultValues, form, open]);
 
+	const handleGeocode = async () => {
+		const address = form.getFieldValue("address");
+		if (!address || address.trim().length === 0) {
+			return;
+		}
+		setIsGeocoding(true);
+		try {
+			const encoded = encodeURIComponent(address.trim());
+			const response = await fetch(
+				`https://maps.google.com/maps/api/geocode/json?address=${encoded}`
+			);
+			const data = await response.json();
+			if (data.results && data.results.length > 0) {
+				const location = data.results[0].geometry.location;
+				form.setFieldValue("latitude", String(location.lat));
+				form.setFieldValue("longitude", String(location.lng));
+				// Also try to fill city, province, country from address components
+				const components = data.results[0].address_components;
+				let city = "";
+				let province = "";
+				let country = "";
+				for (const comp of components) {
+					if (comp.types.includes("locality")) {
+						city = comp.long_name;
+					}
+					if (comp.types.includes("administrative_area_level_1")) {
+						province = comp.long_name;
+					}
+					if (comp.types.includes("country")) {
+						country = comp.long_name;
+					}
+				}
+				if (city) form.setFieldValue("city", city);
+				if (province) form.setFieldValue("province", province);
+				if (country) form.setFieldValue("country", country);
+			}
+		} catch (error) {
+			console.error("Geocoding failed", error);
+		} finally {
+			setIsGeocoding(false);
+		}
+	};
+
 	return (
 		<Sheet open={open} onOpenChange={onOpenChange}>
 			<SheetContent side="right" className="w-full gap-0 sm:max-w-2xl">
@@ -261,16 +317,50 @@ export function PlaceSheet({
 								);
 							}}
 						</form.Field>
+						<form.Field name="address">
+							{field => (
+								<div className="grid gap-2 md:col-span-2">
+									<Label htmlFor={field.name}>Full address</Label>
+									<div className="flex gap-2">
+										<Input
+											id={field.name}
+											value={field.state.value}
+											onBlur={field.handleBlur}
+											onChange={event => field.handleChange(event.target.value)}
+											placeholder="Street, City, Province, Country"
+										/>
+										<Button
+											type="button"
+											variant="secondary"
+											onClick={handleGeocode}
+											disabled={isGeocoding || !field.state.value.trim()}>
+											{isGeocoding ? "Looking up..." : "Look up coordinates"}
+										</Button>
+									</div>
+									<p className="text-xs text-muted-foreground">
+										We'll try to fill latitude, longitude, and location fields automatically.
+									</p>
+								</div>
+							)}
+						</form.Field>
 						<form.Field name="placeType">
 							{field => (
 								<div className="grid gap-2">
 									<Label htmlFor={field.name}>Place type</Label>
-									<Input
-										id={field.name}
+									<Select
 										value={field.state.value}
-										onBlur={field.handleBlur}
-										onChange={event => field.handleChange(event.target.value)}
-									/>
+										onValueChange={value => field.handleChange(value)}>
+										<SelectTrigger id={field.name}>
+											<SelectValue placeholder="Select a type" />
+										</SelectTrigger>
+										<SelectContent>
+											{PLACE_TYPE_OPTIONS.map(opt => (
+												<SelectItem key={opt} value={opt}>
+													{opt}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
 								</div>
 							)}
 						</form.Field>

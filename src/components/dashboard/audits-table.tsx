@@ -49,6 +49,7 @@ export interface AuditsTableProps {
 	rowCount?: number;
 	pageCount?: number;
 	isFetching?: boolean;
+	onRowClick?: (row: AuditActivityRow) => void;
 }
 
 interface AuditIdentityCellProps {
@@ -280,6 +281,7 @@ export function AuditsTable({
 			rowCount={rowCount}
 			pageCount={pageCount}
 			isFetching={isFetching}
+			onRowClick={onRowClick}
 		/>
 	);
 }

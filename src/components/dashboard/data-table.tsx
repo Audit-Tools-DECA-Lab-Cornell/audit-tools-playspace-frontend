@@ -68,6 +68,7 @@ export interface DataTableProps<TData, TValue> {
 	rowCount?: number;
 	pageCount?: number;
 	isFetching?: boolean;
+	onRowClick?: (row: TData) => void;
 }
 
 /**
@@ -209,15 +210,26 @@ export function DataTable<TData, TValue>({
 					</TableHeader>
 					<TableBody>
 						{table.getRowModel().rows.length > 0 ? (
-							table.getRowModel().rows.map(row => (
-								<TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
-									{row.getVisibleCells().map(cell => (
-										<TableCell key={cell.id}>
-											{flexRender(cell.column.columnDef.cell, cell.getContext())}
-										</TableCell>
-									))}
-								</TableRow>
-							))
+							table.getRowModel().rows.map(row => {
+								const rowProps = onRowClick
+									? {
+											onClick: () => onRowClick(row.original),
+											className: "cursor-pointer hover:bg-muted/50",
+										}
+									: {};
+								return (
+									<TableRow
+										key={row.id}
+										data-state={row.getIsSelected() && "selected"}
+										{...rowProps}>
+										{row.getVisibleCells().map(cell => (
+											<TableCell key={cell.id}>
+												{flexRender(cell.column.columnDef.cell, cell.getContext())}
+											</TableCell>
+										))}
+									</TableRow>
+								);
+							})
 						) : (
 							<TableRow className="hover:bg-transparent">
 								<TableCell

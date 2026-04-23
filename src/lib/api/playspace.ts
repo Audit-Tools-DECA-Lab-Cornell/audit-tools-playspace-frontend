@@ -754,6 +754,7 @@ export interface ManagerPlacesQuery {
 	search?: string;
 	sort?: string;
 	projectIds?: readonly string[];
+	auditorIds?: readonly string[];
 	statuses?: Array<"not_started" | "in_progress" | "submitted">;
 }
 
@@ -990,6 +991,7 @@ export const playspaceApi = {
 					search: query.search,
 					sort: query.sort,
 					project_id: query.projectIds,
+					auditor_id: query.auditorIds,
 					status: query.statuses
 				})}`,
 				managerPlacesListSchema
