@@ -28,7 +28,7 @@ export default function ManagerAuditorsReportsPage() {
 			if (!selectedAuditId) throw new Error("No audit selected");
 			return playspaceApi.auditor.getAudit(selectedAuditId);
 		},
-		enabled: !!selectedAuditId,
+		enabled: !!selectedAuditId
 	});
 
 	const reportsQuery = useQuery({
@@ -41,11 +41,11 @@ export default function ManagerAuditorsReportsPage() {
 			const audits = await playspaceApi.accounts.audits(accountId, {
 				statuses: ["SUBMITTED"],
 				page: 1,
-				pageSize: 100,
+				pageSize: 100
 			});
 			return audits;
 		},
-		enabled: accountId !== null,
+		enabled: accountId !== null
 	});
 
 	if (!accountId) {
@@ -58,7 +58,7 @@ export default function ManagerAuditorsReportsPage() {
 					breadcrumbs={[
 						{ label: "Dashboard", href: "/manager/dashboard" },
 						{ label: "Auditors", href: "/manager/auditors" },
-						{ label: "Reports" },
+						{ label: "Reports" }
 					]}
 				/>
 				<Card>
@@ -82,7 +82,7 @@ export default function ManagerAuditorsReportsPage() {
 					breadcrumbs={[
 						{ label: "Dashboard", href: "/manager/dashboard" },
 						{ label: "Auditors", href: "/manager/auditors" },
-						{ label: "Reports" },
+						{ label: "Reports" }
 					]}
 				/>
 				<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -113,23 +113,24 @@ export default function ManagerAuditorsReportsPage() {
 	}
 
 	const data = reportsQuery.data;
-	const rows: AuditActivityRow[] = data.items.map((audit) => ({
-		id: audit.audit_id,
-		auditCode: audit.audit_code,
-		status: audit.status,
-		auditorCode: audit.auditor_code,
-		placeName: audit.place_name,
-		placeId: audit.place_id,
-		projectName: audit.project_name,
-		projectId: audit.project_id,
-		accountName: null,
-		startedAt: audit.started_at,
-		submittedAt: audit.submitted_at,
-		score: audit.summary_score,
-	}));
+	const rows: AuditActivityRow[] =
+		data?.items.map(audit => ({
+			id: audit.audit_id,
+			auditCode: audit.audit_code,
+			status: audit.status,
+			auditorCode: audit.auditor_code,
+			placeName: audit.place_name,
+			placeId: audit.place_id,
+			projectName: audit.project_name,
+			projectId: audit.project_id,
+			accountName: null,
+			startedAt: audit.started_at,
+			submittedAt: audit.submitted_at,
+			score: audit.summary_score
+		})) ?? [];
 
-	const totalSubmitted = data.summary.submitted_audits;
-	const averageScore = data.summary.average_score ?? 0;
+	const totalSubmitted = data?.summary.submitted_audits;
+	const averageScore = data?.summary.average_score ?? 0;
 
 	return (
 		<div className="space-y-6">
@@ -140,7 +141,7 @@ export default function ManagerAuditorsReportsPage() {
 				breadcrumbs={[
 					{ label: "Dashboard", href: "/manager/dashboard" },
 					{ label: "Auditors", href: "/manager/auditors" },
-					{ label: "Reports" },
+					{ label: "Reports" }
 				]}
 			/>
 			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -158,13 +159,13 @@ export default function ManagerAuditorsReportsPage() {
 				/>
 				<StatCard
 					title="Auditors"
-					value={String(new Set(data.items.map((a) => a.auditor_code)).size)}
+					value={String(new Set(data?.items.map(a => a.auditor_code)).size)}
 					helper="Unique auditors with submitted reports."
 					tone="warning"
 				/>
 				<StatCard
 					title="Places"
-					value={String(new Set(data.items.map((a) => a.place_id)).size)}
+					value={String(new Set(data?.items.map(a => a.place_id)).size)}
 					helper="Unique places with submitted audits."
 					tone="violet"
 				/>
@@ -175,21 +176,23 @@ export default function ManagerAuditorsReportsPage() {
 				description="Browse completed audit reports. Click on a row to view details."
 				pageSize={10}
 				emptyMessage="No submitted audit reports yet."
-				onRowClick={(row) => {
+				onRowClick={row => {
 					setSelectedAuditId(row.id);
 				}}
-				getRowActions={(row) => [
+				getRowActions={row => [
 					{
 						label: "View Report",
 						onSelect: () => setSelectedAuditId(row.id),
-						icon: FileTextIcon,
-					},
+						icon: FileTextIcon
+					}
 				]}
 			/>
-			<Sheet open={!!selectedAuditId} onOpenChange={(open) => !open && setSelectedAuditId(null)}>
+			<Sheet open={!!selectedAuditId} onOpenChange={open => !open && setSelectedAuditId(null)}>
 				<SheetContent side="right" className="w-full sm:max-w-3xl">
 					{auditDetailsQuery.isLoading && <div className="p-8 text-center">Loading audit details...</div>}
-					{auditDetailsQuery.isError && <div className="p-8 text-center text-destructive">Error loading audit details.</div>}
+					{auditDetailsQuery.isError && (
+						<div className="p-8 text-center text-destructive">Error loading audit details.</div>
+					)}
 					{auditDetailsQuery.data && (
 						<div className="space-y-6">
 							<SheetHeader>
@@ -205,7 +208,10 @@ export default function ManagerAuditorsReportsPage() {
 								</div>
 								<div>
 									<h4 className="font-medium">Status</h4>
-									<Badge variant={auditDetailsQuery.data.status === "SUBMITTED" ? "default" : "secondary"}>
+									<Badge
+										variant={
+											auditDetailsQuery.data.status === "SUBMITTED" ? "default" : "secondary"
+										}>
 										{auditDetailsQuery.data.status}
 									</Badge>
 								</div>

@@ -97,7 +97,8 @@ export function DataTable<TData, TValue>({
 	manualFiltering = false,
 	rowCount,
 	pageCount,
-	isFetching = false
+	isFetching = false,
+	onRowClick
 }: Readonly<DataTableProps<TData, TValue>>) {
 	const t = useTranslations("tables.shared");
 	const [internalSorting, setInternalSorting] = React.useState<SortingState>(initialSorting);
@@ -211,17 +212,15 @@ export function DataTable<TData, TValue>({
 					<TableBody>
 						{table.getRowModel().rows.length > 0 ? (
 							table.getRowModel().rows.map(row => {
-								const rowProps = onRowClick
-									? {
-											onClick: () => onRowClick(row.original),
-											className: "cursor-pointer hover:bg-muted/50",
-										}
-									: {};
+								const rowProps =
+									typeof onRowClick === "function"
+										? {
+												onClick: () => onRowClick(row.original),
+												className: "cursor-pointer hover:bg-muted/50"
+											}
+										: {};
 								return (
-									<TableRow
-										key={row.id}
-										data-state={row.getIsSelected() && "selected"}
-										{...rowProps}>
+									<TableRow key={row.id} data-state={row.getIsSelected() && "selected"} {...rowProps}>
 										{row.getVisibleCells().map(cell => (
 											<TableCell key={cell.id}>
 												{flexRender(cell.column.columnDef.cell, cell.getContext())}

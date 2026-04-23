@@ -157,6 +157,7 @@ export function AuditsTable({
 	manualFiltering = false,
 	rowCount,
 	pageCount,
+	onRowClick,
 	isFetching = false
 }: Readonly<AuditsTableProps>) {
 	const t = useTranslations("tables.audits");

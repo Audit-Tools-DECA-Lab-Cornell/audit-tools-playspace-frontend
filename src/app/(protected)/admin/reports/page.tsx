@@ -27,7 +27,7 @@ export default function AdminReportsPage() {
 			if (!selectedAuditId) throw new Error("No audit selected");
 			return playspaceApi.auditor.getAudit(selectedAuditId);
 		},
-		enabled: !!selectedAuditId,
+		enabled: !!selectedAuditId
 	});
 
 	const reportsQuery = useQuery({
@@ -37,10 +37,10 @@ export default function AdminReportsPage() {
 			const audits = await playspaceApi.admin.audits({
 				statuses: ["SUBMITTED"],
 				page: 1,
-				pageSize: 100,
+				pageSize: 100
 			});
 			return audits;
-		},
+		}
 	});
 
 	if (reportsQuery.isLoading) {
@@ -50,10 +50,7 @@ export default function AdminReportsPage() {
 					eyebrow="Admin Workspace"
 					title="Audit Reports"
 					description="View all submitted audit reports across the platform."
-					breadcrumbs={[
-						{ label: "Dashboard", href: "/admin/dashboard" },
-						{ label: "Reports" },
-					]}
+					breadcrumbs={[{ label: "Dashboard", href: "/admin/dashboard" }, { label: "Reports" }]}
 				/>
 				<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
 					{Array.from({ length: 4 }).map((_, idx) => (
@@ -83,8 +80,8 @@ export default function AdminReportsPage() {
 	}
 
 	const data = reportsQuery.data;
-	const submittedItems = data.items;
-	const rows: AuditActivityRow[] = submittedItems.map((audit) => ({
+	const submittedItems = data?.items ?? [];
+	const rows: AuditActivityRow[] = submittedItems.map(audit => ({
 		id: audit.audit_id,
 		auditCode: audit.audit_code,
 		status: audit.status,
@@ -96,13 +93,14 @@ export default function AdminReportsPage() {
 		accountName: audit.account_name,
 		startedAt: audit.started_at,
 		submittedAt: audit.submitted_at,
-		score: audit.summary_score,
+		score: audit.summary_score
 	}));
 
 	const totalSubmitted = submittedItems.length;
-	const averageScore = totalSubmitted > 0 
-		? submittedItems.reduce((acc, item) => acc + (item.summary_score ?? 0), 0) / totalSubmitted
-		: 0;
+	const averageScore =
+		totalSubmitted > 0
+			? submittedItems.reduce((acc, item) => acc + (item.summary_score ?? 0), 0) / totalSubmitted
+			: 0;
 
 	return (
 		<div className="space-y-6">
@@ -110,10 +108,7 @@ export default function AdminReportsPage() {
 				eyebrow="Admin Workspace"
 				title="Audit Reports"
 				description="View all submitted audit reports across the platform."
-				breadcrumbs={[
-					{ label: "Dashboard", href: "/admin/dashboard" },
-					{ label: "Reports" },
-				]}
+				breadcrumbs={[{ label: "Dashboard", href: "/admin/dashboard" }, { label: "Reports" }]}
 			/>
 			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
 				<StatCard
@@ -130,13 +125,13 @@ export default function AdminReportsPage() {
 				/>
 				<StatCard
 					title="Accounts"
-					value={String(new Set(submittedItems.map((a) => a.account_id)).size)}
+					value={String(new Set(submittedItems.map(a => a.account_id)).size)}
 					helper="Unique accounts with submitted reports."
 					tone="warning"
 				/>
 				<StatCard
 					title="Auditors"
-					value={String(new Set(submittedItems.map((a) => a.auditor_code)).size)}
+					value={String(new Set(submittedItems.map(a => a.auditor_code)).size)}
 					helper="Unique auditors with submitted reports."
 					tone="violet"
 				/>
@@ -147,21 +142,23 @@ export default function AdminReportsPage() {
 				description="Browse completed audit reports from all accounts. Click on a row to view details."
 				pageSize={10}
 				emptyMessage="No submitted audit reports yet."
-				onRowClick={(row) => {
+				onRowClick={row => {
 					setSelectedAuditId(row.id);
 				}}
-				getRowActions={(row) => [
+				getRowActions={row => [
 					{
 						label: "View Report",
 						onSelect: () => setSelectedAuditId(row.id),
-						icon: FileTextIcon,
-					},
+						icon: FileTextIcon
+					}
 				]}
 			/>
-			<Sheet open={!!selectedAuditId} onOpenChange={(open) => !open && setSelectedAuditId(null)}>
+			<Sheet open={!!selectedAuditId} onOpenChange={open => !open && setSelectedAuditId(null)}>
 				<SheetContent side="right" className="w-full sm:max-w-3xl">
 					{auditDetailsQuery.isLoading && <div className="p-8 text-center">Loading audit details...</div>}
-					{auditDetailsQuery.isError && <div className="p-8 text-center text-destructive">Error loading audit details.</div>}
+					{auditDetailsQuery.isError && (
+						<div className="p-8 text-center text-destructive">Error loading audit details.</div>
+					)}
 					{auditDetailsQuery.data && (
 						<div className="space-y-6">
 							<SheetHeader>
@@ -177,7 +174,10 @@ export default function AdminReportsPage() {
 								</div>
 								<div>
 									<h4 className="font-medium">Status</h4>
-									<Badge variant={auditDetailsQuery.data.status === "SUBMITTED" ? "default" : "secondary"}>
+									<Badge
+										variant={
+											auditDetailsQuery.data.status === "SUBMITTED" ? "default" : "secondary"
+										}>
 										{auditDetailsQuery.data.status}
 									</Badge>
 								</div>

@@ -471,6 +471,7 @@ const auditSessionSchema = z
 	.object({
 		audit_id: z.string().uuid(),
 		audit_code: z.string(),
+		auditor_code: z.string(),
 		project_id: z.string().uuid(),
 		project_name: z.string(),
 		place_id: z.string().uuid(),

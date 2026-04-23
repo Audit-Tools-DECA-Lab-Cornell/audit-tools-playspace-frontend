@@ -16,14 +16,7 @@ import { getValidationMessage, getZodFieldErrors } from "./tanstack-form-utils";
 
 const WHOLE_NUMBER_PATTERN = /^\d+$/;
 
-const PLACE_TYPE_OPTIONS = [
-	"Playground",
-	"Park",
-	"Schoolyard",
-	"Community Center",
-	"Sports Field",
-	"Other"
-] as const;
+const PLACE_TYPE_OPTIONS = ["Playground", "Park", "Schoolyard", "Community Center", "Sports Field", "Other"] as const;
 
 const placeSheetSchema = z
 	.object({
@@ -246,9 +239,7 @@ export function PlaceSheet({
 		setIsGeocoding(true);
 		try {
 			const encoded = encodeURIComponent(address.trim());
-			const response = await fetch(
-				`https://maps.google.com/maps/api/geocode/json?address=${encoded}`
-			);
+			const response = await fetch(`https://maps.google.com/maps/api/geocode/json?address=${encoded}`);
 			const data = await response.json();
 			if (data.results && data.results.length > 0) {
 				const location = data.results[0].geometry.location;
@@ -338,7 +329,7 @@ export function PlaceSheet({
 										</Button>
 									</div>
 									<p className="text-xs text-muted-foreground">
-										We'll try to fill latitude, longitude, and location fields automatically.
+										We&apos;ll try to fill latitude, longitude, and location fields automatically.
 									</p>
 								</div>
 							)}
