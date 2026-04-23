@@ -83,7 +83,8 @@ export default function AdminReportsPage() {
 	}
 
 	const data = reportsQuery.data;
-	const rows: AuditActivityRow[] = data.items.map((audit) => ({
+	const submittedItems = data.items;
+	const rows: AuditActivityRow[] = submittedItems.map((audit) => ({
 		id: audit.audit_id,
 		auditCode: audit.audit_code,
 		status: audit.status,
@@ -98,8 +99,10 @@ export default function AdminReportsPage() {
 		score: audit.summary_score,
 	}));
 
-	const totalSubmitted = data.summary?.submitted_audits ?? data.items.length;
-	const averageScore = data.summary?.average_score ?? 0;
+	const totalSubmitted = submittedItems.length;
+	const averageScore = totalSubmitted > 0 
+		? submittedItems.reduce((acc, item) => acc + (item.summary_score ?? 0), 0) / totalSubmitted
+		: 0;
 
 	return (
 		<div className="space-y-6">
@@ -127,13 +130,13 @@ export default function AdminReportsPage() {
 				/>
 				<StatCard
 					title="Accounts"
-					value={String(new Set(data.items.map((a) => a.account_id)).size)}
+					value={String(new Set(submittedItems.map((a) => a.account_id)).size)}
 					helper="Unique accounts with submitted reports."
 					tone="warning"
 				/>
 				<StatCard
 					title="Auditors"
-					value={String(new Set(data.items.map((a) => a.auditor_code)).size)}
+					value={String(new Set(submittedItems.map((a) => a.auditor_code)).size)}
 					helper="Unique auditors with submitted reports."
 					tone="violet"
 				/>
