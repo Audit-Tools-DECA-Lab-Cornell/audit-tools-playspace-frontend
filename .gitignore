@@ -54,3 +54,4 @@ scripts/screenshots/*
 docs/superpowers/
 
 test-results/
+.aider*
