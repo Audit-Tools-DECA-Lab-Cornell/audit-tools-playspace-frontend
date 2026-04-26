@@ -1,12 +1,12 @@
 "use client";
 
-import * as React from "react";
-import Link from "next/link";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
+import Link from "next/link";
+import * as React from "react";
 
-import type { PlaceSummary } from "@/lib/api/playspace";
 import { Badge } from "@/components/ui/badge";
+import type { PlaceSummary } from "@/lib/api/playspace";
 import { cn } from "@/lib/utils";
 
 import { DataTable, getMultiValueFilterFn } from "./data-table";
@@ -14,6 +14,8 @@ import { DataTableColumnHeader } from "./data-table-column-header";
 import type { EntityRowAction } from "./entity-row-actions";
 import { EntityRowActions } from "./entity-row-actions";
 
+import type { PlayspaceType } from "@/lib/api/playspace";
+import { DataTableFilterOption } from "./data-table-toolbar";
 import { formatDateTimeLabel, formatLocationLabel, formatScoreLabel, getPlaceStatusClassName } from "./utils";
 
 export interface PlacesTableProps {
@@ -45,7 +47,8 @@ export function PlacesTable({
 	const columns = React.useMemo<ColumnDef<PlaceSummary>[]>(
 		() => [
 			{
-				accessorKey: "name",
+				id: "name",
+				accessorFn: row => `${row.name} ${row.address ?? ""} ${formatLocationLabel(row, formatT)}`,
 				header: ({ column }) => <DataTableColumnHeader column={column} title={t("columns.place")} />,
 				cell: ({ row }) => {
 					const place = row.original;
@@ -57,6 +60,7 @@ export function PlacesTable({
 								className="font-medium text-foreground transition-colors hover:text-primary">
 								{place.name}
 							</Link>
+							{place.address && <p className="text-xs text-muted-foreground">{place.address}</p>}
 							<p className="text-sm text-muted-foreground">{formatLocationLabel(place, formatT)}</p>
 						</div>
 					);
@@ -122,13 +126,13 @@ export function PlacesTable({
 			},
 			...(getRowActions
 				? [
-						{
-							id: "actions",
-							enableSorting: false,
-							enableHiding: false,
-							cell: ({ row }) => <EntityRowActions actions={getRowActions(row.original)} />
-						} satisfies ColumnDef<PlaceSummary>
-					]
+					{
+						id: "actions",
+						enableSorting: false,
+						enableHiding: false,
+						cell: ({ row }) => <EntityRowActions actions={getRowActions(row.original)} />
+					} satisfies ColumnDef<PlaceSummary>
+				]
 				: [])
 		],
 		[basePath, formatT, getRowActions, t]
@@ -143,9 +147,9 @@ export function PlacesTable({
 
 	const placeTypeOptions = React.useMemo(() => {
 		return Array.from(
-			new Set(places.map(place => place.place_type).filter((value): value is string => Boolean(value)))
+			new Set(places.map(place => place.place_type).filter((value): value is PlayspaceType => Boolean(value)))
 		)
-			.sort((left, right) => left.localeCompare(right))
+			.sort((left, right) => left?.localeCompare(right ?? "") ?? 0)
 			.map(placeType => ({
 				label: placeType,
 				value: placeType
@@ -169,7 +173,7 @@ export function PlacesTable({
 				{
 					columnId: "place_type",
 					title: t("columns.type"),
-					options: placeTypeOptions
+					options: placeTypeOptions as DataTableFilterOption[]
 				}
 			]}
 			action={action}

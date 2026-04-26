@@ -86,11 +86,14 @@ export default function AdminPlacesPage() {
 			{
 				id: "name",
 				accessorFn: row =>
-					`${row.name} ${row.project_name} ${row.account_name} ${formatLocation(row.city, row.province, row.country, formatT("locationPending"))}`,
+					`${row.name} ${row.address ?? ""} ${row.project_name} ${row.account_name} ${formatLocation(row.city, row.province, row.country, formatT("locationPending"))}`,
 				header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.place")} />,
 				cell: ({ row }) => (
 					<div className="min-w-[260px] space-y-1">
 						<p className="font-medium text-foreground">{row.original.name}</p>
+						{row.original.address ? (
+							<p className="text-sm text-muted-foreground">{row.original.address}</p>
+						) : null}
 						<p className="text-sm text-muted-foreground">
 							{row.original.account_name} · {row.original.project_name}
 						</p>

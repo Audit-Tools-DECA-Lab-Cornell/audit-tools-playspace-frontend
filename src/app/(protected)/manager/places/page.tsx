@@ -238,7 +238,7 @@ export default function ManagerPlacesPage() {
 		() => [
 			{
 				id: "name",
-				accessorFn: row => `${row.name} ${row.project_name} ${formatLocationLabel(row, formatT)}`,
+				accessorFn: row => `${row.name} ${row.project_name} ${row.address ?? ""} ${formatLocationLabel(row, formatT)}`,
 				header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.place")} />,
 				cell: ({ row }) => (
 					<div className="min-w-[280px] space-y-1">
@@ -248,6 +248,9 @@ export default function ManagerPlacesPage() {
 							{row.original.name}
 						</Link>
 						<p className="text-sm text-muted-foreground">{row.original.project_name}</p>
+						{row.original.address && (
+							<p className="text-xs text-muted-foreground">{row.original.address}</p>
+						)}
 						<p className="text-sm text-muted-foreground">{formatLocationLabel(row.original, formatT)}</p>
 					</div>
 				),

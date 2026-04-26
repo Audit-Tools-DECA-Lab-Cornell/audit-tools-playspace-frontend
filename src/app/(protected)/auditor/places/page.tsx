@@ -119,14 +119,18 @@ export default function AuditorPlacesPage() {
 					<div className="min-w-[260px] space-y-1">
 						<p className="font-medium text-foreground">{row.original.place_name}</p>
 						<p className="text-sm text-muted-foreground">{row.original.project_name}</p>
-						<p className="text-xs text-muted-foreground">
-							{formatLocation(
-								row.original.city,
-								row.original.province,
-								row.original.country,
-								t("list.locationPending")
-							)}
-						</p>
+						{row.original.address ? (
+							<p className="text-xs text-muted-foreground">{row.original.address}</p>
+						) : (
+							<p className="text-xs text-muted-foreground">
+								{formatLocation(
+									row.original.city,
+									row.original.province,
+									row.original.country,
+									t("list.locationPending")
+								)}
+							</p>
+						)}
 					</div>
 				),
 				enableHiding: false

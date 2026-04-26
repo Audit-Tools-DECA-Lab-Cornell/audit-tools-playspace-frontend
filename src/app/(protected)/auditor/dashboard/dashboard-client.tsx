@@ -105,9 +105,12 @@ export function AuditorDashboardClient({ summary, places, errorMessage }: Readon
 							<div
 								key={place.place_id}
 								className="flex flex-col gap-3 rounded-card border border-border/70 bg-card/60 p-4 sm:flex-row sm:items-center sm:justify-between">
-								<div className="min-w-0">
+								<div className="min-w-0 space-y-0.5">
 									<p className="truncate font-medium">{place.place_name}</p>
 									<p className="text-sm text-muted-foreground">{place.project_name}</p>
+									{place.address ? (
+										<p className="text-xs text-muted-foreground/70">{place.address}</p>
+									) : null}
 								</div>
 
 								<div className="flex flex-wrap items-center gap-2">

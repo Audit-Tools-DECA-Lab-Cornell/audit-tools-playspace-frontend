@@ -10,7 +10,7 @@ const projectStatusSchema = z.enum(["planned", "active", "completed"]);
 const placeStatusSchema = z.enum(["not_started", "in_progress", "submitted"]);
 const auditStatusSchema = z.enum(["IN_PROGRESS", "PAUSED", "SUBMITTED"]);
 const executionModeSchema = z.enum(["audit", "survey", "both"]);
-const playspaceTypeSchema = z.enum(["Public Playspace", "Pre-School Playspace", "Nature Playspace", "Neighborhood Playspace", "Waterfront Playspace", "School Playspace"]);
+const playspaceTypeSchema = z.enum(["Public Playspace", "Pre-School Playspace", "Destination Playspace", "Nature Playspace", "Neighborhood Playspace", "Waterfront Playspace", "School Playspace"]);
 
 const managerProfileSchema = z.object({
 	id: z.string().uuid(),
@@ -58,7 +58,7 @@ const projectSummarySchema = z.object({
 	account_id: z.string().uuid(),
 	name: z.string(),
 	overview: z.string().nullable(),
-	place_types: z.array(playspaceTypeSchema),
+	place_types: z.array(playspaceTypeSchema).nullable(),
 	start_date: z.string().date().nullable(),
 	end_date: z.string().date().nullable(),
 	status: projectStatusSchema,
@@ -73,7 +73,7 @@ const projectDetailSchema = z.object({
 	account_id: z.string().uuid(),
 	name: z.string(),
 	overview: z.string().nullable(),
-	place_types: z.array(playspaceTypeSchema),
+	place_types: z.array(playspaceTypeSchema).nullable(),
 	start_date: z.string().date().nullable(),
 	end_date: z.string().date().nullable(),
 	est_places: z.number().int().nonnegative().nullable(),
@@ -111,6 +111,8 @@ const placeSummarySchema = z.object({
 	id: z.string().uuid(),
 	project_id: z.string().uuid(),
 	name: z.string(),
+	address: z.string().nullable(),
+	postal_code: z.string().nullable(),
 	city: z.string().nullable(),
 	province: z.string().nullable(),
 	country: z.string().nullable(),
@@ -153,6 +155,13 @@ const placeHistorySchema = z.object({
 	place_name: z.string(),
 	project_id: z.string().uuid(),
 	project_name: z.string(),
+	address: z.string().nullable(),
+	postal_code: z.string().nullable(),
+	city: z.string().nullable(),
+	province: z.string().nullable(),
+	country: z.string().nullable(),
+	lat: z.number().nullable(),
+	lng: z.number().nullable(),
 	total_audits: z.number().int().nonnegative(),
 	submitted_audits: z.number().int().nonnegative(),
 	in_progress_audits: z.number().int().nonnegative(),
@@ -173,6 +182,8 @@ const managerPlaceRowSchema = z.object({
 	project_id: z.string().uuid(),
 	project_name: z.string(),
 	name: z.string(),
+	address: z.string().nullable(),
+	postal_code: z.string().nullable(),
 	city: z.string().nullable(),
 	province: z.string().nullable(),
 	country: z.string().nullable(),
@@ -251,6 +262,8 @@ const placeDetailSchema = z.object({
 	project_ids: z.array(z.string().uuid()),
 	project_names: z.array(z.string()),
 	name: z.string(),
+	address: z.string().nullable(),
+	postal_code: z.string().nullable(),
 	city: z.string().nullable(),
 	province: z.string().nullable(),
 	country: z.string().nullable(),
@@ -315,6 +328,8 @@ const projectUpdateRequestSchema = z.object({
 const placeCreateRequestSchema = z.object({
 	project_ids: z.array(z.string().uuid()).min(1),
 	name: z.string().min(1),
+	address: z.string().nullable().optional(),
+	postal_code: z.string().nullable().optional(),
 	city: z.string().nullable().optional(),
 	province: z.string().nullable().optional(),
 	country: z.string().nullable().optional(),
@@ -330,6 +345,8 @@ const placeCreateRequestSchema = z.object({
 const placeUpdateRequestSchema = z.object({
 	project_ids: z.array(z.string().uuid()).optional(),
 	name: z.string().min(1).optional(),
+	address: z.string().nullable().optional(),
+	postal_code: z.string().nullable().optional(),
 	city: z.string().nullable().optional(),
 	province: z.string().nullable().optional(),
 	country: z.string().nullable().optional(),
@@ -368,6 +385,8 @@ const auditorPlaceSchema = z.object({
 	place_type: playspaceTypeSchema.nullable(),
 	project_id: z.string().uuid(),
 	project_name: z.string(),
+	address: z.string().nullable(),
+	postal_code: z.string().nullable(),
 	city: z.string().nullable(),
 	province: z.string().nullable(),
 	country: z.string().nullable(),
@@ -630,6 +649,7 @@ const adminPlaceRowSchema = z.object({
 	account_id: z.string().uuid(),
 	account_name: z.string(),
 	name: z.string(),
+	address: z.string().nullable(),
 	city: z.string().nullable(),
 	province: z.string().nullable(),
 	country: z.string().nullable(),
@@ -715,6 +735,7 @@ export type ProjectDetail = z.infer<typeof projectDetailSchema>;
 export type ProjectStats = z.infer<typeof projectStatsSchema>;
 export type AuditorSummary = z.infer<typeof auditorSummarySchema>;
 export type PlaceSummary = z.infer<typeof placeSummarySchema>;
+export type PlayspaceType = z.infer<typeof playspaceTypeSchema>;
 export type PlaceAuditHistoryItem = z.infer<typeof placeAuditHistoryItemSchema>;
 export type PlaceHistory = z.infer<typeof placeHistorySchema>;
 export type ManagerPlacesSummary = z.infer<typeof managerPlacesSummarySchema>;

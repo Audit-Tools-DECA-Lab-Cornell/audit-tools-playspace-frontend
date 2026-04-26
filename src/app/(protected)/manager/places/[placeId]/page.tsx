@@ -1,7 +1,9 @@
 "use client";
 
+import Image from "next/image";
 import { useParams, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
+import { ExternalLink, MapPin } from "lucide-react";
 import { useTranslations } from "next-intl";
 
 import { playspaceApi } from "@/lib/api/playspace";
@@ -10,7 +12,32 @@ import { BackButton } from "@/components/dashboard/back-button";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { formatDateTimeLabel, formatScoreLabel } from "@/components/dashboard/utils";
 import { StatCard } from "@/components/dashboard/stat-card";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+/**
+ * Build an internal static-map proxy URL centered on the given coordinates.
+ */
+function buildStaticMapUrl(lat: number, lng: number): string | null {
+	if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+	const params = new URLSearchParams({
+		height: "300",
+		lat: String(lat),
+		lng: String(lng),
+		scale: "2",
+		width: "640",
+		zoom: "15"
+	});
+	return `/api/google-maps/static-map?${params.toString()}`;
+}
+
+/**
+ * Build a Google Maps search URL for the given coordinates.
+ * Used to open the location in a new tab.
+ */
+function buildMapsSearchUrl(lat: number, lng: number, placeName: string): string {
+	return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${placeName} ${lat},${lng}`)}`;
+}
 
 export default function ManagerPlaceDetailPage() {
 	const t = useTranslations("manager.placeDetail");
@@ -62,6 +89,21 @@ export default function ManagerPlaceDetailPage() {
 		score: audit.summary_score
 	}));
 
+	const hasCoordinates =
+		history.lat !== null &&
+		history.lat !== undefined &&
+		history.lng !== null &&
+		history.lng !== undefined;
+
+	const locationParts = [history.city, history.province, history.country].filter(
+		(part): part is string => typeof part === "string" && part.trim().length > 0
+	);
+	const locationLabel = locationParts.join(", ");
+	const mapUrl = hasCoordinates ? buildStaticMapUrl(history.lat as number, history.lng as number) : null;
+	const mapsSearchUrl = hasCoordinates
+		? buildMapsSearchUrl(history.lat as number, history.lng as number, history.place_name)
+		: null;
+
 	return (
 		<div className="space-y-6">
 			<DashboardHeader
@@ -75,11 +117,64 @@ export default function ManagerPlaceDetailPage() {
 				]}
 				actions={<BackButton href="/manager/places" label={t("actions.backToPlaces")} />}
 			/>
+
+			{/* ── Place identity card ── */}
 			<Card>
-				<CardContent className="py-2 text-xl text-muted-foreground">
-					<span className="font-bold text-primary">Project:</span> {`${history.project_name}`}
+				<CardContent className="space-y-2 py-4">
+					<p className="font-medium text-foreground">
+						<span className="text-muted-foreground">Project: </span>
+						{history.project_name}
+					</p>
+					{history.address ? (
+						<div className="flex items-start gap-1.5">
+							<MapPin className="mt-0.5 size-3.5 shrink-0 text-muted-foreground" />
+							<p className="text-sm text-muted-foreground">{history.address}</p>
+						</div>
+					) : null}
+					{locationLabel ? (
+						<p className="text-sm text-muted-foreground">{locationLabel}</p>
+					) : null}
+					{history.postal_code ? (
+						<p className="text-xs text-muted-foreground/70">{history.postal_code}</p>
+					) : null}
 				</CardContent>
 			</Card>
+
+			{/* ── Map card ── */}
+			{hasCoordinates ? (
+				<Card className="overflow-hidden">
+					<CardHeader className="flex flex-row items-center justify-between pb-2 pt-4">
+						<div className="space-y-0.5">
+							<CardTitle className="text-base">Location</CardTitle>
+							<p className="text-xs text-muted-foreground">
+								{(history.lat as number).toFixed(6)}, {(history.lng as number).toFixed(6)}
+							</p>
+						</div>
+						{mapsSearchUrl ? (
+							<Button asChild variant="outline" size="sm" className="gap-1.5">
+								<a href={mapsSearchUrl} target="_blank" rel="noopener noreferrer">
+									<ExternalLink className="size-3.5" />
+									Open in Google Maps
+								</a>
+							</Button>
+						) : null}
+					</CardHeader>
+					<CardContent className="p-0">
+						{mapUrl ? (
+							<Image
+								src={mapUrl}
+								alt={`Map showing the location of ${history.place_name}`}
+								width={640}
+								height={240}
+								className="h-[240px] w-full object-cover"
+								unoptimized
+							/>
+						) : null}
+					</CardContent>
+				</Card>
+			) : null}
+
+			{/* ── KPI stats ── */}
 			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
 				<StatCard
 					title={t("stats.totalAudits.title")}
@@ -116,6 +211,7 @@ export default function ManagerPlaceDetailPage() {
 					tone="success"
 				/>
 			</div>
+
 			<AuditsTable
 				rows={auditRows}
 				title={t("table.title")}
