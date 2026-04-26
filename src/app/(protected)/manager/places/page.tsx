@@ -238,7 +238,8 @@ export default function ManagerPlacesPage() {
 		() => [
 			{
 				id: "name",
-				accessorFn: row => `${row.name} ${row.project_name} ${row.address ?? ""} ${formatLocationLabel(row, formatT)}`,
+				accessorFn: row =>
+					`${row.name} ${row.project_name} ${row.address ?? ""} ${formatLocationLabel(row, formatT)}`,
 				header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.place")} />,
 				cell: ({ row }) => (
 					<div className="min-w-[280px] space-y-1">

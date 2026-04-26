@@ -90,10 +90,7 @@ export default function ManagerPlaceDetailPage() {
 	}));
 
 	const hasCoordinates =
-		history.lat !== null &&
-		history.lat !== undefined &&
-		history.lng !== null &&
-		history.lng !== undefined;
+		history.lat !== null && history.lat !== undefined && history.lng !== null && history.lng !== undefined;
 
 	const locationParts = [history.city, history.province, history.country].filter(
 		(part): part is string => typeof part === "string" && part.trim().length > 0
@@ -131,9 +128,7 @@ export default function ManagerPlaceDetailPage() {
 							<p className="text-sm text-muted-foreground">{history.address}</p>
 						</div>
 					) : null}
-					{locationLabel ? (
-						<p className="text-sm text-muted-foreground">{locationLabel}</p>
-					) : null}
+					{locationLabel ? <p className="text-sm text-muted-foreground">{locationLabel}</p> : null}
 					{history.postal_code ? (
 						<p className="text-xs text-muted-foreground/70">{history.postal_code}</p>
 					) : null}

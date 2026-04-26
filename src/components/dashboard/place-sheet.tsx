@@ -308,13 +308,10 @@ export function PlaceSheet({
 					form.getFieldValue("postalCode")
 				].filter((value): value is string => value.trim().length > 0);
 				const searchQuery = [addressSearchTerm.trim(), ...biasParts].join(", ");
-				const response = await fetch(
-					`/api/google-maps/address-search?q=${encodeURIComponent(searchQuery)}`,
-					{
-						method: "GET",
-						signal: controller.signal
-					}
-				);
+				const response = await fetch(`/api/google-maps/address-search?q=${encodeURIComponent(searchQuery)}`, {
+					method: "GET",
+					signal: controller.signal
+				});
 				const data = (await response.json()) as
 					| { message?: string; suggestions?: AddressSuggestion[] }
 					| undefined;
@@ -395,7 +392,9 @@ export function PlaceSheet({
 							{field => (
 								<div className="grid gap-2 md:col-span-2">
 									<Label htmlFor={field.name}>Place type</Label>
-									<Select value={field.state.value} onValueChange={value => field.handleChange(value)}>
+									<Select
+										value={field.state.value}
+										onValueChange={value => field.handleChange(value)}>
 										<SelectTrigger id={field.name}>
 											<SelectValue placeholder="Select a type" />
 										</SelectTrigger>
@@ -446,8 +445,12 @@ export function PlaceSheet({
 															event.preventDefault();
 															applyAddressSuggestion(suggestion);
 														}}>
-														<span className="text-sm font-medium text-foreground">{suggestion.address}</span>
-														<span className="text-xs text-muted-foreground">{suggestion.formattedAddress}</span>
+														<span className="text-sm font-medium text-foreground">
+															{suggestion.address}
+														</span>
+														<span className="text-xs text-muted-foreground">
+															{suggestion.formattedAddress}
+														</span>
 													</button>
 												))}
 											</div>

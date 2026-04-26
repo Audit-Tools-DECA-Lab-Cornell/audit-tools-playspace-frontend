@@ -40,10 +40,7 @@ function signStaticMapUrl(url: URL, signingSecret: string): URL {
 }
 
 function buildSvgPlaceholder(message: string): Response {
-	const sanitizedMessage = message
-		.replace(/&/g, "&amp;")
-		.replace(/</g, "&lt;")
-		.replace(/>/g, "&gt;");
+	const sanitizedMessage = message.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 	const svg = `
 <svg xmlns="http://www.w3.org/2000/svg" width="1200" height="440" viewBox="0 0 1200 440">
 	<rect width="1200" height="440" fill="#f8fafc" />

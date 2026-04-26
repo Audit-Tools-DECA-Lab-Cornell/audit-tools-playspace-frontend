@@ -259,7 +259,9 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 							demoPassword="DemoPass123!"
 							demoHint={
 								<p className="text-xs text-muted-foreground">
-									<span className="text-amber-600 dark:text-amber-400">{t("admin.demoLabel")}</span>{" "}
+									<span className="font-medium text-amber-600 dark:text-amber-400">
+										{t("admin.demoLabel")}
+									</span>{" "}
 									<span className="font-mono">playspace.admin@example.org</span>
 								</p>
 							}
@@ -278,7 +280,9 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 							demoPassword="DemoPass123!"
 							demoHint={
 								<p className="text-xs text-muted-foreground">
-									<span className="text-amber-600 dark:text-amber-400">{t("manager.demoLabel")}</span>{" "}
+									<span className="font-medium text-amber-600 dark:text-amber-400">
+										{t("manager.demoLabel")}
+									</span>{" "}
 									<span className="font-mono">manager@example.org</span> {t("manager.demoOr")}{" "}
 									<span className="font-mono">canterbury.manager@example.org</span>
 								</p>
@@ -298,7 +302,9 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 							demoPassword="DemoPass123!"
 							demoHint={
 								<p className="text-xs text-muted-foreground">
-									<span className="text-amber-600 dark:text-amber-400">{t("auditor.demoLabel")}</span>{" "}
+									<span className="font-medium text-amber-600 dark:text-amber-400">
+										{t("auditor.demoLabel")}
+									</span>{" "}
 									<span className="font-mono">talia.cooper@example.org</span>
 								</p>
 							}

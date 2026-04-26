@@ -126,13 +126,13 @@ export function PlacesTable({
 			},
 			...(getRowActions
 				? [
-					{
-						id: "actions",
-						enableSorting: false,
-						enableHiding: false,
-						cell: ({ row }) => <EntityRowActions actions={getRowActions(row.original)} />
-					} satisfies ColumnDef<PlaceSummary>
-				]
+						{
+							id: "actions",
+							enableSorting: false,
+							enableHiding: false,
+							cell: ({ row }) => <EntityRowActions actions={getRowActions(row.original)} />
+						} satisfies ColumnDef<PlaceSummary>
+					]
 				: [])
 		],
 		[basePath, formatT, getRowActions, t]

@@ -40,10 +40,7 @@ function getGeocodingApiKey(): string | null {
 	return process.env.GOOGLE_MAPS_GEOCODING_API_KEY ?? process.env.GOOGLE_MAPS_SERVER_API_KEY ?? null;
 }
 
-function getAddressComponent(
-	components: GoogleAddressComponent[],
-	type: string
-): string | null {
+function getAddressComponent(components: GoogleAddressComponent[], type: string): string | null {
 	const component = components.find(candidate => candidate.types.includes(type));
 	return component?.long_name ?? null;
 }
@@ -51,10 +48,7 @@ function getAddressComponent(
 export async function POST(request: NextRequest): Promise<NextResponse> {
 	const apiKey = getGeocodingApiKey();
 	if (!apiKey) {
-		return NextResponse.json(
-			{ message: "Server geocoding is not configured." },
-			{ status: 503 }
-		);
+		return NextResponse.json({ message: "Server geocoding is not configured." }, { status: 503 });
 	}
 
 	let payload: unknown;
@@ -80,10 +74,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 	);
 
 	if (normalizedAddressParts.length === 0) {
-		return NextResponse.json(
-			{ message: "At least one address field is required for geocoding." },
-			{ status: 400 }
-		);
+		return NextResponse.json({ message: "At least one address field is required for geocoding." }, { status: 400 });
 	}
 
 	const params = new URLSearchParams({
@@ -97,10 +88,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
 	});
 
 	if (!response.ok) {
-		return NextResponse.json(
-			{ message: "Google geocoding request failed." },
-			{ status: 502 }
-		);
+		return NextResponse.json({ message: "Google geocoding request failed." }, { status: 502 });
 	}
 
 	const data = (await response.json()) as GoogleGeocodeResponse;

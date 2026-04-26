@@ -10,7 +10,15 @@ const projectStatusSchema = z.enum(["planned", "active", "completed"]);
 const placeStatusSchema = z.enum(["not_started", "in_progress", "submitted"]);
 const auditStatusSchema = z.enum(["IN_PROGRESS", "PAUSED", "SUBMITTED"]);
 const executionModeSchema = z.enum(["audit", "survey", "both"]);
-const playspaceTypeSchema = z.enum(["Public Playspace", "Pre-School Playspace", "Destination Playspace", "Nature Playspace", "Neighborhood Playspace", "Waterfront Playspace", "School Playspace"]);
+const playspaceTypeSchema = z.enum([
+	"Public Playspace",
+	"Pre-School Playspace",
+	"Destination Playspace",
+	"Nature Playspace",
+	"Neighborhood Playspace",
+	"Waterfront Playspace",
+	"School Playspace"
+]);
 
 const managerProfileSchema = z.object({
 	id: z.string().uuid(),

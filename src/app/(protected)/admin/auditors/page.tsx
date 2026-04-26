@@ -83,9 +83,6 @@ export default function AdminAuditorsPage() {
 						<Badge variant="outline" className="font-mono text-primary uppercase tracking-[0.14em]">
 							{row.original.auditor_code}
 						</Badge>
-						<p className="text-sm text-muted-foreground">
-							{row.original.email_masked ?? t("table.emailHidden")}
-						</p>
 					</div>
 				),
 				enableHiding: false

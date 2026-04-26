@@ -42,10 +42,7 @@ function getGeocodingApiKey(): string | null {
 	return process.env.GOOGLE_MAPS_GEOCODING_API_KEY ?? process.env.GOOGLE_MAPS_SERVER_API_KEY ?? null;
 }
 
-function getAddressComponent(
-	components: GoogleAddressComponent[],
-	type: string
-): string | null {
+function getAddressComponent(components: GoogleAddressComponent[], type: string): string | null {
 	const component = components.find(candidate => candidate.types.includes(type));
 	return component?.long_name ?? null;
 }
@@ -73,10 +70,7 @@ function buildStreetAddress(components: GoogleAddressComponent[], formattedAddre
 export async function GET(request: NextRequest): Promise<NextResponse> {
 	const apiKey = getGeocodingApiKey();
 	if (apiKey === null) {
-		return NextResponse.json(
-			{ message: "Server address search is not configured." },
-			{ status: 503 }
-		);
+		return NextResponse.json({ message: "Server address search is not configured." }, { status: 503 });
 	}
 
 	const query = request.nextUrl.searchParams.get("q")?.trim() ?? "";
@@ -95,10 +89,7 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 	});
 
 	if (!response.ok) {
-		return NextResponse.json(
-			{ message: "Google address lookup failed." },
-			{ status: 502 }
-		);
+		return NextResponse.json({ message: "Google address lookup failed." }, { status: 502 });
 	}
 
 	const data = (await response.json()) as GoogleGeocodeResponse;
