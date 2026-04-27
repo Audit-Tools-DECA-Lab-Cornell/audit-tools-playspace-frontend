@@ -33,6 +33,7 @@ export interface DataTableToolbarProps<TData> {
 	searchColumnId?: string;
 	searchPlaceholder?: string;
 	filterConfigs?: DataTableFilterConfig[];
+	toolbarExtra?: React.ReactNode;
 	action?: React.ReactNode;
 	isFetching?: boolean;
 }
@@ -107,6 +108,7 @@ export function DataTableToolbar<TData>({
 	searchColumnId,
 	searchPlaceholder,
 	filterConfigs = [],
+	toolbarExtra,
 	action,
 	isFetching = false
 }: Readonly<DataTableToolbarProps<TData>>) {
@@ -342,6 +344,7 @@ export function DataTableToolbar<TData>({
 			</div>
 			<div className="flex flex-1 flex-col justify-between gap-3 sm:flex-row sm:flex-wrap sm:items-start">
 				<div className="flex flex-wrap items-center gap-2">
+					{toolbarExtra}
 					{filterConfigs.length > 0 ? (
 						<DropdownMenu open={isFiltersMenuOpen} onOpenChange={handleFiltersMenuOpenChange}>
 							<DropdownMenuTrigger asChild>

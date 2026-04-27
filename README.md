@@ -68,8 +68,8 @@ This app is part of a hierarchical Audit Management System (Account → Projects
 
 - **Managers (full access)**:
     - Manager dashboard shows aggregate stats + recent activity.
-    - Playspace audits surface **both** `audit_score` and `combined_score`.
-    - UI can request a **Manager Survey Link** for external place owners.
+    - Playspace place screens show separate `place_audit_status`, and `place_survey_status` statuses.
+    - Manager/admin score views now show explicit `PV` / `U` pairs instead of a collapsed combined score.
 - **Auditors (limited access)**:
     - Identified strictly by an alphanumeric `auditor_code` (no real names displayed).
     - Can execute audits, auto-save progress, and view their own work.
@@ -166,13 +166,16 @@ Auto-save behavior:
 - Sends a debounced `PATCH` (900ms) with a **partial** payload to:
     - `PATCH /playspace/places/:placeId/audits/draft`
 
-### Manager survey link (Playspace-specific)
+### Playspace score model (current)
 
-The Manager dashboard includes a button that requests a “Manager Survey Link” and offers a copy-to-clipboard UX:
-
-- `POST /playspace/places/:placeId/manager-survey-link`
-- Expected response shape:
-    - `{ "survey_link": "https://..." }`
+- Auditor execution mode still drives submission kind: `audit`, `survey`, or `both`
+- Place rollups now expose:
+    - `place_audit_status`
+    - `place_survey_status`
+    - `audit_mean_scores`
+    - `survey_mean_scores`
+    - `overall_scores`
+- Manager/admin UI should render score pairs as `PV {x} | U {y}`
 
 ### Project structure
 

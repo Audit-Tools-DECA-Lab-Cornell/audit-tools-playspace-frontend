@@ -4,6 +4,7 @@ import * as React from "react";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
 
+import { generateAuditorCode } from "@/lib/auditor-code";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -21,13 +22,18 @@ import { getValidationMessage, getZodFieldErrors } from "./tanstack-form-utils";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+/**
+ * Form schema shared by create and edit modes.
+ * `auditorCode` is kept as an optional string — create mode auto-generates it,
+ * edit mode carries the existing value through unchanged.
+ */
 const auditorDialogSchema = z.object({
 	email: z
 		.string()
 		.trim()
 		.refine(value => EMAIL_PATTERN.test(value), "Enter a valid email address."),
 	fullName: z.string().trim().min(1, "Full name is required."),
-	auditorCode: z.string().trim().min(1, "Auditor code is required."),
+	auditorCode: z.string(),
 	role: z.string(),
 	ageRange: z.string(),
 	gender: z.string(),
@@ -59,6 +65,12 @@ export interface AuditorDialogPayload {
 export interface AuditorDialogProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
+	/** Controls whether the auditor code is auto-generated (create) or read-only (edit). */
+	mode: "create" | "edit";
+	/** Organisation name used to derive auditor code initials. Required for create mode. */
+	accountName?: string;
+	/** All existing auditor codes for the account, used to derive the next sequence number. */
+	existingAuditorCodes?: readonly string[];
 	title: string;
 	description: string;
 	submitLabel: string;
@@ -95,10 +107,17 @@ function getDefaultValues(initialValues?: AuditorDialogInitialValues): AuditorDi
 
 /**
  * Shared auditor create/edit dialog with privacy-safe field labels.
+ *
+ * - **Create mode**: auditor code is auto-generated from the organisation name and
+ *   existing codes. The field is hidden from the user.
+ * - **Edit mode**: auditor code is displayed as a read-only badge. It cannot be changed.
  */
 export function AuditorDialog({
 	open,
 	onOpenChange,
+	mode,
+	accountName = "",
+	existingAuditorCodes = [],
 	title,
 	description,
 	submitLabel,
@@ -107,6 +126,7 @@ export function AuditorDialog({
 	onSubmit
 }: Readonly<AuditorDialogProps>) {
 	const [submitError, setSubmitError] = React.useState<string | null>(null);
+	const isCreateMode = mode === "create";
 	const initialEmail = initialValues?.email ?? "";
 	const initialFullName = initialValues?.fullName ?? "";
 	const initialAuditorCode = initialValues?.auditorCode ?? "";
@@ -135,10 +155,14 @@ export function AuditorDialog({
 		onSubmit: async ({ value }) => {
 			try {
 				setSubmitError(null);
+				const auditorCode = isCreateMode
+					? generateAuditorCode(accountName, existingAuditorCodes)
+					: value.auditorCode;
+
 				await onSubmit({
 					email: value.email.trim(),
 					full_name: value.fullName.trim(),
-					auditor_code: value.auditorCode.trim(),
+					auditor_code: auditorCode,
 					role: toNullableString(value.role),
 					age_range: toNullableString(value.ageRange),
 					gender: toNullableString(value.gender),
@@ -174,24 +198,38 @@ export function AuditorDialog({
 						event.stopPropagation();
 						await form.handleSubmit();
 					}}>
-					<div className="grid gap-4 md:grid-cols-2">
+					<p className="text-xs text-muted-foreground">
+						Fields marked with{" "}
+						<span className="text-destructive" aria-hidden="true">
+							*
+						</span>{" "}
+						are required.
+					</p>
+					<div className="grid gap-6 md:grid-cols-2 items-start">
 						<form.Field name="email">
 							{field => {
 								const validationMessage = getValidationMessage(field.state.meta.errors);
 
 								return (
-									<div className="grid gap-2">
-										<Label htmlFor={field.name}>Email</Label>
+									<div className="grid gap-2 items-start">
+										<Label htmlFor={field.name}>
+											Email{" "}
+											<span className="text-destructive" aria-hidden="true">
+												*
+											</span>
+										</Label>
 										<Input
 											id={field.name}
 											name="auditorEmail"
 											type="email"
 											autoComplete="email"
 											spellCheck={false}
+											placeholder="jane@organization.com"
 											value={field.state.value}
 											onBlur={field.handleBlur}
 											onChange={event => field.handleChange(event.target.value)}
 											aria-invalid={Boolean(validationMessage)}
+											aria-required="true"
 										/>
 										{validationMessage ? (
 											<p className="text-sm text-destructive">{validationMessage}</p>
@@ -200,45 +238,41 @@ export function AuditorDialog({
 								);
 							}}
 						</form.Field>
-						<form.Field name="auditorCode">
-							{field => {
-								const validationMessage = getValidationMessage(field.state.meta.errors);
-
-								return (
-									<div className="grid gap-2">
-										<Label htmlFor={field.name}>Auditor code</Label>
-										<Input
-											id={field.name}
-											name="auditorCode"
-											autoComplete="off"
-											spellCheck={false}
-											value={field.state.value}
-											onBlur={field.handleBlur}
-											onChange={event => field.handleChange(event.target.value)}
-											aria-invalid={Boolean(validationMessage)}
-										/>
-										{validationMessage ? (
-											<p className="text-sm text-destructive">{validationMessage}</p>
-										) : null}
-									</div>
-								);
-							}}
-						</form.Field>
+						{!isCreateMode && (
+							<div className="grid gap-2 items-start">
+								<Label>Auditor code</Label>
+								<div
+									className="flex h-9 items-center rounded-md border border-input bg-muted px-3 font-mono text-sm tracking-wider text-muted-foreground"
+									aria-label="Auditor code (read-only)">
+									{initialAuditorCode}
+								</div>
+								<p className="text-xs text-muted-foreground">
+									Assigned automatically and cannot be changed.
+								</p>
+							</div>
+						)}
 						<form.Field name="fullName">
 							{field => {
 								const validationMessage = getValidationMessage(field.state.meta.errors);
 
 								return (
-									<div className="grid gap-2 md:col-span-2">
-										<Label htmlFor={field.name}>Full name</Label>
+									<div className="grid gap-2 items-start md:col-span-2">
+										<Label htmlFor={field.name}>
+											Full name{" "}
+											<span className="text-destructive" aria-hidden="true">
+												*
+											</span>
+										</Label>
 										<Input
 											id={field.name}
 											name="auditorFullName"
 											autoComplete="name"
+											placeholder="Jane Smith"
 											value={field.state.value}
 											onBlur={field.handleBlur}
 											onChange={event => field.handleChange(event.target.value)}
 											aria-invalid={Boolean(validationMessage)}
+											aria-required="true"
 										/>
 										{validationMessage ? (
 											<p className="text-sm text-destructive">{validationMessage}</p>
@@ -249,10 +283,14 @@ export function AuditorDialog({
 						</form.Field>
 						<form.Field name="role">
 							{field => (
-								<div className="grid gap-2">
-									<Label htmlFor={field.name}>Role</Label>
+								<div className="grid gap-2 items-start">
+									<Label htmlFor={field.name}>
+										Role/Profession{" "}
+										<span className="text-xs font-normal text-muted-foreground">(optional)</span>
+									</Label>
 									<Input
 										id={field.name}
+										placeholder="e.g. Field Researcher"
 										value={field.state.value}
 										onBlur={field.handleBlur}
 										onChange={event => field.handleChange(event.target.value)}
@@ -262,10 +300,15 @@ export function AuditorDialog({
 						</form.Field>
 						<form.Field name="country">
 							{field => (
-								<div className="grid gap-2">
-									<Label htmlFor={field.name}>Country</Label>
+								<div className="grid gap-2 items-start">
+									<Label htmlFor={field.name}>
+										Country{" "}
+										<span className="text-xs font-normal text-muted-foreground">(optional)</span>
+									</Label>
 									<Input
 										id={field.name}
+										placeholder="e.g. Canada"
+										autoComplete="country-name"
 										value={field.state.value}
 										onBlur={field.handleBlur}
 										onChange={event => field.handleChange(event.target.value)}
@@ -275,27 +318,41 @@ export function AuditorDialog({
 						</form.Field>
 						<form.Field name="ageRange">
 							{field => (
-								<div className="grid gap-2">
-									<Label htmlFor={field.name}>Age range</Label>
+								<div className="grid gap-2 items-start">
+									<Label htmlFor={field.name}>
+										Age range{" "}
+										<span className="text-xs font-normal text-muted-foreground">(optional)</span>
+									</Label>
 									<Input
 										id={field.name}
+										placeholder="e.g. 25–34"
 										value={field.state.value}
 										onBlur={field.handleBlur}
 										onChange={event => field.handleChange(event.target.value)}
 									/>
+									<p className="text-xs text-muted-foreground">
+										Used for demographic reporting only.
+									</p>
 								</div>
 							)}
 						</form.Field>
 						<form.Field name="gender">
 							{field => (
-								<div className="grid gap-2">
-									<Label htmlFor={field.name}>Gender</Label>
+								<div className="grid gap-2 items-start">
+									<Label htmlFor={field.name}>
+										Gender{" "}
+										<span className="text-xs font-normal text-muted-foreground">(optional)</span>
+									</Label>
 									<Input
 										id={field.name}
+										placeholder="e.g. Female, Male, Non-binary"
 										value={field.state.value}
 										onBlur={field.handleBlur}
 										onChange={event => field.handleChange(event.target.value)}
 									/>
+									<p className="text-xs text-muted-foreground">
+										Used for demographic reporting only.
+									</p>
 								</div>
 							)}
 						</form.Field>

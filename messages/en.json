@@ -47,11 +47,12 @@
 			"places": "Places",
 			"auditors": "Auditors",
 			"audits": "Audits",
+			"reports": "Reports",
+			"rawData": "Raw Data",
 			"instruments": "Instruments",
 			"system": "System",
 			"settings": "Settings",
-			"assignments": "Assignments",
-			"reports": "Reports"
+			"assignments": "Assignments"
 		},
 		"userMenu": {
 			"auditorWithCode": "Auditor ({code})",
@@ -134,7 +135,7 @@
 			"rolePending": "Role pending",
 			"columns": {
 				"auditor": "Auditor",
-				"role": "Role",
+				"role": "Role/Profession",
 				"assignments": "Assignments",
 				"completed": "Completed",
 				"lastActive": "Last Active"
@@ -264,6 +265,7 @@
 				"searchPlaceholder": "Search accounts...",
 				"emptyMessage": "No accounts match the current filters.",
 				"emailHidden": "Email hidden",
+				"nameHidden": "Name hidden",
 				"columns": {
 					"account": "Account",
 					"type": "Type",
@@ -355,6 +357,7 @@
 				"emptyMessage": "No places match the current filters.",
 				"columns": {
 					"place": "Place",
+					"status": "Status",
 					"completed": "Completed",
 					"meanScore": "Mean Score",
 					"latestAudit": "Latest Audit"
@@ -380,6 +383,23 @@
 				"title": "Audit Activity",
 				"description": "Monitor platform-wide audit throughput, lineage, and delivery status.",
 				"emptyMessage": "No audits match the current filters."
+			}
+		},
+		"auditDetail": {
+			"error": {
+				"title": "Audit unavailable",
+				"description": "Refresh this page to retry. If the issue continues, return to the audits list.",
+				"retry": "Try again",
+				"backToList": "Back to audits"
+			},
+			"header": {
+				"eyebrow": "Administrator Workspace",
+				"title": "Audit Detail",
+				"description": "Full audit session detail including scores and responses."
+			},
+			"breadcrumbs": {
+				"dashboard": "Dashboard",
+				"audits": "Audits"
 			}
 		},
 		"instruments": {
@@ -807,6 +827,24 @@
 					"noMatches": "No audits match the current filters."
 				}
 			}
+		},
+		"auditDetail": {
+			"error": {
+				"title": "Audit unavailable",
+				"description": "Refresh this page to retry. If the issue continues, return to the audits list.",
+				"retry": "Try again",
+				"backToList": "Back to audits"
+			},
+			"header": {
+				"eyebrow": "Manager Workspace",
+				"title": "Audit Detail",
+				"description": "Full audit session detail including scores and responses."
+			},
+			"breadcrumbs": {
+				"dashboard": "Dashboard",
+				"audits": "Audits"
+			},
+			"missingAccount": "Manager account context is missing from the current session."
 		},
 		"places": {
 			"errors": {

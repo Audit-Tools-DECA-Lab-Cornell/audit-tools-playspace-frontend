@@ -10,6 +10,8 @@ const projectStatusSchema = z.enum(["planned", "active", "completed"]);
 const placeStatusSchema = z.enum(["not_started", "in_progress", "submitted"]);
 const auditStatusSchema = z.enum(["IN_PROGRESS", "PAUSED", "SUBMITTED"]);
 const executionModeSchema = z.enum(["audit", "survey", "both"]);
+/** Per-axis place coverage; API may also send legacy `complete` for fully covered axes. */
+const placeAxisStatusSchema = z.enum(["not_started", "in_progress", "submitted", "complete"]);
 const playspaceTypeSchema = z.enum([
 	"Public Playspace",
 	"Pre-School Playspace",
@@ -32,6 +34,11 @@ const managerProfileSchema = z.object({
 	created_at: z.string().datetime()
 });
 
+const scorePairSchema = z.object({
+	pv: z.number(),
+	u: z.number()
+});
+
 const accountStatsSchema = z.object({
 	total_projects: z.number().int().nonnegative(),
 	total_places: z.number().int().nonnegative(),
@@ -47,7 +54,8 @@ const recentActivitySchema = z.object({
 	place_id: z.string().uuid(),
 	place_name: z.string(),
 	completed_at: z.string().datetime(),
-	score: z.number().nullable()
+	score: z.number().nullable(),
+	score_pair: scorePairSchema.nullable().optional().default(null)
 });
 
 const accountDetailSchema = z.object({
@@ -66,14 +74,15 @@ const projectSummarySchema = z.object({
 	account_id: z.string().uuid(),
 	name: z.string(),
 	overview: z.string().nullable(),
-	place_types: z.array(playspaceTypeSchema).nullable(),
+	place_types: z.array(playspaceTypeSchema).optional().default([]),
 	start_date: z.string().date().nullable(),
 	end_date: z.string().date().nullable(),
 	status: projectStatusSchema,
 	places_count: z.number().int().nonnegative(),
 	auditors_count: z.number().int().nonnegative(),
 	audits_completed: z.number().int().nonnegative(),
-	average_score: z.number().nullable()
+	average_score: z.number().nullable(),
+	average_scores: scorePairSchema.nullable().optional().default(null)
 });
 
 const projectDetailSchema = z.object({
@@ -81,7 +90,7 @@ const projectDetailSchema = z.object({
 	account_id: z.string().uuid(),
 	name: z.string(),
 	overview: z.string().nullable(),
-	place_types: z.array(playspaceTypeSchema).nullable(),
+	place_types: z.array(playspaceTypeSchema).optional().default([]),
 	start_date: z.string().date().nullable(),
 	end_date: z.string().date().nullable(),
 	est_places: z.number().int().nonnegative().nullable(),
@@ -97,7 +106,8 @@ const projectStatsSchema = z.object({
 	audits_completed: z.number().int().nonnegative(),
 	auditors_count: z.number().int().nonnegative(),
 	in_progress_audits: z.number().int().nonnegative(),
-	average_score: z.number().nullable()
+	average_score: z.number().nullable(),
+	average_scores: scorePairSchema.nullable().optional().default(null)
 });
 
 const auditorSummarySchema = z.object({
@@ -125,10 +135,16 @@ const placeSummarySchema = z.object({
 	province: z.string().nullable(),
 	country: z.string().nullable(),
 	place_type: playspaceTypeSchema.nullable(),
-	status: placeStatusSchema,
 	audits_completed: z.number().int().nonnegative(),
 	average_score: z.number().nullable(),
-	last_audited_at: z.string().datetime().nullable()
+	last_audited_at: z.string().datetime().nullable(),
+	place_audit_status: placeAxisStatusSchema.optional().default("not_started"),
+	place_survey_status: placeAxisStatusSchema.optional().default("not_started"),
+	place_audit_count: z.number().int().nonnegative().optional().default(0),
+	place_survey_count: z.number().int().nonnegative().optional().default(0),
+	audit_mean_scores: scorePairSchema.nullable().optional().default(null),
+	survey_mean_scores: scorePairSchema.nullable().optional().default(null),
+	overall_scores: scorePairSchema.nullable().optional().default(null)
 });
 
 const scoreTotalsSchema = z.object({
@@ -155,7 +171,9 @@ const placeAuditHistoryItemSchema = z.object({
 	status: auditStatusSchema,
 	started_at: z.string().datetime(),
 	submitted_at: z.string().datetime().nullable(),
-	summary_score: z.number().nullable()
+	summary_score: z.number().nullable(),
+	execution_mode: executionModeSchema.nullable().optional().default(null),
+	score_pair: scorePairSchema.nullable().optional().default(null)
 });
 
 const placeHistorySchema = z.object({
@@ -175,14 +193,26 @@ const placeHistorySchema = z.object({
 	in_progress_audits: z.number().int().nonnegative(),
 	average_submitted_score: z.number().nullable(),
 	latest_submitted_at: z.string().datetime().nullable(),
-	audits: z.array(placeAuditHistoryItemSchema)
+	audits: z.array(placeAuditHistoryItemSchema),
+	place_audit_status: placeAxisStatusSchema.optional().default("not_started"),
+	place_survey_status: placeAxisStatusSchema.optional().default("not_started"),
+	place_audit_count: z.number().int().nonnegative().optional().default(0),
+	place_survey_count: z.number().int().nonnegative().optional().default(0),
+	audit_mean_scores: scorePairSchema.nullable().optional().default(null),
+	survey_mean_scores: scorePairSchema.nullable().optional().default(null),
+	overall_scores: scorePairSchema.nullable().optional().default(null)
 });
 
 const managerPlacesSummarySchema = z.object({
 	total_places: z.number().int().nonnegative(),
 	submitted_places: z.number().int().nonnegative(),
 	in_progress_places: z.number().int().nonnegative(),
-	average_score: z.number().nullable()
+	average_score: z.number().nullable(),
+	completed_place_audits: z.number().int().nonnegative().optional().default(0),
+	completed_place_surveys: z.number().int().nonnegative().optional().default(0),
+	audit_mean_scores: scorePairSchema.nullable().optional().default(null),
+	survey_mean_scores: scorePairSchema.nullable().optional().default(null),
+	overall_scores: scorePairSchema.nullable().optional().default(null)
 });
 
 const managerPlaceRowSchema = z.object({
@@ -196,10 +226,16 @@ const managerPlaceRowSchema = z.object({
 	province: z.string().nullable(),
 	country: z.string().nullable(),
 	place_type: playspaceTypeSchema.nullable(),
-	status: placeStatusSchema,
 	audits_completed: z.number().int().nonnegative(),
 	average_score: z.number().nullable(),
-	last_audited_at: z.string().datetime().nullable()
+	last_audited_at: z.string().datetime().nullable(),
+	place_audit_status: placeAxisStatusSchema.optional().default("not_started"),
+	place_survey_status: placeAxisStatusSchema.optional().default("not_started"),
+	place_audit_count: z.number().int().nonnegative().optional().default(0),
+	place_survey_count: z.number().int().nonnegative().optional().default(0),
+	audit_mean_scores: scorePairSchema.nullable().optional().default(null),
+	survey_mean_scores: scorePairSchema.nullable().optional().default(null),
+	overall_scores: scorePairSchema.nullable().optional().default(null)
 });
 
 const managerPlacesListSchema = z.object({
@@ -215,7 +251,8 @@ const managerAuditsSummarySchema = z.object({
 	total_audits: z.number().int().nonnegative(),
 	submitted_audits: z.number().int().nonnegative(),
 	in_progress_audits: z.number().int().nonnegative(),
-	average_score: z.number().nullable()
+	average_score: z.number().nullable(),
+	average_scores: scorePairSchema.nullable().optional().default(null)
 });
 
 const managerAuditRowSchema = z.object({
@@ -229,7 +266,9 @@ const managerAuditRowSchema = z.object({
 	place_name: z.string(),
 	started_at: z.string().datetime(),
 	submitted_at: z.string().datetime().nullable(),
-	summary_score: z.number().nullable()
+	summary_score: z.number().nullable(),
+	execution_mode: executionModeSchema.nullable().optional().default(null),
+	score_pair: scorePairSchema.nullable().optional().default(null)
 });
 
 const managerAuditsListSchema = z.object({
@@ -314,7 +353,6 @@ const projectCreateRequestSchema = z.object({
 	account_id: z.string().uuid().nullable().optional(),
 	name: z.string().min(1),
 	overview: z.string().nullable().optional(),
-	place_types: z.array(z.string()).default([]),
 	start_date: z.string().date().nullable().optional(),
 	end_date: z.string().date().nullable().optional(),
 	est_places: z.number().int().nullable().optional(),
@@ -325,7 +363,6 @@ const projectCreateRequestSchema = z.object({
 const projectUpdateRequestSchema = z.object({
 	name: z.string().min(1).optional(),
 	overview: z.string().nullable().optional(),
-	place_types: z.array(z.string()).optional(),
 	start_date: z.string().date().nullable().optional(),
 	end_date: z.string().date().nullable().optional(),
 	est_places: z.number().int().nullable().optional(),
@@ -398,13 +435,19 @@ const auditorPlaceSchema = z.object({
 	city: z.string().nullable(),
 	province: z.string().nullable(),
 	country: z.string().nullable(),
-	audit_status: auditStatusSchema.nullable(),
+	status: auditStatusSchema.nullable(),
 	audit_id: z.string().uuid().nullable(),
 	started_at: z.string().datetime().nullable(),
 	submitted_at: z.string().datetime().nullable(),
 	summary_score: z.number().nullable(),
 	score_totals: scoreTotalsSchema.nullable(),
-	progress_percent: z.number().nullable()
+	progress_percent: z.number().nullable(),
+	selected_execution_mode: executionModeSchema.nullable().optional().default(null),
+	place_audit_status: placeAxisStatusSchema.optional().default("not_started"),
+	place_survey_status: placeAxisStatusSchema.optional().default("not_started"),
+	audit_scores: scorePairSchema.nullable().optional().default(null),
+	survey_scores: scorePairSchema.nullable().optional().default(null),
+	overall_scores: scorePairSchema.nullable().optional().default(null)
 });
 
 const auditorAuditSummarySchema = z.object({
@@ -415,6 +458,7 @@ const auditorAuditSummarySchema = z.object({
 	project_id: z.string().uuid(),
 	project_name: z.string(),
 	status: auditStatusSchema,
+	execution_mode: executionModeSchema.nullable().optional().default(null),
 	started_at: z.string().datetime(),
 	submitted_at: z.string().datetime().nullable(),
 	summary_score: z.number().nullable(),
@@ -482,6 +526,8 @@ const auditProgressSchema = z.object({
 const auditScoresSchema = z.object({
 	draft_progress_percent: z.number().nullable(),
 	execution_mode: executionModeSchema.nullable(),
+	audit: scoreTotalsSchema.nullable().optional().default(null),
+	survey: scoreTotalsSchema.nullable().optional().default(null),
 	overall: scoreTotalsSchema.nullable(),
 	by_section: z.record(z.string(), scoreTotalsSchema),
 	by_domain: z.record(z.string(), scoreTotalsSchema)
@@ -647,7 +693,8 @@ const adminProjectRowSchema = z.object({
 	places_count: z.number().int().nonnegative(),
 	auditors_count: z.number().int().nonnegative(),
 	audits_completed: z.number().int().nonnegative(),
-	average_score: z.number().nullable()
+	average_score: z.number().nullable(),
+	average_scores: scorePairSchema.nullable().optional().default(null)
 });
 
 const adminPlaceRowSchema = z.object({
@@ -663,7 +710,14 @@ const adminPlaceRowSchema = z.object({
 	country: z.string().nullable(),
 	audits_completed: z.number().int().nonnegative(),
 	average_score: z.number().nullable(),
-	last_audited_at: z.string().datetime().nullable()
+	last_audited_at: z.string().datetime().nullable(),
+	place_audit_status: placeAxisStatusSchema.optional().default("not_started"),
+	place_survey_status: placeAxisStatusSchema.optional().default("not_started"),
+	place_audit_count: z.number().int().nonnegative().optional().default(0),
+	place_survey_count: z.number().int().nonnegative().optional().default(0),
+	audit_mean_scores: scorePairSchema.nullable().optional().default(null),
+	survey_mean_scores: scorePairSchema.nullable().optional().default(null),
+	overall_scores: scorePairSchema.nullable().optional().default(null)
 });
 
 const adminAuditorRowSchema = z.object({
@@ -689,7 +743,9 @@ const adminAuditRowSchema = z.object({
 	auditor_code: z.string(),
 	started_at: z.string().datetime(),
 	submitted_at: z.string().datetime().nullable(),
-	summary_score: z.number().nullable()
+	summary_score: z.number().nullable(),
+	execution_mode: executionModeSchema.nullable().optional().default(null),
+	score_pair: scorePairSchema.nullable().optional().default(null)
 });
 
 const instrumentContentSchema = z.object({
@@ -704,6 +760,91 @@ const adminSystemSchema = z.object({
 	instrument_version: z.string(),
 	generated_at: z.string().datetime(),
 	instrument: instrumentContentSchema
+});
+
+const adminProjectExportRecordSchema = z.object({
+	project_id: z.string().uuid(),
+	account_id: z.string().uuid(),
+	account_name: z.string(),
+	name: z.string(),
+	overview: z.string().nullable(),
+	start_date: z.string().date().nullable(),
+	end_date: z.string().date().nullable(),
+	place_types: z.array(z.string()),
+	places_count: z.number().int().nonnegative(),
+	auditors_count: z.number().int().nonnegative(),
+	audits_completed: z.number().int().nonnegative(),
+	average_pv_score: z.number().nullable(),
+	average_u_score: z.number().nullable()
+});
+
+const adminProjectsExportResponseSchema = z.object({
+	entity: z.literal("projects"),
+	generated_at: z.string().datetime(),
+	record_count: z.number().int().nonnegative(),
+	records: z.array(adminProjectExportRecordSchema)
+});
+
+const adminPlaceExportRecordSchema = z.object({
+	place_id: z.string().uuid(),
+	project_id: z.string().uuid(),
+	project_name: z.string(),
+	account_id: z.string().uuid(),
+	account_name: z.string(),
+	name: z.string(),
+	address: z.string().nullable(),
+	city: z.string().nullable(),
+	province: z.string().nullable(),
+	country: z.string().nullable(),
+	postal_code: z.string().nullable(),
+	place_type: z.string().nullable(),
+	lat: z.number().nullable(),
+	lng: z.number().nullable(),
+	place_audit_status: z.string(),
+	place_survey_status: z.string(),
+	place_audit_count: z.number().int().nonnegative(),
+	place_survey_count: z.number().int().nonnegative(),
+	audits_completed: z.number().int().nonnegative(),
+	audit_mean_pv: z.number().nullable(),
+	audit_mean_u: z.number().nullable(),
+	survey_mean_pv: z.number().nullable(),
+	survey_mean_u: z.number().nullable(),
+	last_audited_at: z.string().datetime().nullable()
+});
+
+const adminPlacesExportResponseSchema = z.object({
+	entity: z.literal("places"),
+	generated_at: z.string().datetime(),
+	record_count: z.number().int().nonnegative(),
+	records: z.array(adminPlaceExportRecordSchema)
+});
+
+const adminAuditExportRecordSchema = z.object({
+	audit_id: z.string().uuid(),
+	audit_code: z.string(),
+	status: auditStatusSchema,
+	execution_mode: executionModeSchema.nullable().optional(),
+	account_id: z.string().uuid(),
+	account_name: z.string(),
+	project_id: z.string().uuid(),
+	project_name: z.string(),
+	place_id: z.string().uuid(),
+	place_name: z.string(),
+	auditor_code: z.string(),
+	started_at: z.string().datetime(),
+	submitted_at: z.string().datetime().nullable(),
+	summary_score: z.number().nullable(),
+	audit_pv_score: z.number().nullable(),
+	audit_u_score: z.number().nullable(),
+	survey_pv_score: z.number().nullable(),
+	survey_u_score: z.number().nullable()
+});
+
+const adminAuditsExportResponseSchema = z.object({
+	entity: z.string(),
+	generated_at: z.string().datetime(),
+	record_count: z.number().int().nonnegative(),
+	records: z.array(adminAuditExportRecordSchema)
 });
 
 const instrumentResponseSchema = z.object({
@@ -771,6 +912,12 @@ export type AdminPlaceRow = z.infer<typeof adminPlaceRowSchema>;
 export type AdminAuditorRow = z.infer<typeof adminAuditorRowSchema>;
 export type AdminAuditRow = z.infer<typeof adminAuditRowSchema>;
 export type AdminSystem = z.infer<typeof adminSystemSchema>;
+export type AdminProjectExportRecord = z.infer<typeof adminProjectExportRecordSchema>;
+export type AdminProjectsExportResponse = z.infer<typeof adminProjectsExportResponseSchema>;
+export type AdminPlaceExportRecord = z.infer<typeof adminPlaceExportRecordSchema>;
+export type AdminPlacesExportResponse = z.infer<typeof adminPlacesExportResponseSchema>;
+export type AdminAuditExportRecord = z.infer<typeof adminAuditExportRecordSchema>;
+export type AdminAuditsExportResponse = z.infer<typeof adminAuditsExportResponseSchema>;
 export type PaginatedResponse<TItem> = {
 	items: TItem[];
 	total_count: number;
@@ -786,7 +933,8 @@ export interface ManagerPlacesQuery {
 	sort?: string;
 	projectIds?: readonly string[];
 	auditorIds?: readonly string[];
-	statuses?: Array<"not_started" | "in_progress" | "submitted">;
+	auditStatuses?: readonly string[];
+	surveyStatuses?: readonly string[];
 }
 
 export interface ManagerAuditsQuery {
@@ -795,6 +943,7 @@ export interface ManagerAuditsQuery {
 	search?: string;
 	sort?: string;
 	projectIds?: readonly string[];
+	auditorIds?: readonly string[];
 	statuses?: Array<"IN_PROGRESS" | "PAUSED" | "SUBMITTED">;
 }
 
@@ -817,7 +966,34 @@ export interface AdminAccountsQuery extends PaginatedListQuery {
 	accountTypes?: Array<"ADMIN" | "MANAGER" | "AUDITOR">;
 }
 
+export interface AdminPlacesQuery extends PaginatedListQuery {
+	projectIds?: readonly string[];
+	accountIds?: readonly string[];
+	auditStatuses?: readonly string[];
+	surveyStatuses?: readonly string[];
+}
+
+export interface AdminAuditorsQuery extends PaginatedListQuery {
+	accountIds?: readonly string[];
+}
+
+export interface AdminProjectsQuery extends PaginatedListQuery {
+	accountIds?: readonly string[];
+}
+
 export interface AdminAuditsQuery extends PaginatedListQuery {
+	projectIds?: readonly string[];
+	accountIds?: readonly string[];
+	auditorIds?: readonly string[];
+	statuses?: Array<"IN_PROGRESS" | "PAUSED" | "SUBMITTED">;
+}
+
+export interface AdminExportQuery {
+	search?: string;
+	accountIds?: readonly string[];
+	projectIds?: readonly string[];
+	auditStatuses?: readonly string[];
+	surveyStatuses?: readonly string[];
 	statuses?: Array<"IN_PROGRESS" | "PAUSED" | "SUBMITTED">;
 }
 
@@ -928,7 +1104,10 @@ async function fetchValidatedJson<TValue>(
 
 		try {
 			return schema.parse(response.data);
-		} catch {
+		} catch (error) {
+			console.log("Error:", error);
+			console.error("The server returned an unexpected response shape.", response.data);
+			console.error("The expected response shape is:", schema.describe("The expected response shape."));
 			throw new PlayspaceApiError("The server returned an unexpected response shape.", response.status);
 		}
 	} catch (error) {
@@ -1023,7 +1202,8 @@ export const playspaceApi = {
 					sort: query.sort,
 					project_id: query.projectIds,
 					auditor_id: query.auditorIds,
-					status: query.statuses
+					audit_status: query.auditStatuses,
+					survey_status: query.surveyStatuses
 				})}`,
 				managerPlacesListSchema
 			),
@@ -1035,10 +1215,13 @@ export const playspaceApi = {
 					search: query.search,
 					sort: query.sort,
 					project_id: query.projectIds,
+					auditor_id: query.auditorIds,
 					status: query.statuses
 				})}`,
 				managerAuditsListSchema
-			)
+			),
+		auditDetail: async (auditId: string): Promise<AuditSession> =>
+			fetchValidatedJson(`/playspace/audits/${encodeURIComponent(auditId)}`, auditSessionSchema)
 	},
 	projects: {
 		get: async (projectId: string): Promise<ProjectDetail> =>
@@ -1307,33 +1490,39 @@ export const playspaceApi = {
 				})}`,
 				paginatedResponseSchema(adminAccountRowSchema)
 			),
-		projects: async (query: PaginatedListQuery = {}): Promise<PaginatedResponse<AdminProjectRow>> =>
+		projects: async (query: AdminProjectsQuery = {}): Promise<PaginatedResponse<AdminProjectRow>> =>
 			fetchValidatedJson(
 				`/playspace/admin/projects${buildQueryString({
 					page: query.page,
 					page_size: query.pageSize,
 					search: query.search,
-					sort: query.sort
+					sort: query.sort,
+					account_id: query.accountIds
 				})}`,
 				paginatedResponseSchema(adminProjectRowSchema)
 			),
-		places: async (query: PaginatedListQuery = {}): Promise<PaginatedResponse<AdminPlaceRow>> =>
+		places: async (query: AdminPlacesQuery = {}): Promise<PaginatedResponse<AdminPlaceRow>> =>
 			fetchValidatedJson(
 				`/playspace/admin/places${buildQueryString({
 					page: query.page,
 					page_size: query.pageSize,
 					search: query.search,
-					sort: query.sort
+					sort: query.sort,
+					project_id: query.projectIds,
+					account_id: query.accountIds,
+					audit_status: query.auditStatuses,
+					survey_status: query.surveyStatuses
 				})}`,
 				paginatedResponseSchema(adminPlaceRowSchema)
 			),
-		auditors: async (query: PaginatedListQuery = {}): Promise<PaginatedResponse<AdminAuditorRow>> =>
+		auditors: async (query: AdminAuditorsQuery = {}): Promise<PaginatedResponse<AdminAuditorRow>> =>
 			fetchValidatedJson(
 				`/playspace/admin/auditors${buildQueryString({
 					page: query.page,
 					page_size: query.pageSize,
 					search: query.search,
-					sort: query.sort
+					sort: query.sort,
+					account_id: query.accountIds
 				})}`,
 				paginatedResponseSchema(adminAuditorRowSchema)
 			),
@@ -1344,10 +1533,53 @@ export const playspaceApi = {
 					page_size: query.pageSize,
 					search: query.search,
 					sort: query.sort,
+					project_id: query.projectIds,
+					account_id: query.accountIds,
+					auditor_id: query.auditorIds,
 					status: query.statuses
 				})}`,
 				paginatedResponseSchema(adminAuditRowSchema)
 			),
-		system: async (): Promise<AdminSystem> => fetchValidatedJson("/playspace/admin/system", adminSystemSchema)
+		auditDetail: async (auditId: string): Promise<AuditSession> =>
+			fetchValidatedJson(`/playspace/audits/${encodeURIComponent(auditId)}`, auditSessionSchema),
+		system: async (): Promise<AdminSystem> => fetchValidatedJson("/playspace/admin/system", adminSystemSchema),
+		exportProjects: async (query: AdminExportQuery = {}): Promise<AdminProjectsExportResponse> =>
+			fetchValidatedJson(
+				`/playspace/admin/export/projects${buildQueryString({
+					search: query.search,
+					account_id: query.accountIds
+				})}`,
+				adminProjectsExportResponseSchema
+			),
+		exportPlaces: async (query: AdminExportQuery = {}): Promise<AdminPlacesExportResponse> =>
+			fetchValidatedJson(
+				`/playspace/admin/export/places${buildQueryString({
+					search: query.search,
+					account_id: query.accountIds,
+					project_id: query.projectIds,
+					audit_status: query.auditStatuses,
+					survey_status: query.surveyStatuses
+				})}`,
+				adminPlacesExportResponseSchema
+			),
+		exportAudits: async (query: AdminExportQuery = {}): Promise<AdminAuditsExportResponse> =>
+			fetchValidatedJson(
+				`/playspace/admin/export/audits${buildQueryString({
+					search: query.search,
+					account_id: query.accountIds,
+					project_id: query.projectIds,
+					status: query.statuses
+				})}`,
+				adminAuditsExportResponseSchema
+			),
+		exportReports: async (query: AdminExportQuery = {}): Promise<AdminAuditsExportResponse> =>
+			fetchValidatedJson(
+				`/playspace/admin/export/reports${buildQueryString({
+					search: query.search,
+					account_id: query.accountIds,
+					project_id: query.projectIds
+				})}`,
+				adminAuditsExportResponseSchema
+			)
 	}
 };

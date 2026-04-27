@@ -3,14 +3,16 @@
 import Image from "next/image";
 import { useParams, useSearchParams } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { ExternalLink, MapPin } from "lucide-react";
+import { ExternalLink, MapPin, UserPlusIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
+import * as React from "react";
 
 import { playspaceApi } from "@/lib/api/playspace";
+import { AssignAuditorDialog } from "@/components/dashboard/assign-auditor-dialog";
 import { AuditsTable } from "@/components/dashboard/audits-table";
 import { BackButton } from "@/components/dashboard/back-button";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
-import { formatDateTimeLabel, formatScoreLabel } from "@/components/dashboard/utils";
+import { formatDateTimeLabel, formatScorePairLabel } from "@/components/dashboard/utils";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -46,6 +48,8 @@ export default function ManagerPlaceDetailPage() {
 	const searchParams = useSearchParams();
 	const placeId = params.placeId;
 	const projectId = searchParams.get("projectId");
+
+	const [isAssignDialogOpen, setIsAssignDialogOpen] = React.useState(false);
 
 	const historyQuery = useQuery({
 		queryKey: ["playspace", "manager", "placeHistory", projectId, placeId],
@@ -86,7 +90,8 @@ export default function ManagerPlaceDetailPage() {
 		placeName: history.place_name,
 		startedAt: audit.started_at,
 		submittedAt: audit.submitted_at,
-		score: audit.summary_score
+		score: audit.summary_score,
+		scorePair: audit.score_pair
 	}));
 
 	const hasCoordinates =
@@ -112,7 +117,15 @@ export default function ManagerPlaceDetailPage() {
 					{ label: t("breadcrumbs.places"), href: "/manager/places" },
 					{ label: history.place_name }
 				]}
-				actions={<BackButton href="/manager/places" label={t("actions.backToPlaces")} />}
+				actions={
+					<div className="flex flex-wrap items-center gap-2">
+						<BackButton href="/manager/places" label={t("actions.backToPlaces")} />
+						<Button type="button" className="gap-2" onClick={() => setIsAssignDialogOpen(true)}>
+							<UserPlusIcon className="size-4" />
+							<span>Assign Auditor</span>
+						</Button>
+					</div>
+				}
 			/>
 
 			{/* ── Place identity card ── */}
@@ -189,8 +202,8 @@ export default function ManagerPlaceDetailPage() {
 					tone="warning"
 				/>
 				<StatCard
-					title={t("stats.meanScore.title")}
-					value={formatScoreLabel(history.average_submitted_score, formatT)}
+					title="Overall PV/U"
+					value={formatScorePairLabel(history.overall_scores, formatT)}
 					helper={t("stats.meanScore.helper")}
 					tone="violet"
 				/>
@@ -206,13 +219,55 @@ export default function ManagerPlaceDetailPage() {
 					tone="success"
 				/>
 			</div>
+			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+				<StatCard
+					title="Overall PV"
+					value={history.overall_scores ? `${history.overall_scores.pv}` : formatT("pending")}
+					helper="Combined place rollup"
+				/>
+				<StatCard
+					title="Overall U"
+					value={history.overall_scores ? `${history.overall_scores.u}` : formatT("pending")}
+					helper="Combined place rollup"
+				/>
+				<StatCard
+					title="Audit Mean PV"
+					value={history.audit_mean_scores ? `${history.audit_mean_scores.pv}` : formatT("pending")}
+					helper="Audit-side coverage"
+				/>
+				<StatCard
+					title="Audit Mean U"
+					value={history.audit_mean_scores ? `${history.audit_mean_scores.u}` : formatT("pending")}
+					helper="Audit-side coverage"
+				/>
+				<StatCard
+					title="Survey Mean PV"
+					value={history.survey_mean_scores ? `${history.survey_mean_scores.pv}` : formatT("pending")}
+					helper="Survey-side coverage"
+				/>
+				<StatCard
+					title="Survey Mean U"
+					value={history.survey_mean_scores ? `${history.survey_mean_scores.u}` : formatT("pending")}
+					helper="Survey-side coverage"
+				/>
+			</div>
 
 			<AuditsTable
 				rows={auditRows}
+				basePath="/manager/audits"
 				title={t("table.title")}
 				description={t("table.description")}
 				pageSize={8}
 				emptyMessage={t("table.emptyMessage")}
+			/>
+
+			<AssignAuditorDialog
+				open={isAssignDialogOpen}
+				onOpenChange={setIsAssignDialogOpen}
+				prefill={{
+					projectId: projectId ?? undefined,
+					placeIds: [placeId]
+				}}
 			/>
 		</div>
 	);

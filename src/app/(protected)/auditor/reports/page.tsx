@@ -143,6 +143,7 @@ export default function AuditorReportsPage() {
 					submittedAt: audit.submitted_at,
 					score: audit.summary_score
 				}))}
+				basePath="/auditor/reports"
 				title={t("list.title")}
 				description={t("header.description")}
 				emptyMessage={t("list.empty")}

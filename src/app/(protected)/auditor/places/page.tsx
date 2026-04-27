@@ -20,6 +20,7 @@ import { formatDateTimeLabel, formatScoreLabel } from "@/components/dashboard/ut
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AuditStatus } from "@/types/audit";
 
 const AUDITOR_PLACES_PAGE_SIZE = 8;
 
@@ -50,9 +51,8 @@ export default function AuditorPlacesPage() {
 		pageSize: AUDITOR_PLACES_PAGE_SIZE
 	});
 	const searchValue = getTextColumnFilterValue(columnFilters, "place_name");
-	const selectedStatuses = getMultiValueColumnFilter(columnFilters, "audit_status").filter(
-		(value): value is "IN_PROGRESS" | "PAUSED" | "SUBMITTED" | "not_started" =>
-			value === "IN_PROGRESS" || value === "PAUSED" || value === "SUBMITTED" || value === "not_started"
+	const selectedStatuses = getMultiValueColumnFilter(columnFilters, "status").filter(
+		(value): value is AuditStatus => value === "IN_PROGRESS" || value === "PAUSED" || value === "SUBMITTED"
 	);
 	const selectedStatusesKey = selectedStatuses.join("|");
 	const sortParam = toBackendSortParam(sorting);
@@ -136,16 +136,14 @@ export default function AuditorPlacesPage() {
 				enableHiding: false
 			},
 			{
-				id: "audit_status",
-				accessorFn: row => row.audit_status ?? "not_started",
+				id: "status",
+				accessorFn: row => row.status ?? "not_started",
 				header: ({ column }) => <DataTableColumnHeader column={column} title="Status" />,
 				filterFn: getMultiValueFilterFn<AuditorPlace>(),
 				cell: ({ row }) => (
-					<Badge
-						variant={getStatusBadgeVariant(row.original.audit_status)}
-						className="font-medium text-foreground">
-						{row.original.audit_status
-							? t(`status.${row.original.audit_status.toLowerCase()}`)
+					<Badge variant={getStatusBadgeVariant(row.original.status)} className="font-medium text-foreground">
+						{row.original.status
+							? t(`status.${row.original.status.toLowerCase()}`)
 							: t("status.not_started")}
 					</Badge>
 				)
@@ -177,11 +175,10 @@ export default function AuditorPlacesPage() {
 				cell: ({ row }) => {
 					const executeHref = `/auditor/execute/${encodeURIComponent(row.original.place_id)}?projectId=${encodeURIComponent(row.original.project_id)}`;
 					const reportHref =
-						row.original.audit_status === "SUBMITTED" && row.original.audit_id
+						row.original.status === "SUBMITTED" && row.original.audit_id
 							? `/auditor/reports/${encodeURIComponent(row.original.audit_id)}`
 							: null;
-					const isResumeAction =
-						row.original.audit_status === "IN_PROGRESS" || row.original.audit_status === "PAUSED";
+					const isResumeAction = row.original.status === "IN_PROGRESS" || row.original.status === "PAUSED";
 
 					return (
 						<EntityRowActions
@@ -247,7 +244,7 @@ export default function AuditorPlacesPage() {
 				searchPlaceholder="Search assigned places..."
 				filterConfigs={[
 					{
-						columnId: "audit_status",
+						columnId: "status",
 						title: "Status",
 						options: [
 							{ label: t("status.not_started"), value: "not_started" },

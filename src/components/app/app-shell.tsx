@@ -7,6 +7,7 @@ import * as React from "react";
 import {
 	ChevronDown,
 	ClipboardList,
+	DatabaseIcon,
 	FileText,
 	FolderKanban,
 	LayoutDashboard,
@@ -62,6 +63,8 @@ function getNavItems(role: UserRole, t: NavigationTranslator): NavItem[] {
 			{ label: t("places"), href: "/admin/places", icon: MapPin },
 			{ label: t("auditors"), href: "/admin/auditors", icon: Users },
 			{ label: t("audits"), href: "/admin/audits", icon: ClipboardList },
+			{ label: t("reports"), href: "/admin/reports", icon: ClipboardList },
+			{ label: t("rawData"), href: "/admin/raw-data", icon: DatabaseIcon },
 			{ label: t("instruments"), href: "/admin/instruments", icon: FileText },
 			{ label: t("system"), href: "/admin/system", icon: Settings },
 			{ label: t("settings"), href: "/settings", icon: Settings }
@@ -73,9 +76,9 @@ function getNavItems(role: UserRole, t: NavigationTranslator): NavItem[] {
 			{ label: t("dashboard"), href: "/manager/dashboard", icon: LayoutDashboard },
 			{ label: t("projects"), href: "/manager/projects", icon: FolderKanban },
 			{ label: t("places"), href: "/manager/places", icon: MapPin },
-			{ label: t("audits"), href: "/manager/audits", icon: ClipboardList },
 			{ label: t("auditors"), href: "/manager/auditors", icon: Users },
-			{ label: t("assignments"), href: "/manager/assignments", icon: ClipboardList },
+			{ label: t("audits"), href: "/manager/audits", icon: ClipboardList },
+			{ label: t("reports"), href: "/manager/reports", icon: ClipboardList },
 			{ label: t("settings"), href: "/settings", icon: Settings }
 		];
 	}

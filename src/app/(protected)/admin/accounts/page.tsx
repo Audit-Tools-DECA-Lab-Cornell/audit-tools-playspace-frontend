@@ -95,10 +95,11 @@ export default function AdminAccountsPage() {
 				header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.account")} />,
 				cell: ({ row }) => (
 					<div className="min-w-[220px] space-y-1">
-						<p className="font-medium text-foreground">{row.original.name}</p>
-						<p className="text-sm text-muted-foreground">
-							{row.original.email_masked ?? t("table.emailHidden")}
-						</p>
+						{row.original.account_type === "ADMIN" || row.original.account_type === "MANAGER" ? (
+							<p className="font-medium text-foreground">{row.original.name}</p>
+						) : (
+							<p className="text-sm text-muted-foreground">{t("table.nameHidden")}</p>
+						)}
 					</div>
 				)
 			},

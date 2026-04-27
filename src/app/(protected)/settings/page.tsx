@@ -132,6 +132,9 @@ function getWorkspaceLabel(role: AuthSession["role"], workspaceT: SettingsRoleTr
 
 /**
  * Resolve a user-facing display name from the current session.
+ *
+ * Uses session.userName — the logged-in user's own name from their personal
+ * ManagerProfile or AuditorProfile record — not the account's primary contact.
  */
 function getSessionDisplayName(
 	session: AuthSession,
@@ -139,7 +142,7 @@ function getSessionDisplayName(
 	t: SettingsTranslator
 ): string {
 	if (session.role === "manager") {
-		return managerAccount?.primary_manager?.full_name ?? managerAccount?.name ?? t("managerFallback");
+		return session.userName ?? managerAccount?.name ?? t("managerFallback");
 	}
 
 	if (session.role === "admin") {
@@ -151,6 +154,7 @@ function getSessionDisplayName(
 
 /**
  * Resolve a subtitle line for the signed-in user.
+ * For managers this shows the organisation workspace name, not personal details.
  */
 function getProfileSubtitle(session: AuthSession, managerAccount: AccountDetail | null, t: SettingsTranslator): string {
 	if (session.role === "manager") {
@@ -165,14 +169,13 @@ function getProfileSubtitle(session: AuthSession, managerAccount: AccountDetail 
 }
 
 /**
- * Resolve the most appropriate account email visible in settings.
+ * Resolve the profile email for the signed-in user.
+ *
+ * Uses session.userEmail — the logged-in user's personal email — rather than
+ * the organisational account email.
  */
-function getProfileEmail(session: AuthSession, managerAccount: AccountDetail | null, t: SettingsTranslator): string {
-	if (session.role === "manager" && managerAccount) {
-		return managerAccount.email;
-	}
-
-	return t("emailFallback");
+function getProfileEmail(session: AuthSession, t: SettingsTranslator): string {
+	return session.userEmail ?? t("emailFallback");
 }
 
 /**
@@ -442,7 +445,14 @@ function ProfileSummaryCard({
 	const t = useTranslations("settings.profile");
 	const roleT = useTranslations("common.roles");
 	const workspaceT = useTranslations("common.workspace");
-	const isManagerIdentityLoading = session.role === "manager" && isLoading && managerAccount === null;
+
+	/**
+	 * Only the org workspace name (subtitle) and "member since" date need the
+	 * account API response. Name, email, and role come from the session cookie
+	 * and are available immediately without any loading state.
+	 */
+	const isAccountDataLoading = session.role === "manager" && isLoading && managerAccount === null;
+
 	const resolvedDisplayName = getSessionDisplayName(session, managerAccount, t);
 	const profileSubtitle = getProfileSubtitle(session, managerAccount, t);
 
@@ -457,27 +467,15 @@ function ProfileSummaryCard({
 			</CardHeader>
 			<CardContent className="space-y-5">
 				<div className="flex items-start gap-4">
-					{isManagerIdentityLoading ? (
-						<SettingsInlineSkeleton className="size-10 rounded-full" />
-					) : (
-						<Avatar size="lg">
-							<AvatarFallback>{getAvatarFallbackLabel(resolvedDisplayName)}</AvatarFallback>
-						</Avatar>
-					)}
+					<Avatar size="lg">
+						<AvatarFallback>{getAvatarFallbackLabel(resolvedDisplayName)}</AvatarFallback>
+					</Avatar>
 					<div className="space-y-2">
 						<div className="flex flex-wrap items-center gap-2">
-							{isManagerIdentityLoading ? (
-								<SettingsInlineSkeleton className="h-6 w-40" />
-							) : (
-								<p className="text-lg font-medium text-foreground">{resolvedDisplayName}</p>
-							)}
-							{isManagerIdentityLoading ? (
-								<SettingsInlineSkeleton className="h-6 w-20 rounded-full" />
-							) : (
-								<Badge>{formatRoleLabel(session.role, roleT)}</Badge>
-							)}
+							<p className="text-lg font-medium text-foreground">{resolvedDisplayName}</p>
+							<Badge>{formatRoleLabel(session.role, roleT)}</Badge>
 						</div>
-						{isManagerIdentityLoading ? (
+						{isAccountDataLoading ? (
 							<SettingsInlineSkeleton className="h-4 w-32" />
 						) : (
 							<p className="text-sm text-muted-foreground">{profileSubtitle}</p>
@@ -486,30 +484,20 @@ function ProfileSummaryCard({
 				</div>
 
 				<div className="grid gap-4 sm:grid-cols-2">
-					{isManagerIdentityLoading ? (
-						<>
-							<DetailItemSkeleton label={t("fields.role")} />
-							<DetailItemSkeleton label={t("fields.workspace")} />
-							<DetailItemSkeleton label={t("fields.email")} />
-							<DetailItemSkeleton label={t("fields.memberSince")} />
-						</>
+					<DetailItem label={t("fields.role")} value={formatRoleLabel(session.role, roleT)} />
+					<DetailItem label={t("fields.workspace")} value={getWorkspaceLabel(session.role, workspaceT)} />
+					<DetailItem label={t("fields.email")} value={getProfileEmail(session, t)} />
+					{isAccountDataLoading ? (
+						<DetailItemSkeleton label={t("fields.memberSince")} />
 					) : (
-						<>
-							<DetailItem label={t("fields.role")} value={formatRoleLabel(session.role, roleT)} />
-							<DetailItem
-								label={t("fields.workspace")}
-								value={getWorkspaceLabel(session.role, workspaceT)}
-							/>
-							<DetailItem label={t("fields.email")} value={getProfileEmail(session, managerAccount, t)} />
-							<DetailItem
-								label={t("fields.memberSince")}
-								value={
-									managerAccount
-										? formatDateLabel(managerAccount.created_at, formatT)
-										: t("memberSinceFallback")
-								}
-							/>
-						</>
+						<DetailItem
+							label={t("fields.memberSince")}
+							value={
+								managerAccount
+									? formatDateLabel(managerAccount.created_at, formatT)
+									: t("memberSinceFallback")
+							}
+						/>
 					)}
 				</div>
 			</CardContent>
@@ -912,27 +900,53 @@ function ManagerOrganizationCard({
 
 						{isEditingOrganization ? (
 							<div className="space-y-4 rounded-card border border-border bg-secondary/40 p-4">
+								<p className="text-xs text-muted-foreground">
+									Fields marked with{" "}
+									<span className="text-destructive" aria-hidden="true">
+										*
+									</span>{" "}
+									are required.
+								</p>
 								<div className="grid gap-2">
-									<Label htmlFor="organization_name">{t("fields.organizationName")}</Label>
+									<Label htmlFor="organization_name">
+										{t("fields.organizationName")}{" "}
+										<span className="text-destructive" aria-hidden="true">
+											*
+										</span>
+									</Label>
 									<Input
 										id="organization_name"
 										name="organizationName"
 										autoComplete="organization"
+										placeholder="e.g. City Parks Department"
 										value={accountNameInput}
 										onChange={event => onAccountNameChange(event.target.value)}
+										aria-required="true"
+										aria-invalid={saveError !== null && accountNameInput.trim().length === 0}
 									/>
 								</div>
 								<div className="grid gap-2">
-									<Label htmlFor="organization_email">{t("fields.accountEmail")}</Label>
+									<Label htmlFor="organization_email">
+										{t("fields.accountEmail")}{" "}
+										<span className="text-destructive" aria-hidden="true">
+											*
+										</span>
+									</Label>
 									<Input
 										id="organization_email"
 										name="organizationEmail"
 										type="email"
 										autoComplete="email"
 										spellCheck={false}
+										placeholder="admin@organization.com"
 										value={accountEmailInput}
 										onChange={event => onAccountEmailChange(event.target.value)}
+										aria-required="true"
+										aria-invalid={saveError !== null && accountEmailInput.trim().length === 0}
 									/>
+									<p className="text-xs text-muted-foreground">
+										Used for account notifications and recovery.
+									</p>
 								</div>
 								{saveError ? (
 									<p aria-live="polite" className="text-sm text-destructive">

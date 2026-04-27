@@ -1,7 +1,7 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { ClipboardListIcon, FileTextIcon, PencilLineIcon, PlusIcon, Trash2Icon } from "lucide-react";
+import { FileTextIcon, FolderOpenIcon, PencilLineIcon, PlusIcon, Trash2Icon } from "lucide-react";
 import * as React from "react";
 
 import { playspaceApi } from "@/lib/api/playspace";
@@ -25,6 +25,17 @@ export default function ManagerAuditorsPage() {
 		id: string;
 		label: string;
 	} | null>(null);
+
+	const accountQuery = useQuery({
+		queryKey: ["playspace", "manager", "account", accountId],
+		queryFn: async () => {
+			if (!accountId) {
+				throw new Error("Manager account context is unavailable.");
+			}
+			return playspaceApi.accounts.get(accountId);
+		},
+		enabled: accountId !== null
+	});
 
 	const auditorsQuery = useQuery({
 		queryKey: ["playspace", "manager", "auditors", accountId],
@@ -79,6 +90,8 @@ export default function ManagerAuditorsPage() {
 	});
 
 	const auditors = auditorsQuery.data ?? [];
+	const accountName = accountQuery.data?.name ?? "";
+	const existingAuditorCodes = React.useMemo(() => auditors.map(a => a.auditor_code), [auditors]);
 	const editingAuditor = auditors.find(auditor => auditor.id === editingAuditorId) ?? null;
 	const activeAuditors = auditors.filter(auditor => auditor.last_active_at !== null).length;
 	const totalAssignments = auditors.reduce((runningTotal, auditor) => runningTotal + auditor.assignments_count, 0);
@@ -194,9 +207,9 @@ export default function ManagerAuditorsPage() {
 				description="Search, sort, and manage the delivery capacity behind your audit programs."
 				getRowActions={auditor => [
 					{
-						label: "Manage assignments",
-						href: `/manager/assignments?auditorId=${encodeURIComponent(auditor.id)}`,
-						icon: ClipboardListIcon
+						label: "View auditor",
+						href: `/manager/auditors/${encodeURIComponent(auditor.id)}`,
+						icon: FolderOpenIcon
 					},
 					{
 						label: "Edit auditor",
@@ -219,6 +232,9 @@ export default function ManagerAuditorsPage() {
 			<AuditorDialog
 				open={isCreateDialogOpen}
 				onOpenChange={setIsCreateDialogOpen}
+				mode="create"
+				accountName={accountName}
+				existingAuditorCodes={existingAuditorCodes}
 				title="Create auditor"
 				description="Add a new auditor profile that can be assigned to projects and places."
 				submitLabel="Create auditor"
@@ -234,6 +250,7 @@ export default function ManagerAuditorsPage() {
 						setEditingAuditorId(null);
 					}
 				}}
+				mode="edit"
 				title="Edit auditor"
 				description="Update roster identity, profile metadata, and contact details."
 				submitLabel="Save changes"

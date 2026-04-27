@@ -47,11 +47,12 @@
 			"places": "Orte",
 			"auditors": "Prüfer",
 			"audits": "Audits",
+			"reports": "Berichte",
+			"rawData": "Rohdaten",
 			"instruments": "Instrumente",
 			"system": "System",
 			"settings": "Einstellungen",
-			"assignments": "Zuweisungen",
-			"reports": "Berichte"
+			"assignments": "Zuweisungen"
 		},
 		"userMenu": {
 			"auditorWithCode": "Prüfer ({code})",
@@ -134,7 +135,7 @@
 			"rolePending": "Rolle ausstehend",
 			"columns": {
 				"auditor": "Prüfer",
-				"role": "Rolle",
+				"role": "Rolle/Beruf",
 				"assignments": "Zuweisungen",
 				"completed": "Abgeschlossen",
 				"lastActive": "Zuletzt aktiv"
@@ -264,6 +265,7 @@
 				"searchPlaceholder": "Konten suchen...",
 				"emptyMessage": "Keine Konten entsprechen den aktuellen Filtern.",
 				"emailHidden": "E-Mail verborgen",
+				"nameHidden": "Name verborgen",
 				"columns": {
 					"account": "Konto",
 					"type": "Typ",
@@ -1524,7 +1526,7 @@
 			"emailFallback": "Nach dem vollständigen Rollout der Anmeldung verfügbar",
 			"memberSinceFallback": "Nach der Kontoeinrichtung verfügbar",
 			"fields": {
-				"role": "Rolle",
+				"role": "Rolle/Beruf",
 				"workspace": "Arbeitsbereich",
 				"email": "E-Mail",
 				"memberSince": "Mitglied seit"
@@ -1662,7 +1664,7 @@
 			"title": "Administratorzugriff",
 			"description": "Zentrale Übersicht über alle Konten, Orte und Audits.",
 			"fields": {
-				"role": "Rolle",
+				"role": "Rolle/Beruf",
 				"scope": "Umfang",
 				"emailVisibility": "Sichtbarkeit von E-Mail-Adressen",
 				"auditorIdentity": "Prüferidentität"
@@ -1678,7 +1680,7 @@
 			"title": "Prüferzugriff",
 			"description": "Überprüfen Sie den Prüfungszugriff, der mit Ihrer aktuellen Anmeldung verknüpft ist.",
 			"fields": {
-				"role": "Rolle",
+				"role": "Rolle/Beruf",
 				"auditorCode": "Prüfercode",
 				"workspace": "Arbeitsbereich",
 				"accessType": "Zugriffsart"

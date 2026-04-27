@@ -9,7 +9,7 @@ import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
 import { ProjectsTable } from "@/components/dashboard/projects-table";
 import { StatCard } from "@/components/dashboard/stat-card";
-import { formatAuditCodeReference, formatDateTimeLabel, formatScoreLabel } from "@/components/dashboard/utils";
+import { formatAuditCodeReference, formatDateTimeLabel, formatScorePairLabel } from "@/components/dashboard/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -176,9 +176,10 @@ export function ManagerDashboardClient({
 				<CardContent className="space-y-3">
 					{account.recent_activity.length > 0 ? (
 						account.recent_activity.map(activity => (
-							<div
+							<Link
 								key={activity.audit_id}
-								className="flex flex-col gap-3 rounded-card border border-border/70 bg-card/60 p-4">
+								href={`/manager/audits/${encodeURIComponent(activity.audit_id)}`}
+								className="flex flex-col gap-3 rounded-card border border-border/70 bg-card/60 p-4 transition-colors hover:border-primary/30 hover:bg-primary/5">
 								<div className="space-y-1">
 									<p className="font-medium text-foreground">{activity.place_name}</p>
 									<p className="text-sm text-muted-foreground">{activity.project_name}</p>
@@ -197,11 +198,11 @@ export function ManagerDashboardClient({
 									</Badge>
 									<Badge className="font-mono tabular-nums">
 										{t("recentActivity.score", {
-											value: formatScoreLabel(activity.score, formatT)
+											value: formatScorePairLabel(activity.score_pair, formatT)
 										})}
 									</Badge>
 								</div>
-							</div>
+							</Link>
 						))
 					) : (
 						<p className="text-sm text-muted-foreground">{t("recentActivity.empty")}</p>

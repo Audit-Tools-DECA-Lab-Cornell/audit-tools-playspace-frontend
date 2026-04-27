@@ -1,71 +1,191 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
-import { FileTextIcon } from "lucide-react";
-import { useTranslations } from "next-intl";
+import type { ColumnFiltersState, PaginationState, SortingState } from "@tanstack/react-table";
+import { FileTextIcon, FilterIcon, XIcon } from "lucide-react";
 import * as React from "react";
 
-import { playspaceApi } from "@/lib/api/playspace";
-import { useAuthSession } from "@/components/app/auth-session-provider";
+import { playspaceApi, type AdminProjectRow, type PaginatedResponse } from "@/lib/api/playspace";
 import { AuditsTable, type AuditActivityRow } from "@/components/dashboard/audits-table";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
-import { StatCard } from "@/components/dashboard/stat-card";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetDescription } from "@/components/ui/sheet";
+import {
+	getTextColumnFilterValue,
+	preservePreviousData,
+	toBackendSortParam
+} from "@/components/dashboard/server-table-utils";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Separator } from "@/components/ui/separator";
+
+interface FilterPopoverProps {
+	title: string;
+	options: Array<{ label: string; value: string }>;
+	selectedValues: string[];
+	onChange: (values: string[]) => void;
+}
+
+function FilterPopover({ title, options, selectedValues, onChange }: FilterPopoverProps) {
+	return (
+		<Popover>
+			<PopoverTrigger asChild>
+				<Button variant="outline" size="sm" className="gap-2">
+					<FilterIcon className="size-3.5" />
+					{title}
+					{selectedValues.length > 0 && (
+						<Badge variant="secondary" className="ml-1 rounded-sm px-1.5 font-mono text-xs">
+							{selectedValues.length}
+						</Badge>
+					)}
+				</Button>
+			</PopoverTrigger>
+			<PopoverContent className="w-64 p-3" align="start">
+				<div className="space-y-3">
+					<div className="flex items-center justify-between">
+						<h4 className="text-sm font-medium">{title}</h4>
+						{selectedValues.length > 0 && (
+							<Button
+								type="button"
+								variant="ghost"
+								size="sm"
+								className="h-auto p-0 text-xs text-muted-foreground"
+								onClick={() => onChange([])}>
+								Clear
+							</Button>
+						)}
+					</div>
+					<Separator />
+					<div className="max-h-60 space-y-2 overflow-y-auto">
+						{options.map(option => (
+							<div key={option.value} className="flex items-center gap-2">
+								<Checkbox
+									id={`filter-${title}-${option.value}`}
+									checked={selectedValues.includes(option.value)}
+									onCheckedChange={checked => {
+										if (checked) {
+											onChange([...selectedValues, option.value]);
+										} else {
+											onChange(selectedValues.filter(v => v !== option.value));
+										}
+									}}
+								/>
+								<Label
+									htmlFor={`filter-${title}-${option.value}`}
+									className="text-sm font-normal leading-none">
+									{option.label}
+								</Label>
+							</div>
+						))}
+					</div>
+				</div>
+			</PopoverContent>
+		</Popover>
+	);
+}
 
 export default function AdminReportsPage() {
-	const t = useTranslations("admin.reports");
-	const session = useAuthSession();
-	const [selectedAuditId, setSelectedAuditId] = React.useState<string | null>(null);
+	const router = useRouter();
+	const [sorting, setSorting] = React.useState<SortingState>([{ id: "submitted_at", desc: true }]);
+	const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
+	const [pagination, setPagination] = React.useState<PaginationState>({
+		pageIndex: 0,
+		pageSize: 10
+	});
 
-	const auditDetailsQuery = useQuery({
-		queryKey: ["playspace", "audit", selectedAuditId],
-		queryFn: async () => {
-			if (!selectedAuditId) throw new Error("No audit selected");
-			return playspaceApi.auditor.getAudit(selectedAuditId);
-		},
-		enabled: !!selectedAuditId
+	const searchValue = getTextColumnFilterValue(columnFilters, "audit_code");
+	const sortParam = toBackendSortParam(sorting);
+
+	const [selectedProjectIds, setSelectedProjectIds] = React.useState<string[]>([]);
+
+	const selectedProjectIdsKey = selectedProjectIds.join("|");
+
+	React.useEffect(() => {
+		setPagination(currentValue => {
+			return currentValue.pageIndex === 0 ? currentValue : { ...currentValue, pageIndex: 0 };
+		});
+	}, [searchValue, selectedProjectIdsKey, sortParam]);
+
+	const projectsQuery = useQuery({
+		queryKey: ["playspace", "admin", "reports", "projects-for-filter"],
+		queryFn: async (): Promise<PaginatedResponse<AdminProjectRow>> =>
+			playspaceApi.admin.projects({ page: 1, pageSize: 100 })
 	});
 
 	const reportsQuery = useQuery({
-		queryKey: ["playspace", "admin", "reports"],
-		queryFn: async () => {
-			// Fetch all submitted audits for admin
-			const audits = await playspaceApi.admin.audits({
-				statuses: ["SUBMITTED"],
-				page: 1,
-				pageSize: 100
-			});
-			return audits;
-		}
+		queryKey: [
+			"playspace",
+			"admin",
+			"reports",
+			pagination.pageIndex,
+			pagination.pageSize,
+			searchValue,
+			sortParam,
+			selectedProjectIds
+		],
+		queryFn: () =>
+			playspaceApi.admin.audits({
+				page: pagination.pageIndex + 1,
+				pageSize: pagination.pageSize,
+				search: searchValue,
+				sort: sortParam,
+				projectIds: selectedProjectIds,
+				statuses: ["SUBMITTED"]
+			}),
+		placeholderData: preservePreviousData
 	});
 
-	if (reportsQuery.isLoading) {
-		return (
-			<div className="space-y-6">
-				<DashboardHeader
-					eyebrow="Admin Workspace"
-					title="Audit Reports"
-					description="View all submitted audit reports across the platform."
-					breadcrumbs={[{ label: "Dashboard", href: "/admin/dashboard" }, { label: "Reports" }]}
-				/>
-				<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-					{Array.from({ length: 4 }).map((_, idx) => (
-						<div
-							key={`stat-skeleton-${idx}`}
-							className="h-32 animate-pulse rounded-card border border-border bg-card"
-						/>
-					))}
-				</div>
-				<div className="h-[420px] animate-pulse rounded-card border border-border bg-card" />
-			</div>
-		);
+	React.useEffect(() => {
+		if (!reportsQuery.data) {
+			return;
+		}
+
+		const maxPageIndex = Math.max(reportsQuery.data.total_pages - 1, 0);
+		if (pagination.pageIndex <= maxPageIndex) {
+			return;
+		}
+
+		setPagination(currentValue => ({
+			...currentValue,
+			pageIndex: maxPageIndex
+		}));
+	}, [reportsQuery.data, pagination.pageIndex]);
+
+	const projectOptions = React.useMemo(() => {
+		return (projectsQuery.data?.items ?? []).map(p => ({
+			label: `${p.account_name} · ${p.name}`,
+			value: p.project_id
+		}));
+	}, [projectsQuery.data]);
+
+	const rows = React.useMemo((): AuditActivityRow[] => {
+		return (reportsQuery.data?.items ?? []).map(audit => ({
+			id: audit.audit_id,
+			auditCode: audit.audit_code,
+			status: audit.status,
+			auditorCode: audit.auditor_code,
+			accountName: audit.account_name,
+			projectName: audit.project_name,
+			projectId: audit.project_id,
+			placeName: audit.place_name,
+			placeId: audit.place_id,
+			startedAt: audit.started_at,
+			submittedAt: audit.submitted_at,
+			score: audit.summary_score,
+			scorePair: audit.score_pair
+		}));
+	}, [reportsQuery.data]);
+
+	const isInitialLoading = reportsQuery.isLoading && !reportsQuery.data;
+
+	if (isInitialLoading) {
+		return <div className="h-64 animate-pulse rounded-card border border-border bg-card" />;
 	}
 
-	if (reportsQuery.isError) {
+	if (reportsQuery.isError && !reportsQuery.data) {
 		return (
 			<EmptyState
 				title="Reports unavailable"
@@ -79,29 +199,6 @@ export default function AdminReportsPage() {
 		);
 	}
 
-	const data = reportsQuery.data;
-	const submittedItems = data?.items ?? [];
-	const rows: AuditActivityRow[] = submittedItems.map(audit => ({
-		id: audit.audit_id,
-		auditCode: audit.audit_code,
-		status: audit.status,
-		auditorCode: audit.auditor_code,
-		placeName: audit.place_name,
-		placeId: audit.place_id,
-		projectName: audit.project_name,
-		projectId: audit.project_id,
-		accountName: audit.account_name,
-		startedAt: audit.started_at,
-		submittedAt: audit.submitted_at,
-		score: audit.summary_score
-	}));
-
-	const totalSubmitted = submittedItems.length;
-	const averageScore =
-		totalSubmitted > 0
-			? submittedItems.reduce((acc, item) => acc + (item.summary_score ?? 0), 0) / totalSubmitted
-			: 0;
-
 	return (
 		<div className="space-y-6">
 			<DashboardHeader
@@ -110,88 +207,54 @@ export default function AdminReportsPage() {
 				description="View all submitted audit reports across the platform."
 				breadcrumbs={[{ label: "Dashboard", href: "/admin/dashboard" }, { label: "Reports" }]}
 			/>
-			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-				<StatCard
-					title="Total Reports"
-					value={String(totalSubmitted)}
-					helper="Submitted audits across all accounts."
-					tone="info"
-				/>
-				<StatCard
-					title="Average Score"
-					value={averageScore.toFixed(1)}
-					helper="Mean score across all submitted audits."
-					tone="success"
-				/>
-				<StatCard
-					title="Accounts"
-					value={String(new Set(submittedItems.map(a => a.account_id)).size)}
-					helper="Unique accounts with submitted reports."
-					tone="warning"
-				/>
-				<StatCard
-					title="Auditors"
-					value={String(new Set(submittedItems.map(a => a.auditor_code)).size)}
-					helper="Unique auditors with submitted reports."
-					tone="violet"
-				/>
-			</div>
 			<AuditsTable
 				rows={rows}
+				basePath="/admin/reports"
 				title="All Submitted Audit Reports"
-				description="Browse completed audit reports from all accounts. Click on a row to view details."
-				pageSize={10}
+				description="Browse completed audit reports from all accounts. Click a row to view details."
 				emptyMessage="No submitted audit reports yet."
-				onRowClick={row => {
-					setSelectedAuditId(row.id);
-				}}
+				sortingState={sorting}
+				onSortingStateChange={setSorting}
+				columnFiltersState={columnFilters}
+				onColumnFiltersStateChange={setColumnFilters}
+				paginationState={pagination}
+				onPaginationStateChange={setPagination}
+				manualFiltering
+				manualSorting
+				manualPagination
+				rowCount={reportsQuery.data?.total_count}
+				pageCount={reportsQuery.data?.total_pages}
+				isFetching={reportsQuery.isFetching}
+				onRowClick={row => router.push(`/admin/reports/${row.id}`)}
 				getRowActions={row => [
 					{
 						label: "View Report",
-						onSelect: () => setSelectedAuditId(row.id),
+						onSelect: () => router.push(`/admin/reports/${row.id}`),
 						icon: FileTextIcon
 					}
 				]}
+				toolbarExtra={
+					<>
+						<FilterPopover
+							title="Projects"
+							options={projectOptions}
+							selectedValues={selectedProjectIds}
+							onChange={setSelectedProjectIds}
+						/>
+						{selectedProjectIds.length > 0 && (
+							<Button
+								type="button"
+								variant="ghost"
+								size="sm"
+								className="gap-1.5"
+								onClick={() => setSelectedProjectIds([])}>
+								<XIcon className="size-3.5" />
+								Clear filters
+							</Button>
+						)}
+					</>
+				}
 			/>
-			<Sheet open={!!selectedAuditId} onOpenChange={open => !open && setSelectedAuditId(null)}>
-				<SheetContent side="right" className="w-full sm:max-w-3xl">
-					{auditDetailsQuery.isLoading && <div className="p-8 text-center">Loading audit details...</div>}
-					{auditDetailsQuery.isError && (
-						<div className="p-8 text-center text-destructive">Error loading audit details.</div>
-					)}
-					{auditDetailsQuery.data && (
-						<div className="space-y-6">
-							<SheetHeader>
-								<SheetTitle>Audit Report: {auditDetailsQuery.data.audit_code}</SheetTitle>
-								<SheetDescription>
-									{auditDetailsQuery.data.place_name} • {auditDetailsQuery.data.project_name}
-								</SheetDescription>
-							</SheetHeader>
-							<div className="grid gap-4">
-								<div>
-									<h4 className="font-medium">Auditor</h4>
-									<p className="text-sm">{auditDetailsQuery.data.auditor_code}</p>
-								</div>
-								<div>
-									<h4 className="font-medium">Status</h4>
-									<Badge
-										variant={
-											auditDetailsQuery.data.status === "SUBMITTED" ? "default" : "secondary"
-										}>
-										{auditDetailsQuery.data.status}
-									</Badge>
-								</div>
-								<div>
-									<h4 className="font-medium">Scores</h4>
-									<pre className="text-xs bg-muted p-3 rounded overflow-auto">
-										{JSON.stringify(auditDetailsQuery.data.scores, null, 2)}
-									</pre>
-								</div>
-							</div>
-						</div>
-					)}
-				</SheetContent>
-			</Sheet>
 		</div>
 	);
 }

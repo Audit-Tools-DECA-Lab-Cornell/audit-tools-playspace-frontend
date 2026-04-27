@@ -11,8 +11,9 @@ import { formatScoreLabel } from "@/components/dashboard/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AuditStatus } from "@/types/audit";
 
-function getStatusBadgeVariant(status: "IN_PROGRESS" | "PAUSED" | "SUBMITTED" | null) {
+function getStatusBadgeVariant(status: AuditStatus | null) {
 	if (status === "SUBMITTED") return "default";
 	if (status === "IN_PROGRESS" || status === "PAUSED") return "secondary";
 	return "outline";
@@ -96,7 +97,7 @@ export function AuditorDashboardClient({ summary, places, errorMessage }: Readon
 						const reportHref = place.audit_id
 							? `/auditor/reports/${encodeURIComponent(place.audit_id)}`
 							: "/auditor/reports";
-						const isResumeAction = place.audit_status === "IN_PROGRESS" || place.audit_status === "PAUSED";
+						const isResumeAction = place.status === "IN_PROGRESS" || place.status === "PAUSED";
 						const actionLabel = isResumeAction
 							? t("assignedPlaces.resumeAudit")
 							: t("assignedPlaces.startAudit");
@@ -115,13 +116,13 @@ export function AuditorDashboardClient({ summary, places, errorMessage }: Readon
 
 								<div className="flex flex-wrap items-center gap-2">
 									<Badge
-										variant={getStatusBadgeVariant(place.audit_status)}
+										variant={getStatusBadgeVariant(place.status)}
 										className="font-medium text-foreground">
-										{place.audit_status
-											? t(`status.${place.audit_status.toLowerCase()}`)
+										{place.status
+											? t(`status.${place.status.toLowerCase()}`)
 											: t("status.not_started")}
 									</Badge>
-									{place.audit_status === "SUBMITTED" ? (
+									{place.status === "SUBMITTED" ? (
 										<Button asChild size="sm" variant="secondary">
 											<Link href={reportHref}>{t("assignedPlaces.openReport")}</Link>
 										</Button>

@@ -5,6 +5,10 @@ import { getServerAuthSession } from "@/lib/auth/server-session";
 const accountTypeSchema = z.enum(["ADMIN", "MANAGER", "AUDITOR"]);
 const projectStatusSchema = z.enum(["planned", "active", "completed"]);
 const auditStatusSchema = z.enum(["IN_PROGRESS", "PAUSED", "SUBMITTED"]);
+const scorePairSchema = z.object({
+	pv: z.number(),
+	u: z.number()
+});
 
 const managerProfileSchema = z.object({
 	id: z.uuid(),
@@ -33,7 +37,8 @@ const recentActivitySchema = z.object({
 	place_id: z.uuid(),
 	place_name: z.string(),
 	completed_at: z.string().datetime(),
-	score: z.number().nullable()
+	score: z.number().nullable(),
+	score_pair: scorePairSchema.nullable().optional().default(null)
 });
 
 const accountDetailSchema = z.object({
@@ -59,7 +64,8 @@ const projectSummarySchema = z.object({
 	places_count: z.number().int().nonnegative(),
 	auditors_count: z.number().int().nonnegative(),
 	audits_completed: z.number().int().nonnegative(),
-	average_score: z.number().nullable()
+	average_score: z.number().nullable(),
+	average_scores: scorePairSchema.nullable().optional().default(null)
 });
 
 const auditorSummarySchema = z.object({
@@ -100,7 +106,8 @@ const adminAuditRowSchema = z.object({
 	auditor_code: z.string(),
 	started_at: z.iso.datetime(),
 	submitted_at: z.iso.datetime().nullable(),
-	summary_score: z.number().nullable()
+	summary_score: z.number().nullable(),
+	score_pair: scorePairSchema.nullable().optional().default(null)
 });
 
 function paginatedResponseSchema<TItem extends z.ZodTypeAny>(itemSchema: TItem) {
@@ -182,7 +189,7 @@ const auditorPlaceSchema = z.object({
 	city: z.string().nullable(),
 	province: z.string().nullable(),
 	country: z.string().nullable(),
-	audit_status: auditStatusSchema.nullable(),
+	status: auditStatusSchema.nullable(),
 	audit_id: z.uuid().nullable(),
 	started_at: z.iso.datetime().nullable(),
 	submitted_at: z.iso.datetime().nullable(),

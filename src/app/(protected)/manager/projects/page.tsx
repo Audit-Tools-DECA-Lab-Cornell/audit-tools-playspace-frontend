@@ -102,14 +102,18 @@ export default function ManagerProjectsPage() {
 	const completedProjectsCount = projects.filter(project => project.status === "completed").length;
 	const meanScoreAcrossProjects = (() => {
 		const scoredProjects = projects.filter(
-			(project): project is typeof project & { average_score: number } => project.average_score !== null
+			(project): project is typeof project & { average_scores: { pv: number; u: number } } =>
+				project.average_scores !== null
 		);
 		if (scoredProjects.length === 0) {
 			return "Pending";
 		}
 
-		const totalScore = scoredProjects.reduce((runningTotal, project) => runningTotal + project.average_score, 0);
-		return `${Math.round((totalScore / scoredProjects.length) * 10) / 10}`;
+		const totalPv = scoredProjects.reduce((runningTotal, project) => runningTotal + project.average_scores.pv, 0);
+		const totalU = scoredProjects.reduce((runningTotal, project) => runningTotal + project.average_scores.u, 0);
+		return `PV ${(Math.round((totalPv / scoredProjects.length) * 10) / 10).toString()} | U ${(
+			Math.round((totalU / scoredProjects.length) * 10) / 10
+		).toString()}`;
 	})();
 
 	if (!accountId) {
@@ -277,7 +281,6 @@ export default function ManagerProjectsPage() {
 						? {
 								name: editingProjectQuery.data.name,
 								overview: editingProjectQuery.data.overview,
-								placeTypes: editingProjectQuery.data.place_types,
 								startDate: editingProjectQuery.data.start_date,
 								endDate: editingProjectQuery.data.end_date,
 								estimatedPlaces: editingProjectQuery.data.est_places,

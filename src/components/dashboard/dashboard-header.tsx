@@ -59,19 +59,19 @@ export function DashboardHeader({
 			) : (
 				<div className="h-5" />
 			)}
-			<div className="flex flex-col gap-4 rounded-card border border-border/70 bg-card/70 p-6 shadow-card md:p-7">
+			<div className="flex flex-col gap-4 rounded-card border border-foreground/10 bg-foreground p-6 text-foreground shadow-md md:p-7">
 				<div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
 					<div className="space-y-2">
 						{eyebrow ? (
-							<p className="text-(length:--eyebrow-size) font-semibold tracking-(--eyebrow-tracking) text-text-secondary uppercase">
+							<p className="text-(length:--eyebrow-size) font-semibold tracking-(--eyebrow-tracking) text-background/70 uppercase">
 								{eyebrow}
 							</p>
 						) : null}
 						<div className="space-y-1.5">
-							<h1 className="text-3xl font-semibold leading-tight text-balance md:text-4xl">{title}</h1>
-							<p className="max-w-4xl text-sm leading-6 text-muted-foreground md:text-base">
-								{description}
-							</p>
+							<h1 className="text-3xl font-semibold leading-tight text-balance text-background md:text-4xl">
+								{title}
+							</h1>
+							<p className="max-w-4xl text-sm leading-6 text-background/70 md:text-base">{description}</p>
 						</div>
 					</div>
 					{actions ? <div className="flex flex-wrap items-center gap-2 lg:justify-end">{actions}</div> : null}

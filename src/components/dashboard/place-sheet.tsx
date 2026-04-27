@@ -367,18 +367,32 @@ export function PlaceSheet({
 						await form.handleSubmit();
 					}}>
 					<div className="grid min-h-0 flex-1 gap-4 overflow-y-auto px-6 py-5 md:grid-cols-2">
+						<p className="text-xs text-muted-foreground md:col-span-2">
+							Fields marked with{" "}
+							<span className="text-destructive" aria-hidden="true">
+								*
+							</span>{" "}
+							are required.
+						</p>
 						<form.Field name="name">
 							{field => {
 								const validationMessage = getValidationMessage(field.state.meta.errors);
 								return (
 									<div className="grid gap-2 md:col-span-2">
-										<Label htmlFor={field.name}>Place name</Label>
+										<Label htmlFor={field.name}>
+											Place name{" "}
+											<span className="text-destructive" aria-hidden="true">
+												*
+											</span>
+										</Label>
 										<Input
 											id={field.name}
+											placeholder="e.g. High Park Playground"
 											value={field.state.value}
 											onBlur={field.handleBlur}
 											onChange={event => field.handleChange(event.target.value)}
 											aria-invalid={Boolean(validationMessage)}
+											aria-required="true"
 										/>
 										{validationMessage ? (
 											<p className="text-sm text-destructive">{validationMessage}</p>
@@ -391,7 +405,10 @@ export function PlaceSheet({
 						<form.Field name="placeType">
 							{field => (
 								<div className="grid gap-2 md:col-span-2">
-									<Label htmlFor={field.name}>Place type</Label>
+									<Label htmlFor={field.name}>
+										Place type{" "}
+										<span className="text-xs font-normal text-muted-foreground">(optional)</span>
+									</Label>
 									<Select
 										value={field.state.value}
 										onValueChange={value => field.handleChange(value)}>
@@ -558,7 +575,10 @@ export function PlaceSheet({
 						<form.Field name="startDate">
 							{field => (
 								<div className="grid gap-2">
-									<Label htmlFor={field.name}>Start date</Label>
+									<Label htmlFor={field.name}>
+										Start date{" "}
+										<span className="text-xs font-normal text-muted-foreground">(optional)</span>
+									</Label>
 									<Input
 										id={field.name}
 										type="date"
@@ -575,7 +595,12 @@ export function PlaceSheet({
 								const validationMessage = getValidationMessage(field.state.meta.errors);
 								return (
 									<div className="grid gap-2">
-										<Label htmlFor={field.name}>End date</Label>
+										<Label htmlFor={field.name}>
+											End date{" "}
+											<span className="text-xs font-normal text-muted-foreground">
+												(optional)
+											</span>
+										</Label>
 										<Input
 											id={field.name}
 											type="date"
@@ -597,10 +622,16 @@ export function PlaceSheet({
 								const validationMessage = getValidationMessage(field.state.meta.errors);
 								return (
 									<div className="grid gap-2 md:col-span-2">
-										<Label htmlFor={field.name}>Estimated auditors</Label>
+										<Label htmlFor={field.name}>
+											Estimated auditors{" "}
+											<span className="text-xs font-normal text-muted-foreground">
+												(optional)
+											</span>
+										</Label>
 										<Input
 											id={field.name}
 											inputMode="numeric"
+											placeholder="e.g. 2"
 											value={field.state.value}
 											onBlur={field.handleBlur}
 											onChange={event => field.handleChange(event.target.value)}
@@ -608,7 +639,11 @@ export function PlaceSheet({
 										/>
 										{validationMessage ? (
 											<p className="text-sm text-destructive">{validationMessage}</p>
-										) : null}
+										) : (
+											<p className="text-xs text-muted-foreground">
+												How many auditors you expect to visit this place.
+											</p>
+										)}
 									</div>
 								);
 							}}
@@ -617,13 +652,20 @@ export function PlaceSheet({
 						<form.Field name="auditorDescription">
 							{field => (
 								<div className="grid gap-2 md:col-span-2">
-									<Label htmlFor={field.name}>Auditor guidance</Label>
+									<Label htmlFor={field.name}>
+										Auditor guidance{" "}
+										<span className="text-xs font-normal text-muted-foreground">(optional)</span>
+									</Label>
 									<Textarea
 										id={field.name}
+										placeholder="e.g. Enter from the north gate. Focus on the water feature and swing area."
 										value={field.state.value}
 										onBlur={field.handleBlur}
 										onChange={event => field.handleChange(event.target.value)}
 									/>
+									<p className="text-xs text-muted-foreground">
+										These instructions will be shown to auditors in the mobile app.
+									</p>
 								</div>
 							)}
 						</form.Field>
