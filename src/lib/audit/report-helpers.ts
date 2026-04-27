@@ -719,3 +719,33 @@ export function buildConstructRankings(domainRows: DomainReportRow[]): Construct
 export function formatConstructDomainLine(score: number, max: number): string {
 	return `${formatScoreValue(score)} / ${formatScoreValue(max)}`;
 }
+
+/**
+ * Rounded percent of max (0–100), used for report bar fill tiering (aligned with web UI).
+ * @returns `null` when `max <= 0`.
+ */
+export function roundedPercentOfMax(value: number, max: number): number | null {
+	if (max <= 0) {
+		return null;
+	}
+	return Math.round((value / max) * 100);
+}
+
+/**
+ * Bar color band from percentage: 70+ high, 40+ mid, below low, null → not assessed.
+ * Matches the Playspace report bar visualization across web and mobile.
+ */
+export type ReportBarScoreTier = "na" | "high" | "mid" | "low";
+
+export function reportBarScoreTier(percent: number | null): ReportBarScoreTier {
+	if (percent === null) {
+		return "na";
+	}
+	if (percent >= 70) {
+		return "high";
+	}
+	if (percent >= 40) {
+		return "mid";
+	}
+	return "low";
+}

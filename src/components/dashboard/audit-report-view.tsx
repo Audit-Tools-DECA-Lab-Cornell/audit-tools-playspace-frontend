@@ -29,7 +29,9 @@ import {
 	buildConstructRankings,
 	countUniqueScaledQuestionsWithDomains,
 	toDomainTitle,
-	formatConstructDomainLine
+	formatConstructDomainLine,
+	reportBarScoreTier,
+	roundedPercentOfMax
 } from "@/lib/audit/report-helpers";
 import { downloadSingleAuditExport, type AuditExportFormat } from "@/lib/audit/export";
 import { cn } from "@/lib/utils";
@@ -54,11 +56,6 @@ function pct(value: number, max: number): string {
 	return `${Math.round((value / max) * 100)}%`;
 }
 
-function pctNum(value: number, max: number): number | null {
-	if (max <= 0) return null;
-	return Math.round((value / max) * 100);
-}
-
 function formatDateTime(iso: string): string {
 	const date = new Date(iso);
 	if (Number.isNaN(date.getTime())) return iso;
@@ -74,9 +71,10 @@ function formatDateTime(iso: string): string {
 
 /** Returns a Tailwind bg class based on the percentage tier. */
 function barColorClass(percentage: number | null): string {
-	if (percentage === null) return "bg-muted";
-	if (percentage >= 70) return "bg-emerald-500";
-	if (percentage >= 40) return "bg-amber-500";
+	const tier = reportBarScoreTier(percentage);
+	if (tier === "na") return "bg-muted";
+	if (tier === "high") return "bg-emerald-500";
+	if (tier === "mid") return "bg-amber-500";
 	return "bg-rose-500";
 }
 
@@ -150,7 +148,7 @@ function AlignedBarCell({
 	const value = scores === null ? 0 : metric.getValue(scores);
 	const max = scores === null ? 0 : metric.getMax(scores);
 	const isNa = scores === null || max <= 0;
-	const percentage = pctNum(value, max);
+	const percentage = roundedPercentOfMax(value, max);
 	const fillRatio = isNa ? 0 : Math.min(1, value / max);
 	const fillHeight = Math.round(fillRatio * BAR_TRACK_HEIGHT);
 	const color = barColorClass(percentage);
