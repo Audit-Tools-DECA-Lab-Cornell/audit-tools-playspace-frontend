@@ -33,7 +33,7 @@ function getSummary(data: unknown) {
 
 function renderPrimitive(value: unknown) {
 	if (typeof value === "string") {
-		return <span className="text-emerald-300">"{value}"</span>;
+		return <span className="text-emerald-300">&ldquo;{value}&ldquo;</span>;
 	}
 
 	if (typeof value === "number") {
@@ -101,7 +101,7 @@ export function JsonViewer({ data, title = "payload.json", defaultOpen = true, c
 
 			return (
 				<>
-					<span className="text-sky-300">"{label}"</span>
+					<span className="text-sky-300">&ldquo;{label}&rdquo;</span>
 					<span className="text-zinc-500">: </span>
 				</>
 			);

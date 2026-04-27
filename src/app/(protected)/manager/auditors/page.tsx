@@ -2,6 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FileTextIcon, FolderOpenIcon, PencilLineIcon, PlusIcon, Trash2Icon } from "lucide-react";
+import Link from "next/link";
 import * as React from "react";
 
 import { playspaceApi } from "@/lib/api/playspace";
@@ -163,10 +164,10 @@ export default function ManagerAuditorsPage() {
 				actions={
 					<div className="flex gap-2">
 						<Button type="button" variant="outline" className="gap-2" asChild>
-							<a href="/manager/auditors/reports">
+							<Link href="/manager/reports">
 								<FileTextIcon className="size-4" />
 								<span>View Reports</span>
-							</a>
+							</Link>
 						</Button>
 						<Button type="button" className="gap-2" onClick={() => setIsCreateDialogOpen(true)}>
 							<PlusIcon className="size-4" />
@@ -257,14 +258,14 @@ export default function ManagerAuditorsPage() {
 				initialValues={
 					editingAuditor
 						? {
-								email: editingAuditor.email,
-								fullName: editingAuditor.full_name,
-								auditorCode: editingAuditor.auditor_code,
-								role: editingAuditor.role,
-								ageRange: editingAuditor.age_range,
-								gender: editingAuditor.gender,
-								country: editingAuditor.country
-							}
+							email: editingAuditor.email,
+							fullName: editingAuditor.full_name,
+							auditorCode: editingAuditor.auditor_code,
+							role: editingAuditor.role,
+							ageRange: editingAuditor.age_range,
+							gender: editingAuditor.gender,
+							country: editingAuditor.country
+						}
 						: undefined
 				}
 				isPending={updateAuditor.isPending}
