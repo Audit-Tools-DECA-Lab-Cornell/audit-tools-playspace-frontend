@@ -31,6 +31,15 @@
 					"helper": "stats.meanSubmittedScore.helper"
 				}
 			}
+		},
+		"errorBoundary": {
+			"title": "Something went wrong",
+			"description": "We hit an unexpected error rendering this page. You can try again, or go back to the dashboard.",
+			"globalDescription": "We hit an unexpected error and could not finish loading the app. Reloading the page usually fixes this.",
+			"actions": {
+				"retry": "Try again",
+				"reload": "Reload the page"
+			}
 		}
 	},
 	"shell": {
