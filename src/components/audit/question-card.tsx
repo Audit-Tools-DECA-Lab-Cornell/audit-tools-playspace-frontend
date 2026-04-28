@@ -60,9 +60,7 @@ export function AuditQuestionCard({
 		<div className="field-card">
 			<div className="field-card-body space-y-5">
 				<p className="text-base leading-7 text-foreground">
-					<span className="block text-sm font-semibold uppercase tracking-[0.16em] text-primary">
-						{t("thisPlayspace")}
-					</span>
+					<span className="block text-sm font-bold text-primary">{t("thisPlayspace")}</span>
 					{promptSegments.map((segment, index) => (
 						<Fragment key={`${question.question_key}-segment-${index.toString()}`}>
 							<span className={segment.bold ? "font-semibold text-primary" : undefined}>

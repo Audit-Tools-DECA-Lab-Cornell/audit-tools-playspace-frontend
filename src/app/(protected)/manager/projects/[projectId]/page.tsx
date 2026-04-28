@@ -1,12 +1,13 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { PencilLineIcon, PlusIcon, Trash2Icon } from "lucide-react";
+import { PencilLineIcon, PlusIcon, Trash2Icon, UserPlusIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 import { use } from "react";
 
-import { playspaceApi } from "@/lib/api/playspace";
+import { playspaceApi, PlayspaceType } from "@/lib/api/playspace";
+import { AssignAuditorDialog } from "@/components/dashboard/assign-auditor-dialog";
 import { BackButton } from "@/components/dashboard/back-button";
 import { ConfirmDialog } from "@/components/dashboard/confirm-dialog";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
@@ -15,7 +16,7 @@ import { PlaceSheet, type PlaceSheetPayload } from "@/components/dashboard/place
 import { PlacesTable } from "@/components/dashboard/places-table";
 import { ProjectDialog, type ProjectDialogPayload } from "@/components/dashboard/project-dialog";
 import { StatCard } from "@/components/dashboard/stat-card";
-import { formatDateLabel, formatProjectDateRange, formatScoreLabel } from "@/components/dashboard/utils";
+import { formatDateLabel, formatProjectDateRange, formatScorePairLabel } from "@/components/dashboard/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -50,6 +51,7 @@ export default function ManagerProjectDetailPage({ params }: Readonly<ManagerPro
 	const queryClient = useQueryClient();
 	const [isPlaceSheetOpen, setIsPlaceSheetOpen] = React.useState(false);
 	const [isProjectDialogOpen, setIsProjectDialogOpen] = React.useState(false);
+	const [isAssignDialogOpen, setIsAssignDialogOpen] = React.useState(false);
 	const [placePendingDelete, setPlacePendingDelete] = React.useState<{
 		id: string;
 		name: string;
@@ -72,7 +74,10 @@ export default function ManagerProjectDetailPage({ params }: Readonly<ManagerPro
 
 	const createPlace = useMutation({
 		mutationFn: async (payload: PlaceSheetPayload & { project_ids: string[] }) =>
-			playspaceApi.management.places.create(payload),
+			playspaceApi.management.places.create({
+				...payload,
+				place_type: payload.place_type as PlayspaceType | null
+			}),
 		onSuccess: async () => {
 			await queryClient.invalidateQueries({
 				queryKey: ["playspace", "project", projectId, "places"]
@@ -165,7 +170,7 @@ export default function ManagerProjectDetailPage({ params }: Readonly<ManagerPro
 	const project = projectQuery.data;
 	const stats = projectStatsQuery.data;
 	const places = projectPlacesQuery.data;
-	const placeTypeLabel = project.place_types.length > 0 ? project.place_types : [t("overview.placeTypesPending")];
+	const placeTypeLabel = project.place_types?.length > 0 ? project.place_types : [t("overview.placeTypesPending")];
 
 	return (
 		<div className="space-y-6">
@@ -180,7 +185,6 @@ export default function ManagerProjectDetailPage({ params }: Readonly<ManagerPro
 				]}
 				actions={
 					<div className="flex flex-wrap items-center gap-2">
-						<BackButton href="/manager/projects" label={t("actions.backToProjects")} />
 						<Button
 							type="button"
 							variant="outline"
@@ -188,6 +192,14 @@ export default function ManagerProjectDetailPage({ params }: Readonly<ManagerPro
 							onClick={() => setIsProjectDialogOpen(true)}>
 							<PencilLineIcon className="size-4" />
 							<span>{t("actions.editProject")}</span>
+						</Button>
+						<Button
+							type="button"
+							variant="outline"
+							className="gap-2"
+							onClick={() => setIsAssignDialogOpen(true)}>
+							<UserPlusIcon className="size-4" />
+							<span>Assign Auditor</span>
 						</Button>
 						<Button type="button" className="gap-2" onClick={() => setIsPlaceSheetOpen(true)}>
 							<PlusIcon className="size-4" />
@@ -216,7 +228,7 @@ export default function ManagerProjectDetailPage({ params }: Readonly<ManagerPro
 				/>
 				<StatCard
 					title={t("stats.overallMeanScore.title")}
-					value={formatScoreLabel(stats.average_score, formatT)}
+					value={formatScorePairLabel(stats.average_scores, formatT)}
 					helper={t("stats.overallMeanScore.helper")}
 					tone="info"
 				/>
@@ -234,7 +246,7 @@ export default function ManagerProjectDetailPage({ params }: Readonly<ManagerPro
 							</CardHeader>
 							<CardContent className="space-y-5">
 								<div className="flex flex-wrap gap-2">
-									{placeTypeLabel.map(placeType => (
+									{placeTypeLabel?.map(placeType => (
 										<Badge
 											key={placeType}
 											variant="outline"
@@ -279,7 +291,7 @@ export default function ManagerProjectDetailPage({ params }: Readonly<ManagerPro
 										{t("deliverySignals.currentSubmittedMeanScore")}
 									</p>
 									<p className="mt-2 font-mono text-3xl text-foreground">
-										{formatScoreLabel(stats.average_score, formatT)}
+										{formatScorePairLabel(stats.average_scores, formatT)}
 									</p>
 								</div>
 								<div className="grid gap-3 text-sm text-muted-foreground">
@@ -326,7 +338,6 @@ export default function ManagerProjectDetailPage({ params }: Readonly<ManagerPro
 				initialValues={{
 					name: project.name,
 					overview: project.overview,
-					placeTypes: project.place_types,
 					startDate: project.start_date,
 					endDate: project.end_date,
 					estimatedPlaces: project.est_places,
@@ -373,6 +384,16 @@ export default function ManagerProjectDetailPage({ params }: Readonly<ManagerPro
 					}
 
 					deletePlace.mutate(placePendingDelete.id);
+				}}
+			/>
+			<AssignAuditorDialog
+				open={isAssignDialogOpen}
+				onOpenChange={setIsAssignDialogOpen}
+				prefill={{ projectId }}
+				onAssigned={() => {
+					void queryClient.invalidateQueries({
+						queryKey: ["playspace", "project", projectId, "stats"]
+					});
 				}}
 			/>
 		</div>

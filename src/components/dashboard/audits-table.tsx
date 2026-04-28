@@ -4,6 +4,7 @@ import * as React from "react";
 import type { ColumnDef, ColumnFiltersState, PaginationState, SortingState } from "@tanstack/react-table";
 import { CheckIcon, CopyIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -12,7 +13,7 @@ import { DataTable, getMultiValueFilterFn } from "./data-table";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import type { EntityRowAction } from "./entity-row-actions";
 import { EntityRowActions } from "./entity-row-actions";
-import { formatAuditCodeReference, formatDateTimeLabel, formatScoreLabel } from "./utils";
+import { formatAuditCodeReference, formatDateTimeLabel, formatScoreLabel, formatScorePairLabel } from "./utils";
 
 export interface AuditActivityRow {
 	id: string;
@@ -27,13 +28,19 @@ export interface AuditActivityRow {
 	startedAt: string | null;
 	submittedAt: string | null;
 	score: number | null;
+	scorePair?: {
+		pv: number;
+		u: number;
+	} | null;
 }
 
 export interface AuditsTableProps {
 	rows: AuditActivityRow[];
 	title?: string;
 	description?: string;
+	basePath?: string;
 	action?: React.ReactNode;
+	toolbarExtra?: React.ReactNode;
 	pageSize?: number;
 	emptyMessage?: string;
 	getRowActions?: (row: AuditActivityRow) => EntityRowAction[];
@@ -58,6 +65,7 @@ interface AuditIdentityCellProps {
 	placeName?: string | null;
 	projectName?: string | null;
 	accountName?: string | null;
+	href?: string;
 }
 
 /**
@@ -68,7 +76,8 @@ function AuditIdentityCell({
 	auditorCode,
 	placeName,
 	projectName,
-	accountName
+	accountName,
+	href
 }: Readonly<AuditIdentityCellProps>) {
 	const t = useTranslations("tables.audits");
 	const [isCopied, setIsCopied] = React.useState(false);
@@ -104,7 +113,13 @@ function AuditIdentityCell({
 	return (
 		<div className="min-w-[320px] space-y-2">
 			<div className="space-y-1">
-				<p className="font-medium text-foreground">{primaryLabel}</p>
+				{href ? (
+					<Link href={href} className="font-medium text-foreground transition-colors hover:text-primary">
+						{primaryLabel}
+					</Link>
+				) : (
+					<p className="font-medium text-foreground">{primaryLabel}</p>
+				)}
 				{lineage.length > 0 ? <p className="text-sm text-muted-foreground">{lineage}</p> : null}
 			</div>
 			<div className="flex flex-wrap items-center gap-2">
@@ -142,7 +157,9 @@ export function AuditsTable({
 	rows,
 	title,
 	description,
+	basePath,
 	action,
+	toolbarExtra,
 	pageSize = 10,
 	emptyMessage,
 	getRowActions,
@@ -178,6 +195,7 @@ export function AuditsTable({
 						placeName={row.original.placeName}
 						projectName={row.original.projectName}
 						accountName={row.original.accountName}
+						href={basePath ? `${basePath}/${encodeURIComponent(row.original.id)}` : undefined}
 					/>
 				),
 				enableHiding: false
@@ -226,7 +244,9 @@ export function AuditsTable({
 				),
 				cell: ({ row }) => (
 					<span className="block text-right font-mono text-foreground tabular-nums">
-						{formatScoreLabel(row.original.score, formatT)}
+						{row.original.scorePair
+							? formatScorePairLabel(row.original.scorePair, formatT)
+							: formatScoreLabel(row.original.score, formatT)}
 					</span>
 				)
 			},
@@ -241,7 +261,7 @@ export function AuditsTable({
 					]
 				: [])
 		],
-		[formatT, getRowActions, t]
+		[basePath, formatT, getRowActions, t]
 	);
 
 	const statusOptions = React.useMemo(() => {
@@ -266,6 +286,7 @@ export function AuditsTable({
 					options: statusOptions
 				}
 			]}
+			toolbarExtra={toolbarExtra}
 			action={action}
 			pageSize={pageSize}
 			emptyMessage={emptyMessage ?? t("emptyMessage")}

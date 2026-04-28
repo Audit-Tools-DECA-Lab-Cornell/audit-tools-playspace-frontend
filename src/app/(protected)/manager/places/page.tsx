@@ -15,7 +15,6 @@ import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
 import { EntityRowActions } from "@/components/dashboard/entity-row-actions";
 import {
-	getMultiValueColumnFilter,
 	preservePreviousData,
 	getTextColumnFilterValue,
 	toBackendSortParam
@@ -23,9 +22,10 @@ import {
 import { StatCard } from "@/components/dashboard/stat-card";
 import {
 	formatDateTimeLabel,
+	formatRequirementStatusLabel,
 	formatLocationLabel,
-	formatScoreLabel,
-	getPlaceStatusClassName
+	formatScorePairLabel,
+	getRequirementStatusClassName
 } from "@/components/dashboard/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -44,9 +44,8 @@ function getErrorMessage(error: unknown, fallbackMessage: string): string {
 	return fallbackMessage;
 }
 
-function isManagerPlaceStatus(value: string): value is ManagerPlaceRow["status"] {
-	return value === "not_started" || value === "in_progress" || value === "submitted";
-}
+/** Valid axis-level statuses for place_audit_status / place_survey_status filters. */
+const PLACE_AXIS_STATUSES = ["not_started", "in_progress", "submitted", "complete"] as const;
 
 const MANAGER_PLACES_SKELETON_IDS = [
 	"manager-places-skeleton-1",
@@ -132,12 +131,14 @@ export default function ManagerPlacesPage() {
 	});
 	const [selectedProjectIds, setSelectedProjectIds] = React.useState<string[]>([]);
 	const [selectedAuditorIds, setSelectedAuditorIds] = React.useState<string[]>([]);
+	const [selectedAuditStatuses, setSelectedAuditStatuses] = React.useState<string[]>([]);
+	const [selectedSurveyStatuses, setSelectedSurveyStatuses] = React.useState<string[]>([]);
 
 	const searchValue = getTextColumnFilterValue(columnFilters, "name");
-	const selectedStatuses = getMultiValueColumnFilter(columnFilters, "status").filter(isManagerPlaceStatus);
 	const selectedProjectIdsKey = selectedProjectIds.join("|");
 	const selectedAuditorIdsKey = selectedAuditorIds.join("|");
-	const selectedStatusesKey = selectedStatuses.join("|");
+	const selectedAuditStatusesKey = selectedAuditStatuses.join("|");
+	const selectedSurveyStatusesKey = selectedSurveyStatuses.join("|");
 	const sortParam = toBackendSortParam(sorting);
 
 	React.useEffect(() => {
@@ -149,7 +150,14 @@ export default function ManagerPlacesPage() {
 						pageIndex: 0
 					};
 		});
-	}, [searchValue, selectedProjectIdsKey, selectedAuditorIdsKey, selectedStatusesKey, sortParam]);
+	}, [
+		searchValue,
+		selectedProjectIdsKey,
+		selectedAuditorIdsKey,
+		selectedAuditStatusesKey,
+		selectedSurveyStatusesKey,
+		sortParam
+	]);
 
 	const projectsQuery = useQuery({
 		queryKey: ["playspace", "manager", "places", "projects", accountId],
@@ -186,7 +194,8 @@ export default function ManagerPlacesPage() {
 			sortParam,
 			selectedProjectIds,
 			selectedAuditorIds,
-			selectedStatuses
+			selectedAuditStatuses,
+			selectedSurveyStatuses
 		],
 		queryFn: async () => {
 			if (!accountId) {
@@ -200,7 +209,8 @@ export default function ManagerPlacesPage() {
 				sort: sortParam,
 				projectIds: selectedProjectIds,
 				auditorIds: selectedAuditorIds,
-				statuses: selectedStatuses
+				auditStatuses: selectedAuditStatuses,
+				surveyStatuses: selectedSurveyStatuses
 			});
 		},
 		enabled: accountId !== null,
@@ -234,6 +244,15 @@ export default function ManagerPlacesPage() {
 		}));
 	}, [auditorsQuery.data]);
 
+	const axisStatusOptions = React.useMemo(
+		() =>
+			PLACE_AXIS_STATUSES.map(status => ({
+				label: formatRequirementStatusLabel(status, formatT),
+				value: status
+			})),
+		[formatT]
+	);
+
 	const columns = React.useMemo<ColumnDef<ManagerPlaceRow>[]>(
 		() => [
 			{
@@ -265,18 +284,28 @@ export default function ManagerPlacesPage() {
 				cell: ({ row }) => <span className="text-sm text-muted-foreground">{row.original.project_name}</span>
 			},
 			{
-				accessorKey: "status",
+				id: "place_axes",
+				accessorFn: (row: ManagerPlaceRow) => [row.place_audit_status, row.place_survey_status],
 				header: ({ column }) => <DataTableColumnHeader column={column} title={t("table.columns.status")} />,
-				filterFn: getMultiValueFilterFn<ManagerPlaceRow>(),
 				cell: ({ row }) => (
-					<Badge
-						variant="outline"
-						className={cn(
-							getPlaceStatusClassName(row.original.status),
-							"font-medium tracking-[0.14em] uppercase"
-						)}>
-						{t(`table.status.${row.original.status}`)}
-					</Badge>
+					<div className="flex min-w-[180px] flex-wrap gap-1.5">
+						<Badge
+							variant="outline"
+							className={cn(
+								getRequirementStatusClassName(row.original.place_audit_status),
+								"font-medium tracking-[0.14em] uppercase"
+							)}>
+							{`A ${formatRequirementStatusLabel(row.original.place_audit_status, formatT)}`}
+						</Badge>
+						<Badge
+							variant="outline"
+							className={cn(
+								getRequirementStatusClassName(row.original.place_survey_status),
+								"font-medium tracking-[0.14em] uppercase"
+							)}>
+							{`S ${formatRequirementStatusLabel(row.original.place_survey_status, formatT)}`}
+						</Badge>
+					</div>
 				)
 			},
 			{
@@ -289,13 +318,13 @@ export default function ManagerPlacesPage() {
 				)
 			},
 			{
-				accessorKey: "average_score",
+				accessorKey: "overall_scores",
 				header: ({ column }) => (
 					<DataTableColumnHeader column={column} title={t("table.columns.meanScore")} align="end" />
 				),
 				cell: ({ row }) => (
 					<span className="block text-right font-mono text-foreground tabular-nums">
-						{formatScoreLabel(row.original.average_score, formatT)}
+						{formatScorePairLabel(row.original.overall_scores, formatT)}
 					</span>
 				)
 			},
@@ -404,11 +433,7 @@ export default function ManagerPlacesPage() {
 	}
 
 	const places = placesQuery.data.items;
-	const projects = projectsQuery.data;
-	const meanScore =
-		placesQuery.data.summary.average_score !== null
-			? `${placesQuery.data.summary.average_score}`
-			: formatT("pending");
+	const meanScore = formatScorePairLabel(placesQuery.data.summary.overall_scores, formatT);
 
 	return (
 		<div className="space-y-6">
@@ -441,50 +466,17 @@ export default function ManagerPlacesPage() {
 				/>
 				<StatCard
 					title={t("stats.submitted.title")}
-					value={String(placesQuery.data.summary.submitted_places)}
+					value={String(placesQuery.data.summary.completed_place_audits)}
 					helper={t("stats.submitted.helper")}
 					tone="success"
 				/>
 				<StatCard
 					title={t("stats.inProgress.title")}
-					value={String(placesQuery.data.summary.in_progress_places)}
+					value={String(placesQuery.data.summary.completed_place_surveys)}
 					helper={t("stats.inProgress.helper")}
 					tone="warning"
 				/>
-				<StatCard
-					title={t("stats.meanScore.title")}
-					value={meanScore}
-					helper={t("stats.meanScore.helper")}
-					tone="info"
-				/>
-			</div>
-			<div className="flex flex-wrap items-center gap-2 pb-4">
-				<FilterPopover
-					title="Projects"
-					options={projectOptions}
-					selectedValues={selectedProjectIds}
-					onChange={setSelectedProjectIds}
-				/>
-				<FilterPopover
-					title="Auditors"
-					options={auditorOptions}
-					selectedValues={selectedAuditorIds}
-					onChange={setSelectedAuditorIds}
-				/>
-				{(selectedProjectIds.length > 0 || selectedAuditorIds.length > 0) && (
-					<Button
-						type="button"
-						variant="ghost"
-						size="sm"
-						className="gap-1.5"
-						onClick={() => {
-							setSelectedProjectIds([]);
-							setSelectedAuditorIds([]);
-						}}>
-						<XIcon className="size-3.5" />
-						Clear filters
-					</Button>
-				)}
+				<StatCard title="Overall PV/U" value={meanScore} helper={t("stats.meanScore.helper")} tone="info" />
 			</div>
 			<DataTable
 				title={t("table.title")}
@@ -493,16 +485,54 @@ export default function ManagerPlacesPage() {
 				data={places}
 				searchColumnId="name"
 				searchPlaceholder={t("table.searchPlaceholder")}
-				filterConfigs={[
-					{
-						columnId: "status",
-						title: t("table.columns.status"),
-						options: (["not_started", "in_progress", "submitted"] as const).map(status => ({
-							label: t(`table.status.${status}`),
-							value: status
-						}))
-					}
-				]}
+				filterConfigs={[]}
+				toolbarExtra={
+					<>
+						<FilterPopover
+							title="Projects"
+							options={projectOptions}
+							selectedValues={selectedProjectIds}
+							onChange={setSelectedProjectIds}
+						/>
+						<FilterPopover
+							title="Auditors"
+							options={auditorOptions}
+							selectedValues={selectedAuditorIds}
+							onChange={setSelectedAuditorIds}
+						/>
+						<FilterPopover
+							title="Audit Status"
+							options={axisStatusOptions}
+							selectedValues={selectedAuditStatuses}
+							onChange={setSelectedAuditStatuses}
+						/>
+						<FilterPopover
+							title="Survey Status"
+							options={axisStatusOptions}
+							selectedValues={selectedSurveyStatuses}
+							onChange={setSelectedSurveyStatuses}
+						/>
+						{(selectedProjectIds.length > 0 ||
+							selectedAuditorIds.length > 0 ||
+							selectedAuditStatuses.length > 0 ||
+							selectedSurveyStatuses.length > 0) && (
+							<Button
+								type="button"
+								variant="ghost"
+								size="sm"
+								className="gap-1.5"
+								onClick={() => {
+									setSelectedProjectIds([]);
+									setSelectedAuditorIds([]);
+									setSelectedAuditStatuses([]);
+									setSelectedSurveyStatuses([]);
+								}}>
+								<XIcon className="size-3.5" />
+								Clear filters
+							</Button>
+						)}
+					</>
+				}
 				emptyMessage={
 					placesQuery.data.total_count === 0
 						? t("table.emptyState.noPlaces")

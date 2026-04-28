@@ -1,5 +1,10 @@
 import type { PlaceSummary, ProjectSummary } from "@/lib/api/playspace";
 
+export interface ScorePair {
+	pv: number;
+	u: number;
+}
+
 export type DashboardTextValues = Record<string, string | number | Date>;
 
 export type DashboardTranslator = (key: string, values?: DashboardTextValues) => string;
@@ -112,6 +117,19 @@ export function formatScoreLabel(value: number | null, t: DashboardTranslator): 
 }
 
 /**
+ * Format a PV/U score pair consistently across cards and tables.
+ */
+export function formatScorePairLabel(value: ScorePair | null | undefined, t: DashboardTranslator): string {
+	if (value === null || value === undefined) {
+		return t("pending");
+	}
+
+	const pv = Math.round(value.pv * 10) / 10;
+	const u = Math.round(value.u * 10) / 10;
+	return `PV ${pv} | U ${u}`;
+}
+
+/**
  * Build a location label from the place summary fields.
  */
 export function formatLocationLabel(
@@ -166,11 +184,14 @@ export function getProjectStatusClassName(status: ProjectSummary["status"]): str
 	return "border-status-in-progress-border bg-status-in-progress-surface text-status-in-progress";
 }
 
+/** Per-axis place coverage: backend may send `submitted` (activity) or legacy `complete`. */
+export type PlaceAxisRequirementStatus = "not_started" | "in_progress" | "complete" | "submitted";
+
 /**
- * Resolve a status chip class for project place activity states.
+ * Resolve a status chip class for place requirement completion states.
  */
-export function getPlaceStatusClassName(status: PlaceSummary["status"]): string {
-	if (status === "submitted") {
+export function getRequirementStatusClassName(status: PlaceAxisRequirementStatus): string {
+	if (status === "complete" || status === "submitted") {
 		return "border-status-success-border bg-status-success-surface text-status-success";
 	}
 
@@ -179,4 +200,17 @@ export function getPlaceStatusClassName(status: PlaceSummary["status"]): string 
 	}
 
 	return "border-status-pending-border bg-status-pending-surface text-status-pending";
+}
+
+/**
+ * Render a friendly label for the new requirement-completion statuses.
+ */
+export function formatRequirementStatusLabel(status: PlaceAxisRequirementStatus, t: DashboardTranslator): string {
+	if (status === "complete" || status === "submitted") {
+		return "Complete";
+	}
+	if (status === "in_progress") {
+		return "In progress";
+	}
+	return t("pending");
 }

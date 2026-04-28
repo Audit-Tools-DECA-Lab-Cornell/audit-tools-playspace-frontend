@@ -52,6 +52,7 @@ export interface DataTableProps<TData, TValue> {
 	searchColumnId?: string;
 	searchPlaceholder?: string;
 	filterConfigs?: DataTableFilterConfig[];
+	toolbarExtra?: React.ReactNode;
 	action?: React.ReactNode;
 	emptyMessage?: string;
 	initialSorting?: SortingState;
@@ -82,6 +83,7 @@ export function DataTable<TData, TValue>({
 	searchColumnId,
 	searchPlaceholder,
 	filterConfigs = [],
+	toolbarExtra,
 	action,
 	emptyMessage,
 	initialSorting = [],
@@ -188,6 +190,7 @@ export function DataTable<TData, TValue>({
 				searchColumnId={searchColumnId}
 				searchPlaceholder={searchPlaceholder}
 				filterConfigs={filterConfigs}
+				toolbarExtra={toolbarExtra}
 				action={action}
 				isFetching={isFetching}
 			/>

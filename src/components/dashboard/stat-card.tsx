@@ -35,7 +35,7 @@ export function StatCard({ title, value, helper, tone = "neutral", valueClassNam
 			<CardContent className="space-y-2.5">
 				<div
 					className={cn(
-						"max-w-full overflow-hidden text-ellipsis font-mono text-[2rem] font-semibold leading-none tracking-tight text-foreground tabular-nums md:text-[2.3rem]",
+						"max-w-full overflow-hidden text-ellipsis font-mono text-[2.3rem] font-semibold leading-none tracking-tight text-foreground tabular-nums md:text-[2.5rem]",
 						valueClassName
 					)}>
 					{value}

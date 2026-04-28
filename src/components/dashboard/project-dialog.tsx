@@ -18,27 +18,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 
 import { getValidationMessage, getZodFieldErrors } from "./tanstack-form-utils";
-import { toNullableInteger, toNullableString, toTrimmedList } from "./form-utils";
+import { toNullableInteger, toNullableString } from "./form-utils";
 
 const WHOLE_NUMBER_PATTERN = /^\d+$/;
-
-/**
- * Safely parse serialized place types back into a string list.
- */
-function parsePlaceTypesJson(value: string): string[] {
-	try {
-		const parsedValue: unknown = JSON.parse(value);
-		return Array.isArray(parsedValue) ? parsedValue.filter((item): item is string => typeof item === "string") : [];
-	} catch {
-		return [];
-	}
-}
 
 const projectDialogSchema = z
 	.object({
 		name: z.string().trim().min(1, "Project name is required."),
 		overview: z.string(),
-		placeTypes: z.string(),
 		startDate: z.string(),
 		endDate: z.string(),
 		estimatedPlaces: z
@@ -70,7 +57,6 @@ type ProjectDialogFormValues = z.infer<typeof projectDialogSchema>;
 export interface ProjectDialogInitialValues {
 	name?: string;
 	overview?: string | null;
-	placeTypes?: string[];
 	startDate?: string | null;
 	endDate?: string | null;
 	estimatedPlaces?: number | null;
@@ -81,7 +67,6 @@ export interface ProjectDialogInitialValues {
 export interface ProjectDialogPayload {
 	name: string;
 	overview: string | null;
-	place_types: string[];
 	start_date: string | null;
 	end_date: string | null;
 	est_places: number | null;
@@ -118,7 +103,6 @@ function getDefaultValues(initialValues?: ProjectDialogInitialValues): ProjectDi
 	return {
 		name: initialValues?.name ?? "",
 		overview: initialValues?.overview ?? "",
-		placeTypes: initialValues?.placeTypes?.join(", ") ?? "",
 		startDate: initialValues?.startDate ?? "",
 		endDate: initialValues?.endDate ?? "",
 		estimatedPlaces:
@@ -149,7 +133,6 @@ export function ProjectDialog({
 	const [submitError, setSubmitError] = React.useState<string | null>(null);
 	const initialName = initialValues?.name ?? "";
 	const initialOverview = initialValues?.overview ?? "";
-	const initialPlaceTypesJson = JSON.stringify(initialValues?.placeTypes ?? []);
 	const initialStartDate = initialValues?.startDate ?? "";
 	const initialEndDate = initialValues?.endDate ?? "";
 	const initialEstimatedPlaces = initialValues?.estimatedPlaces ?? null;
@@ -160,7 +143,6 @@ export function ProjectDialog({
 			getDefaultValues({
 				name: initialName,
 				overview: initialOverview,
-				placeTypes: parsePlaceTypesJson(initialPlaceTypesJson),
 				startDate: initialStartDate,
 				endDate: initialEndDate,
 				estimatedPlaces: initialEstimatedPlaces,
@@ -174,7 +156,6 @@ export function ProjectDialog({
 			initialEstimatedPlaces,
 			initialName,
 			initialOverview,
-			initialPlaceTypesJson,
 			initialStartDate
 		]
 	);
@@ -189,7 +170,6 @@ export function ProjectDialog({
 				await onSubmit({
 					name: value.name.trim(),
 					overview: toNullableString(value.overview),
-					place_types: toTrimmedList(value.placeTypes),
 					start_date: toNullableString(value.startDate),
 					end_date: toNullableString(value.endDate),
 					est_places: toNullableInteger(value.estimatedPlaces),
@@ -226,6 +206,13 @@ export function ProjectDialog({
 						event.stopPropagation();
 						await form.handleSubmit();
 					}}>
+					<p className="text-xs text-muted-foreground">
+						Fields marked with{" "}
+						<span className="text-destructive" aria-hidden="true">
+							*
+						</span>{" "}
+						are required.
+					</p>
 					<div className="grid gap-4 md:grid-cols-2">
 						<form.Field name="name">
 							{field => {
@@ -233,13 +220,20 @@ export function ProjectDialog({
 
 								return (
 									<div className="grid gap-2 md:col-span-2">
-										<Label htmlFor={field.name}>Project name</Label>
+										<Label htmlFor={field.name}>
+											Project name{" "}
+											<span className="text-destructive" aria-hidden="true">
+												*
+											</span>
+										</Label>
 										<Input
 											id={field.name}
+											placeholder="e.g. Summer 2026 Playspace Audit"
 											value={field.state.value}
 											onBlur={field.handleBlur}
 											onChange={event => field.handleChange(event.target.value)}
 											aria-invalid={Boolean(validationMessage)}
+											aria-required="true"
 										/>
 										{validationMessage ? (
 											<p className="text-sm text-destructive">{validationMessage}</p>
@@ -251,26 +245,16 @@ export function ProjectDialog({
 						<form.Field name="overview">
 							{field => (
 								<div className="grid gap-2 md:col-span-2">
-									<Label htmlFor={field.name}>Overview</Label>
+									<Label htmlFor={field.name}>
+										Overview{" "}
+										<span className="text-xs font-normal text-muted-foreground">(optional)</span>
+									</Label>
 									<Textarea
 										id={field.name}
+										placeholder="A brief description of the project's goals and scope…"
 										value={field.state.value}
 										onBlur={field.handleBlur}
 										onChange={event => field.handleChange(event.target.value)}
-									/>
-								</div>
-							)}
-						</form.Field>
-						<form.Field name="placeTypes">
-							{field => (
-								<div className="grid gap-2 md:col-span-2">
-									<Label htmlFor={field.name}>Place types</Label>
-									<Input
-										id={field.name}
-										value={field.state.value}
-										onBlur={field.handleBlur}
-										onChange={event => field.handleChange(event.target.value)}
-										placeholder="Playground, Pocket park, Community green"
 									/>
 								</div>
 							)}
@@ -278,7 +262,10 @@ export function ProjectDialog({
 						<form.Field name="startDate">
 							{field => (
 								<div className="grid gap-2">
-									<Label htmlFor={field.name}>Start date</Label>
+									<Label htmlFor={field.name}>
+										Start date{" "}
+										<span className="text-xs font-normal text-muted-foreground">(optional)</span>
+									</Label>
 									<Input
 										id={field.name}
 										type="date"
@@ -295,7 +282,12 @@ export function ProjectDialog({
 
 								return (
 									<div className="grid gap-2">
-										<Label htmlFor={field.name}>End date</Label>
+										<Label htmlFor={field.name}>
+											End date{" "}
+											<span className="text-xs font-normal text-muted-foreground">
+												(optional)
+											</span>
+										</Label>
 										<Input
 											id={field.name}
 											type="date"
@@ -317,10 +309,16 @@ export function ProjectDialog({
 
 								return (
 									<div className="grid gap-2">
-										<Label htmlFor={field.name}>Estimated places</Label>
+										<Label htmlFor={field.name}>
+											Estimated places{" "}
+											<span className="text-xs font-normal text-muted-foreground">
+												(optional)
+											</span>
+										</Label>
 										<Input
 											id={field.name}
 											inputMode="numeric"
+											placeholder="e.g. 20"
 											value={field.state.value}
 											onBlur={field.handleBlur}
 											onChange={event => field.handleChange(event.target.value)}
@@ -328,7 +326,11 @@ export function ProjectDialog({
 										/>
 										{validationMessage ? (
 											<p className="text-sm text-destructive">{validationMessage}</p>
-										) : null}
+										) : (
+											<p className="text-xs text-muted-foreground">
+												Total number of places you plan to include.
+											</p>
+										)}
 									</div>
 								);
 							}}
@@ -339,10 +341,16 @@ export function ProjectDialog({
 
 								return (
 									<div className="grid gap-2">
-										<Label htmlFor={field.name}>Estimated auditors</Label>
+										<Label htmlFor={field.name}>
+											Estimated auditors{" "}
+											<span className="text-xs font-normal text-muted-foreground">
+												(optional)
+											</span>
+										</Label>
 										<Input
 											id={field.name}
 											inputMode="numeric"
+											placeholder="e.g. 5"
 											value={field.state.value}
 											onBlur={field.handleBlur}
 											onChange={event => field.handleChange(event.target.value)}
@@ -350,7 +358,11 @@ export function ProjectDialog({
 										/>
 										{validationMessage ? (
 											<p className="text-sm text-destructive">{validationMessage}</p>
-										) : null}
+										) : (
+											<p className="text-xs text-muted-foreground">
+												Number of auditors expected to work on this project.
+											</p>
+										)}
 									</div>
 								);
 							}}
@@ -358,13 +370,20 @@ export function ProjectDialog({
 						<form.Field name="auditorDescription">
 							{field => (
 								<div className="grid gap-2 md:col-span-2">
-									<Label htmlFor={field.name}>Auditor guidance</Label>
+									<Label htmlFor={field.name}>
+										Auditor guidance{" "}
+										<span className="text-xs font-normal text-muted-foreground">(optional)</span>
+									</Label>
 									<Textarea
 										id={field.name}
+										placeholder="Provide any site-specific instructions, access details, or scoring priorities for your auditors…"
 										value={field.state.value}
 										onBlur={field.handleBlur}
 										onChange={event => field.handleChange(event.target.value)}
 									/>
+									<p className="text-xs text-muted-foreground">
+										Auditors will see this guidance in the mobile app before starting an audit.
+									</p>
 								</div>
 							)}
 						</form.Field>

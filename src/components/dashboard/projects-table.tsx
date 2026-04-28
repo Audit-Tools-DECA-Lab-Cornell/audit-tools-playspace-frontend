@@ -14,7 +14,7 @@ import { DataTableColumnHeader } from "./data-table-column-header";
 import type { EntityRowAction } from "./entity-row-actions";
 import { EntityRowActions } from "./entity-row-actions";
 
-import { formatProjectDateRange, formatScoreLabel, getProjectStatusClassName } from "./utils";
+import { formatProjectDateRange, formatScorePairLabel, getProjectStatusClassName } from "./utils";
 
 export interface ProjectsTableProps {
 	projects: ProjectSummary[];
@@ -135,13 +135,13 @@ export function ProjectsTable({
 				)
 			},
 			{
-				accessorKey: "average_score",
+				accessorKey: "average_scores",
 				header: ({ column }) => (
 					<DataTableColumnHeader column={column} title={t("columns.meanScore")} align="end" />
 				),
 				cell: ({ row }) => (
 					<span className="block min-w-[110px] text-right font-mono text-foreground tabular-nums">
-						{formatScoreLabel(row.original.average_score, formatT)}
+						{formatScorePairLabel(row.original.average_scores, formatT)}
 					</span>
 				)
 			},

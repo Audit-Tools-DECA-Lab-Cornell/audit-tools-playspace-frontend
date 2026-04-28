@@ -15,7 +15,7 @@ import {
 	preservePreviousData,
 	toBackendSortParam
 } from "@/components/dashboard/server-table-utils";
-import { formatProjectDateRange, formatScoreLabel } from "@/components/dashboard/utils";
+import { formatProjectDateRange, formatScorePairLabel } from "@/components/dashboard/utils";
 import { Button } from "@/components/ui/button";
 
 export default function AdminProjectsPage() {
@@ -130,13 +130,13 @@ export default function AdminProjectsPage() {
 				)
 			},
 			{
-				accessorKey: "average_score",
+				accessorKey: "average_scores",
 				header: ({ column }) => (
 					<DataTableColumnHeader column={column} title={t("table.columns.meanScore")} align="end" />
 				),
 				cell: ({ row }) => (
 					<span className="block text-right font-mono text-foreground tabular-nums">
-						{formatScoreLabel(row.original.average_score, formatT)}
+						{formatScorePairLabel(row.original.average_scores, formatT)}
 					</span>
 				)
 			}

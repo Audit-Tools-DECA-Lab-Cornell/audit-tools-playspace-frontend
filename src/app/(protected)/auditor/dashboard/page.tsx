@@ -1,16 +1,31 @@
-import { getServerAuditorDashboardData } from "@/lib/api/server-playspace-dashboard";
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
+
+import { getServerAuditorAssignedPlaces, getServerAuditorDashboardSummary } from "@/lib/api/playspace-server";
+import { getQueryClient } from "@/lib/query/server-query-client";
 
 import { AuditorDashboardClient } from "./dashboard-client";
 
 export default async function AuditorDashboardPage() {
-	let dashboardData: Awaited<ReturnType<typeof getServerAuditorDashboardData>> | null = null;
-	let errorMessage: string | null = null;
+	const queryClient = getQueryClient();
 
-	try {
-		dashboardData = await getServerAuditorDashboardData();
-	} catch (error) {
-		errorMessage = error instanceof Error ? error.message : "Unable to load auditor dashboard.";
-	}
+	await Promise.all([
+		queryClient
+			.prefetchQuery({
+				queryKey: ["playspace", "auditor", "dashboardSummary"],
+				queryFn: () => getServerAuditorDashboardSummary()
+			})
+			.catch(() => undefined),
+		queryClient
+			.prefetchQuery({
+				queryKey: ["playspace", "auditor", "assignedPlaces", "dashboard"],
+				queryFn: () => getServerAuditorAssignedPlaces({ page: 1, pageSize: 100 })
+			})
+			.catch(() => undefined)
+	]);
 
-	return <AuditorDashboardClient {...(dashboardData ?? {})} errorMessage={errorMessage} />;
+	return (
+		<HydrationBoundary state={dehydrate(queryClient)}>
+			<AuditorDashboardClient />
+		</HydrationBoundary>
+	);
 }

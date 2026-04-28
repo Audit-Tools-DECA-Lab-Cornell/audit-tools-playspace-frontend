@@ -16,7 +16,13 @@ import { EntityRowActions } from "./entity-row-actions";
 
 import type { PlayspaceType } from "@/lib/api/playspace";
 import { DataTableFilterOption } from "./data-table-toolbar";
-import { formatDateTimeLabel, formatLocationLabel, formatScoreLabel, getPlaceStatusClassName } from "./utils";
+import {
+	formatRequirementStatusLabel,
+	formatDateTimeLabel,
+	formatLocationLabel,
+	formatScorePairLabel,
+	getRequirementStatusClassName
+} from "./utils";
 
 export interface PlacesTableProps {
 	places: PlaceSummary[];
@@ -80,15 +86,29 @@ export function PlacesTable({
 					)
 			},
 			{
-				accessorKey: "status",
+				id: "place_axes",
+				accessorFn: (row: PlaceSummary) => [row.place_audit_status, row.place_survey_status],
 				header: ({ column }) => <DataTableColumnHeader column={column} title={t("columns.status")} />,
 				filterFn: getMultiValueFilterFn<PlaceSummary>(),
 				cell: ({ row }) => (
-					<Badge
-						variant="outline"
-						className={cn(getPlaceStatusClassName(row.original.status), "font-medium")}>
-						{t(`status.${row.original.status}`)}
-					</Badge>
+					<div className="flex min-w-[180px] flex-wrap gap-1.5">
+						<Badge
+							variant="outline"
+							className={cn(
+								getRequirementStatusClassName(row.original.place_audit_status),
+								"font-medium"
+							)}>
+							{`A ${formatRequirementStatusLabel(row.original.place_audit_status, formatT)}`}
+						</Badge>
+						<Badge
+							variant="outline"
+							className={cn(
+								getRequirementStatusClassName(row.original.place_survey_status),
+								"font-medium"
+							)}>
+							{`S ${formatRequirementStatusLabel(row.original.place_survey_status, formatT)}`}
+						</Badge>
+					</div>
 				)
 			},
 			{
@@ -103,13 +123,13 @@ export function PlacesTable({
 				)
 			},
 			{
-				accessorKey: "average_score",
+				accessorKey: "overall_scores",
 				header: ({ column }) => (
 					<DataTableColumnHeader column={column} title={t("columns.meanScore")} align="end" />
 				),
 				cell: ({ row }) => (
 					<span className="block text-right font-mono text-foreground tabular-nums">
-						{formatScoreLabel(row.original.average_score, formatT)}
+						{formatScorePairLabel(row.original.overall_scores, formatT)}
 					</span>
 				)
 			},
@@ -139,7 +159,12 @@ export function PlacesTable({
 	);
 
 	const statusOptions = React.useMemo(() => {
-		return Array.from(new Set(places.map(place => place.status))).map(status => ({
+		const values = new Set<string>();
+		for (const place of places) {
+			values.add(place.place_audit_status);
+			values.add(place.place_survey_status);
+		}
+		return Array.from(values).map(status => ({
 			label: t(`status.${status}`),
 			value: status
 		}));
@@ -166,7 +191,7 @@ export function PlacesTable({
 			searchPlaceholder={t("searchPlaceholder")}
 			filterConfigs={[
 				{
-					columnId: "status",
+					columnId: "place_axes",
 					title: t("columns.status"),
 					options: statusOptions
 				},

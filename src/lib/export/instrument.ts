@@ -1,6 +1,3 @@
-import * as XLSX from "xlsx";
-import jsPDF from "jspdf";
-import "jspdf-autotable";
 import type { PlayspaceInstrument } from "@/types/audit";
 
 export type InstrumentContent = Record<string, PlayspaceInstrument>;
@@ -92,12 +89,54 @@ function flattenInstrument(instrument: PlayspaceInstrument): FlatInstrumentRow[]
 	return rows;
 }
 
-export function exportInstrument(
+async function generateXlsxBlob(headers: string[], tableData: string[][]): Promise<Blob> {
+	const XLSX = await import("xlsx");
+	const wb = XLSX.utils.book_new();
+	const ws = XLSX.utils.aoa_to_sheet([headers, ...tableData]);
+	XLSX.utils.book_append_sheet(wb, ws, "Instrument");
+	const buffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
+	return new Blob([buffer], {
+		type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+	});
+}
+
+async function downloadPdf(
+	headers: string[],
+	tableData: string[][],
+	fileName: string,
+	version: string,
+	lang: string
+): Promise<void> {
+	const jsPDFModule = await import("jspdf");
+	const jsPDF = jsPDFModule.default;
+	const autoTableModule = await import("jspdf-autotable");
+	const autoTable = autoTableModule.default;
+
+	const doc = new jsPDF({ orientation: "landscape" });
+	doc.setFontSize(14);
+	doc.text(`Instrument v${version} (${lang.toUpperCase()})`, 14, 15);
+	autoTable(doc, {
+		head: [headers],
+		body: tableData,
+		startY: 20,
+		styles: { fontSize: 8, cellPadding: 2 },
+		headStyles: { fillColor: [41, 128, 185], textColor: 255 },
+		columnStyles: {
+			6: { cellWidth: 50 },
+			2: { cellWidth: 30 }
+		},
+		margin: { top: 20 }
+	});
+
+	doc.save(`${fileName}.pdf`);
+}
+
+export async function exportInstrument(
 	content: InstrumentContent,
 	version: string,
 	format: ExportFormat,
 	lang: string = "en"
-) {
+): Promise<void> {
 	const instrument = content[lang];
 	if (!instrument) {
 		return;
@@ -147,6 +186,7 @@ export function exportInstrument(
 	]);
 
 	if (format === "csv") {
+		const XLSX = await import("xlsx");
 		const ws = XLSX.utils.aoa_to_sheet([headers, ...tableData]);
 		const csv = XLSX.utils.sheet_to_csv(ws);
 		const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
@@ -155,37 +195,12 @@ export function exportInstrument(
 	}
 
 	if (format === "xlsx") {
-		const wb = XLSX.utils.book_new();
-		const ws = XLSX.utils.aoa_to_sheet([headers, ...tableData]);
-		XLSX.utils.book_append_sheet(wb, ws, "Instrument");
-		const buffer = XLSX.write(wb, { bookType: "xlsx", type: "array" });
-		const blob = new Blob([buffer], {
-			type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-		});
+		const blob = await generateXlsxBlob(headers, tableData);
 		downloadBlob(blob, `${fileName}.xlsx`);
 		return;
 	}
 
 	if (format === "pdf") {
-		const doc = new jsPDF({ orientation: "landscape" });
-		doc.setFontSize(14);
-		doc.text(`Instrument v${version} (${lang.toUpperCase()})`, 14, 15);
-
-		// eslint-disable-next-line @typescript-eslint/no-explicit-any
-		(doc as any).autoTable({
-			head: [headers],
-			body: tableData,
-			startY: 20,
-			styles: { fontSize: 8, cellPadding: 2 },
-			headStyles: { fillColor: [41, 128, 185], textColor: 255 },
-			columnStyles: {
-				6: { cellWidth: 50 },
-				2: { cellWidth: 30 }
-			},
-			margin: { top: 20 }
-		});
-
-		doc.save(`${fileName}.pdf`);
-		return;
+		await downloadPdf(headers, tableData, fileName, version, lang);
 	}
 }

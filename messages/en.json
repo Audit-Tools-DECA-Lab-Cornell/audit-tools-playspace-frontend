@@ -31,6 +31,15 @@
 					"helper": "stats.meanSubmittedScore.helper"
 				}
 			}
+		},
+		"errorBoundary": {
+			"title": "Something went wrong",
+			"description": "We hit an unexpected error rendering this page. You can try again, or go back to the dashboard.",
+			"globalDescription": "We hit an unexpected error and could not finish loading the app. Reloading the page usually fixes this.",
+			"actions": {
+				"retry": "Try again",
+				"reload": "Reload the page"
+			}
 		}
 	},
 	"shell": {
@@ -47,11 +56,12 @@
 			"places": "Places",
 			"auditors": "Auditors",
 			"audits": "Audits",
+			"reports": "Reports",
+			"rawData": "Raw Data",
 			"instruments": "Instruments",
 			"system": "System",
 			"settings": "Settings",
-			"assignments": "Assignments",
-			"reports": "Reports"
+			"assignments": "Assignments"
 		},
 		"userMenu": {
 			"auditorWithCode": "Auditor ({code})",
@@ -134,7 +144,7 @@
 			"rolePending": "Role pending",
 			"columns": {
 				"auditor": "Auditor",
-				"role": "Role",
+				"role": "Role/Profession",
 				"assignments": "Assignments",
 				"completed": "Completed",
 				"lastActive": "Last Active"
@@ -264,6 +274,7 @@
 				"searchPlaceholder": "Search accounts...",
 				"emptyMessage": "No accounts match the current filters.",
 				"emailHidden": "Email hidden",
+				"nameHidden": "Name hidden",
 				"columns": {
 					"account": "Account",
 					"type": "Type",
@@ -355,6 +366,7 @@
 				"emptyMessage": "No places match the current filters.",
 				"columns": {
 					"place": "Place",
+					"status": "Status",
 					"completed": "Completed",
 					"meanScore": "Mean Score",
 					"latestAudit": "Latest Audit"
@@ -380,6 +392,23 @@
 				"title": "Audit Activity",
 				"description": "Monitor platform-wide audit throughput, lineage, and delivery status.",
 				"emptyMessage": "No audits match the current filters."
+			}
+		},
+		"auditDetail": {
+			"error": {
+				"title": "Audit unavailable",
+				"description": "Refresh this page to retry. If the issue continues, return to the audits list.",
+				"retry": "Try again",
+				"backToList": "Back to audits"
+			},
+			"header": {
+				"eyebrow": "Administrator Workspace",
+				"title": "Audit Detail",
+				"description": "Full audit session detail including scores and responses."
+			},
+			"breadcrumbs": {
+				"dashboard": "Dashboard",
+				"audits": "Audits"
 			}
 		},
 		"instruments": {
@@ -808,6 +837,24 @@
 				}
 			}
 		},
+		"auditDetail": {
+			"error": {
+				"title": "Audit unavailable",
+				"description": "Refresh this page to retry. If the issue continues, return to the audits list.",
+				"retry": "Try again",
+				"backToList": "Back to audits"
+			},
+			"header": {
+				"eyebrow": "Manager Workspace",
+				"title": "Audit Detail",
+				"description": "Full audit session detail including scores and responses."
+			},
+			"breadcrumbs": {
+				"dashboard": "Dashboard",
+				"audits": "Audits"
+			},
+			"missingAccount": "Manager account context is missing from the current session."
+		},
 		"places": {
 			"errors": {
 				"accountContextUnavailable": "Manager account context is unavailable."
@@ -1191,7 +1238,10 @@
 				"description": "Try refreshing the page. If the issue persists, verify your sign-in role and auditor code."
 			},
 			"actions": {
-				"refresh": "Refresh"
+				"refresh": "Refresh",
+				"resumeAudit": "Resume audit",
+				"startAudit": "Start audit",
+				"viewReport": "View report"
 			},
 			"stats": {
 				"assignedPlaces": {
@@ -1217,17 +1267,27 @@
 			},
 			"assignedPlaces": {
 				"title": "Assigned places",
-				"empty": "Assigned places will appear here after a manager grants access. Refresh if you were just assigned.",
-				"resumeAudit": "Resume audit",
-				"startAudit": "Start audit",
-				"openReport": "Open report",
-				"viewAll": "View all assigned places"
+				"tableDescription": "Your assigned locations with audit and survey progress. Click a place to start or resume.",
+				"searchPlaceholder": "Search places...",
+				"empty": "Assigned places will appear here after a manager grants access. Refresh if you were just assigned."
+			},
+			"table": {
+				"place": "Place",
+				"status": "Status",
+				"mode": "Mode",
+				"score": "Score",
+				"started": "Started"
+			},
+			"filters": {
+				"projects": "Projects",
+				"clearAll": "Clear filters"
 			},
 			"status": {
 				"in_progress": "in progress",
 				"paused": "paused",
 				"submitted": "submitted",
-				"not_started": "not started"
+				"not_started": "not started",
+				"complete": "complete"
 			}
 		},
 		"places": {
@@ -1270,42 +1330,36 @@
 				"title": "Unable to load reports",
 				"description": "Try refreshing the page. If this continues, verify your sign-in context."
 			},
-			"actions": {
-				"refresh": "Refresh"
-			},
 			"header": {
 				"eyebrow": "Auditor Workspace",
-				"title": "Reports",
-				"description": "Review submitted and in-progress audit sessions."
+				"title": "Audit Reports",
+				"description": "View your submitted audit reports."
 			},
 			"breadcrumbs": {
 				"dashboard": "Dashboard",
 				"reports": "Reports"
 			},
-			"list": {
-				"title": "Audit sessions",
-				"empty": "Submitted and in-progress sessions will appear here after you start an assigned audit.",
-				"openReport": "Open report",
-				"resumeAudit": "Resume audit",
-				"submittedAt": "Submitted {value}",
-				"draftNotSubmitted": "Draft not submitted yet",
-				"startedAt": "Started {value}"
+			"stats": {
+				"totalReports": "Total Reports",
+				"totalReportsHelper": "Your submitted audits ready for review.",
+				"avgPlayValue": "Avg Play Value",
+				"avgPlayValueHelper": "Mean Play Value score across your submissions.",
+				"avgUsability": "Avg Usability",
+				"avgUsabilityHelper": "Mean Usability score across your submissions.",
+				"places": "Places Covered",
+				"placesHelper": "Unique places with submitted audits.",
+				"projects": "Projects",
+				"projectsHelper": "Projects with submitted reports."
 			},
-			"groups": {
-				"actionRequired": "Action required ({count})",
-				"submitted": "Submitted ({count})"
+			"table": {
+				"title": "Submitted Audit Reports",
+				"description": "Browse your completed audit reports. Click a row to view details.",
+				"emptyMessage": "No submitted audit reports yet.",
+				"viewReport": "View Report"
 			},
-			"status": {
-				"in_progress": "in progress",
-				"paused": "paused",
-				"submitted": "submitted"
-			},
-			"pagination": {
-				"itemLabel": "audit sessions"
-			},
-			"summary": {
-				"title": "Submitted report count",
-				"description": "Sessions that have been submitted and are ready for review."
+			"filters": {
+				"projects": "Projects",
+				"clearAll": "Clear filters"
 			}
 		},
 		"reportDetail": {

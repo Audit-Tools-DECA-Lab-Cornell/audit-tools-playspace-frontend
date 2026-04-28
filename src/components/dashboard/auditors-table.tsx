@@ -3,6 +3,7 @@
 import * as React from "react";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useTranslations } from "next-intl";
+import Link from "next/link";
 
 import type { AuditorSummary } from "@/lib/api/playspace";
 import { Badge } from "@/components/ui/badge";
@@ -18,7 +19,9 @@ export interface AuditorsTableProps {
 	auditors: AuditorSummary[];
 	title?: string;
 	description?: string;
+	basePath?: string;
 	action?: React.ReactNode;
+	toolbarExtra?: React.ReactNode;
 	getRowActions?: (auditor: AuditorSummary) => EntityRowAction[];
 	pageSize?: number;
 	emptyMessage?: string;
@@ -41,7 +44,9 @@ export function AuditorsTable({
 	auditors,
 	title,
 	description,
+	basePath = "/manager/auditors",
 	action,
+	toolbarExtra,
 	getRowActions,
 	pageSize = 10,
 	emptyMessage
@@ -66,7 +71,11 @@ export function AuditorsTable({
 								</Badge>
 							) : null}
 						</div>
-						<p className="font-medium text-foreground">{row.original.full_name}</p>
+						<Link
+							href={`${basePath}/${encodeURIComponent(row.original.id)}`}
+							className="font-medium text-foreground transition-colors hover:text-primary">
+							{row.original.full_name}
+						</Link>
 						<p className="text-sm text-muted-foreground">{row.original.email ?? t("emailPending")}</p>
 					</div>
 				),
@@ -126,7 +135,7 @@ export function AuditorsTable({
 					]
 				: [])
 		],
-		[formatT, getRowActions, t]
+		[basePath, formatT, getRowActions, t]
 	);
 
 	const roleOptions = React.useMemo(() => {
@@ -155,6 +164,7 @@ export function AuditorsTable({
 					options: roleOptions
 				}
 			]}
+			toolbarExtra={toolbarExtra}
 			action={action}
 			pageSize={pageSize}
 			emptyMessage={emptyMessage ?? t("emptyMessage")}
