@@ -2,7 +2,12 @@ import type { NextConfig } from "next";
 import createNextIntlPlugin from "next-intl/plugin";
 
 const nextConfig: NextConfig = {
-	/* config options here */
+	experimental: {
+		optimizePackageImports: ["lucide-react", "radix-ui", "@tanstack/react-query", "@tanstack/react-table"]
+	},
+	images: {
+		formats: ["image/avif", "image/webp"]
+	}
 };
 
 const withNextIntl = createNextIntlPlugin();

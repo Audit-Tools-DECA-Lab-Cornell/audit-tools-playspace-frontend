@@ -294,7 +294,6 @@ export async function getServerAdminDashboardData(): Promise<ServerAdminDashboar
  * Fetch the auditor dashboard payloads on the server so the page can render without a client-side request waterfall.
  */
 export async function getServerAuditorDashboardData(): Promise<ServerAuditorDashboardData> {
-	console.log(`Fetching auditor dashboard data...`);
 	const [summary, placesPage] = await Promise.all([
 		fetchServerValidatedJson("/playspace/auditor/me/dashboard-summary", auditorDashboardSummarySchema),
 		fetchServerValidatedJson(
@@ -302,8 +301,6 @@ export async function getServerAuditorDashboardData(): Promise<ServerAuditorDash
 			paginatedResponseSchema(auditorPlaceSchema)
 		)
 	]);
-
-	console.log(`Auditor dashboard data fetched.`, summary, placesPage);
 
 	return {
 		summary,
