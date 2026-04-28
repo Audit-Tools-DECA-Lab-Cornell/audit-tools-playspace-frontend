@@ -1,88 +1,40 @@
-"use client";
+import { dehydrate, HydrationBoundary } from "@tanstack/react-query";
 
-import { useQuery } from "@tanstack/react-query";
-import { ArrowLeftIcon } from "lucide-react";
-import Link from "next/link";
-import { useParams } from "next/navigation";
+import { getServerAudit, getServerInstrument } from "@/lib/api/playspace-server";
+import { type AuditSession } from "@/lib/api/playspace-types";
+import { getQueryClient } from "@/lib/query/server-query-client";
 
-import { playspaceApi } from "@/lib/api/playspace";
-import { AuditReportView } from "@/components/dashboard/audit-report-view";
-import { DashboardHeader } from "@/components/dashboard/dashboard-header";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
-import { BackButton } from "@/components/dashboard/back-button";
+import { AdminReportDetailClient } from "./report-detail-client";
 
-/**
- * Admin-facing individual audit report detail page.
- * Fetches the full AuditSession + instrument and renders a formatted report view.
- */
-export default function AdminReportDetailPage() {
-	const params = useParams<{ auditId: string }>();
-	const auditId = params.auditId;
+interface AdminReportDetailPageProps {
+	params: Promise<{ auditId: string }>;
+}
 
-	const auditQuery = useQuery({
-		queryKey: ["playspace", "audit", auditId],
-		queryFn: () => playspaceApi.auditor.getAudit(auditId),
-		enabled: typeof auditId === "string" && auditId.length > 0
-	});
+export default async function AdminReportDetailPage({ params }: Readonly<AdminReportDetailPageProps>) {
+	const { auditId } = await params;
+	const queryClient = getQueryClient();
 
-	const audit = auditQuery.data;
+	const auditKey = ["playspace", "audit", auditId] as const;
+	await queryClient
+		.prefetchQuery({
+			queryKey: auditKey,
+			queryFn: () => getServerAudit(auditId)
+		})
+		.catch(() => undefined);
 
-	const instrumentQuery = useQuery({
-		queryKey: ["playspace", "instrument", audit?.instrument_key],
-		queryFn: () => {
-			if (audit?.instrument !== undefined && audit.instrument !== null) {
-				return Promise.resolve(audit.instrument);
-			}
-			if (typeof audit?.instrument_key !== "string") {
-				throw new Error("No instrument key available");
-			}
-			return playspaceApi.auditor.fetchInstrument(audit.instrument_key);
-		},
-		enabled: audit !== undefined
-	});
+	const audit = queryClient.getQueryData<AuditSession>(auditKey);
+	if (audit && (audit.instrument === null || audit.instrument === undefined)) {
+		await queryClient
+			.prefetchQuery({
+				queryKey: ["playspace", "instrument", audit.instrument_key],
+				queryFn: () => getServerInstrument(audit.instrument_key)
+			})
+			.catch(() => undefined);
+	}
 
 	return (
-		<div className="space-y-6">
-			<DashboardHeader
-				eyebrow="Administrator Workspace"
-				title={audit?.place_name ?? "Audit Report"}
-				description={audit !== undefined ? audit.project_name : "Loading report details\u2026"}
-				breadcrumbs={[
-					{ label: "Dashboard", href: "/admin/dashboard" },
-					{ label: "Reports", href: "/admin/reports" },
-					{ label: audit?.audit_code ?? "Report" }
-				]}
-				actions={<BackButton href="/admin/reports" label="Back to Reports" />}
-			/>
-
-			{auditQuery.isLoading ? (
-				<div className="space-y-4">
-					{Array.from({ length: 3 }).map((_, idx) => (
-						<div
-							key={`skeleton-${idx}`}
-							className="h-40 animate-pulse rounded-card border border-border bg-card"
-						/>
-					))}
-				</div>
-			) : null}
-
-			{auditQuery.isError ? (
-				<Card>
-					<CardContent className="py-8 text-center">
-						<p className="text-sm text-destructive">
-							Unable to load audit report. The audit may not exist or you may not have access.
-						</p>
-						<Link href="/admin/reports" className="mt-3 inline-block">
-							<Button variant="outline" size="sm">
-								Return to Reports
-							</Button>
-						</Link>
-					</CardContent>
-				</Card>
-			) : null}
-
-			{audit !== undefined ? <AuditReportView audit={audit} instrument={instrumentQuery.data ?? null} /> : null}
-		</div>
+		<HydrationBoundary state={dehydrate(queryClient)}>
+			<AdminReportDetailClient auditId={auditId} />
+		</HydrationBoundary>
 	);
 }

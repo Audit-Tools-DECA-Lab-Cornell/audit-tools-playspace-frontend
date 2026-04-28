@@ -1,3 +1,4 @@
+import * as React from "react";
 import type { ReactNode } from "react";
 import Link from "next/link";
 
@@ -41,16 +42,18 @@ export function DashboardHeader({
 								const isLastItem = index === breadcrumbs.length - 1;
 
 								return (
-									<BreadcrumbItem key={`${item.label}_${index}`}>
-										{item.href && !isLastItem ? (
-											<BreadcrumbLink asChild>
-												<Link href={item.href}>{item.label}</Link>
-											</BreadcrumbLink>
-										) : (
-											<BreadcrumbPage>{item.label}</BreadcrumbPage>
-										)}
+									<React.Fragment key={`${item.label}_${index}`}>
+										<BreadcrumbItem>
+											{item.href && !isLastItem ? (
+												<BreadcrumbLink asChild>
+													<Link href={item.href}>{item.label}</Link>
+												</BreadcrumbLink>
+											) : (
+												<BreadcrumbPage>{item.label}</BreadcrumbPage>
+											)}
+										</BreadcrumbItem>
 										{!isLastItem && <BreadcrumbSeparator />}
-									</BreadcrumbItem>
+									</React.Fragment>
 								);
 							})}
 						</BreadcrumbList>
