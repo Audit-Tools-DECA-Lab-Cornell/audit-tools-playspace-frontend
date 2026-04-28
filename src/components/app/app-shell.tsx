@@ -85,7 +85,6 @@ function getNavItems(role: UserRole, t: NavigationTranslator): NavItem[] {
 
 	return [
 		{ label: t("dashboard"), href: "/auditor/dashboard", icon: LayoutDashboard },
-		{ label: t("places"), href: "/auditor/places", icon: MapPin },
 		{ label: t("reports"), href: "/auditor/reports", icon: ClipboardList },
 		{ label: t("settings"), href: "/settings", icon: Settings }
 	];

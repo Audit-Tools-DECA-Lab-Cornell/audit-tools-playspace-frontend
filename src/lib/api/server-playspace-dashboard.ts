@@ -1,10 +1,21 @@
 import { z } from "zod";
 
 import { getServerAuthSession } from "@/lib/auth/server-session";
+import { executionModeSchema } from "@/types/audit";
 
 const accountTypeSchema = z.enum(["ADMIN", "MANAGER", "AUDITOR"]);
 const projectStatusSchema = z.enum(["planned", "active", "completed"]);
 const auditStatusSchema = z.enum(["IN_PROGRESS", "PAUSED", "SUBMITTED"]);
+const playspaceTypeSchema = z.enum([
+	"Public Playspace",
+	"Pre-School Playspace",
+	"Destination Playspace",
+	"Nature Playspace",
+	"Neighborhood Playspace",
+	"Waterfront Playspace",
+	"School Playspace"
+]);
+const placeAxisStatusSchema = z.enum(["not_started", "in_progress", "submitted", "complete"]);
 const scorePairSchema = z.object({
 	pv: z.number(),
 	u: z.number()
@@ -57,7 +68,7 @@ const projectSummarySchema = z.object({
 	account_id: z.uuid(),
 	name: z.string(),
 	overview: z.string().nullable(),
-	place_types: z.array(z.string()),
+	place_types: z.array(playspaceTypeSchema),
 	start_date: z.iso.date().nullable(),
 	end_date: z.iso.date().nullable(),
 	status: projectStatusSchema,
@@ -183,13 +194,14 @@ export type ServerAdminDashboardData = Readonly<{
 const auditorPlaceSchema = z.object({
 	place_id: z.uuid(),
 	place_name: z.string(),
-	place_type: z.string().nullable(),
+	place_type: playspaceTypeSchema.nullable(),
 	project_id: z.uuid(),
 	project_name: z.string(),
+	address: z.string().nullable(),
+	postal_code: z.string().nullable(),
 	city: z.string().nullable(),
 	province: z.string().nullable(),
 	country: z.string().nullable(),
-	status: auditStatusSchema.nullable(),
 	audit_id: z.uuid().nullable(),
 	started_at: z.iso.datetime().nullable(),
 	submitted_at: z.iso.datetime().nullable(),
@@ -210,7 +222,13 @@ const auditorPlaceSchema = z.object({
 			usability_total_max: z.number()
 		})
 		.nullable(),
-	progress_percent: z.number().nullable()
+	progress_percent: z.number().nullable(),
+	selected_execution_mode: executionModeSchema.nullable().optional().default(null),
+	place_audit_status: placeAxisStatusSchema.optional().default("not_started"),
+	place_survey_status: placeAxisStatusSchema.optional().default("not_started"),
+	audit_scores: scorePairSchema.nullable().optional().default(null),
+	survey_scores: scorePairSchema.nullable().optional().default(null),
+	overall_scores: scorePairSchema.nullable().optional().default(null)
 });
 
 const auditorDashboardSummarySchema = z.object({
@@ -276,6 +294,7 @@ export async function getServerAdminDashboardData(): Promise<ServerAdminDashboar
  * Fetch the auditor dashboard payloads on the server so the page can render without a client-side request waterfall.
  */
 export async function getServerAuditorDashboardData(): Promise<ServerAuditorDashboardData> {
+	console.log(`Fetching auditor dashboard data...`);
 	const [summary, placesPage] = await Promise.all([
 		fetchServerValidatedJson("/playspace/auditor/me/dashboard-summary", auditorDashboardSummarySchema),
 		fetchServerValidatedJson(
@@ -283,6 +302,8 @@ export async function getServerAuditorDashboardData(): Promise<ServerAuditorDash
 			paginatedResponseSchema(auditorPlaceSchema)
 		)
 	]);
+
+	console.log(`Auditor dashboard data fetched.`, summary, placesPage);
 
 	return {
 		summary,

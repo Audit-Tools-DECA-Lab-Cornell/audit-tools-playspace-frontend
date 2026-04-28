@@ -87,7 +87,6 @@ function AuditIdentityCell({
 		.filter((value): value is string => Boolean(value && value.trim().length > 0))
 		.join(" · ");
 
-	console.log("primaryLabel", primaryLabel, "auditCode", auditCode);
 	React.useEffect(() => {
 		return () => {
 			if (resetTimeoutRef.current !== null) {

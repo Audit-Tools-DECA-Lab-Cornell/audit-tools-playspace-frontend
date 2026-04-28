@@ -435,7 +435,6 @@ const auditorPlaceSchema = z.object({
 	city: z.string().nullable(),
 	province: z.string().nullable(),
 	country: z.string().nullable(),
-	status: auditStatusSchema.nullable(),
 	audit_id: z.string().uuid().nullable(),
 	started_at: z.string().datetime().nullable(),
 	submitted_at: z.string().datetime().nullable(),
@@ -453,6 +452,7 @@ const auditorPlaceSchema = z.object({
 const auditorAuditSummarySchema = z.object({
 	audit_id: z.string().uuid(),
 	audit_code: z.string(),
+	auditor_code: z.string().optional().default(""),
 	place_id: z.string().uuid(),
 	place_name: z.string(),
 	project_id: z.string().uuid(),
@@ -463,6 +463,7 @@ const auditorAuditSummarySchema = z.object({
 	submitted_at: z.string().datetime().nullable(),
 	summary_score: z.number().nullable(),
 	score_totals: scoreTotalsSchema.nullable(),
+	score_pair: scorePairSchema.nullable().optional().default(null),
 	progress_percent: z.number().nullable()
 });
 
@@ -1105,9 +1106,6 @@ async function fetchValidatedJson<TValue>(
 		try {
 			return schema.parse(response.data);
 		} catch (error) {
-			console.log("Error:", error);
-			console.error("The server returned an unexpected response shape.", response.data);
-			console.error("The expected response shape is:", schema.describe("The expected response shape."));
 			throw new PlayspaceApiError("The server returned an unexpected response shape.", response.status);
 		}
 	} catch (error) {

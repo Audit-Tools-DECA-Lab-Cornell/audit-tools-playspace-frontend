@@ -263,3 +263,14 @@ export function buildNextQuestionAnswers(
 
 	return { provision: optionKey };
 }
+
+/**
+ * Format a backend question key (e.g. `q_8_1`) like the execution question card (`Q 8.1`).
+ */
+export function formatQuestionKeyForDisplay(questionKey: string): string {
+	if (!questionKey.startsWith("q_")) {
+		return questionKey;
+	}
+	const sections = questionKey.slice(2).split("_");
+	return `Q ${sections.map(section => section.toUpperCase()).join(".")}`;
+}

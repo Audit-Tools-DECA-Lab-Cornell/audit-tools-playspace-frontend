@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import { getActiveScaleKeysForQuestion } from "@/lib/audit/selectors";
 import { cn } from "@/lib/utils";
 import type { InstrumentQuestion, QuestionResponsePayload, ScaleKey } from "@/types/audit";
+import { formatQuestionKeyForDisplay } from "@/lib/audit/selectors";
 
 interface PromptSegment {
 	readonly text: string;
@@ -170,12 +171,10 @@ function QuestionPrompt({ question }: Readonly<QuestionPromptProps>) {
 	return (
 		<div className="space-y-2">
 			<p className="text-xs font-semibold uppercase tracking-[0.08em] text-text-secondary">
-				{question.question_key}
+				{formatQuestionKeyForDisplay(question.question_key)}
 			</p>
 			<p className="text-sm leading-6 text-foreground">
-				<span className="block text-xs font-semibold uppercase tracking-[0.14em] text-primary">
-					{t("thisPlayspace")}
-				</span>
+				<span className="block text-sm font-bold tracking-[0.04em] text-primary">{t("thisPlayspace")}</span>
 				{promptSegments.map((segment, index) => (
 					<Fragment key={`${question.question_key}-${index.toString()}`}>
 						<span className={segment.bold ? "font-semibold text-primary" : undefined}>{segment.text}</span>

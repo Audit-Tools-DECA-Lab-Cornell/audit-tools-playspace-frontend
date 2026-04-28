@@ -1193,7 +1193,10 @@
 				"description": "Versuchen Sie, die Seite zu aktualisieren. Wenn das Problem weiterhin besteht, überprüfen Sie Ihre Anmelderolle und Ihren Prüfercode."
 			},
 			"actions": {
-				"refresh": "Aktualisieren"
+				"refresh": "Aktualisieren",
+				"resumeAudit": "Audit fortsetzen",
+				"startAudit": "Audit starten",
+				"viewReport": "Bericht anzeigen"
 			},
 			"stats": {
 				"assignedPlaces": {
@@ -1219,17 +1222,27 @@
 			},
 			"assignedPlaces": {
 				"title": "Zugewiesene Orte",
-				"empty": "Zugewiesene Orte werden hier angezeigt, nachdem eine Führungskraft Zugriff gewährt hat. Aktualisieren Sie die Seite, wenn Ihnen gerade Zugriff zugewiesen wurde.",
-				"resumeAudit": "Audit fortsetzen",
-				"startAudit": "Audit starten",
-				"openReport": "Bericht öffnen",
-				"viewAll": "Alle zugewiesenen Orte anzeigen"
+				"tableDescription": "Ihre zugewiesenen Standorte mit Audit- und Umfragefortschritt. Klicken Sie auf einen Ort, um zu starten oder fortzufahren.",
+				"searchPlaceholder": "Orte suchen...",
+				"empty": "Zugewiesene Orte werden hier angezeigt, nachdem eine Führungskraft Zugriff gewährt hat. Aktualisieren Sie die Seite, wenn Ihnen gerade Zugriff zugewiesen wurde."
+			},
+			"table": {
+				"place": "Ort",
+				"status": "Status",
+				"mode": "Modus",
+				"score": "Punktzahl",
+				"started": "Gestartet"
+			},
+			"filters": {
+				"projects": "Projekte",
+				"clearAll": "Filter löschen"
 			},
 			"status": {
 				"in_progress": "in Bearbeitung",
 				"paused": "pausiert",
 				"submitted": "eingereicht",
-				"not_started": "nicht gestartet"
+				"not_started": "nicht gestartet",
+				"complete": "abgeschlossen"
 			}
 		},
 		"places": {
@@ -1272,42 +1285,36 @@
 				"title": "Berichte konnten nicht geladen werden",
 				"description": "Versuchen Sie, die Seite zu aktualisieren. Wenn das Problem weiterhin besteht, überprüfen Sie Ihren Anmeldekontext."
 			},
-			"actions": {
-				"refresh": "Aktualisieren"
-			},
 			"header": {
 				"eyebrow": "Auditor-Arbeitsbereich",
-				"title": "Berichte",
-				"description": "Prüfen Sie eingereichte und laufende Auditsitzungen."
+				"title": "Auditberichte",
+				"description": "Ihre eingereichten Auditberichte anzeigen."
 			},
 			"breadcrumbs": {
 				"dashboard": "Dashboard",
 				"reports": "Berichte"
 			},
-			"list": {
-				"title": "Auditsitzungen",
-				"empty": "Eingereichte und laufende Sitzungen werden hier angezeigt, nachdem Sie ein zugewiesenes Audit gestartet haben.",
-				"openReport": "Bericht öffnen",
-				"resumeAudit": "Audit fortsetzen",
-				"submittedAt": "Eingereicht {value}",
-				"draftNotSubmitted": "Entwurf noch nicht eingereicht",
-				"startedAt": "Gestartet {value}"
+			"stats": {
+				"totalReports": "Berichte gesamt",
+				"totalReportsHelper": "Ihre eingereichten Audits zur Überprüfung.",
+				"avgPlayValue": "Ø Spielwert",
+				"avgPlayValueHelper": "Durchschnittlicher Spielwert Ihrer Einreichungen.",
+				"avgUsability": "Ø Nutzbarkeit",
+				"avgUsabilityHelper": "Durchschnittliche Nutzbarkeit Ihrer Einreichungen.",
+				"places": "Abgedeckte Orte",
+				"placesHelper": "Einzigartige Orte mit eingereichten Audits.",
+				"projects": "Projekte",
+				"projectsHelper": "Projekte mit eingereichten Berichten."
 			},
-			"groups": {
-				"actionRequired": "Erfordert Aufmerksamkeit ({count})",
-				"submitted": "Eingereicht ({count})"
+			"table": {
+				"title": "Eingereichte Auditberichte",
+				"description": "Durchsuchen Sie Ihre abgeschlossenen Auditberichte. Klicken Sie auf eine Zeile für Details.",
+				"emptyMessage": "Noch keine eingereichten Auditberichte.",
+				"viewReport": "Bericht anzeigen"
 			},
-			"status": {
-				"in_progress": "in Bearbeitung",
-				"paused": "pausiert",
-				"submitted": "eingereicht"
-			},
-			"pagination": {
-				"itemLabel": "Audit-Sitzungen"
-			},
-			"summary": {
-				"title": "Anzahl eingereichter Berichte",
-				"description": "Sitzungen, die eingereicht wurden und zur Prüfung bereit sind."
+			"filters": {
+				"projects": "Projekte",
+				"clearAll": "Filter löschen"
 			}
 		},
 		"reportDetail": {

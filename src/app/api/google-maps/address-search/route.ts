@@ -108,7 +108,6 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
 	const suggestions: AddressSuggestionResponse[] = [];
 	const seenFormattedAddresses = new Set<string>();
-	console.log("data", data.results);
 
 	for (const result of data.results) {
 		if (seenFormattedAddresses.has(result.formatted_address)) {

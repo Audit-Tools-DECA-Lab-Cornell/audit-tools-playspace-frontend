@@ -87,10 +87,6 @@ function formatAuditCodeDateSegment(value: string): string | null {
  * Compress one verbose audit code into a lighter human-readable reference label.
  */
 export function formatAuditCodeReference(auditCode: string): string {
-	console.log("auditCode", auditCode);
-	if (!auditCode) {
-		return "";
-	}
 	const segments = auditCode
 		.split("-")
 		.map(segment => segment.trim())
