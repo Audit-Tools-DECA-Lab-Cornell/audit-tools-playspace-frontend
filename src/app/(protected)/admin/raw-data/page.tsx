@@ -4,13 +4,17 @@ import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import type { ColumnDef, ColumnFiltersState, PaginationState, SortingState } from "@tanstack/react-table";
 import {
+	CheckIcon,
+	ChevronRightIcon,
 	ClipboardListIcon,
+	DatabaseIcon,
 	DownloadIcon,
 	FileTextIcon,
 	FilterIcon,
 	FolderKanban,
 	Loader2Icon,
 	MapPinIcon,
+	Rows3Icon,
 	XIcon
 } from "lucide-react";
 import { useTranslations } from "next-intl";
@@ -53,6 +57,7 @@ import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
+	DropdownMenuLabel,
 	DropdownMenuSeparator,
 	DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
@@ -119,6 +124,168 @@ async function downloadRecords(
 	const workbook = utils.book_new();
 	utils.book_append_sheet(workbook, worksheet, filename.slice(0, 31));
 	writeFile(workbook, `${filename}.xlsx`);
+}
+
+// ── Collection namespace bar ───────────────────────────────────────────────────
+
+const ENTITY_LABELS: Record<ExportEntity, string> = {
+	projects: "projects",
+	places: "places",
+	audits: "audits",
+	reports: "reports"
+};
+
+interface CollectionNamespaceBarProps {
+	entity: ExportEntity;
+	totalCount: number | undefined;
+	selectedCount: number;
+	isFetching: boolean;
+	onClearSelection: () => void;
+}
+
+function CollectionNamespaceBar({
+	entity,
+	totalCount,
+	selectedCount,
+	isFetching,
+	onClearSelection
+}: CollectionNamespaceBarProps) {
+	return (
+		<div className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-border/70 bg-muted/20 px-3.5 py-2">
+			{/* Namespace path — monospace database path like Atlas */}
+			<div className="flex min-w-0 items-center gap-1 font-mono text-[13px]">
+				<DatabaseIcon className="size-3.5 shrink-0 text-muted-foreground" aria-hidden="true" />
+				<span className="text-muted-foreground">playspace</span>
+				<ChevronRightIcon className="size-3 shrink-0 text-muted-foreground/40" aria-hidden="true" />
+				<span className="text-muted-foreground">raw_data</span>
+				<ChevronRightIcon className="size-3 shrink-0 text-muted-foreground/40" aria-hidden="true" />
+				<span className="font-semibold text-foreground">{ENTITY_LABELS[entity]}</span>
+			</div>
+
+			<Separator orientation="vertical" className="h-3.5 shrink-0" />
+
+			{/* Document count */}
+			<div className="flex items-center gap-1.5">
+				{isFetching ? (
+					<Loader2Icon className="size-3 animate-spin text-muted-foreground" aria-hidden="true" />
+				) : (
+					<Rows3Icon className="size-3.5 shrink-0 text-muted-foreground" aria-hidden="true" />
+				)}
+				<span className="font-mono text-[13px] text-muted-foreground">
+					{totalCount !== undefined ? (
+						<>
+							<span className="font-semibold text-foreground">{totalCount.toLocaleString()}</span>{" "}
+							{totalCount === 1 ? "document" : "documents"}
+						</>
+					) : (
+						"—"
+					)}
+				</span>
+			</div>
+
+			{/* Selected pill — only visible when rows are selected */}
+			{selectedCount > 0 && (
+				<>
+					<Separator orientation="vertical" className="h-3.5 shrink-0" />
+					<div className="flex items-center gap-1.5">
+						<span
+							className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 font-mono text-[11px] font-semibold tabular-nums"
+							style={{
+								background: "rgba(0, 168, 90, 0.10)",
+								color: "#00a85a",
+								border: "1px solid rgba(0, 168, 90, 0.28)"
+							}}>
+							<CheckIcon className="size-2.5" aria-hidden="true" />
+							{selectedCount.toLocaleString()} selected
+						</span>
+						<button
+							type="button"
+							onClick={onClearSelection}
+							className="inline-flex items-center gap-0.5 rounded text-[11px] text-muted-foreground underline-offset-2 hover:text-foreground hover:underline focus:outline-none"
+							aria-label="Clear selection">
+							<XIcon className="size-2.5" aria-hidden="true" />
+							clear
+						</button>
+					</div>
+				</>
+			)}
+		</div>
+	);
+}
+
+// ── Selection Status Bar (floats above table when rows are selected) ───────────
+
+interface SelectionBarProps {
+	selectedCount: number;
+	isExporting: boolean;
+	onExportSelected: (format: ExportFormat) => void;
+	onClearSelection: () => void;
+}
+
+function SelectionBar({ selectedCount, isExporting, onExportSelected, onClearSelection }: SelectionBarProps) {
+	if (selectedCount === 0) return null;
+	return (
+		<div
+			className="flex flex-wrap items-center justify-between gap-3 rounded-lg border px-4 py-2.5 text-sm"
+			style={{
+				background: "rgba(0, 168, 90, 0.07)",
+				borderColor: "rgba(0, 168, 90, 0.25)"
+			}}>
+			<div className="flex items-center gap-2">
+				<span
+					className="flex size-5 items-center justify-center rounded-full text-[10px] font-bold tabular-nums"
+					style={{ background: "#00a85a", color: "#fff" }}
+					aria-hidden="true">
+					{selectedCount > 99 ? "99+" : selectedCount}
+				</span>
+				<span className="font-medium" style={{ color: "#007a40" }}>
+					{selectedCount === 1
+						? "1 document selected on this page"
+						: `${selectedCount.toLocaleString()} documents selected on this page`}
+				</span>
+			</div>
+			<div className="flex items-center gap-2">
+				<DropdownMenu>
+					<DropdownMenuTrigger asChild>
+						<Button
+							type="button"
+							size="sm"
+							disabled={isExporting}
+							className="h-8 gap-1.5 text-white"
+							style={{ background: "#00a85a" }}
+							onMouseEnter={e => ((e.currentTarget as HTMLButtonElement).style.background = "#008f4c")}
+							onMouseLeave={e => ((e.currentTarget as HTMLButtonElement).style.background = "#00a85a")}>
+							{isExporting ? (
+								<Loader2Icon className="size-3.5 animate-spin" aria-hidden="true" />
+							) : (
+								<DownloadIcon className="size-3.5" aria-hidden="true" />
+							)}
+							Export selected
+						</Button>
+					</DropdownMenuTrigger>
+					<DropdownMenuContent align="end" className="min-w-44">
+						<DropdownMenuLabel className="font-mono text-xs text-muted-foreground">
+							{selectedCount} document{selectedCount !== 1 ? "s" : ""}
+						</DropdownMenuLabel>
+						<DropdownMenuSeparator />
+						<DropdownMenuItem onClick={() => onExportSelected("json")}>JSON (.json)</DropdownMenuItem>
+						<DropdownMenuSeparator />
+						<DropdownMenuItem onClick={() => onExportSelected("csv")}>CSV (.csv)</DropdownMenuItem>
+						<DropdownMenuItem onClick={() => onExportSelected("xlsx")}>Excel (.xlsx)</DropdownMenuItem>
+					</DropdownMenuContent>
+				</DropdownMenu>
+				<Button
+					type="button"
+					variant="ghost"
+					size="sm"
+					className="h-8 gap-1.5 text-muted-foreground"
+					onClick={onClearSelection}>
+					<XIcon className="size-3.5" aria-hidden="true" />
+					Deselect all
+				</Button>
+			</div>
+		</div>
+	);
 }
 
 // ── Filter Popover (reused across all tabs) ────────────────────────────────────
@@ -206,6 +373,29 @@ function projectExportRecord(r: AdminProjectExportRecord): Record<string, unknow
 	};
 }
 
+/**
+ * Maps a preview-list row (AdminProjectRow) to the same column shape as
+ * projectExportRecord. overview and place_types are not carried by the
+ * preview endpoint and are left blank; average scores are read from
+ * average_scores { pv, u }.
+ */
+function projectRowExportRecord(r: AdminProjectRow): Record<string, unknown> {
+	return {
+		project_id: r.project_id,
+		account_name: r.account_name,
+		name: r.name,
+		overview: "",
+		start_date: r.start_date ?? "",
+		end_date: r.end_date ?? "",
+		place_types: "",
+		places_count: r.places_count,
+		auditors_count: r.auditors_count,
+		audits_completed: r.audits_completed,
+		average_pv_score: r.average_scores?.pv ?? "",
+		average_u_score: r.average_scores?.u ?? ""
+	};
+}
+
 function placeExportRecord(r: AdminPlaceExportRecord): Record<string, unknown> {
 	return {
 		place_id: r.place_id,
@@ -233,6 +423,39 @@ function placeExportRecord(r: AdminPlaceExportRecord): Record<string, unknown> {
 	};
 }
 
+/**
+ * Maps a preview-list row (AdminPlaceRow) to the same column shape as
+ * placeExportRecord. postal_code, lat, and lng are not carried by the
+ * preview endpoint and are left blank; per-mode mean scores are read from
+ * audit_mean_scores and survey_mean_scores { pv, u }.
+ */
+function placeRowExportRecord(r: AdminPlaceRow): Record<string, unknown> {
+	return {
+		place_id: r.place_id,
+		account_name: r.account_name,
+		project_name: r.project_name,
+		name: r.name,
+		address: r.address ?? "",
+		city: r.city ?? "",
+		province: r.province ?? "",
+		country: r.country ?? "",
+		postal_code: "",
+		place_type: r.place_type ?? "",
+		lat: "",
+		lng: "",
+		place_audit_status: r.place_audit_status,
+		place_survey_status: r.place_survey_status,
+		place_audit_count: r.place_audit_count,
+		place_survey_count: r.place_survey_count,
+		audits_completed: r.audits_completed,
+		audit_mean_pv: r.audit_mean_scores?.pv ?? "",
+		audit_mean_u: r.audit_mean_scores?.u ?? "",
+		survey_mean_pv: r.survey_mean_scores?.pv ?? "",
+		survey_mean_u: r.survey_mean_scores?.u ?? "",
+		last_audited_at: r.last_audited_at ?? ""
+	};
+}
+
 function auditExportRecord(r: AdminAuditExportRecord): Record<string, unknown> {
 	return {
 		audit_id: r.audit_id,
@@ -253,12 +476,78 @@ function auditExportRecord(r: AdminAuditExportRecord): Record<string, unknown> {
 	};
 }
 
+/**
+ * Maps a preview-list row (AdminAuditRow) to the same column shape as
+ * auditExportRecord. Used for the "export selected rows" path, where only
+ * the currently-visible page data is available rather than the dedicated
+ * export endpoint.
+ *
+ * AdminAuditRow carries a single score_pair { pv, u } instead of four flat
+ * per-mode score fields. We populate the mode-specific columns only when
+ * execution_mode is unambiguously single-mode ("audit" or "survey"). For
+ * "both"/null the combined score lives in summary_score and the four
+ * per-mode columns are left blank — we cannot reconstruct the split from
+ * a single score_pair.
+ */
+function auditRowExportRecord(r: AdminAuditRow): Record<string, unknown> {
+	const pv = r.score_pair?.pv ?? null;
+	const u = r.score_pair?.u ?? null;
+	const mode = r.execution_mode;
+	return {
+		audit_id: r.audit_id,
+		audit_code: r.audit_code,
+		status: r.status,
+		execution_mode: mode ?? "",
+		account_name: r.account_name,
+		project_name: r.project_name,
+		place_name: r.place_name,
+		auditor_code: r.auditor_code,
+		started_at: r.started_at,
+		submitted_at: r.submitted_at ?? "",
+		summary_score: r.summary_score ?? "",
+		audit_pv_score: mode === "audit" ? (pv ?? "") : "",
+		audit_u_score: mode === "audit" ? (u ?? "") : "",
+		survey_pv_score: mode === "survey" ? (pv ?? "") : "",
+		survey_u_score: mode === "survey" ? (u ?? "") : ""
+	};
+}
+
 // ── Page ──────────────────────────────────────────────────────────────────────
 
 export default function AdminRawDataPage() {
 	const formatT = useTranslations("common.format");
 	const [activeEntity, setActiveEntity] = React.useState<ExportEntity>("projects");
 	const [isExporting, setIsExporting] = React.useState(false);
+
+	// ── Row selection state ───────────────────────────────────────────────────
+	const [selectedRowIds, setSelectedRowIds] = React.useState<Set<string>>(new Set());
+
+	const toggleRowSelection = React.useCallback((id: string) => {
+		setSelectedRowIds(prev => {
+			const next = new Set(prev);
+			if (next.has(id)) {
+				next.delete(id);
+			} else {
+				next.add(id);
+			}
+			return next;
+		});
+	}, []);
+
+	const togglePageSelection = React.useCallback((ids: string[]) => {
+		setSelectedRowIds(prev => {
+			const allSelected = ids.length > 0 && ids.every(id => prev.has(id));
+			const next = new Set(prev);
+			if (allSelected) {
+				ids.forEach(id => next.delete(id));
+			} else {
+				ids.forEach(id => next.add(id));
+			}
+			return next;
+		});
+	}, []);
+
+	const clearSelection = React.useCallback(() => setSelectedRowIds(new Set()), []);
 
 	// ── Shared dropdown filter state (reset on tab change) ───────────────────
 	const [accountIds, setAccountIds] = React.useState<string[]>([]);
@@ -274,6 +563,7 @@ export default function AdminRawDataPage() {
 
 	const handleEntityChange = React.useCallback((entity: string) => {
 		setActiveEntity(entity as ExportEntity);
+		setSelectedRowIds(new Set());
 		setAccountIds([]);
 		setProjectIds([]);
 		setAuditStatuses([]);
@@ -427,7 +717,8 @@ export default function AdminRawDataPage() {
 		[searchValue, accountIds, projectIds, auditStatusFilter, auditStatuses, surveyStatuses]
 	);
 
-	const handleExport = React.useCallback(
+	/** Export all matching documents (full dataset, server-fetched) */
+	const handleExportAll = React.useCallback(
 		async (format: ExportFormat) => {
 			setIsExporting(true);
 			try {
@@ -468,10 +759,90 @@ export default function AdminRawDataPage() {
 		[activeEntity, exportQuery]
 	);
 
-	// ── Column definitions (same approach as admin/projects and admin/places pages) ──
+	/** Export only the currently-selected rows (from the visible page) */
+	const handleExportSelected = React.useCallback(
+		async (format: ExportFormat) => {
+			setIsExporting(true);
+			try {
+				const timestamp = new Date().toISOString().slice(0, 10);
+				let records: Record<string, unknown>[];
+				let filename: string;
+				switch (activeEntity) {
+					case "projects": {
+						const items = (previewQuery.data?.items as AdminProjectRow[] | undefined) ?? [];
+						records = items.filter(r => selectedRowIds.has(r.project_id)).map(projectRowExportRecord);
+						filename = `playspace-projects-selected-${timestamp}`;
+						break;
+					}
+					case "places": {
+						const items = (previewQuery.data?.items as AdminPlaceRow[] | undefined) ?? [];
+						records = items.filter(r => selectedRowIds.has(r.place_id)).map(placeRowExportRecord);
+						filename = `playspace-places-selected-${timestamp}`;
+						break;
+					}
+					case "audits": {
+						const items = (previewQuery.data?.items as AdminAuditRow[] | undefined) ?? [];
+						records = items.filter(r => selectedRowIds.has(r.audit_id)).map(auditRowExportRecord);
+						filename = `playspace-audits-selected-${timestamp}`;
+						break;
+					}
+					case "reports": {
+						const items = (previewQuery.data?.items as AdminAuditRow[] | undefined) ?? [];
+						records = items.filter(r => selectedRowIds.has(r.audit_id)).map(auditRowExportRecord);
+						filename = `playspace-reports-selected-${timestamp}`;
+						break;
+					}
+				}
+				await downloadRecords(records, format, filename);
+			} finally {
+				setIsExporting(false);
+			}
+		},
+		[activeEntity, previewQuery.data, selectedRowIds]
+	);
+
+	// ── Column definitions ────────────────────────────────────────────────────
+
+	// Current-page items for select-all header logic
+	const projectPageItems = (previewQuery.data?.items as AdminProjectRow[] | undefined) ?? [];
+	const placePageItems = (previewQuery.data?.items as AdminPlaceRow[] | undefined) ?? [];
+	const auditPageItems = (previewQuery.data?.items as AdminAuditRow[] | undefined) ?? [];
 
 	const projectColumns = React.useMemo<ColumnDef<AdminProjectRow>[]>(
 		() => [
+			// ── Selection column ──────────────────────────────────────────────
+			{
+				id: "select",
+				size: 40,
+				enableSorting: false,
+				enableHiding: false,
+				header: () => {
+					const ids = projectPageItems.map(r => r.project_id);
+					const allSelected = ids.length > 0 && ids.every(id => selectedRowIds.has(id));
+					const someSelected = ids.some(id => selectedRowIds.has(id));
+					return (
+						<Checkbox
+							checked={allSelected}
+							data-state={someSelected && !allSelected ? "indeterminate" : undefined}
+							onCheckedChange={() => togglePageSelection(ids)}
+							aria-label="Select all on this page"
+							className="translate-y-px"
+						/>
+					);
+				},
+				cell: ({ row }) => {
+					const id = row.original.project_id;
+					return (
+						<Checkbox
+							checked={selectedRowIds.has(id)}
+							onCheckedChange={() => toggleRowSelection(id)}
+							aria-label={`Select project ${row.original.name}`}
+							className="translate-y-px"
+						/>
+					);
+				}
+			},
+			// ── Data columns ──────────────────────────────────────────────────
 			{
 				id: "name",
 				accessorFn: row => `${row.name} ${row.account_name}`,
@@ -523,11 +894,45 @@ export default function AdminRawDataPage() {
 				)
 			}
 		],
-		[formatT]
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[formatT, selectedRowIds, projectPageItems, toggleRowSelection, togglePageSelection]
 	);
 
 	const placeColumns = React.useMemo<ColumnDef<AdminPlaceRow>[]>(
 		() => [
+			// ── Selection column ──────────────────────────────────────────────
+			{
+				id: "select",
+				size: 40,
+				enableSorting: false,
+				enableHiding: false,
+				header: () => {
+					const ids = placePageItems.map(r => r.place_id);
+					const allSelected = ids.length > 0 && ids.every(id => selectedRowIds.has(id));
+					const someSelected = ids.some(id => selectedRowIds.has(id));
+					return (
+						<Checkbox
+							checked={allSelected}
+							data-state={someSelected && !allSelected ? "indeterminate" : undefined}
+							onCheckedChange={() => togglePageSelection(ids)}
+							aria-label="Select all on this page"
+							className="translate-y-px"
+						/>
+					);
+				},
+				cell: ({ row }) => {
+					const id = row.original.place_id;
+					return (
+						<Checkbox
+							checked={selectedRowIds.has(id)}
+							onCheckedChange={() => toggleRowSelection(id)}
+							aria-label={`Select place ${row.original.name}`}
+							className="translate-y-px"
+						/>
+					);
+				}
+			},
+			// ── Data columns ──────────────────────────────────────────────────
 			{
 				id: "name",
 				accessorFn: row =>
@@ -602,7 +1007,8 @@ export default function AdminRawDataPage() {
 				)
 			}
 		],
-		[formatT]
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[formatT, selectedRowIds, placePageItems, toggleRowSelection, togglePageSelection]
 	);
 
 	// ── Shared table props ────────────────────────────────────────────────────
@@ -659,6 +1065,8 @@ export default function AdminRawDataPage() {
 		</Button>
 	) : null;
 
+	const selectedCount = selectedRowIds.size;
+
 	return (
 		<div className="space-y-6">
 			<DashboardHeader
@@ -675,29 +1083,46 @@ export default function AdminRawDataPage() {
 								) : (
 									<DownloadIcon className="size-4" aria-hidden="true" />
 								)}
-								{isExporting ? "Exporting…" : "Download"}
+								{isExporting ? "Exporting…" : "Export"}
 							</Button>
 						</DropdownMenuTrigger>
-						<DropdownMenuContent align="end" className="min-w-40">
-							<DropdownMenuItem
-								onClick={() => {
-									void handleExport("json");
-								}}>
+						<DropdownMenuContent align="end" className="min-w-48">
+							{/* Export all (filtered) */}
+							<DropdownMenuLabel className="font-normal text-muted-foreground">
+								<span className="font-mono text-xs">
+									{totalCount !== undefined
+										? `${totalCount.toLocaleString()} documents`
+										: "All documents"}
+								</span>
+							</DropdownMenuLabel>
+							<DropdownMenuItem onClick={() => void handleExportAll("json")}>
 								JSON (.json)
 							</DropdownMenuItem>
 							<DropdownMenuSeparator />
-							<DropdownMenuItem
-								onClick={() => {
-									void handleExport("csv");
-								}}>
-								CSV (.csv)
-							</DropdownMenuItem>
-							<DropdownMenuItem
-								onClick={() => {
-									void handleExport("xlsx");
-								}}>
+							<DropdownMenuItem onClick={() => void handleExportAll("csv")}>CSV (.csv)</DropdownMenuItem>
+							<DropdownMenuItem onClick={() => void handleExportAll("xlsx")}>
 								Excel (.xlsx)
 							</DropdownMenuItem>
+
+							{/* Export selected — only shown when rows are checked */}
+							{selectedCount > 0 && (
+								<>
+									<DropdownMenuSeparator />
+									<DropdownMenuLabel className="font-normal text-muted-foreground">
+										<span className="font-mono text-xs">{selectedCount} selected</span>
+									</DropdownMenuLabel>
+									<DropdownMenuItem onClick={() => void handleExportSelected("json")}>
+										Selected as JSON
+									</DropdownMenuItem>
+									<DropdownMenuSeparator />
+									<DropdownMenuItem onClick={() => void handleExportSelected("csv")}>
+										Selected as CSV
+									</DropdownMenuItem>
+									<DropdownMenuItem onClick={() => void handleExportSelected("xlsx")}>
+										Selected as Excel
+									</DropdownMenuItem>
+								</>
+							)}
 						</DropdownMenuContent>
 					</DropdownMenu>
 				}
@@ -723,8 +1148,21 @@ export default function AdminRawDataPage() {
 					</TabsTrigger>
 				</TabsList>
 
-				{/* Projects — same DataTable approach as admin/projects page */}
-				<TabsContent value="projects" className="mt-4">
+				{/* Projects */}
+				<TabsContent value="projects" className="mt-4 space-y-3">
+					<CollectionNamespaceBar
+						entity="projects"
+						totalCount={totalCount}
+						selectedCount={selectedCount}
+						isFetching={previewQuery.isFetching}
+						onClearSelection={clearSelection}
+					/>
+					<SelectionBar
+						selectedCount={selectedCount}
+						isExporting={isExporting}
+						onExportSelected={handleExportSelected}
+						onClearSelection={clearSelection}
+					/>
 					<DataTable
 						title="Projects"
 						description={makeDescription("projects")}
@@ -743,8 +1181,21 @@ export default function AdminRawDataPage() {
 					/>
 				</TabsContent>
 
-				{/* Places — same DataTable approach as admin/places page */}
-				<TabsContent value="places" className="mt-4">
+				{/* Places */}
+				<TabsContent value="places" className="mt-4 space-y-3">
+					<CollectionNamespaceBar
+						entity="places"
+						totalCount={totalCount}
+						selectedCount={selectedCount}
+						isFetching={previewQuery.isFetching}
+						onClearSelection={clearSelection}
+					/>
+					<SelectionBar
+						selectedCount={selectedCount}
+						isExporting={isExporting}
+						onExportSelected={handleExportSelected}
+						onClearSelection={clearSelection}
+					/>
 					<DataTable
 						title="Places"
 						description={makeDescription("places")}
@@ -776,8 +1227,15 @@ export default function AdminRawDataPage() {
 					/>
 				</TabsContent>
 
-				{/* Audits — uses AuditsTable (same as admin/audits page) */}
-				<TabsContent value="audits" className="mt-4">
+				{/* Audits */}
+				<TabsContent value="audits" className="mt-4 space-y-3">
+					<CollectionNamespaceBar
+						entity="audits"
+						totalCount={totalCount}
+						selectedCount={selectedCount}
+						isFetching={previewQuery.isFetching}
+						onClearSelection={clearSelection}
+					/>
 					{/* <AuditsTable
 						rows={auditRows}
 						basePath="/admin/audits"
@@ -789,8 +1247,15 @@ export default function AdminRawDataPage() {
 					/> */}
 				</TabsContent>
 
-				{/* Reports — uses AuditsTable (same as admin/reports page) */}
-				<TabsContent value="reports" className="mt-4">
+				{/* Reports */}
+				<TabsContent value="reports" className="mt-4 space-y-3">
+					<CollectionNamespaceBar
+						entity="reports"
+						totalCount={totalCount}
+						selectedCount={selectedCount}
+						isFetching={previewQuery.isFetching}
+						onClearSelection={clearSelection}
+					/>
 					<AuditsTable
 						rows={auditRows}
 						basePath="/admin/reports"

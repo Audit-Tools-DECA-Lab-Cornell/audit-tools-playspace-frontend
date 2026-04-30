@@ -9,6 +9,8 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 
+import { getExecutionModeLabel } from "@/lib/audit/score-mode-helpers";
+
 import { DataTable, getMultiValueFilterFn } from "./data-table";
 import { DataTableColumnHeader } from "./data-table-column-header";
 import type { EntityRowAction } from "./entity-row-actions";
@@ -25,6 +27,7 @@ export interface AuditActivityRow {
 	projectName?: string | null;
 	projectId?: string | null;
 	accountName?: string | null;
+	executionMode?: string | null;
 	startedAt: string | null;
 	submittedAt: string | null;
 	score: number | null;
@@ -211,6 +214,22 @@ export function AuditsTable({
 						{t(`status.${row.original.status.toLowerCase()}`)}
 					</Badge>
 				)
+			},
+			{
+				id: "execution_mode",
+				accessorFn: row => row.executionMode ?? null,
+				header: ({ column }) => <DataTableColumnHeader column={column} title={t("columns.auditType")} />,
+				cell: ({ row }) => {
+					const mode = row.original.executionMode;
+					if (mode === null || mode === undefined) {
+						return <span className="text-sm text-muted-foreground">—</span>;
+					}
+					return (
+						<Badge variant="outline" className="text-xs font-medium whitespace-nowrap">
+							{getExecutionModeLabel(mode as "audit" | "survey" | "both")}
+						</Badge>
+					);
+				}
 			},
 			{
 				id: "started_at",

@@ -30,6 +30,9 @@ import {
 	auditorPlaceSchema,
 	auditorProfileDetailSchema,
 	auditorSummarySchema,
+	changePasswordRequestSchema,
+	myAuditorProfileSchema,
+	myAuditorProfileUpdateSchema,
 	auditorUpdateRequestSchema,
 	bulkAssignmentWriteSchema,
 	instrumentCreateRequestSchema,
@@ -79,10 +82,13 @@ import {
 	type AuditorDashboardSummary,
 	type AuditorPlace,
 	type AuditorPlacesQuery,
+	type ChangePasswordRequest,
 	type AuditorProfileDetail,
 	type AuditorSummary,
 	type BulkAssignmentWrite,
 	type ManagerAuditsList,
+	type MyAuditorProfile,
+	type MyAuditorProfileUpdate,
 	type ManagerAuditsQuery,
 	type ManagerPlacesList,
 	type ManagerPlacesQuery,
@@ -302,6 +308,7 @@ export const playspaceApi = {
 					sort: query.sort,
 					project_id: query.projectIds,
 					auditor_id: query.auditorIds,
+					place_id: query.placeIds,
 					status: query.statuses
 				})}`,
 				managerAuditsListSchema
@@ -404,6 +411,26 @@ export const playspaceApi = {
 			),
 		dashboardSummary: async (): Promise<AuditorDashboardSummary> =>
 			fetchValidatedJson("/playspace/auditor/me/dashboard-summary", auditorDashboardSummarySchema),
+		myProfile: async (): Promise<MyAuditorProfile> =>
+			fetchValidatedJson("/playspace/me/auditor-profile", myAuditorProfileSchema),
+		updateMyProfile: async (payload: MyAuditorProfileUpdate): Promise<MyAuditorProfile> => {
+			const parsedPayload = myAuditorProfileUpdateSchema.parse(payload);
+			return fetchValidatedJson("/playspace/me/auditor-profile", myAuditorProfileSchema, {
+				method: "PATCH",
+				body: JSON.stringify(parsedPayload)
+			});
+		},
+		changePassword: async (payload: ChangePasswordRequest): Promise<void> => {
+			const parsedPayload = changePasswordRequestSchema.parse(payload);
+			await fetchNoContent("/playspace/me/change-password", {
+				method: "POST",
+				body: JSON.stringify(parsedPayload)
+			});
+		},
+		completeOnboarding: async (): Promise<MyAuditorProfile> =>
+			fetchValidatedJson("/playspace/me/complete-onboarding", myAuditorProfileSchema, {
+				method: "POST"
+			}),
 		fetchInstrument: async (instrumentKey: string, lang: string = "en"): Promise<PlayspaceInstrument> =>
 			fetchValidatedJson(
 				`/playspace/instruments/active/${encodeURIComponent(instrumentKey)}${buildQueryString({ lang })}`,
@@ -608,7 +635,9 @@ export const playspaceApi = {
 					page_size: query.pageSize,
 					search: query.search,
 					sort: query.sort,
-					account_id: query.accountIds
+					account_id: query.accountIds,
+					project_id: query.projectIds,
+					place_id: query.placeIds
 				})}`,
 				paginatedResponseSchema(adminAuditorRowSchema)
 			),
@@ -622,6 +651,7 @@ export const playspaceApi = {
 					project_id: query.projectIds,
 					account_id: query.accountIds,
 					auditor_id: query.auditorIds,
+					place_id: query.placeIds,
 					status: query.statuses
 				})}`,
 				paginatedResponseSchema(adminAuditRowSchema)

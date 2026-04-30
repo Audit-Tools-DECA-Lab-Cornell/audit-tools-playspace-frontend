@@ -81,7 +81,9 @@ export function ManagerReportDetailClient({ auditId }: Readonly<ManagerReportDet
 				</Card>
 			) : null}
 
-			{audit !== undefined ? <AuditReportView audit={audit} instrument={instrumentQuery.data ?? null} /> : null}
+			{audit !== undefined ? (
+				<AuditReportView audit={audit} instrument={instrumentQuery.data ?? null} basePath="/manager" />
+			) : null}
 		</div>
 	);
 }

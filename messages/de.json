@@ -125,6 +125,7 @@
 			"columns": {
 				"audit": "Audit",
 				"status": "Status",
+				"auditType": "Audit-Typ",
 				"started": "Gestartet",
 				"submitted": "Eingereicht",
 				"score": "Punktzahl"
@@ -579,7 +580,26 @@
 				"clickToEdit": "Zum Bearbeiten klicken",
 				"saveEdit": "Speichern",
 				"cancelEdit": "Abbrechen",
-				"editableSpreadsheet": "Tabelle (Bearbeitbar)"
+				"editableSpreadsheet": "Tabelle (Bearbeitbar)",
+				"legalDocuments": "Rechtliche Dokumente",
+				"legalDocumentsDescription": "Nutzungsbedingungen und Datenschutzhinweis für Prüfer beim Onboarding.",
+				"addLegalDocument": "Dokument hinzufügen",
+				"noLegalDocuments": "Keine rechtlichen Dokumente. Fügen Sie ein Dokument hinzu.",
+				"legalDocKey": "Dokumentschlüssel",
+				"legalDocShortTitle": "Kurztitel",
+				"legalDocTitle": "Titel",
+				"legalDocEyebrow": "Kategorie",
+				"legalDocLastUpdated": "Zuletzt aktualisiert",
+				"legalDocSummary": "Zusammenfassung",
+				"legalSections": "Abschnitte",
+				"legalSectionsCount": "Abschnitte",
+				"addLegalSection": "Abschnitt hinzufügen",
+				"legalSectionKey": "Abschnittsschlüssel",
+				"legalSectionTitle": "Abschnittstitel",
+				"legalSectionBody": "Textabsätze",
+				"legalSectionBullets": "Aufzählungspunkte",
+				"addBullet": "Punkt hinzufügen",
+				"noBullets": "Keine Aufzählungspunkte in diesem Abschnitt."
 			}
 		},
 		"system": {

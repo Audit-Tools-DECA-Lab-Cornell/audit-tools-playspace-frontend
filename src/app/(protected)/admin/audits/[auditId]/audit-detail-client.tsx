@@ -73,6 +73,7 @@ export function AdminAuditDetailClient({ auditId }: Readonly<AdminAuditDetailCli
 		<AuditDetailView
 			audit={auditQuery.data}
 			eyebrow={t("header.eyebrow")}
+			basePath="/admin"
 			breadcrumbs={[
 				{ label: t("breadcrumbs.dashboard"), href: "/admin/dashboard" },
 				{ label: t("breadcrumbs.audits"), href: "/admin/audits" },

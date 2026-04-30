@@ -1,17 +1,18 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { FileTextIcon, FolderOpenIcon, PencilLineIcon, PlusIcon, Trash2Icon } from "lucide-react";
+import { FileTextIcon, FolderOpenIcon, PencilLineIcon, PlusIcon, Trash2Icon, XIcon } from "lucide-react";
 import Link from "next/link";
 import * as React from "react";
 
-import { playspaceApi } from "@/lib/api/playspace";
+import { playspaceApi, type AuditorSummary, type ManagerPlaceRow } from "@/lib/api/playspace";
 import { useAuthSession } from "@/components/app/auth-session-provider";
 import { AuditorDialog, type AuditorDialogPayload } from "@/components/dashboard/auditor-dialog";
 import { AuditorsTable } from "@/components/dashboard/auditors-table";
 import { ConfirmDialog } from "@/components/dashboard/confirm-dialog";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
+import { FilterPopover } from "@/components/dashboard/filter-popover";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -26,17 +27,8 @@ export default function ManagerAuditorsPage() {
 		id: string;
 		label: string;
 	} | null>(null);
-
-	const accountQuery = useQuery({
-		queryKey: ["playspace", "manager", "account", accountId],
-		queryFn: async () => {
-			if (!accountId) {
-				throw new Error("Manager account context is unavailable.");
-			}
-			return playspaceApi.accounts.get(accountId);
-		},
-		enabled: accountId !== null
-	});
+	const [selectedProjectIds, setSelectedProjectIds] = React.useState<string[]>([]);
+	const [selectedPlaceIds, setSelectedPlaceIds] = React.useState<string[]>([]);
 
 	const auditorsQuery = useQuery({
 		queryKey: ["playspace", "manager", "auditors", accountId],
@@ -47,6 +39,60 @@ export default function ManagerAuditorsPage() {
 			return playspaceApi.accounts.auditors(accountId);
 		},
 		enabled: accountId !== null
+	});
+
+	const projectsQuery = useQuery({
+		queryKey: ["playspace", "manager", "auditors", "projects", accountId],
+		queryFn: async () => {
+			if (!accountId) {
+				throw new Error("Manager account context is unavailable.");
+			}
+			return playspaceApi.accounts.projects(accountId);
+		},
+		enabled: accountId !== null
+	});
+
+	const placesQuery = useQuery({
+		queryKey: ["playspace", "manager", "auditors", "places", accountId],
+		queryFn: async () => {
+			if (!accountId) {
+				throw new Error("Manager account context is unavailable.");
+			}
+			return playspaceApi.accounts.places(accountId, { page: 1, pageSize: 200 });
+		},
+		enabled: accountId !== null
+	});
+
+	/**
+	 * When project or place filters are active, fetch audits for those scopes and
+	 * derive the set of auditor codes that have activity there.  Used to
+	 * client-side filter the roster below.
+	 */
+	const hasActiveFilter = selectedProjectIds.length > 0 || selectedPlaceIds.length > 0;
+
+	const filteredAuditorsQuery = useQuery({
+		queryKey: [
+			"playspace",
+			"manager",
+			"auditors",
+			"filter-by-scope",
+			accountId,
+			selectedProjectIds,
+			selectedPlaceIds
+		],
+		queryFn: async () => {
+			if (!accountId) {
+				throw new Error("Manager account context is unavailable.");
+			}
+			const result = await playspaceApi.accounts.audits(accountId, {
+				projectIds: selectedProjectIds.length > 0 ? selectedProjectIds : undefined,
+				placeIds: selectedPlaceIds.length > 0 ? selectedPlaceIds : undefined,
+				page: 1,
+				pageSize: 200
+			});
+			return new Set(result.items.map(a => a.auditor_code));
+		},
+		enabled: accountId !== null && hasActiveFilter
 	});
 
 	const createAuditor = useMutation({
@@ -90,13 +136,37 @@ export default function ManagerAuditorsPage() {
 		}
 	});
 
-	const auditors = auditorsQuery.data ?? [];
-	const accountName = accountQuery.data?.name ?? "";
-	const existingAuditorCodes = React.useMemo(() => auditors.map(a => a.auditor_code), [auditors]);
-	const editingAuditor = auditors.find(auditor => auditor.id === editingAuditorId) ?? null;
+	const allAuditors = React.useMemo(() => auditorsQuery.data ?? [], [auditorsQuery.data]);
+	const editingAuditor = allAuditors.find(auditor => auditor.id === editingAuditorId) ?? null;
+
+	/** Apply project / place filter client-side using the scoped auditor-code set. */
+	const auditors = React.useMemo((): AuditorSummary[] => {
+		if (!hasActiveFilter) {
+			return allAuditors;
+		}
+		const allowedCodes = filteredAuditorsQuery.data;
+		if (!allowedCodes) {
+			return allAuditors;
+		}
+		return allAuditors.filter(a => allowedCodes.has(a.auditor_code));
+	}, [allAuditors, hasActiveFilter, filteredAuditorsQuery.data]);
+
 	const activeAuditors = auditors.filter(auditor => auditor.last_active_at !== null).length;
 	const totalAssignments = auditors.reduce((runningTotal, auditor) => runningTotal + auditor.assignments_count, 0);
 	const completedAudits = auditors.reduce((runningTotal, auditor) => runningTotal + auditor.completed_audits, 0);
+
+	const projectOptions = React.useMemo(() => {
+		return (projectsQuery.data ?? []).map(p => ({ label: p.name, value: p.id }));
+	}, [projectsQuery.data]);
+
+	const placeOptions = React.useMemo(() => {
+		return (placesQuery.data?.items ?? []).map((p: ManagerPlaceRow) => ({ label: p.name, value: p.id }));
+	}, [placesQuery.data]);
+
+	function clearAllFilters(): void {
+		setSelectedProjectIds([]);
+		setSelectedPlaceIds([]);
+	}
 
 	if (!accountId) {
 		return (
@@ -206,6 +276,33 @@ export default function ManagerAuditorsPage() {
 				auditors={auditors}
 				title="Auditor Roster"
 				description="Search, sort, and manage the delivery capacity behind your audit programs."
+				toolbarExtra={
+					<>
+						<FilterPopover
+							title="Projects"
+							options={projectOptions}
+							selectedValues={selectedProjectIds}
+							onChange={setSelectedProjectIds}
+						/>
+						<FilterPopover
+							title="Places"
+							options={placeOptions}
+							selectedValues={selectedPlaceIds}
+							onChange={setSelectedPlaceIds}
+						/>
+						{hasActiveFilter && (
+							<Button
+								type="button"
+								variant="ghost"
+								size="sm"
+								className="gap-1.5"
+								onClick={clearAllFilters}>
+								<XIcon className="size-3.5" />
+								Clear filters
+							</Button>
+						)}
+					</>
+				}
 				getRowActions={auditor => [
 					{
 						label: "View auditor",
@@ -234,8 +331,6 @@ export default function ManagerAuditorsPage() {
 				open={isCreateDialogOpen}
 				onOpenChange={setIsCreateDialogOpen}
 				mode="create"
-				accountName={accountName}
-				existingAuditorCodes={existingAuditorCodes}
 				title="Create auditor"
 				description="Add a new auditor profile that can be assigned to projects and places."
 				submitLabel="Create auditor"

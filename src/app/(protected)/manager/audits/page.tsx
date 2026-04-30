@@ -4,14 +4,15 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import type { ColumnFiltersState, PaginationState, SortingState } from "@tanstack/react-table";
-import { ClipboardListIcon, FilterIcon, MapPinnedIcon, XIcon } from "lucide-react";
+import { ClipboardListIcon, MapPinnedIcon, XIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 
-import { playspaceApi, type AuditorSummary } from "@/lib/api/playspace";
+import { playspaceApi, type AuditorSummary, type ManagerPlaceRow } from "@/lib/api/playspace";
 import { useAuthSession } from "@/components/app/auth-session-provider";
 import { AuditsTable, type AuditActivityRow } from "@/components/dashboard/audits-table";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
+import { FilterPopover } from "@/components/dashboard/filter-popover";
 import {
 	getMultiValueColumnFilter,
 	preservePreviousData,
@@ -19,13 +20,8 @@ import {
 	toBackendSortParam
 } from "@/components/dashboard/server-table-utils";
 import { StatCard } from "@/components/dashboard/stat-card";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Separator } from "@/components/ui/separator";
 import React from "react";
 import { formatScoreLabel } from "@/components/dashboard/utils";
 
@@ -35,71 +31,6 @@ function getErrorMessage(error: unknown): string {
 	}
 
 	return "Unable to load manager audits.";
-}
-
-/** Reusable checkbox-based filter popover for multi-select filtering. */
-interface FilterPopoverProps {
-	title: string;
-	options: Array<{ label: string; value: string }>;
-	selectedValues: string[];
-	onChange: (values: string[]) => void;
-}
-function FilterPopover({ title, options, selectedValues, onChange }: FilterPopoverProps) {
-	return (
-		<Popover>
-			<PopoverTrigger asChild>
-				<Button variant="outline" size="sm" className="gap-2">
-					<FilterIcon className="size-3.5" />
-					{title}
-					{selectedValues.length > 0 && (
-						<Badge variant="secondary" className="ml-1 rounded-sm px-1.5 font-mono text-xs">
-							{selectedValues.length}
-						</Badge>
-					)}
-				</Button>
-			</PopoverTrigger>
-			<PopoverContent className="w-64 p-3" align="start">
-				<div className="space-y-3">
-					<div className="flex items-center justify-between">
-						<h4 className="text-sm font-medium">{title}</h4>
-						{selectedValues.length > 0 && (
-							<Button
-								type="button"
-								variant="ghost"
-								size="sm"
-								className="h-auto p-0 text-xs text-muted-foreground"
-								onClick={() => onChange([])}>
-								Clear
-							</Button>
-						)}
-					</div>
-					<Separator />
-					<div className="max-h-60 space-y-2 overflow-y-auto">
-						{options.map(option => (
-							<div key={option.value} className="flex items-center gap-2">
-								<Checkbox
-									id={`filter-${title}-${option.value}`}
-									checked={selectedValues.includes(option.value)}
-									onCheckedChange={checked => {
-										if (checked) {
-											onChange([...selectedValues, option.value]);
-										} else {
-											onChange(selectedValues.filter(v => v !== option.value));
-										}
-									}}
-								/>
-								<Label
-									htmlFor={`filter-${title}-${option.value}`}
-									className="text-sm font-normal leading-none">
-									{option.label}
-								</Label>
-							</div>
-						))}
-					</div>
-				</div>
-			</PopoverContent>
-		</Popover>
-	);
 }
 
 export default function ManagerAuditsPage() {
@@ -116,6 +47,7 @@ export default function ManagerAuditsPage() {
 	});
 	const [selectedProjectIds, setSelectedProjectIds] = React.useState<string[]>([]);
 	const [selectedAuditorIds, setSelectedAuditorIds] = React.useState<string[]>([]);
+	const [selectedPlaceIds, setSelectedPlaceIds] = React.useState<string[]>([]);
 	const searchValue = getTextColumnFilterValue(columnFilters, "audit_code");
 	const selectedStatuses = getMultiValueColumnFilter(columnFilters, "status").filter(
 		(value): value is "IN_PROGRESS" | "PAUSED" | "SUBMITTED" =>
@@ -124,6 +56,7 @@ export default function ManagerAuditsPage() {
 	const selectedStatusesKey = selectedStatuses.join("|");
 	const selectedProjectIdsKey = selectedProjectIds.join("|");
 	const selectedAuditorIdsKey = selectedAuditorIds.join("|");
+	const selectedPlaceIdsKey = selectedPlaceIds.join("|");
 	const sortParam = toBackendSortParam(sorting);
 
 	React.useEffect(() => {
@@ -135,7 +68,14 @@ export default function ManagerAuditsPage() {
 						pageIndex: 0
 					};
 		});
-	}, [searchValue, selectedStatusesKey, selectedProjectIdsKey, selectedAuditorIdsKey, sortParam]);
+	}, [
+		searchValue,
+		selectedStatusesKey,
+		selectedProjectIdsKey,
+		selectedAuditorIdsKey,
+		selectedPlaceIdsKey,
+		sortParam
+	]);
 
 	/** Fetch all projects for this manager account (used by the project filter). */
 	const projectsQuery = useQuery({
@@ -145,6 +85,18 @@ export default function ManagerAuditsPage() {
 				throw new Error("Manager account context is unavailable.");
 			}
 			return playspaceApi.accounts.projects(accountId);
+		},
+		enabled: accountId !== null
+	});
+
+	/** Fetch all places for this manager account (used by the place filter). */
+	const placesQuery = useQuery({
+		queryKey: ["playspace", "manager", "audits", "places", accountId],
+		queryFn: async () => {
+			if (!accountId) {
+				throw new Error("Manager account context is unavailable.");
+			}
+			return playspaceApi.accounts.places(accountId, { page: 1, pageSize: 200 });
 		},
 		enabled: accountId !== null
 	});
@@ -165,6 +117,13 @@ export default function ManagerAuditsPage() {
 		return (projectsQuery.data ?? []).map(p => ({ label: p.name, value: p.id }));
 	}, [projectsQuery.data]);
 
+	const placeOptions = React.useMemo(() => {
+		return (placesQuery.data?.items ?? []).map((p: ManagerPlaceRow) => ({
+			label: p.name,
+			value: p.id
+		}));
+	}, [placesQuery.data]);
+
 	const auditorOptions = React.useMemo(() => {
 		return (auditorsQuery.data ?? []).map((a: AuditorSummary) => ({
 			label: `${a.auditor_code} · ${a.full_name}`,
@@ -184,7 +143,8 @@ export default function ManagerAuditsPage() {
 			sortParam,
 			selectedStatuses,
 			selectedProjectIds,
-			selectedAuditorIds
+			selectedAuditorIds,
+			selectedPlaceIds
 		],
 		queryFn: async () => {
 			if (!accountId) {
@@ -198,6 +158,7 @@ export default function ManagerAuditsPage() {
 				sort: sortParam,
 				projectIds: selectedProjectIds,
 				auditorIds: selectedAuditorIds,
+				placeIds: selectedPlaceIds,
 				statuses: selectedStatuses
 			});
 		},
@@ -292,6 +253,7 @@ export default function ManagerAuditsPage() {
 		projectId: audit.project_id,
 		placeName: audit.place_name,
 		placeId: audit.place_id,
+		executionMode: audit.execution_mode,
 		startedAt: audit.started_at,
 		submittedAt: audit.submitted_at,
 		score: audit.summary_score,
@@ -385,12 +347,20 @@ export default function ManagerAuditsPage() {
 							onChange={setSelectedProjectIds}
 						/>
 						<FilterPopover
+							title="Places"
+							options={placeOptions}
+							selectedValues={selectedPlaceIds}
+							onChange={setSelectedPlaceIds}
+						/>
+						<FilterPopover
 							title="Auditors"
 							options={auditorOptions}
 							selectedValues={selectedAuditorIds}
 							onChange={setSelectedAuditorIds}
 						/>
-						{(selectedProjectIds.length > 0 || selectedAuditorIds.length > 0) && (
+						{(selectedProjectIds.length > 0 ||
+							selectedPlaceIds.length > 0 ||
+							selectedAuditorIds.length > 0) && (
 							<Button
 								type="button"
 								variant="ghost"
@@ -398,6 +368,7 @@ export default function ManagerAuditsPage() {
 								className="gap-1.5"
 								onClick={() => {
 									setSelectedProjectIds([]);
+									setSelectedPlaceIds([]);
 									setSelectedAuditorIds([]);
 								}}>
 								<XIcon className="size-3.5" />

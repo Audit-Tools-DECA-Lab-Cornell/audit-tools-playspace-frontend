@@ -191,6 +191,7 @@ export default function AuditorReportsPage() {
 			placeId: audit.place_id,
 			projectName: audit.project_name,
 			projectId: audit.project_id,
+			executionMode: audit.execution_mode,
 			startedAt: audit.started_at,
 			submittedAt: audit.submitted_at,
 			score: audit.summary_score,

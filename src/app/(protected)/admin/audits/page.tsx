@@ -3,91 +3,29 @@
 import { useRouter } from "next/navigation";
 import { useQuery } from "@tanstack/react-query";
 import type { ColumnFiltersState, PaginationState, SortingState } from "@tanstack/react-table";
+import { XIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 
-import { FilterIcon, XIcon } from "lucide-react";
-
-import { playspaceApi, type AdminProjectRow, type PaginatedResponse } from "@/lib/api/playspace";
+import {
+	playspaceApi,
+	type AdminAccountRow,
+	type AdminAuditorRow,
+	type AdminPlaceRow,
+	type AdminProjectRow,
+	type PaginatedResponse
+} from "@/lib/api/playspace";
 import { AuditsTable, type AuditActivityRow } from "@/components/dashboard/audits-table";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
+import { FilterPopover } from "@/components/dashboard/filter-popover";
 import {
 	getMultiValueColumnFilter,
 	preservePreviousData,
 	getTextColumnFilterValue,
 	toBackendSortParam
 } from "@/components/dashboard/server-table-utils";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Checkbox } from "@/components/ui/checkbox";
-import { Label } from "@/components/ui/label";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Separator } from "@/components/ui/separator";
-
-interface FilterPopoverProps {
-	title: string;
-	options: Array<{ label: string; value: string }>;
-	selectedValues: string[];
-	onChange: (values: string[]) => void;
-}
-function FilterPopover({ title, options, selectedValues, onChange }: FilterPopoverProps) {
-	return (
-		<Popover>
-			<PopoverTrigger asChild>
-				<Button variant="outline" size="sm" className="gap-2">
-					<FilterIcon className="size-3.5" />
-					{title}
-					{selectedValues.length > 0 && (
-						<Badge variant="secondary" className="ml-1 rounded-sm px-1.5 font-mono text-xs">
-							{selectedValues.length}
-						</Badge>
-					)}
-				</Button>
-			</PopoverTrigger>
-			<PopoverContent className="w-64 p-3" align="start">
-				<div className="space-y-3">
-					<div className="flex items-center justify-between">
-						<h4 className="text-sm font-medium">{title}</h4>
-						{selectedValues.length > 0 && (
-							<Button
-								type="button"
-								variant="ghost"
-								size="sm"
-								className="h-auto p-0 text-xs text-muted-foreground"
-								onClick={() => onChange([])}>
-								Clear
-							</Button>
-						)}
-					</div>
-					<Separator />
-					<div className="max-h-60 space-y-2 overflow-y-auto">
-						{options.map(option => (
-							<div key={option.value} className="flex items-center gap-2">
-								<Checkbox
-									id={`filter-${title}-${option.value}`}
-									checked={selectedValues.includes(option.value)}
-									onCheckedChange={checked => {
-										if (checked) {
-											onChange([...selectedValues, option.value]);
-										} else {
-											onChange(selectedValues.filter(v => v !== option.value));
-										}
-									}}
-								/>
-								<Label
-									htmlFor={`filter-${title}-${option.value}`}
-									className="text-sm font-normal leading-none">
-									{option.label}
-								</Label>
-							</div>
-						))}
-					</div>
-				</div>
-			</PopoverContent>
-		</Popover>
-	);
-}
 
 export default function AdminAuditsPage() {
 	const t = useTranslations("admin.audits");
@@ -107,24 +45,51 @@ export default function AdminAuditsPage() {
 	const sortParam = toBackendSortParam(sorting);
 
 	const [selectedProjectIds, setSelectedProjectIds] = React.useState<string[]>([]);
+	const [selectedPlaceIds, setSelectedPlaceIds] = React.useState<string[]>([]);
+	const [selectedAuditorIds, setSelectedAuditorIds] = React.useState<string[]>([]);
+	const [selectedAccountIds, setSelectedAccountIds] = React.useState<string[]>([]);
 
 	const selectedProjectIdsKey = selectedProjectIds.join("|");
+	const selectedPlaceIdsKey = selectedPlaceIds.join("|");
+	const selectedAuditorIdsKey = selectedAuditorIds.join("|");
+	const selectedAccountIdsKey = selectedAccountIds.join("|");
 
 	React.useEffect(() => {
 		setPagination(currentValue => {
-			return currentValue.pageIndex === 0
-				? currentValue
-				: {
-						...currentValue,
-						pageIndex: 0
-					};
+			return currentValue.pageIndex === 0 ? currentValue : { ...currentValue, pageIndex: 0 };
 		});
-	}, [searchValue, selectedStatusesKey, selectedProjectIdsKey, sortParam]);
+	}, [
+		searchValue,
+		selectedStatusesKey,
+		selectedProjectIdsKey,
+		selectedPlaceIdsKey,
+		selectedAuditorIdsKey,
+		selectedAccountIdsKey,
+		sortParam
+	]);
 
 	const projectsQuery = useQuery({
 		queryKey: ["playspace", "admin", "audits", "projects-for-filter"],
 		queryFn: async (): Promise<PaginatedResponse<AdminProjectRow>> =>
 			playspaceApi.admin.projects({ page: 1, pageSize: 100 })
+	});
+
+	const placesQuery = useQuery({
+		queryKey: ["playspace", "admin", "audits", "places-for-filter"],
+		queryFn: async (): Promise<PaginatedResponse<AdminPlaceRow>> =>
+			playspaceApi.admin.places({ page: 1, pageSize: 200 })
+	});
+
+	const auditorsQuery = useQuery({
+		queryKey: ["playspace", "admin", "audits", "auditors-for-filter"],
+		queryFn: async (): Promise<PaginatedResponse<AdminAuditorRow>> =>
+			playspaceApi.admin.auditors({ page: 1, pageSize: 200 })
+	});
+
+	const accountsQuery = useQuery({
+		queryKey: ["playspace", "admin", "audits", "accounts-for-filter"],
+		queryFn: async (): Promise<PaginatedResponse<AdminAccountRow>> =>
+			playspaceApi.admin.accounts({ page: 1, pageSize: 100, accountTypes: ["MANAGER"] })
 	});
 
 	const auditsQuery = useQuery({
@@ -137,7 +102,10 @@ export default function AdminAuditsPage() {
 			searchValue,
 			sortParam,
 			selectedStatuses,
-			selectedProjectIds
+			selectedProjectIds,
+			selectedPlaceIds,
+			selectedAuditorIds,
+			selectedAccountIds
 		],
 		queryFn: () =>
 			playspaceApi.admin.audits({
@@ -146,6 +114,9 @@ export default function AdminAuditsPage() {
 				search: searchValue,
 				sort: sortParam,
 				projectIds: selectedProjectIds,
+				placeIds: selectedPlaceIds,
+				auditorIds: selectedAuditorIds,
+				accountIds: selectedAccountIds,
 				statuses: selectedStatuses
 			}),
 		placeholderData: preservePreviousData
@@ -168,11 +139,46 @@ export default function AdminAuditsPage() {
 	}, [auditsQuery.data, pagination.pageIndex]);
 
 	const projectOptions = React.useMemo(() => {
-		return (projectsQuery.data?.items ?? []).map(p => ({
+		return (projectsQuery.data?.items ?? []).map((p: AdminProjectRow) => ({
 			label: `${p.account_name} · ${p.name}`,
 			value: p.project_id
 		}));
 	}, [projectsQuery.data]);
+
+	const placeOptions = React.useMemo(() => {
+		return (placesQuery.data?.items ?? []).map((p: AdminPlaceRow) => ({
+			label: p.name,
+			value: p.place_id
+		}));
+	}, [placesQuery.data]);
+
+	/** Admin auditors filter shows auditor code only — no personal details. */
+	const auditorOptions = React.useMemo(() => {
+		return (auditorsQuery.data?.items ?? []).map((a: AdminAuditorRow) => ({
+			label: a.auditor_code,
+			value: a.auditor_profile_id
+		}));
+	}, [auditorsQuery.data]);
+
+	const accountOptions = React.useMemo(() => {
+		return (accountsQuery.data?.items ?? []).map((a: AdminAccountRow) => ({
+			label: a.name,
+			value: a.account_id
+		}));
+	}, [accountsQuery.data]);
+
+	const hasActiveFilters =
+		selectedProjectIds.length > 0 ||
+		selectedPlaceIds.length > 0 ||
+		selectedAuditorIds.length > 0 ||
+		selectedAccountIds.length > 0;
+
+	function clearAllFilters(): void {
+		setSelectedProjectIds([]);
+		setSelectedPlaceIds([]);
+		setSelectedAuditorIds([]);
+		setSelectedAccountIds([]);
+	}
 
 	const handleRowClick = React.useCallback(
 		(row: AuditActivityRow) => {
@@ -223,6 +229,7 @@ export default function AdminAuditsPage() {
 					projectId: audit.project_id,
 					placeName: audit.place_name,
 					placeId: audit.place_id,
+					executionMode: audit.execution_mode,
 					startedAt: audit.started_at,
 					submittedAt: audit.submitted_at,
 					score: audit.summary_score,
@@ -253,13 +260,31 @@ export default function AdminAuditsPage() {
 							selectedValues={selectedProjectIds}
 							onChange={setSelectedProjectIds}
 						/>
-						{selectedProjectIds.length > 0 && (
+						<FilterPopover
+							title="Places"
+							options={placeOptions}
+							selectedValues={selectedPlaceIds}
+							onChange={setSelectedPlaceIds}
+						/>
+						<FilterPopover
+							title="Auditors"
+							options={auditorOptions}
+							selectedValues={selectedAuditorIds}
+							onChange={setSelectedAuditorIds}
+						/>
+						<FilterPopover
+							title="Managers"
+							options={accountOptions}
+							selectedValues={selectedAccountIds}
+							onChange={setSelectedAccountIds}
+						/>
+						{hasActiveFilters && (
 							<Button
 								type="button"
 								variant="ghost"
 								size="sm"
 								className="gap-1.5"
-								onClick={() => setSelectedProjectIds([])}>
+								onClick={clearAllFilters}>
 								<XIcon className="size-3.5" />
 								Clear filters
 							</Button>

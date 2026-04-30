@@ -6,7 +6,8 @@ export const AUTH_COOKIE_NAMES = {
 	auditorCode: "playspace_auditor_code",
 	accountId: "playspace_account_id",
 	userName: "playspace_user_name",
-	userEmail: "playspace_user_email"
+	userEmail: "playspace_user_email",
+	nextStep: "playspace_next_step"
 } as const;
 
 /**

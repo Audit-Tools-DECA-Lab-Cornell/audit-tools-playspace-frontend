@@ -16,6 +16,7 @@ import {
 
 import type { AuditSession } from "@/lib/api/playspace";
 import type { PlayspaceInstrument, InstrumentQuestion, QuestionResponsePayload } from "@/types/audit";
+import { getEffectiveScoreTotals, getExecutionModeLabel } from "@/lib/audit/score-mode-helpers";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -55,22 +56,11 @@ function getStatusBadgeVariant(status: string): "default" | "secondary" | "outli
 
 /**
  * Resolve the human-friendly execution mode label from the audit session.
+ * Prefers the user-selected mode; falls back to the meta-level mode.
  */
 function resolveExecutionModeLabel(audit: AuditSession): string {
 	const mode = audit.selected_execution_mode ?? audit.meta.execution_mode;
-	if (mode === null) {
-		return "Not set";
-	}
-	switch (mode) {
-		case "audit":
-			return "Audit";
-		case "survey":
-			return "Survey";
-		case "both":
-			return "Survey + Audit";
-		default:
-			return mode;
-	}
+	return getExecutionModeLabel(mode);
 }
 
 /**
@@ -94,14 +84,14 @@ function formatTimestamp(value: string | null): string {
 }
 
 /**
- * Derive the overall summary score from an audit session.
+ * Derive the summary score from an audit session using mode-appropriate score totals.
  */
 function deriveSummaryScore(audit: AuditSession): number | null {
-	const overall = audit.scores.overall;
-	if (overall === null) {
+	const effective = getEffectiveScoreTotals(audit.scores);
+	if (effective === null) {
 		return null;
 	}
-	return Math.round((overall.play_value_total + overall.usability_total) * 10) / 10;
+	return Math.round((effective.play_value_total + effective.usability_total) * 10) / 10;
 }
 
 /**
@@ -162,7 +152,7 @@ interface ScoreSummaryProps {
  * Score overview cards for a submitted audit showing PV, U, and component scores.
  */
 function ScoreSummary({ audit, formatT }: ScoreSummaryProps) {
-	const overall = audit.scores.overall;
+	const overall = getEffectiveScoreTotals(audit.scores);
 	const summaryScore = deriveSummaryScore(audit);
 
 	return (
@@ -635,6 +625,8 @@ export interface AuditDetailViewProps {
 	readonly breadcrumbs: Array<{ label: string; href?: string }>;
 	/** The role-specific eyebrow text, e.g. "Administrator Workspace". */
 	readonly eyebrow: string;
+	/** Role-scoped base path (e.g. "/admin", "/manager") for cross-navigation links. */
+	readonly basePath?: string | undefined;
 }
 
 /**
@@ -646,7 +638,7 @@ export interface AuditDetailViewProps {
  * For unsubmitted audits, shows the header metadata with a restricted-access card
  * and progress summary.
  */
-export function AuditDetailView({ audit, breadcrumbs, eyebrow }: AuditDetailViewProps) {
+export function AuditDetailView({ audit, breadcrumbs, eyebrow, basePath }: AuditDetailViewProps) {
 	const formatT = useTranslations("common.format");
 	const isSubmitted = audit.status === "SUBMITTED";
 	const instrument = audit.instrument;
@@ -694,7 +686,17 @@ export function AuditDetailView({ audit, breadcrumbs, eyebrow }: AuditDetailView
 								</p>
 							</div>
 						</div>
-						{isSubmitted && <ExportActions audit={audit} />}
+						<div className="flex items-center gap-3">
+							{isSubmitted && basePath !== undefined && (
+								<a href={`${basePath}/reports/${audit.audit_id}`}>
+									<Button variant="outline" size="sm" className="gap-1.5">
+										<FileTextIcon className="size-3.5" />
+										View Report
+									</Button>
+								</a>
+							)}
+							{isSubmitted && <ExportActions audit={audit} />}
+						</div>
 					</div>
 				</div>
 			</div>
@@ -705,47 +707,66 @@ export function AuditDetailView({ audit, breadcrumbs, eyebrow }: AuditDetailView
 					<ScoreSummary audit={audit} formatT={formatT} />
 
 					{/* ── Detailed Score Breakdown ── */}
-					{audit.scores.overall && (
-						<Card>
-							<CardHeader>
-								<CardTitle className="text-base font-semibold">Score Breakdown</CardTitle>
-							</CardHeader>
-							<CardContent>
-								<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-									{(
-										[
-											{ label: "Provision", key: "provision" },
-											{ label: "Diversity", key: "diversity" },
-											{ label: "Sociability", key: "sociability" },
-											{ label: "Challenge", key: "challenge" }
-										] as const
-									).map(({ label, key }) => {
-										const totalKey = `${key}_total` as const;
-										const maxKey = `${key}_total_max` as const;
-										const total =
-											audit.scores.overall?.[totalKey as keyof typeof audit.scores.overall] ?? 0;
-										const max =
-											audit.scores.overall?.[maxKey as keyof typeof audit.scores.overall] ?? 0;
-										const numTotal = typeof total === "number" ? total : 0;
-										const numMax = typeof max === "number" ? max : 0;
-										return (
-											<div key={key} className="space-y-2 rounded-lg border border-border/50 p-4">
-												<p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-													{label}
-												</p>
-												<p className="font-mono text-2xl font-semibold tabular-nums">
-													{formatPercent(numTotal, numMax)}
-												</p>
-												<p className="text-xs text-muted-foreground">
-													{Math.round(numTotal * 10) / 10} / {Math.round(numMax * 10) / 10}
-												</p>
-											</div>
-										);
-									})}
-								</div>
-							</CardContent>
-						</Card>
-					)}
+					{(() => {
+						const effectiveBreakdown = getEffectiveScoreTotals(audit.scores);
+						if (effectiveBreakdown === null) {
+							return null;
+						}
+						return (
+							<Card>
+								<CardHeader>
+									<CardTitle className="text-base font-semibold">Score Breakdown</CardTitle>
+								</CardHeader>
+								<CardContent>
+									<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+										{(
+											[
+												{
+													label: "Provision",
+													totalKey: "provision_total",
+													maxKey: "provision_total_max"
+												},
+												{
+													label: "Diversity",
+													totalKey: "diversity_total",
+													maxKey: "diversity_total_max"
+												},
+												{
+													label: "Sociability",
+													totalKey: "sociability_total",
+													maxKey: "sociability_total_max"
+												},
+												{
+													label: "Challenge",
+													totalKey: "challenge_total",
+													maxKey: "challenge_total_max"
+												}
+											] as const
+										).map(({ label, totalKey, maxKey }) => {
+											const numTotal = effectiveBreakdown[totalKey];
+											const numMax = effectiveBreakdown[maxKey];
+											return (
+												<div
+													key={label}
+													className="space-y-2 rounded-lg border border-border/50 p-4">
+													<p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+														{label}
+													</p>
+													<p className="font-mono text-2xl font-semibold tabular-nums">
+														{formatPercent(numTotal, numMax)}
+													</p>
+													<p className="text-xs text-muted-foreground">
+														{Math.round(numTotal * 10) / 10} /{" "}
+														{Math.round(numMax * 10) / 10}
+													</p>
+												</div>
+											);
+										})}
+									</div>
+								</CardContent>
+							</Card>
+						);
+					})()}
 
 					{/* ── Audit Metadata ── */}
 					<MetaInfoCard audit={audit} />

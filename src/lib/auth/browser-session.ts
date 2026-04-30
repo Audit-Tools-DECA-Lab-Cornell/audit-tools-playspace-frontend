@@ -1,7 +1,7 @@
 "use client";
 
 import { AUTH_COOKIE_NAMES, parseUserRole, type UserRole } from "./role";
-import type { AuthSession } from "./session";
+import type { AuthNextStep, AuthSession } from "./session";
 
 export type BrowserAuthSession = AuthSession;
 
@@ -27,6 +27,19 @@ function getCookieValue(name: string): string | null {
 	return null;
 }
 
+function parseAuthNextStep(value: string | null): AuthNextStep {
+	if (
+		value === "VERIFY_EMAIL" ||
+		value === "WAITING_APPROVAL" ||
+		value === "COMPLETE_PROFILE" ||
+		value === "DASHBOARD"
+	) {
+		return value;
+	}
+
+	return "DASHBOARD";
+}
+
 function setCookieValue(name: string, value: string, maxAgeSeconds: number) {
 	if (typeof document === "undefined") return;
 
@@ -48,8 +61,9 @@ export function getBrowserAuthSession(): BrowserAuthSession | null {
 	const auditorCode = role === "auditor" ? getCookieValue(AUTH_COOKIE_NAMES.auditorCode) || null : null;
 	const userName = getCookieValue(AUTH_COOKIE_NAMES.userName);
 	const userEmail = getCookieValue(AUTH_COOKIE_NAMES.userEmail);
+	const nextStep = parseAuthNextStep(getCookieValue(AUTH_COOKIE_NAMES.nextStep));
 
-	return { role, accessToken, accountId, auditorCode, userName, userEmail };
+	return { role, accessToken, accountId, auditorCode, userName, userEmail, nextStep };
 }
 
 export function setBrowserAuthSession(input: {
@@ -59,12 +73,14 @@ export function setBrowserAuthSession(input: {
 	auditorCode?: string | null;
 	userName?: string | null;
 	userEmail?: string | null;
+	nextStep?: AuthNextStep | null;
 }) {
 	// 8 hours
 	const maxAgeSeconds = 60 * 60 * 8;
 
 	setCookieValue(AUTH_COOKIE_NAMES.role, input.role, maxAgeSeconds);
 	setCookieValue(AUTH_COOKIE_NAMES.accessToken, input.accessToken, maxAgeSeconds);
+	setCookieValue(AUTH_COOKIE_NAMES.nextStep, input.nextStep ?? "DASHBOARD", maxAgeSeconds);
 	if (input.accountId && input.accountId.trim().length > 0) {
 		setCookieValue(AUTH_COOKIE_NAMES.accountId, input.accountId, maxAgeSeconds);
 	} else {
@@ -101,4 +117,5 @@ export function clearBrowserAuthSession() {
 	clearCookie(AUTH_COOKIE_NAMES.auditorCode);
 	clearCookie(AUTH_COOKIE_NAMES.userName);
 	clearCookie(AUTH_COOKIE_NAMES.userEmail);
+	clearCookie(AUTH_COOKIE_NAMES.nextStep);
 }

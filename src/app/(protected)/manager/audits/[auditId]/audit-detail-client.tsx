@@ -99,6 +99,7 @@ export function ManagerAuditDetailClient({ auditId }: Readonly<ManagerAuditDetai
 		<AuditDetailView
 			audit={auditQuery.data}
 			eyebrow={t("header.eyebrow")}
+			basePath="/manager"
 			breadcrumbs={[
 				{ label: t("breadcrumbs.dashboard"), href: "/manager/dashboard" },
 				{ label: t("breadcrumbs.audits"), href: "/manager/audits" },

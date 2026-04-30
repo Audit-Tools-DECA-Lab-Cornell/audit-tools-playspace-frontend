@@ -20,8 +20,8 @@ import {
 	type LucideIcon
 } from "lucide-react";
 
-import { playspaceApi, type AccountDetail, type ManagerProfile } from "@/lib/api/playspace";
-import { clearBrowserAuthSession } from "@/lib/auth/browser-session";
+import { playspaceApi, type AccountDetail, type ManagerProfile, type MyAuditorProfile } from "@/lib/api/playspace";
+import { clearBrowserAuthSession, getBrowserAuthSession, setBrowserAuthSession } from "@/lib/auth/browser-session";
 import type { AuthSession } from "@/lib/auth/session";
 import { useAuthSession } from "@/components/app/auth-session-provider";
 import {
@@ -1108,6 +1108,196 @@ function AuditorWorkspaceCard({ session }: Readonly<{ session: AuthSession }>) {
 	);
 }
 
+function AuditorSelfServiceCard({ profile }: Readonly<{ profile: MyAuditorProfile | null }>) {
+	const queryClient = useQueryClient();
+	const [fullName, setFullName] = React.useState(profile?.full_name ?? "");
+	const [email, setEmail] = React.useState(profile?.email ?? "");
+	const [phone, setPhone] = React.useState(profile?.phone ?? "");
+	const [role, setRole] = React.useState(profile?.role ?? "");
+	const [country, setCountry] = React.useState(profile?.country ?? "");
+	const [profileMessage, setProfileMessage] = React.useState<string | null>(null);
+	const [currentPassword, setCurrentPassword] = React.useState("");
+	const [newPassword, setNewPassword] = React.useState("");
+	const [passwordMessage, setPasswordMessage] = React.useState<string | null>(null);
+
+	React.useEffect(() => {
+		setFullName(profile?.full_name ?? "");
+		setEmail(profile?.email ?? "");
+		setPhone(profile?.phone ?? "");
+		setRole(profile?.role ?? "");
+		setCountry(profile?.country ?? "");
+	}, [profile?.country, profile?.email, profile?.full_name, profile?.phone, profile?.role]);
+
+	const updateProfileMutation = useMutation({
+		mutationFn: () =>
+			playspaceApi.auditor.updateMyProfile({
+				full_name: fullName.trim(),
+				email: email.trim() || undefined,
+				phone: phone.trim() || undefined,
+				role: role.trim() || undefined,
+				country: country.trim() || undefined
+			}),
+		onSuccess: async updatedProfile => {
+			setProfileMessage("Profile saved.");
+			const currentSession = getBrowserAuthSession();
+			if (currentSession) {
+				setBrowserAuthSession({
+					...currentSession,
+					auditorCode: updatedProfile.auditor_code,
+					userName: updatedProfile.full_name,
+					userEmail: updatedProfile.email
+				});
+			}
+			await queryClient.invalidateQueries({ queryKey: ["playspace", "settings", "auditorProfile"] });
+		},
+		onError: error => {
+			setProfileMessage(error instanceof Error ? error.message : "Unable to save profile.");
+		}
+	});
+
+	const changePasswordMutation = useMutation({
+		mutationFn: () =>
+			playspaceApi.auditor.changePassword({
+				current_password: currentPassword,
+				new_password: newPassword
+			}),
+		onSuccess: () => {
+			setCurrentPassword("");
+			setNewPassword("");
+			setPasswordMessage("Password updated.");
+		},
+		onError: error => {
+			setPasswordMessage(error instanceof Error ? error.message : "Unable to update password.");
+		}
+	});
+
+	const canSaveProfile = fullName.trim().length > 0;
+	const canChangePassword = currentPassword.length > 0 && newPassword.length >= 8;
+
+	return (
+		<div className="grid gap-4 xl:grid-cols-2">
+			<Card>
+				<CardHeader>
+					<CardTitle>Auditor profile</CardTitle>
+					<CardDescription>Update the contact details attached to your auditor code.</CardDescription>
+				</CardHeader>
+				<CardContent>
+					<form
+						className="flex flex-col gap-4"
+						onSubmit={event => {
+							event.preventDefault();
+							setProfileMessage(null);
+							if (!canSaveProfile) return;
+							updateProfileMutation.mutate();
+						}}>
+						<div className="grid gap-4 md:grid-cols-2">
+							<div className="flex flex-col gap-2">
+								<Label htmlFor="settings_auditor_name">Full name</Label>
+								<Input
+									id="settings_auditor_name"
+									value={fullName}
+									onChange={event => setFullName(event.target.value)}
+								/>
+							</div>
+							<div className="flex flex-col gap-2">
+								<Label htmlFor="settings_auditor_email">Email</Label>
+								<Input
+									id="settings_auditor_email"
+									type="email"
+									value={email}
+									onChange={event => setEmail(event.target.value)}
+								/>
+							</div>
+							<div className="flex flex-col gap-2">
+								<Label htmlFor="settings_auditor_phone">Phone</Label>
+								<Input
+									id="settings_auditor_phone"
+									value={phone}
+									onChange={event => setPhone(event.target.value)}
+								/>
+							</div>
+							<div className="flex flex-col gap-2">
+								<Label htmlFor="settings_auditor_role">Role / profession</Label>
+								<Input
+									id="settings_auditor_role"
+									value={role}
+									onChange={event => setRole(event.target.value)}
+								/>
+							</div>
+							<div className="flex flex-col gap-2">
+								<Label htmlFor="settings_auditor_country">Country</Label>
+								<Input
+									id="settings_auditor_country"
+									value={country}
+									onChange={event => setCountry(event.target.value)}
+								/>
+							</div>
+						</div>
+						{profileMessage ? <p className="text-sm text-muted-foreground">{profileMessage}</p> : null}
+						<div className="flex justify-end">
+							<Button
+								type="submit"
+								disabled={!canSaveProfile || updateProfileMutation.isPending}
+								aria-busy={updateProfileMutation.isPending}>
+								{updateProfileMutation.isPending ? "Saving..." : "Save profile"}
+							</Button>
+						</div>
+					</form>
+				</CardContent>
+			</Card>
+
+			<Card>
+				<CardHeader>
+					<CardTitle>Change password</CardTitle>
+					<CardDescription>Use this when you need to rotate your auditor dashboard password.</CardDescription>
+				</CardHeader>
+				<CardContent>
+					<form
+						className="flex flex-col gap-4"
+						onSubmit={event => {
+							event.preventDefault();
+							setPasswordMessage(null);
+							if (!canChangePassword) return;
+							changePasswordMutation.mutate();
+						}}>
+						<div className="flex flex-col gap-2">
+							<Label htmlFor="settings_current_password">Current password</Label>
+							<Input
+								id="settings_current_password"
+								type="password"
+								autoComplete="current-password"
+								value={currentPassword}
+								onChange={event => setCurrentPassword(event.target.value)}
+							/>
+						</div>
+						<div className="flex flex-col gap-2">
+							<Label htmlFor="settings_new_password">New password</Label>
+							<Input
+								id="settings_new_password"
+								type="password"
+								autoComplete="new-password"
+								value={newPassword}
+								onChange={event => setNewPassword(event.target.value)}
+							/>
+							<p className="text-xs text-muted-foreground">Use at least 8 characters.</p>
+						</div>
+						{passwordMessage ? <p className="text-sm text-muted-foreground">{passwordMessage}</p> : null}
+						<div className="flex justify-end">
+							<Button
+								type="submit"
+								variant="secondary"
+								disabled={!canChangePassword || changePasswordMutation.isPending}
+								aria-busy={changePasswordMutation.isPending}>
+								{changePasswordMutation.isPending ? "Updating..." : "Update password"}
+							</Button>
+						</div>
+					</form>
+				</CardContent>
+			</Card>
+		</div>
+	);
+}
+
 export default function SettingsPage() {
 	const router = useRouter();
 	const session = useAuthSession();
@@ -1128,6 +1318,12 @@ export default function SettingsPage() {
 			return playspaceApi.accounts.get(managerAccountId);
 		},
 		enabled: preferences.isHydrated && managerAccountId !== null
+	});
+
+	const auditorProfileQuery = useQuery({
+		queryKey: ["playspace", "settings", "auditorProfile"],
+		queryFn: () => playspaceApi.auditor.myProfile(),
+		enabled: preferences.isHydrated && session?.role === "auditor"
 	});
 
 	const managerProfilesQuery = useQuery({
@@ -1152,6 +1348,7 @@ export default function SettingsPage() {
 
 	const managerAccount = accountQuery.data ?? null;
 	const managerProfiles = managerProfilesQuery.data ?? [];
+	const auditorProfile = auditorProfileQuery.data ?? null;
 	return (
 		<div className="space-y-6">
 			<DashboardHeader
@@ -1199,7 +1396,10 @@ export default function SettingsPage() {
 			) : session.role === "admin" ? (
 				<AdminWorkspaceCard />
 			) : (
-				<AuditorWorkspaceCard session={session} />
+				<div className="flex flex-col gap-4">
+					<AuditorWorkspaceCard session={session} />
+					<AuditorSelfServiceCard profile={auditorProfile} />
+				</div>
 			)}
 		</div>
 	);

@@ -32,6 +32,8 @@ import type {
 	ChoiceOption,
 	InstrumentQuestion,
 	InstrumentSection,
+	LegalDocument,
+	LegalSection,
 	PlayspaceInstrument,
 	PreAuditQuestion,
 	QuestionDisplayCondition,
@@ -268,6 +270,27 @@ function makeDefaultPreAuditQuestion(): PreAuditQuestion {
 
 function makeDefaultExecutionMode(): ChoiceOption {
 	return { key: "new_mode", label: "New Mode", description: null };
+}
+
+function makeDefaultLegalSection(): LegalSection {
+	return {
+		key: "new_section",
+		title: "New Section",
+		body: [""],
+		bullets: []
+	};
+}
+
+function makeDefaultLegalDocument(): LegalDocument {
+	return {
+		key: "new_document",
+		short_title: "New Doc",
+		title: "New Document",
+		eyebrow: "Document category",
+		last_updated: new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" }),
+		summary: "",
+		sections: [makeDefaultLegalSection()]
+	};
 }
 
 /* -------------------------------------------------------------------------- */
@@ -689,9 +712,9 @@ function InstrumentContentViewer({ content, version }: Readonly<{ content: Instr
 	const t = useTranslations("admin.instruments.content");
 	const languages = Object.keys(content);
 	const [activeLang, setActiveLang] = useState(languages[0] ?? "en");
-	const [activeTab, setActiveTab] = useState<"overview" | "sections" | "spreadsheet" | "preAudit" | "scales">(
-		"overview"
-	);
+	const [activeTab, setActiveTab] = useState<
+		"overview" | "sections" | "spreadsheet" | "preAudit" | "scales" | "legalDocuments"
+	>("overview");
 	const instrument = content[activeLang] as PlayspaceInstrument | undefined;
 
 	const sections = useMemo(() => instrument?.sections ?? [], [instrument?.sections]);
@@ -699,6 +722,7 @@ function InstrumentContentViewer({ content, version }: Readonly<{ content: Instr
 	const scaleGuidance = useMemo(() => instrument?.scale_guidance ?? [], [instrument?.scale_guidance]);
 	const preamble = useMemo(() => instrument?.preamble ?? [], [instrument?.preamble]);
 	const executionModes = useMemo(() => instrument?.execution_modes ?? [], [instrument?.execution_modes]);
+	const legalDocuments = useMemo(() => instrument?.legal_documents ?? [], [instrument?.legal_documents]);
 	const totalQuestions = useMemo(() => countTotalQuestions(sections), [sections]);
 	const scaleGuidanceMap = useMemo(() => buildScaleGuidanceMap(scaleGuidance), [scaleGuidance]);
 
@@ -776,6 +800,11 @@ function InstrumentContentViewer({ content, version }: Readonly<{ content: Instr
 					<TabsTrigger value="scales">
 						{t("scaleGuidance")} ({scaleGuidance.length})
 					</TabsTrigger>
+					{legalDocuments.length > 0 && (
+						<TabsTrigger value="legalDocuments">
+							{t("legalDocuments")} ({legalDocuments.length})
+						</TabsTrigger>
+					)}
 				</TabsList>
 
 				<TabsContent value="overview" className="space-y-4">
@@ -839,7 +868,81 @@ function InstrumentContentViewer({ content, version }: Readonly<{ content: Instr
 				<TabsContent value="scales">
 					<ScaleGuidanceViewer scales={scaleGuidance} />
 				</TabsContent>
+
+				<TabsContent value="legalDocuments">
+					<LegalDocumentsViewer documents={legalDocuments} />
+				</TabsContent>
 			</Tabs>
+		</div>
+	);
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Legal Documents Viewer                                                     */
+/* -------------------------------------------------------------------------- */
+
+function LegalDocumentsViewer({ documents }: Readonly<{ documents: LegalDocument[] }>) {
+	const t = useTranslations("admin.instruments.content");
+
+	if (documents.length === 0) {
+		return (
+			<Card>
+				<CardContent className="py-8 text-center text-sm text-muted-foreground">
+					{t("noLegalDocuments")}
+				</CardContent>
+			</Card>
+		);
+	}
+
+	return (
+		<div className="space-y-4">
+			{documents.map((doc, docIndex) => (
+				<Card key={docIndex}>
+					<CardHeader className="pb-3">
+						<div className="flex flex-wrap items-start justify-between gap-3">
+							<div className="space-y-1 min-w-0">
+								<p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+									{doc.eyebrow}
+								</p>
+								<CardTitle className="text-base">{doc.title}</CardTitle>
+								<p className="text-xs text-muted-foreground">
+									{t("legalDocLastUpdated")}: {doc.last_updated}
+								</p>
+							</div>
+							<Badge variant="outline" className="font-mono text-xs shrink-0">
+								{doc.key}
+							</Badge>
+						</div>
+						{doc.summary && (
+							<p className="mt-2 text-sm text-muted-foreground leading-relaxed">{doc.summary}</p>
+						)}
+					</CardHeader>
+
+					<CardContent className="space-y-5 pt-0">
+						{doc.sections.map((section, sectionIndex) => (
+							<div key={sectionIndex} className="space-y-2">
+								<h4 className="text-sm font-semibold text-foreground">{section.title}</h4>
+								{section.body.map((para, paraIndex) => (
+									<p key={paraIndex} className="text-sm text-muted-foreground leading-relaxed">
+										{para}
+									</p>
+								))}
+								{section.bullets.length > 0 && (
+									<ul className="space-y-1 pl-4">
+										{section.bullets.map((bullet, bulletIndex) => (
+											<li
+												key={bulletIndex}
+												className="text-sm text-muted-foreground leading-relaxed list-disc">
+												{bullet}
+											</li>
+										))}
+									</ul>
+								)}
+							</div>
+						))}
+					</CardContent>
+				</Card>
+			))}
 		</div>
 	);
 }
@@ -1969,7 +2072,7 @@ function InstrumentEditor({ content, sourceVersion, isPending, onPublish, onCanc
 	const languages = Object.keys(draft);
 	const [activeLang, setActiveLang] = useState(languages[0] ?? "en");
 	const [activeEditorTab, setActiveEditorTab] = useState<
-		"preamble" | "modes" | "scaleGuidance" | "preAudit" | "sections" | "spreadsheet"
+		"preamble" | "modes" | "scaleGuidance" | "preAudit" | "sections" | "spreadsheet" | "legalDocuments"
 	>("sections");
 	const [showPublishDialog, setShowPublishDialog] = useState(false);
 	const [publishActivate, setPublishActivate] = useState(true);
@@ -2103,6 +2206,7 @@ function InstrumentEditor({ content, sourceVersion, isPending, onPublish, onCanc
 									<TabsTrigger value="spreadsheet" data-testid="spreadsheet-tab">
 										{ct("editableSpreadsheet")}
 									</TabsTrigger>
+									<TabsTrigger value="legalDocuments">{ct("legalDocuments")}</TabsTrigger>
 								</TabsList>
 
 								<TabsContent value="preamble">
@@ -2189,6 +2293,17 @@ function InstrumentEditor({ content, sourceVersion, isPending, onPublish, onCanc
 												else if (field === "notes_prompt") s.notes_prompt = value;
 											});
 										}}
+									/>
+								</TabsContent>
+
+								<TabsContent value="legalDocuments">
+									<LegalDocumentsEditor
+										documents={instrument.legal_documents ?? []}
+										onChange={docs =>
+											updateInstrument(inst => {
+												inst.legal_documents = docs;
+											})
+										}
 									/>
 								</TabsContent>
 							</Tabs>
@@ -3591,12 +3706,14 @@ function EditableField({
 				<Textarea
 					className={`min-h-[60px] text-sm ${mono ? "font-mono" : ""}`}
 					value={value}
+					autoComplete="off"
 					onChange={e => onChange(e.target.value)}
 				/>
 			) : (
 				<Input
 					className={`text-sm ${mono ? "font-mono" : ""}`}
 					value={value}
+					autoComplete="off"
 					onChange={e => onChange(e.target.value)}
 				/>
 			)}
@@ -3617,6 +3734,344 @@ function StatBox({ label, value, textValue }: Readonly<{ label: string; value?: 
 			) : (
 				<p className="text-2xl font-bold tabular-nums">{value}</p>
 			)}
+		</div>
+	);
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Legal Documents Editor                                                    */
+/* -------------------------------------------------------------------------- */
+
+function LegalDocumentsEditor({
+	documents,
+	onChange
+}: Readonly<{
+	documents: LegalDocument[];
+	onChange: (documents: LegalDocument[]) => void;
+}>) {
+	const t = useTranslations("admin.instruments.content");
+	const [expandedDocIdx, setExpandedDocIdx] = useState<string>(documents.length > 0 ? "0" : "");
+
+	function updateDocument(index: number, updater: (doc: LegalDocument) => LegalDocument) {
+		const next = documents.map((doc, i) => (i === index ? updater(doc) : doc));
+		onChange(next);
+	}
+
+	function addDocument() {
+		const doc = makeDefaultLegalDocument();
+		onChange([...documents, doc]);
+		setExpandedDocIdx(String(documents.length));
+	}
+
+	function removeDocument(index: number) {
+		const next = documents.filter((_, i) => i !== index);
+		onChange(next);
+		setExpandedDocIdx(next.length > 0 ? "0" : "");
+	}
+
+	function addSection(docIndex: number) {
+		updateDocument(docIndex, doc => ({
+			...doc,
+			sections: [...doc.sections, makeDefaultLegalSection()]
+		}));
+	}
+
+	function removeSection(docIndex: number, sectionIndex: number) {
+		updateDocument(docIndex, doc => ({
+			...doc,
+			sections: doc.sections.filter((_, i) => i !== sectionIndex)
+		}));
+	}
+
+	function updateSection(docIndex: number, sectionIndex: number, updater: (section: LegalSection) => LegalSection) {
+		updateDocument(docIndex, doc => ({
+			...doc,
+			sections: doc.sections.map((s, i) => (i === sectionIndex ? updater(s) : s))
+		}));
+	}
+
+	function addBodyParagraph(docIndex: number, sectionIndex: number) {
+		updateSection(docIndex, sectionIndex, s => ({ ...s, body: [...s.body, ""] }));
+	}
+
+	function removeBodyParagraph(docIndex: number, sectionIndex: number, paraIndex: number) {
+		updateSection(docIndex, sectionIndex, s => ({
+			...s,
+			body: s.body.filter((_, i) => i !== paraIndex)
+		}));
+	}
+
+	function updateBodyParagraph(docIndex: number, sectionIndex: number, paraIndex: number, value: string) {
+		updateSection(docIndex, sectionIndex, s => {
+			const next = [...s.body];
+			next[paraIndex] = value;
+			return { ...s, body: next };
+		});
+	}
+
+	function addBullet(docIndex: number, sectionIndex: number) {
+		updateSection(docIndex, sectionIndex, s => ({ ...s, bullets: [...s.bullets, ""] }));
+	}
+
+	function removeBullet(docIndex: number, sectionIndex: number, bulletIndex: number) {
+		updateSection(docIndex, sectionIndex, s => ({
+			...s,
+			bullets: s.bullets.filter((_, i) => i !== bulletIndex)
+		}));
+	}
+
+	function updateBullet(docIndex: number, sectionIndex: number, bulletIndex: number, value: string) {
+		updateSection(docIndex, sectionIndex, s => {
+			const next = [...s.bullets];
+			next[bulletIndex] = value;
+			return { ...s, bullets: next };
+		});
+	}
+
+	return (
+		<div className="space-y-4">
+			<div className="flex items-center justify-between">
+				<div>
+					<h3 className="text-sm font-semibold">{t("legalDocuments")}</h3>
+					<p className="text-xs text-muted-foreground mt-0.5">{t("legalDocumentsDescription")}</p>
+				</div>
+				<Button variant="outline" size="sm" onClick={addDocument}>
+					<Plus className="mr-1.5 h-3.5 w-3.5" />
+					{t("addLegalDocument")}
+				</Button>
+			</div>
+
+			{documents.length === 0 && (
+				<Card>
+					<CardContent className="py-8 text-center text-sm text-muted-foreground">
+						{t("noLegalDocuments")}
+					</CardContent>
+				</Card>
+			)}
+
+			<Accordion type="single" collapsible value={expandedDocIdx} onValueChange={v => setExpandedDocIdx(v)}>
+				{documents.map((doc, docIndex) => (
+					<AccordionItem
+						key={docIndex}
+						value={String(docIndex)}
+						className="border rounded-lg mb-3 px-0 overflow-hidden">
+						<div className="flex items-center gap-2 px-4">
+							<AccordionTrigger className="flex-1 py-3 hover:no-underline">
+								<div className="flex items-center gap-3 text-left min-w-0">
+									<Badge variant="outline" className="shrink-0 font-mono text-xs">
+										{doc.key}
+									</Badge>
+									<span className="truncate text-sm font-medium">{doc.title}</span>
+									<span className="text-xs text-muted-foreground shrink-0">
+										{doc.sections.length} {t("legalSectionsCount")}
+									</span>
+								</div>
+							</AccordionTrigger>
+							<Button
+								variant="ghost"
+								size="icon"
+								className="shrink-0 text-destructive hover:text-destructive h-8 w-8"
+								onClick={e => {
+									e.stopPropagation();
+									removeDocument(docIndex);
+								}}>
+								<Trash2 className="h-3.5 w-3.5" />
+							</Button>
+						</div>
+
+						<AccordionContent className="px-4 pb-4 pt-0">
+							<div className="space-y-4">
+								{/* Document metadata */}
+								<Card className="bg-muted/30">
+									<CardContent className="pt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+										<EditableField
+											label={t("legalDocKey")}
+											value={doc.key}
+											mono
+											onChange={v => updateDocument(docIndex, d => ({ ...d, key: v }))}
+										/>
+										<EditableField
+											label={t("legalDocShortTitle")}
+											value={doc.short_title}
+											onChange={v => updateDocument(docIndex, d => ({ ...d, short_title: v }))}
+										/>
+										<EditableField
+											label={t("legalDocTitle")}
+											value={doc.title}
+											onChange={v => updateDocument(docIndex, d => ({ ...d, title: v }))}
+										/>
+										<EditableField
+											label={t("legalDocEyebrow")}
+											value={doc.eyebrow}
+											onChange={v => updateDocument(docIndex, d => ({ ...d, eyebrow: v }))}
+										/>
+										<EditableField
+											label={t("legalDocLastUpdated")}
+											value={doc.last_updated}
+											onChange={v => updateDocument(docIndex, d => ({ ...d, last_updated: v }))}
+										/>
+										<div className="col-span-full sm:col-span-2">
+											<EditableField
+												label={t("legalDocSummary")}
+												value={doc.summary}
+												multiline
+												onChange={v => updateDocument(docIndex, d => ({ ...d, summary: v }))}
+											/>
+										</div>
+									</CardContent>
+								</Card>
+
+								{/* Sections */}
+								<div className="space-y-3">
+									<div className="flex items-center justify-between">
+										<p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+											{t("legalSections")} ({doc.sections.length})
+										</p>
+										<Button variant="outline" size="sm" onClick={() => addSection(docIndex)}>
+											<Plus className="mr-1.5 h-3 w-3" />
+											{t("addLegalSection")}
+										</Button>
+									</div>
+
+									{doc.sections.map((section, sectionIndex) => (
+										<Card key={sectionIndex} className="border-border/60">
+											<CardHeader className="pb-2 pt-3 px-4">
+												<div className="flex items-start justify-between gap-2">
+													<div className="grid grid-cols-2 gap-2 flex-1 min-w-0">
+														<EditableField
+															label={t("legalSectionKey")}
+															value={section.key}
+															mono
+															onChange={v =>
+																updateSection(docIndex, sectionIndex, s => ({
+																	...s,
+																	key: v
+																}))
+															}
+														/>
+														<EditableField
+															label={t("legalSectionTitle")}
+															value={section.title}
+															onChange={v =>
+																updateSection(docIndex, sectionIndex, s => ({
+																	...s,
+																	title: v
+																}))
+															}
+														/>
+													</div>
+													<Button
+														variant="ghost"
+														size="icon"
+														className="shrink-0 text-destructive hover:text-destructive h-8 w-8 mt-4"
+														onClick={() => removeSection(docIndex, sectionIndex)}>
+														<Trash2 className="h-3.5 w-3.5" />
+													</Button>
+												</div>
+											</CardHeader>
+
+											<CardContent className="px-4 pb-4 space-y-3">
+												{/* Body paragraphs */}
+												<div className="space-y-2">
+													<div className="flex items-center justify-between">
+														<p className="text-xs text-muted-foreground">
+															{t("legalSectionBody")}
+														</p>
+														<Button
+															variant="ghost"
+															size="sm"
+															className="h-6 text-xs"
+															onClick={() => addBodyParagraph(docIndex, sectionIndex)}>
+															<Plus className="mr-1 h-3 w-3" />
+															{t("addParagraph")}
+														</Button>
+													</div>
+													{section.body.map((para, paraIndex) => (
+														<div key={paraIndex} className="flex gap-2">
+															<Textarea
+																className="min-h-[64px] text-sm flex-1"
+																value={para}
+																onChange={e =>
+																	updateBodyParagraph(
+																		docIndex,
+																		sectionIndex,
+																		paraIndex,
+																		e.target.value
+																	)
+																}
+															/>
+															<Button
+																variant="ghost"
+																size="icon"
+																className="shrink-0 text-destructive hover:text-destructive h-8 w-8 mt-1"
+																onClick={() =>
+																	removeBodyParagraph(
+																		docIndex,
+																		sectionIndex,
+																		paraIndex
+																	)
+																}>
+																<Trash2 className="h-3.5 w-3.5" />
+															</Button>
+														</div>
+													))}
+												</div>
+
+												{/* Bullet points */}
+												<div className="space-y-2">
+													<div className="flex items-center justify-between">
+														<p className="text-xs text-muted-foreground">
+															{t("legalSectionBullets")}
+														</p>
+														<Button
+															variant="ghost"
+															size="sm"
+															className="h-6 text-xs"
+															onClick={() => addBullet(docIndex, sectionIndex)}>
+															<Plus className="mr-1 h-3 w-3" />
+															{t("addBullet")}
+														</Button>
+													</div>
+													{section.bullets.map((bullet, bulletIndex) => (
+														<div key={bulletIndex} className="flex gap-2">
+															<Textarea
+																className="min-h-[48px] text-sm flex-1"
+																value={bullet}
+																onChange={e =>
+																	updateBullet(
+																		docIndex,
+																		sectionIndex,
+																		bulletIndex,
+																		e.target.value
+																	)
+																}
+															/>
+															<Button
+																variant="ghost"
+																size="icon"
+																className="shrink-0 text-destructive hover:text-destructive h-8 w-8 mt-1"
+																onClick={() =>
+																	removeBullet(docIndex, sectionIndex, bulletIndex)
+																}>
+																<Trash2 className="h-3.5 w-3.5" />
+															</Button>
+														</div>
+													))}
+													{section.bullets.length === 0 && (
+														<p className="text-xs text-muted-foreground/60 italic">
+															{t("noBullets")}
+														</p>
+													)}
+												</div>
+											</CardContent>
+										</Card>
+									))}
+								</div>
+							</div>
+						</AccordionContent>
+					</AccordionItem>
+				))}
+			</Accordion>
 		</div>
 	);
 }

@@ -4,7 +4,8 @@ import * as React from "react";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
 
-import { generateAuditorCode } from "@/lib/auditor-code";
+import { LockIcon } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -22,18 +23,12 @@ import { getValidationMessage, getZodFieldErrors } from "./tanstack-form-utils";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-/**
- * Form schema shared by create and edit modes.
- * `auditorCode` is kept as an optional string — create mode auto-generates it,
- * edit mode carries the existing value through unchanged.
- */
 const auditorDialogSchema = z.object({
 	email: z
 		.string()
 		.trim()
 		.refine(value => EMAIL_PATTERN.test(value), "Enter a valid email address."),
 	fullName: z.string().trim().min(1, "Full name is required."),
-	auditorCode: z.string(),
 	role: z.string(),
 	ageRange: z.string(),
 	gender: z.string(),
@@ -45,6 +40,7 @@ type AuditorDialogFormValues = z.infer<typeof auditorDialogSchema>;
 export interface AuditorDialogInitialValues {
 	email?: string | null;
 	fullName?: string | null;
+	/** Existing auditor code displayed read-only in edit mode. */
 	auditorCode?: string | null;
 	role?: string | null;
 	ageRange?: string | null;
@@ -55,7 +51,6 @@ export interface AuditorDialogInitialValues {
 export interface AuditorDialogPayload {
 	email: string;
 	full_name: string;
-	auditor_code: string;
 	role: string | null;
 	age_range: string | null;
 	gender: string | null;
@@ -65,12 +60,8 @@ export interface AuditorDialogPayload {
 export interface AuditorDialogProps {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	/** Controls whether the auditor code is auto-generated (create) or read-only (edit). */
+	/** Controls whether the auditor code badge is shown (edit) or hidden (create). */
 	mode: "create" | "edit";
-	/** Organisation name used to derive auditor code initials. Required for create mode. */
-	accountName?: string;
-	/** All existing auditor codes for the account, used to derive the next sequence number. */
-	existingAuditorCodes?: readonly string[];
 	title: string;
 	description: string;
 	submitLabel: string;
@@ -97,7 +88,6 @@ function getDefaultValues(initialValues?: AuditorDialogInitialValues): AuditorDi
 	return {
 		email: initialValues?.email ?? "",
 		fullName: initialValues?.fullName ?? "",
-		auditorCode: initialValues?.auditorCode ?? "",
 		role: initialValues?.role ?? "",
 		ageRange: initialValues?.ageRange ?? "",
 		gender: initialValues?.gender ?? "",
@@ -116,8 +106,6 @@ export function AuditorDialog({
 	open,
 	onOpenChange,
 	mode,
-	accountName = "",
-	existingAuditorCodes = [],
 	title,
 	description,
 	submitLabel,
@@ -139,13 +127,12 @@ export function AuditorDialog({
 			getDefaultValues({
 				email: initialEmail,
 				fullName: initialFullName,
-				auditorCode: initialAuditorCode,
 				role: initialRole,
 				ageRange: initialAgeRange,
 				gender: initialGender,
 				country: initialCountry
 			}),
-		[initialAgeRange, initialAuditorCode, initialCountry, initialEmail, initialFullName, initialGender, initialRole]
+		[initialAgeRange, initialCountry, initialEmail, initialFullName, initialGender, initialRole]
 	);
 	const form = useForm({
 		defaultValues,
@@ -155,14 +142,9 @@ export function AuditorDialog({
 		onSubmit: async ({ value }) => {
 			try {
 				setSubmitError(null);
-				const auditorCode = isCreateMode
-					? generateAuditorCode(accountName, existingAuditorCodes)
-					: value.auditorCode;
-
 				await onSubmit({
 					email: value.email.trim(),
 					full_name: value.fullName.trim(),
-					auditor_code: auditorCode,
 					role: toNullableString(value.role),
 					age_range: toNullableString(value.ageRange),
 					gender: toNullableString(value.gender),
@@ -186,7 +168,7 @@ export function AuditorDialog({
 
 	return (
 		<Dialog open={open} onOpenChange={onOpenChange}>
-			<DialogContent className="max-h-[90dvh] overflow-y-auto sm:max-w-2xl">
+			<DialogContent className="max-h-[90dvh] overflow-y-auto [scrollbar-gutter:stable] sm:max-w-2xl">
 				<DialogHeader>
 					<DialogTitle>{title}</DialogTitle>
 					<DialogDescription>{description}</DialogDescription>
@@ -231,9 +213,9 @@ export function AuditorDialog({
 											aria-invalid={Boolean(validationMessage)}
 											aria-required="true"
 										/>
-										{validationMessage ? (
-											<p className="text-sm text-destructive">{validationMessage}</p>
-										) : null}
+										<p className="min-h-5 text-sm text-destructive" aria-live="polite">
+											{validationMessage}
+										</p>
 									</div>
 								);
 							}}
@@ -242,8 +224,11 @@ export function AuditorDialog({
 							<div className="grid gap-2 items-start">
 								<Label>Auditor code</Label>
 								<div
-									className="flex h-9 items-center rounded-md border border-input bg-muted px-3 font-mono text-sm tracking-wider text-muted-foreground"
-									aria-label="Auditor code (read-only)">
+									className="flex h-9 select-all items-center gap-2 rounded-md border border-input bg-muted px-3 font-mono text-sm tracking-wider text-muted-foreground"
+									aria-label={`Auditor code: ${initialAuditorCode} (read-only)`}
+									aria-readonly="true"
+									tabIndex={-1}>
+									<LockIcon className="size-3.5 shrink-0 opacity-50" aria-hidden="true" />
 									{initialAuditorCode}
 								</div>
 								<p className="text-xs text-muted-foreground">
@@ -274,9 +259,9 @@ export function AuditorDialog({
 											aria-invalid={Boolean(validationMessage)}
 											aria-required="true"
 										/>
-										{validationMessage ? (
-											<p className="text-sm text-destructive">{validationMessage}</p>
-										) : null}
+										<p className="min-h-5 text-sm text-destructive" aria-live="polite">
+											{validationMessage}
+										</p>
 									</div>
 								);
 							}}

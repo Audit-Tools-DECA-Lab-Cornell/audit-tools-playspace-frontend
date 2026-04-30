@@ -9,6 +9,7 @@ import {
 	ClipboardListIcon,
 	HashIcon,
 	ActivityIcon,
+	LayersIcon,
 	DownloadIcon,
 	ChevronsUpDownIcon,
 	ChevronDownIcon,
@@ -23,6 +24,7 @@ import { JsonViewer } from "./raw-json";
 
 import type { AuditScoreTotals, PlayspaceInstrument } from "@/types/audit";
 import type { AuditSession } from "@/lib/api/playspace";
+import { getEffectiveScoreTotals, getExecutionModeLabel } from "@/lib/audit/score-mode-helpers";
 import type { DomainReportRow, DomainQuestionRow, ConstructRanking } from "@/lib/audit/report-helpers";
 import {
 	buildDomainReportRows,
@@ -630,14 +632,16 @@ function ExportSection({
 export interface AuditReportViewProps {
 	readonly audit: AuditSession;
 	readonly instrument?: PlayspaceInstrument | null;
+	/** Role-scoped base path (e.g. "/admin", "/manager") for cross-navigation links. */
+	readonly basePath?: string | undefined;
 }
 
 /**
  * Full formatted audit report view with aligned score bars, domain breakdown,
  * item-level toggle, overall scores, best/worst table, and export.
  */
-export function AuditReportView({ audit, instrument = null }: Readonly<AuditReportViewProps>) {
-	const overall = audit.scores.overall;
+export function AuditReportView({ audit, instrument = null, basePath }: Readonly<AuditReportViewProps>) {
+	const overall = getEffectiveScoreTotals(audit.scores);
 	const overallPvPct = overall !== null ? pct(overall.play_value_total, overall.play_value_total_max) : "—";
 	const overallUPct = overall !== null ? pct(overall.usability_total, overall.usability_total_max) : "—";
 	const overallSocPct = overall !== null ? pct(overall.sociability_total, overall.sociability_total_max) : "—";
@@ -688,13 +692,25 @@ export function AuditReportView({ audit, instrument = null }: Readonly<AuditRepo
 			{/* ── 1. Audit metadata ────────────────────────────────── */}
 			<Card>
 				<CardHeader>
-					<CardTitle className="flex items-center gap-2 text-base">
-						<ActivityIcon className="size-4 text-primary" />
-						Audit Details
-						<Badge variant={audit.status === "SUBMITTED" ? "default" : "secondary"} className="uppercase">
-							{audit.status}
-						</Badge>
-					</CardTitle>
+					<div className="flex items-center justify-between gap-3">
+						<CardTitle className="flex items-center gap-2 text-base">
+							<ActivityIcon className="size-4 text-primary" />
+							Audit Details
+							<Badge
+								variant={audit.status === "SUBMITTED" ? "default" : "secondary"}
+								className="uppercase">
+								{audit.status}
+							</Badge>
+						</CardTitle>
+						{basePath !== undefined && (
+							<a href={`${basePath}/audits/${audit.audit_id}`}>
+								<Button variant="outline" size="sm" className="gap-1.5 text-xs">
+									<ClipboardListIcon className="size-3.5" />
+									View Audit Details
+								</Button>
+							</a>
+						)}
+					</div>
 				</CardHeader>
 				<CardContent>
 					<div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
@@ -706,6 +722,11 @@ export function AuditReportView({ audit, instrument = null }: Readonly<AuditRepo
 						</MetadataRow>
 						<MetadataRow icon={MapPinIcon} label="Place">
 							{audit.place_name}
+						</MetadataRow>
+						<MetadataRow icon={LayersIcon} label="Audit Type">
+							<Badge variant="outline" className="text-xs font-medium">
+								{getExecutionModeLabel(audit.scores.execution_mode)}
+							</Badge>
 						</MetadataRow>
 						<MetadataRow icon={CalendarIcon} label="Started">
 							{formatDateTime(audit.started_at)}

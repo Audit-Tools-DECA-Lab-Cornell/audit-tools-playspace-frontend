@@ -34,6 +34,11 @@ function getDefaultDashboard(role: UserRole): string {
 	return role === "manager" ? "/manager/dashboard" : "/auditor/dashboard";
 }
 
+function getAuditorOnboardingPath(nextStep: AuthResponse["user"]["next_step"]): string | null {
+	if (nextStep === "DASHBOARD") return null;
+	return "/auditor/onboarding";
+}
+
 function isAllowedNextPath(role: UserRole, nextPath: string): boolean {
 	if (!isSafeInternalPath(nextPath)) return false;
 	if (nextPath.startsWith("/settings")) return true;
@@ -42,7 +47,12 @@ function isAllowedNextPath(role: UserRole, nextPath: string): boolean {
 	return nextPath.startsWith("/auditor");
 }
 
-function getRedirectAfterLogin(role: UserRole, nextParam: string | null): string {
+function getRedirectAfterLogin(role: UserRole, authResponse: AuthResponse, nextParam: string | null): string {
+	if (role === "auditor") {
+		const onboardingPath = getAuditorOnboardingPath(authResponse.user.next_step);
+		if (onboardingPath) return onboardingPath;
+	}
+
 	if (nextParam && isAllowedNextPath(role, nextParam)) return nextParam;
 	return getDefaultDashboard(role);
 }
@@ -56,7 +66,8 @@ function applyAuthResponse(authResponse: AuthResponse): UserRole | null {
 		accessToken: authResponse.access_token,
 		accountId: authResponse.user.account_id,
 		userName: authResponse.user.name,
-		userEmail: authResponse.user.email
+		userEmail: authResponse.user.email,
+		nextStep: authResponse.user.next_step
 	});
 
 	return role;
@@ -147,7 +158,7 @@ function RoleLoginCard({
 				return;
 			}
 
-			const redirectPath = getRedirectAfterLogin(role, nextParam ?? null);
+			const redirectPath = getRedirectAfterLogin(role, authResponse, nextParam ?? null);
 			router.push(redirectPath);
 		} catch (error) {
 			setServerError(error instanceof Error ? error.message : t("errors.unexpected"));

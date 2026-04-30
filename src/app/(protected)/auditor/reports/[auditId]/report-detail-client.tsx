@@ -6,6 +6,7 @@ import { useTranslations } from "next-intl";
 import * as React from "react";
 
 import { playspaceApi, type AuditSession } from "@/lib/api/playspace";
+import { getEffectiveScoreTotals } from "@/lib/audit/score-mode-helpers";
 import { useLocalizedInstrument } from "@/lib/instrument-translations";
 import { BackButton } from "@/components/dashboard/back-button";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
@@ -293,37 +294,38 @@ export function AuditorReportDetailClient({ auditId }: Readonly<AuditorReportDet
 						<CardTitle>{t("scores.title")}</CardTitle>
 					</CardHeader>
 					<CardContent className="space-y-2 text-sm text-muted-foreground">
-						<p>
-							{t("scores.summary", {
-								value: formatScoreLabel(
-									audit.scores.overall
-										? audit.scores.overall.play_value_total + audit.scores.overall.usability_total
-										: null,
-									formatT
-								)
-							})}
-						</p>
-						<p>
-							{t("scores.playValue", {
-								value: audit.scores.overall
-									? String(audit.scores.overall.play_value_total)
-									: formatT("pending")
-							})}
-						</p>
-						<p>
-							{t("scores.usability", {
-								value: audit.scores.overall
-									? String(audit.scores.overall.usability_total)
-									: formatT("pending")
-							})}
-						</p>
-						<p>
-							{t("scores.sociability", {
-								value: audit.scores.overall
-									? String(audit.scores.overall.sociability_total)
-									: formatT("pending")
-							})}
-						</p>
+						{(() => {
+							const effective = getEffectiveScoreTotals(audit.scores);
+							return (
+								<>
+									<p>
+										{t("scores.summary", {
+											value: formatScoreLabel(
+												effective
+													? effective.play_value_total + effective.usability_total
+													: null,
+												formatT
+											)
+										})}
+									</p>
+									<p>
+										{t("scores.playValue", {
+											value: effective ? String(effective.play_value_total) : formatT("pending")
+										})}
+									</p>
+									<p>
+										{t("scores.usability", {
+											value: effective ? String(effective.usability_total) : formatT("pending")
+										})}
+									</p>
+									<p>
+										{t("scores.sociability", {
+											value: effective ? String(effective.sociability_total) : formatT("pending")
+										})}
+									</p>
+								</>
+							);
+						})()}
 					</CardContent>
 				</Card>
 			</div>

@@ -12,13 +12,28 @@ function redirectToLogin(request: NextRequest) {
 	return NextResponse.redirect(loginUrl);
 }
 
+function parseNextStep(value: string | undefined): string {
+	if (
+		value === "VERIFY_EMAIL" ||
+		value === "WAITING_APPROVAL" ||
+		value === "COMPLETE_PROFILE" ||
+		value === "DASHBOARD"
+	) {
+		return value;
+	}
+
+	return "DASHBOARD";
+}
+
 function getAuthState(request: NextRequest) {
 	const role = parseUserRole(request.cookies.get(AUTH_COOKIE_NAMES.role)?.value);
 	const accessToken = request.cookies.get(AUTH_COOKIE_NAMES.accessToken)?.value ?? null;
+	const nextStep = parseNextStep(request.cookies.get(AUTH_COOKIE_NAMES.nextStep)?.value);
 
 	return {
 		role,
-		isAuthenticated: Boolean(role && accessToken)
+		isAuthenticated: Boolean(role && accessToken),
+		nextStep
 	};
 }
 
@@ -33,7 +48,9 @@ export function middleware(request: NextRequest) {
 				? "/admin/dashboard"
 				: auth.role === "manager"
 					? "/manager/dashboard"
-					: "/auditor/dashboard";
+					: auth.nextStep === "DASHBOARD"
+						? "/auditor/dashboard"
+						: "/auditor/onboarding";
 		return NextResponse.redirect(new URL(dashboardPath, request.url));
 	}
 
@@ -61,11 +78,23 @@ export function middleware(request: NextRequest) {
 			const fallbackPath = auth.role === "admin" ? "/admin/dashboard" : "/manager/dashboard";
 			return NextResponse.redirect(new URL(fallbackPath, request.url));
 		}
+
+		const isOnboardingPath = pathname.startsWith("/auditor/onboarding");
+		if (auth.nextStep !== "DASHBOARD" && !isOnboardingPath) {
+			return NextResponse.redirect(new URL("/auditor/onboarding", request.url));
+		}
+		if (auth.nextStep === "DASHBOARD" && isOnboardingPath) {
+			return NextResponse.redirect(new URL("/auditor/dashboard", request.url));
+		}
+
 		return NextResponse.next();
 	}
 
 	if (pathname.startsWith("/settings")) {
 		if (!auth.isAuthenticated) return redirectToLogin(request);
+		if (auth.role === "auditor" && auth.nextStep !== "DASHBOARD") {
+			return NextResponse.redirect(new URL("/auditor/onboarding", request.url));
+		}
 		return NextResponse.next();
 	}
 

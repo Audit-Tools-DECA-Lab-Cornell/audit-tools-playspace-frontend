@@ -125,6 +125,7 @@
 			"columns": {
 				"audit": "Audit",
 				"status": "Status",
+				"auditType": "Audit Type",
 				"started": "Started",
 				"submitted": "Submitted",
 				"score": "Score"
@@ -597,7 +598,26 @@
 				"clickToEdit": "Click to edit",
 				"saveEdit": "Save",
 				"cancelEdit": "Cancel",
-				"editableSpreadsheet": "Spreadsheet (Editable)"
+				"editableSpreadsheet": "Spreadsheet (Editable)",
+				"legalDocuments": "Legal Documents",
+				"legalDocumentsDescription": "Terms and Privacy Notice shown to auditors during onboarding.",
+				"addLegalDocument": "Add document",
+				"noLegalDocuments": "No legal documents. Add a Terms or Privacy document to display during onboarding.",
+				"legalDocKey": "Document Key",
+				"legalDocShortTitle": "Short Title",
+				"legalDocTitle": "Title",
+				"legalDocEyebrow": "Eyebrow Label",
+				"legalDocLastUpdated": "Last Updated",
+				"legalDocSummary": "Summary",
+				"legalSections": "Sections",
+				"legalSectionsCount": "sections",
+				"addLegalSection": "Add section",
+				"legalSectionKey": "Section Key",
+				"legalSectionTitle": "Section Title",
+				"legalSectionBody": "Body paragraphs",
+				"legalSectionBullets": "Bullet points",
+				"addBullet": "Add bullet",
+				"noBullets": "No bullet points in this section."
 			}
 		},
 		"system": {

@@ -337,6 +337,37 @@ export const accountUpdateRequestSchema = z.object({
 	email: z.string().email().optional()
 });
 
+export const myAuditorProfileSchema = z.object({
+	profile_id: z.string().uuid(),
+	auditor_code: z.string(),
+	full_name: z.string(),
+	email: z.string().nullable(),
+	phone: z.string().nullable(),
+	age_range: z.string().nullable(),
+	gender: z.string().nullable(),
+	city: z.string().nullable(),
+	province: z.string().nullable(),
+	country: z.string().nullable(),
+	role: z.string().nullable()
+});
+
+export const myAuditorProfileUpdateSchema = z.object({
+	full_name: z.string().min(1).optional(),
+	email: z.string().email().optional(),
+	phone: z.string().optional(),
+	gender: z.string().optional(),
+	age_range: z.string().optional(),
+	city: z.string().optional(),
+	province: z.string().optional(),
+	country: z.string().optional(),
+	role: z.string().optional()
+});
+
+export const changePasswordRequestSchema = z.object({
+	current_password: z.string().min(1),
+	new_password: z.string().min(8)
+});
+
 export const auditorProfileDetailSchema = z.object({
 	id: z.string().uuid(),
 	account_id: z.string().uuid(),
@@ -407,7 +438,6 @@ export const placeUpdateRequestSchema = z.object({
 export const auditorCreateRequestSchema = z.object({
 	email: z.string().email(),
 	full_name: z.string().min(1),
-	auditor_code: z.string().min(1),
 	age_range: z.string().nullable().optional(),
 	gender: z.string().nullable().optional(),
 	country: z.string().nullable().optional(),
@@ -705,6 +735,7 @@ export const adminPlaceRowSchema = z.object({
 	account_id: z.string().uuid(),
 	account_name: z.string(),
 	name: z.string(),
+	place_type: playspaceTypeSchema.nullable(),
 	address: z.string().nullable(),
 	city: z.string().nullable(),
 	province: z.string().nullable(),
@@ -878,6 +909,9 @@ export function paginatedResponseSchema<TItem extends z.ZodTypeAny>(itemSchema: 
 	});
 }
 
+export type MyAuditorProfile = z.infer<typeof myAuditorProfileSchema>;
+export type MyAuditorProfileUpdate = z.infer<typeof myAuditorProfileUpdateSchema>;
+export type ChangePasswordRequest = z.infer<typeof changePasswordRequestSchema>;
 export type ManagerProfile = z.infer<typeof managerProfileSchema>;
 export type AccountDetail = z.infer<typeof accountDetailSchema>;
 export type ProjectSummary = z.infer<typeof projectSummarySchema>;
@@ -903,6 +937,10 @@ export type AuditorProfileDetail = z.infer<typeof auditorProfileDetailSchema>;
 export type AuditorPlace = z.infer<typeof auditorPlaceSchema>;
 export type AuditorAuditSummary = z.infer<typeof auditorAuditSummarySchema>;
 export type AuditorDashboardSummary = z.infer<typeof auditorDashboardSummarySchema>;
+export type ScoreTotals = z.infer<typeof scoreTotalsSchema>;
+export type ScorePair = z.infer<typeof scorePairSchema>;
+export type ExecutionMode = z.infer<typeof executionModeSchema>;
+export type AuditScores = z.infer<typeof auditScoresSchema>;
 export type AuditSession = z.infer<typeof auditSessionSchema>;
 export type AuditDraftPatch = z.infer<typeof auditDraftPatchSchema>;
 export type AuditDraftSave = z.infer<typeof auditDraftSaveSchema>;
@@ -945,6 +983,7 @@ export interface ManagerAuditsQuery {
 	sort?: string;
 	projectIds?: readonly string[];
 	auditorIds?: readonly string[];
+	placeIds?: readonly string[];
 	statuses?: Array<"IN_PROGRESS" | "PAUSED" | "SUBMITTED">;
 }
 
@@ -976,6 +1015,8 @@ export interface AdminPlacesQuery extends PaginatedListQuery {
 
 export interface AdminAuditorsQuery extends PaginatedListQuery {
 	accountIds?: readonly string[];
+	projectIds?: readonly string[];
+	placeIds?: readonly string[];
 }
 
 export interface AdminProjectsQuery extends PaginatedListQuery {
@@ -986,6 +1027,7 @@ export interface AdminAuditsQuery extends PaginatedListQuery {
 	projectIds?: readonly string[];
 	accountIds?: readonly string[];
 	auditorIds?: readonly string[];
+	placeIds?: readonly string[];
 	statuses?: Array<"IN_PROGRESS" | "PAUSED" | "SUBMITTED">;
 }
 
