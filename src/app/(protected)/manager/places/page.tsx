@@ -45,7 +45,7 @@ function getErrorMessage(error: unknown, fallbackMessage: string): string {
 }
 
 /** Valid axis-level statuses for place_audit_status / place_survey_status filters. */
-const PLACE_AXIS_STATUSES = ["not_started", "in_progress", "submitted", "complete"] as const;
+const PLACE_AXIS_STATUSES = ["not_started", "in_progress", "submitted"] as const;
 
 const MANAGER_PLACES_SKELETON_IDS = [
 	"manager-places-skeleton-1",
@@ -146,9 +146,9 @@ export default function ManagerPlacesPage() {
 			return currentValue.pageIndex === 0
 				? currentValue
 				: {
-						...currentValue,
-						pageIndex: 0
-					};
+					...currentValue,
+					pageIndex: 0
+				};
 		});
 	}, [
 		searchValue,
@@ -516,21 +516,21 @@ export default function ManagerPlacesPage() {
 							selectedAuditorIds.length > 0 ||
 							selectedAuditStatuses.length > 0 ||
 							selectedSurveyStatuses.length > 0) && (
-							<Button
-								type="button"
-								variant="ghost"
-								size="sm"
-								className="gap-1.5"
-								onClick={() => {
-									setSelectedProjectIds([]);
-									setSelectedAuditorIds([]);
-									setSelectedAuditStatuses([]);
-									setSelectedSurveyStatuses([]);
-								}}>
-								<XIcon className="size-3.5" />
-								Clear filters
-							</Button>
-						)}
+								<Button
+									type="button"
+									variant="ghost"
+									size="sm"
+									className="gap-1.5"
+									onClick={() => {
+										setSelectedProjectIds([]);
+										setSelectedAuditorIds([]);
+										setSelectedAuditStatuses([]);
+										setSelectedSurveyStatuses([]);
+									}}>
+									<XIcon className="size-3.5" />
+									Clear filters
+								</Button>
+							)}
 					</>
 				}
 				emptyMessage={

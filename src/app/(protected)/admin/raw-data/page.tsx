@@ -620,7 +620,7 @@ export default function AdminRawDataPage() {
 
 	const axisStatusOptions = React.useMemo(
 		() =>
-			(["not_started", "in_progress", "submitted", "complete"] as const).map(s => ({
+			(["not_started", "in_progress", "submitted"] as const).map(s => ({
 				label: formatRequirementStatusLabel(s, formatT),
 				value: s
 			})),

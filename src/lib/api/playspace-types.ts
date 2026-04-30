@@ -10,8 +10,7 @@ export const projectStatusSchema = z.enum(["planned", "active", "completed"]);
 export const placeStatusSchema = z.enum(["not_started", "in_progress", "submitted"]);
 export const auditStatusSchema = z.enum(["IN_PROGRESS", "PAUSED", "SUBMITTED"]);
 export const executionModeSchema = z.enum(["audit", "survey", "both"]);
-/** Per-axis place coverage; API may also send legacy `complete` for fully covered axes. */
-export const placeAxisStatusSchema = z.enum(["not_started", "in_progress", "submitted", "complete"]);
+export const placeAxisStatusSchema = z.enum(["not_started", "in_progress", "submitted"]);
 export const playspaceTypeSchema = z.enum([
 	"Public Playspace",
 	"Pre-School Playspace",
@@ -735,7 +734,7 @@ export const adminPlaceRowSchema = z.object({
 	account_id: z.string().uuid(),
 	account_name: z.string(),
 	name: z.string(),
-	place_type: playspaceTypeSchema.nullable(),
+	place_type: z.string().nullable(),
 	address: z.string().nullable(),
 	city: z.string().nullable(),
 	province: z.string().nullable(),

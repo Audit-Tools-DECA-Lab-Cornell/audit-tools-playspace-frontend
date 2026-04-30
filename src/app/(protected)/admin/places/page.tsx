@@ -36,7 +36,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Separator } from "@/components/ui/separator";
 
 /** Valid axis-level statuses for place_audit_status / place_survey_status filters. */
-const PLACE_AXIS_STATUSES = ["not_started", "in_progress", "submitted", "complete"] as const;
+const PLACE_AXIS_STATUSES = ["not_started", "in_progress", "submitted"] as const;
 
 function formatLocation(
 	city: string | null,
@@ -138,9 +138,9 @@ export default function AdminPlacesPage() {
 			return currentValue.pageIndex === 0
 				? currentValue
 				: {
-						...currentValue,
-						pageIndex: 0
-					};
+					...currentValue,
+					pageIndex: 0
+				};
 		});
 	}, [
 		searchValue,

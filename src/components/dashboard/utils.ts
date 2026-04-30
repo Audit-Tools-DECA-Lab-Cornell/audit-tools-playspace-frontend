@@ -184,14 +184,13 @@ export function getProjectStatusClassName(status: ProjectSummary["status"]): str
 	return "border-status-in-progress-border bg-status-in-progress-surface text-status-in-progress";
 }
 
-/** Per-axis place coverage: backend may send `submitted` (activity) or legacy `complete`. */
-export type PlaceAxisRequirementStatus = "not_started" | "in_progress" | "complete" | "submitted";
+export type PlaceAxisRequirementStatus = "not_started" | "in_progress" | "submitted";
 
 /**
  * Resolve a status chip class for place requirement completion states.
  */
 export function getRequirementStatusClassName(status: PlaceAxisRequirementStatus): string {
-	if (status === "complete" || status === "submitted") {
+	if (status === "submitted") {
 		return "border-status-success-border bg-status-success-surface text-status-success";
 	}
 
@@ -206,7 +205,7 @@ export function getRequirementStatusClassName(status: PlaceAxisRequirementStatus
  * Render a friendly label for the new requirement-completion statuses.
  */
 export function formatRequirementStatusLabel(status: PlaceAxisRequirementStatus, t: DashboardTranslator): string {
-	if (status === "complete" || status === "submitted") {
+	if (status === "submitted") {
 		return "Complete";
 	}
 	if (status === "in_progress") {

@@ -2,14 +2,16 @@
 
 import { useQuery } from "@tanstack/react-query";
 import type { ColumnDef, ColumnFiltersState, PaginationState, SortingState } from "@tanstack/react-table";
+import { XIcon } from "lucide-react";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 
-import { playspaceApi, type AdminProjectRow } from "@/lib/api/playspace";
+import { playspaceApi, type AdminAccountRow, type AdminProjectRow, type PaginatedResponse } from "@/lib/api/playspace";
 import { DataTable } from "@/components/dashboard/data-table";
 import { DataTableColumnHeader } from "@/components/dashboard/data-table-column-header";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
+import { FilterPopover } from "@/components/dashboard/filter-popover";
 import {
 	getTextColumnFilterValue,
 	preservePreviousData,
@@ -29,26 +31,44 @@ export default function AdminProjectsPage() {
 	});
 	const searchValue = getTextColumnFilterValue(columnFilters, "name");
 	const sortParam = toBackendSortParam(sorting);
+	const [selectedAccountIds, setSelectedAccountIds] = React.useState<string[]>([]);
+	const selectedAccountIdsKey = selectedAccountIds.join("|");
 
 	React.useEffect(() => {
 		setPagination(currentValue => {
 			return currentValue.pageIndex === 0
 				? currentValue
 				: {
-						...currentValue,
-						pageIndex: 0
-					};
+					...currentValue,
+					pageIndex: 0
+				};
 		});
-	}, [searchValue, sortParam]);
+	}, [searchValue, sortParam, selectedAccountIdsKey]);
+
+	const accountsQuery = useQuery({
+		queryKey: ["playspace", "admin", "projects", "accounts-for-filter"],
+		queryFn: async (): Promise<PaginatedResponse<AdminAccountRow>> =>
+			playspaceApi.admin.accounts({ page: 1, pageSize: 100, accountTypes: ["MANAGER"] })
+	});
 
 	const projectsQuery = useQuery({
-		queryKey: ["playspace", "admin", "projects", pagination.pageIndex, pagination.pageSize, searchValue, sortParam],
+		queryKey: [
+			"playspace",
+			"admin",
+			"projects",
+			pagination.pageIndex,
+			pagination.pageSize,
+			searchValue,
+			sortParam,
+			selectedAccountIds
+		],
 		queryFn: () =>
 			playspaceApi.admin.projects({
 				page: pagination.pageIndex + 1,
 				pageSize: pagination.pageSize,
 				search: searchValue,
-				sort: sortParam
+				sort: sortParam,
+				accountIds: selectedAccountIds
 			}),
 		placeholderData: preservePreviousData
 	});
@@ -68,6 +88,15 @@ export default function AdminProjectsPage() {
 			pageIndex: maxPageIndex
 		}));
 	}, [pagination.pageIndex, projectsQuery.data]);
+
+	const accountOptions = React.useMemo(
+		() =>
+			(accountsQuery.data?.items ?? []).map(a => ({
+				label: a.name,
+				value: a.account_id
+			})),
+		[accountsQuery.data]
+	);
 
 	const isInitialLoading = projectsQuery.isLoading && !projectsQuery.data;
 
@@ -179,6 +208,28 @@ export default function AdminProjectsPage() {
 				searchColumnId="name"
 				searchPlaceholder={t("table.searchPlaceholder")}
 				emptyMessage={t("table.emptyMessage")}
+				filterConfigs={[]}
+				toolbarExtra={
+					<>
+						<FilterPopover
+							title="Managers"
+							options={accountOptions}
+							selectedValues={selectedAccountIds}
+							onChange={setSelectedAccountIds}
+						/>
+						{selectedAccountIds.length > 0 && (
+							<Button
+								type="button"
+								variant="ghost"
+								size="sm"
+								className="gap-1.5"
+								onClick={() => setSelectedAccountIds([])}>
+								<XIcon className="size-3.5" />
+								Clear filters
+							</Button>
+						)}
+					</>
+				}
 				initialSorting={[{ id: "date_range", desc: true }]}
 				sortingState={sorting}
 				onSortingStateChange={setSorting}
