@@ -7,7 +7,11 @@ import * as React from "react";
 
 import { playspaceApi, type AuditorSummary, type ManagerPlaceRow } from "@/lib/api/playspace";
 import { useAuthSession } from "@/components/app/auth-session-provider";
-import { AuditorDialog, type AuditorDialogPayload } from "@/components/dashboard/auditor-dialog";
+import {
+	AuditorDialog,
+	type AuditorCreatedSummary,
+	type AuditorDialogPayload
+} from "@/components/dashboard/auditor-dialog";
 import { AuditorsTable } from "@/components/dashboard/auditors-table";
 import { ConfirmDialog } from "@/components/dashboard/confirm-dialog";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
@@ -104,7 +108,6 @@ export default function ManagerAuditorsPage() {
 			await queryClient.invalidateQueries({
 				queryKey: ["playspace", "account", accountId, "auditors"]
 			});
-			setIsCreateDialogOpen(false);
 		}
 	});
 
@@ -241,7 +244,7 @@ export default function ManagerAuditorsPage() {
 						</Button>
 						<Button type="button" className="gap-2" onClick={() => setIsCreateDialogOpen(true)}>
 							<PlusIcon className="size-4" />
-							<span>New auditor</span>
+							<span>Invite new auditor</span>
 						</Button>
 					</div>
 				}
@@ -331,12 +334,13 @@ export default function ManagerAuditorsPage() {
 				open={isCreateDialogOpen}
 				onOpenChange={setIsCreateDialogOpen}
 				mode="create"
-				title="Create auditor"
-				description="Add a new auditor profile that can be assigned to projects and places."
-				submitLabel="Create auditor"
+				title="Invite new auditor"
+				description="Invite a new auditor to join your organization and start delivering audits."
+				submitLabel="Invite new auditor"
 				isPending={createAuditor.isPending}
-				onSubmit={async payload => {
-					await createAuditor.mutateAsync(payload);
+				onSubmit={async (payload): Promise<AuditorCreatedSummary | undefined> => {
+					const created = await createAuditor.mutateAsync(payload);
+					return { auditorCode: created.auditor_code, email: payload.email };
 				}}
 			/>
 			<AuditorDialog
@@ -364,7 +368,7 @@ export default function ManagerAuditorsPage() {
 						: undefined
 				}
 				isPending={updateAuditor.isPending}
-				onSubmit={async payload => {
+				onSubmit={async (payload): Promise<AuditorCreatedSummary | undefined> => {
 					if (!editingAuditorId) {
 						throw new Error("Auditor context is unavailable.");
 					}
@@ -373,6 +377,7 @@ export default function ManagerAuditorsPage() {
 						auditorId: editingAuditorId,
 						payload
 					});
+					return undefined;
 				}}
 			/>
 			<ConfirmDialog

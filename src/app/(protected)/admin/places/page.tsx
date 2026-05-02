@@ -138,9 +138,9 @@ export default function AdminPlacesPage() {
 			return currentValue.pageIndex === 0
 				? currentValue
 				: {
-					...currentValue,
-					pageIndex: 0
-				};
+						...currentValue,
+						pageIndex: 0
+					};
 		});
 	}, [
 		searchValue,

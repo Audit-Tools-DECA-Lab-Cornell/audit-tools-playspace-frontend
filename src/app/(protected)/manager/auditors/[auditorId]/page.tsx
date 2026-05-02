@@ -9,7 +9,11 @@ import { use } from "react";
 import { playspaceApi, type Assignment } from "@/lib/api/playspace";
 import { useAuthSession } from "@/components/app/auth-session-provider";
 import { AssignAuditorDialog } from "@/components/dashboard/assign-auditor-dialog";
-import { AuditorDialog, type AuditorDialogPayload } from "@/components/dashboard/auditor-dialog";
+import {
+	AuditorDialog,
+	type AuditorCreatedSummary,
+	type AuditorDialogPayload
+} from "@/components/dashboard/auditor-dialog";
 import { BackButton } from "@/components/dashboard/back-button";
 import { ConfirmDialog } from "@/components/dashboard/confirm-dialog";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
@@ -306,8 +310,9 @@ export default function ManagerAuditorDetailPage({ params }: Readonly<ManagerAud
 					country: auditor.country
 				}}
 				isPending={updateAuditor.isPending}
-				onSubmit={async payload => {
+				onSubmit={async (payload): Promise<AuditorCreatedSummary | undefined> => {
 					await updateAuditor.mutateAsync(payload);
+					return undefined;
 				}}
 			/>
 			<ConfirmDialog

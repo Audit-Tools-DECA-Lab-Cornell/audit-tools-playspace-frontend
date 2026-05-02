@@ -39,9 +39,9 @@ export default function AdminProjectsPage() {
 			return currentValue.pageIndex === 0
 				? currentValue
 				: {
-					...currentValue,
-					pageIndex: 0
-				};
+						...currentValue,
+						pageIndex: 0
+					};
 		});
 	}, [searchValue, sortParam, selectedAccountIdsKey]);
 

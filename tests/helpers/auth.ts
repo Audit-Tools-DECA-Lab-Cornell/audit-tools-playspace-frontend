@@ -6,11 +6,11 @@ export const DUMMY_CREDS = {
 		password: "DemoPass123!"
 	},
 	manager: {
-		email: "manager@example.org",
+		email: "amelia.carter@example.org",
 		password: "DemoPass123!"
 	},
 	auditor: {
-		email: "talia.cooper@example.org",
+		email: "ariana.ngata@example.org",
 		password: "DemoPass123!"
 	}
 };
