@@ -1,7 +1,8 @@
 "use client";
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { PencilLineIcon, PlusIcon, Trash2Icon, UserCircle2Icon } from "lucide-react";
+import { PencilLineIcon, PlusIcon, Trash2Icon, UserCircle2Icon, UserMinusIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 import { use } from "react";
@@ -51,9 +52,12 @@ export default function ManagerAuditorDetailPage({ params }: Readonly<ManagerAud
 	const queryClient = useQueryClient();
 	const accountId = session?.role === "manager" ? session.accountId : null;
 
+	const router = useRouter();
+
 	const [isAssignDialogOpen, setIsAssignDialogOpen] = React.useState(false);
 	const [isEditDialogOpen, setIsEditDialogOpen] = React.useState(false);
 	const [assignmentPendingDelete, setAssignmentPendingDelete] = React.useState<PendingAssignmentDelete | null>(null);
+	const [isRemoveAuditorDialogOpen, setIsRemoveAuditorDialogOpen] = React.useState(false);
 
 	/* ── Fetch auditor roster (to get the specific auditor's summary) ── */
 	const auditorsQuery = useQuery({
@@ -101,6 +105,20 @@ export default function ManagerAuditorDetailPage({ params }: Readonly<ManagerAud
 			setIsEditDialogOpen(false);
 		},
 		retry: 0
+	});
+
+	/* ── Remove auditor from account ── */
+	const removeAuditor = useMutation({
+		mutationFn: async () => playspaceApi.management.auditors.delete(auditorId),
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({
+				queryKey: ["playspace", "manager", "auditors", accountId]
+			});
+			await queryClient.invalidateQueries({
+				queryKey: ["playspace", "account", accountId, "auditors"]
+			});
+			router.push("/manager/auditors");
+		}
 	});
 
 	const auditors = auditorsQuery.data ?? [];
@@ -165,6 +183,14 @@ export default function ManagerAuditorDetailPage({ params }: Readonly<ManagerAud
 						<Button type="button" className="gap-2" onClick={() => setIsAssignDialogOpen(true)}>
 							<PlusIcon className="size-4" />
 							<span>{t("actions.assignToProject")}</span>
+						</Button>
+						<Button
+							type="button"
+							variant="destructive"
+							className="gap-2"
+							onClick={() => setIsRemoveAuditorDialogOpen(true)}>
+							<UserMinusIcon className="size-4" />
+							<span>{t("actions.removeFromAccount")}</span>
 						</Button>
 					</div>
 				}
@@ -342,6 +368,27 @@ export default function ManagerAuditorDetailPage({ params }: Readonly<ManagerAud
 						return;
 					}
 					deleteAssignment.mutate(assignmentPendingDelete.id);
+				}}
+			/>
+			<ConfirmDialog
+				open={isRemoveAuditorDialogOpen}
+				onOpenChange={open => {
+					if (!open) {
+						setIsRemoveAuditorDialogOpen(false);
+					}
+				}}
+				title={t("removeAuditorConfirm.title")}
+				description={
+					auditor
+						? t("removeAuditorConfirm.descriptionWithLabel", {
+								label: `${auditor.auditor_code} · ${auditor.full_name}`
+							})
+						: t("removeAuditorConfirm.descriptionGeneric")
+				}
+				confirmLabel={t("removeAuditorConfirm.confirmLabel")}
+				isPending={removeAuditor.isPending}
+				onConfirm={() => {
+					removeAuditor.mutate();
 				}}
 			/>
 		</div>

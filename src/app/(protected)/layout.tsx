@@ -8,6 +8,11 @@ export default async function ProtectedLayout({ children }: Readonly<{ children:
 	const session = await getServerAuthSession();
 	if (!session) redirect("/login");
 
+	if (session.nextStep === "COMPLETE_PROFILE") {
+		const onboardingPath = session.role === "auditor" ? "/onboarding/auditor" : "/onboarding/manager";
+		redirect(onboardingPath);
+	}
+
 	return (
 		<AuthSessionProvider initialSession={session}>
 			<AppShell

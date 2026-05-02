@@ -33,6 +33,25 @@ export const managerProfileSchema = z.object({
 	created_at: z.string().datetime()
 });
 
+export const managerInviteStatusSchema = z.enum(["PENDING", "EXPIRED", "ACCEPTED"]);
+
+export const managerInviteListItemSchema = z.object({
+	id: z.string().uuid(),
+	email: z.string().email(),
+	status: managerInviteStatusSchema,
+	created_at: z.string().datetime(),
+	expires_at: z.string().datetime(),
+	accepted_at: z.string().datetime().nullable()
+});
+
+export const managerInviteCreatedResponseSchema = z.object({
+	id: z.string().uuid(),
+	email: z.string().email(),
+	expires_at: z.string().datetime(),
+	invite_url: z.string(),
+	status: z.string()
+});
+
 export const scorePairSchema = z.object({
 	pv: z.number(),
 	u: z.number()
@@ -360,6 +379,23 @@ export const myAuditorProfileUpdateSchema = z.object({
 	province: z.string().optional(),
 	country: z.string().optional(),
 	role: z.string().optional()
+});
+
+export const myManagerProfileSchema = z.object({
+	profile_id: z.string().uuid(),
+	full_name: z.string(),
+	email: z.string(),
+	phone: z.string().nullable(),
+	position: z.string().nullable(),
+	organization: z.string().nullable(),
+	is_primary: z.boolean()
+});
+
+export const myManagerProfileUpdateSchema = z.object({
+	full_name: z.string().min(1).optional(),
+	email: z.string().email().optional(),
+	phone: z.string().optional(),
+	position: z.string().optional()
 });
 
 export const changePasswordRequestSchema = z.object({
@@ -753,7 +789,7 @@ export const adminPlaceRowSchema = z.object({
 
 export const adminAuditorRowSchema = z.object({
 	auditor_profile_id: z.string().uuid(),
-	account_id: z.string().uuid(),
+	account_id: z.string().uuid().nullable(),
 	auditor_code: z.string(),
 	email_masked: z.string().nullable(),
 	assignments_count: z.number().int().nonnegative(),
@@ -908,8 +944,13 @@ export function paginatedResponseSchema<TItem extends z.ZodTypeAny>(itemSchema: 
 	});
 }
 
+export type ManagerInviteStatus = z.infer<typeof managerInviteStatusSchema>;
+export type ManagerInviteListItem = z.infer<typeof managerInviteListItemSchema>;
+export type ManagerInviteCreatedResponse = z.infer<typeof managerInviteCreatedResponseSchema>;
 export type MyAuditorProfile = z.infer<typeof myAuditorProfileSchema>;
 export type MyAuditorProfileUpdate = z.infer<typeof myAuditorProfileUpdateSchema>;
+export type MyManagerProfile = z.infer<typeof myManagerProfileSchema>;
+export type MyManagerProfileUpdate = z.infer<typeof myManagerProfileUpdateSchema>;
 export type ChangePasswordRequest = z.infer<typeof changePasswordRequestSchema>;
 export type ManagerProfile = z.infer<typeof managerProfileSchema>;
 export type AccountDetail = z.infer<typeof accountDetailSchema>;

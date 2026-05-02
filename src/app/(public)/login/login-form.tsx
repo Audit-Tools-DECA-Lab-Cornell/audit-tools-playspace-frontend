@@ -34,9 +34,9 @@ function getDefaultDashboard(role: UserRole): string {
 	return role === "manager" ? "/manager/dashboard" : "/auditor/dashboard";
 }
 
-function getAuditorOnboardingPath(nextStep: AuthResponse["user"]["next_step"]): string | null {
-	if (nextStep === "DASHBOARD") return null;
-	return "/auditor/onboarding";
+function getOnboardingPath(role: UserRole, nextStep: AuthResponse["user"]["next_step"]): string | null {
+	if (nextStep !== "COMPLETE_PROFILE") return null;
+	return role === "auditor" ? "/onboarding/auditor" : "/onboarding/manager";
 }
 
 function isAllowedNextPath(role: UserRole, nextPath: string): boolean {
@@ -48,10 +48,8 @@ function isAllowedNextPath(role: UserRole, nextPath: string): boolean {
 }
 
 function getRedirectAfterLogin(role: UserRole, authResponse: AuthResponse, nextParam: string | null): string {
-	if (role === "auditor") {
-		const onboardingPath = getAuditorOnboardingPath(authResponse.user.next_step);
-		if (onboardingPath) return onboardingPath;
-	}
+	const onboardingPath = getOnboardingPath(role, authResponse.user.next_step);
+	if (onboardingPath) return onboardingPath;
 
 	if (nextParam && isAllowedNextPath(role, nextParam)) return nextParam;
 	return getDefaultDashboard(role);

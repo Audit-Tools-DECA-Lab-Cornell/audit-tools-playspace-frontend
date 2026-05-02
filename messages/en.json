@@ -779,6 +779,44 @@
 		"hasAccount": "Already have an account?",
 		"signInLink": "Sign in"
 	},
+	"managerInvite": {
+		"title": "Join your team",
+		"subtitle": "You've been invited to manage an Audit Tools workspace.",
+		"description": "Set up your name and password to get started. You'll be taken to the manager dashboard once you're done.",
+		"workspaceContext": {
+			"label": "You are joining",
+			"organisation": "Organisation",
+			"invitedBy": "Invited by"
+		},
+		"fields": {
+			"name": "Full name",
+			"position": "Position / role",
+			"password": "Password",
+			"confirmPassword": "Confirm password"
+		},
+		"namePlaceholder": "e.g. Jordan Rivera",
+		"positionPlaceholder": "e.g. Parks Manager",
+		"positionHelp": "Optional. Your job title or role in the organisation.",
+		"passwordHelp": "At least 8 characters.",
+		"actions": {
+			"accept": "Accept & join workspace",
+			"accepting": "Setting up your account\u2026"
+		},
+		"errors": {
+			"nameRequired": "Your name is required.",
+			"passwordMin": "Password must be at least 8 characters.",
+			"passwordMismatch": "Passwords do not match.",
+			"unknownRole": "Unrecognized account type.",
+			"unexpected": "Something went wrong. The link may have expired or already been used."
+		},
+		"expired": {
+			"title": "This invitation has expired",
+			"description": "The invite link is no longer valid. Ask the primary manager of the workspace to send you a new one.",
+			"loginLink": "Go to sign in"
+		},
+		"alreadySignedIn": "Already have an account?",
+		"signInLink": "Sign in instead"
+	},
 	"manager": {
 		"dashboard": {
 			"errors": {
@@ -795,7 +833,8 @@
 			"header": {
 				"eyebrow": "Manager Dashboard",
 				"description": "Shared account-level view across projects, places, auditors, and recent submissions.",
-				"viewProjects": "View projects"
+				"viewProjects": "View projects",
+				"inviteManager": "Invite manager"
 			},
 			"stats": {
 				"projects": {
@@ -910,7 +949,7 @@
 			"rowActions": {
 				"view": "View auditor",
 				"edit": "Edit auditor",
-				"delete": "Delete auditor"
+				"delete": "Remove from account"
 			},
 			"dialogs": {
 				"create": {
@@ -925,10 +964,10 @@
 				}
 			},
 			"deleteConfirm": {
-				"title": "Delete auditor",
-				"descriptionWithLabel": "Delete \"{label}\"? This action cannot be undone.",
-				"descriptionGeneric": "Delete this auditor? This action cannot be undone.",
-				"confirmLabel": "Delete auditor"
+				"title": "Remove auditor from account",
+				"descriptionWithLabel": "Remove \"{label}\" from this account? Their submitted audits and reports will be preserved. They will no longer be able to log in.",
+				"descriptionGeneric": "Remove this auditor from the account? Their submitted audits and reports will be preserved. They will no longer be able to log in.",
+				"confirmLabel": "Remove from account"
 			}
 		},
 		"auditorDetail": {
@@ -944,7 +983,8 @@
 			"actions": {
 				"backToAuditors": "Back to auditors",
 				"editProfile": "Edit profile",
-				"assignToProject": "Assign to project"
+				"assignToProject": "Assign to project",
+				"removeFromAccount": "Remove from account"
 			},
 			"profile": {
 				"emailPending": "Email pending"
@@ -987,6 +1027,12 @@
 				"descriptionWithScope": "Remove the assignment for \"{scopeName}\"? This action cannot be undone.",
 				"descriptionGeneric": "Remove this assignment? This action cannot be undone.",
 				"confirmLabel": "Remove assignment"
+			},
+			"removeAuditorConfirm": {
+				"title": "Remove auditor from account",
+				"descriptionWithLabel": "Remove \"{label}\" from this account? Their submitted audits and reports will be preserved. They will no longer be able to log in.",
+				"descriptionGeneric": "Remove this auditor from the account? Their submitted audits and reports will be preserved. They will no longer be able to log in.",
+				"confirmLabel": "Remove from account"
 			}
 		},
 		"audits": {
@@ -1944,7 +1990,39 @@
 			"empty": "Manager contact information will appear here once the account roster is configured.",
 			"primaryContactBadge": "Primary contact",
 			"managerBadge": "Manager",
-			"positionPending": "Position pending"
+			"positionPending": "Position pending",
+			"inviteButton": "Invite manager",
+			"inviteDialog": {
+				"title": "Invite a manager",
+				"description": "Enter the email address of the person you'd like to add as a secondary manager for this workspace. They'll receive a link to set up their account.",
+				"emailLabel": "Email address",
+				"emailPlaceholder": "colleague@organization.com",
+				"cancelButton": "Cancel",
+				"sendButton": "Send invitation",
+				"sendingButton": "Sending\u2026",
+				"errors": {
+					"emailRequired": "Email address is required.",
+					"emailInvalid": "Please enter a valid email address.",
+					"generic": "Unable to send invitation. Please try again."
+				}
+			},
+			"pendingInvites": {
+				"sectionTitle": "Pending invitations",
+				"emptyPending": "No pending invitations.",
+				"invitedAt": "Invited {date}",
+				"statusPending": "Pending",
+				"statusExpired": "Expired",
+				"statusAccepted": "Accepted",
+				"revokeButton": "Revoke",
+				"resendButton": "Resend",
+				"revokeConfirmTitle": "Revoke invitation",
+				"revokeConfirmDescription": "Are you sure you want to revoke the invitation for {email}? The link will no longer work.",
+				"revokeConfirmLabel": "Revoke invitation",
+				"inviteSuccess": "Invitation sent to {email}.",
+				"resendSuccess": "Invitation resent successfully.",
+				"revokeError": "Unable to revoke the invitation.",
+				"resendError": "Unable to resend the invitation."
+			}
 		},
 		"adminWorkspace": {
 			"title": "Administrator access",
@@ -1976,6 +2054,43 @@
 				"codePending": "Code pending",
 				"workspace": "Field audits",
 				"accessType": "Assignment-based"
+			}
+		},
+		"managerProfile": {
+			"title": "Manager profile",
+			"description": "Update the contact details attached to your manager account.",
+			"fields": {
+				"fullName": "Full name",
+				"email": "Email",
+				"phone": "Phone",
+				"position": "Position / role"
+			},
+			"messages": {
+				"saved": "Profile saved.",
+				"unableToSave": "Unable to save profile."
+			},
+			"actions": {
+				"save": "Save profile",
+				"saving": "Saving\u2026"
+			}
+		},
+		"managerPassword": {
+			"title": "Change password",
+			"description": "Use this to rotate your manager account password.",
+			"fields": {
+				"currentPassword": "Current password",
+				"newPassword": "New password"
+			},
+			"hints": {
+				"newPassword": "Use at least 8 characters."
+			},
+			"messages": {
+				"updated": "Password updated.",
+				"unableToUpdate": "Unable to update password."
+			},
+			"actions": {
+				"update": "Update password",
+				"updating": "Updating\u2026"
 			}
 		}
 	},

@@ -1,12 +1,15 @@
 "use client";
 
+import * as React from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 
 import type { AccountDetail, AuditorSummary, ManagerProfile, ProjectSummary } from "@/lib/api/playspace";
+import { useAuthSession } from "@/components/app/auth-session-provider";
 import { AuditorsTable } from "@/components/dashboard/auditors-table";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { EmptyState } from "@/components/dashboard/empty-state";
+import { InviteManagerDialog } from "@/components/dashboard/invite-manager-dialog";
 import { ProjectsTable } from "@/components/dashboard/projects-table";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { formatAuditCodeReference, formatDateTimeLabel, formatScorePairLabel } from "@/components/dashboard/utils";
@@ -93,6 +96,15 @@ function OverviewPanels({
 	);
 }
 
+/**
+ * Returns true when the authenticated session user is the primary manager.
+ */
+function isPrimaryManagerProfile(userEmail: string | null | undefined, managerProfiles: ManagerProfile[]): boolean {
+	if (!userEmail) return false;
+	const normalized = userEmail.toLowerCase();
+	return managerProfiles.some(p => p.is_primary && p.email.toLowerCase() === normalized);
+}
+
 export interface ManagerDashboardClientProps {
 	account?: AccountDetail;
 	managerProfiles?: ManagerProfile[];
@@ -110,6 +122,10 @@ export function ManagerDashboardClient({
 }: Readonly<ManagerDashboardClientProps>) {
 	const t = useTranslations("manager.dashboard");
 	const formatT = useTranslations("common.format");
+	const session = useAuthSession();
+	const [isInviteOpen, setIsInviteOpen] = React.useState(false);
+
+	const isPrimary = isPrimaryManagerProfile(session?.userEmail, managerProfiles ?? []);
 
 	if (!account || !managerProfiles || !projects || !auditors) {
 		return (
@@ -132,11 +148,20 @@ export function ManagerDashboardClient({
 				title={account.name}
 				description={t("header.description")}
 				actions={
-					<Button asChild>
-						<Link href="/manager/projects">{t("header.viewProjects")}</Link>
-					</Button>
+					<div className="flex items-center gap-2">
+						{isPrimary ? (
+							<Button type="button" variant="outline" onClick={() => setIsInviteOpen(true)}>
+								{t("header.inviteManager")}
+							</Button>
+						) : null}
+						<Button asChild>
+							<Link href="/manager/projects">{t("header.viewProjects")}</Link>
+						</Button>
+					</div>
 				}
 			/>
+
+			<InviteManagerDialog open={isInviteOpen} onOpenChange={setIsInviteOpen} />
 
 			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
 				<StatCard

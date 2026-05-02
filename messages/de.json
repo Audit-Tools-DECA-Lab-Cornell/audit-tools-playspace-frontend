@@ -761,6 +761,36 @@
 		"hasAccount": "Bereits ein Konto?",
 		"signInLink": "Anmelden"
 	},
+	"managerInvite": {
+		"title": "Treten Sie Ihrem Team bei",
+		"subtitle": "Sie wurden eingeladen, einen Audit-Tools-Arbeitsbereich zu verwalten.",
+		"description": "Legen Sie Ihren Namen und Ihr Passwort fest, um loszulegen. Sie werden anschließend zum Manager-Dashboard weitergeleitet.",
+		"fields": {
+			"name": "Vollständiger Name",
+			"password": "Passwort",
+			"confirmPassword": "Passwort bestätigen"
+		},
+		"namePlaceholder": "z. B. Jordan Rivera",
+		"passwordHelp": "Mindestens 8 Zeichen.",
+		"actions": {
+			"accept": "Annehmen & beitreten",
+			"accepting": "Konto wird eingerichtet\u2026"
+		},
+		"errors": {
+			"nameRequired": "Ihr Name ist erforderlich.",
+			"passwordMin": "Das Passwort muss mindestens 8 Zeichen lang sein.",
+			"passwordMismatch": "Die Passwörter stimmen nicht überein.",
+			"unknownRole": "Unbekannter Kontotyp.",
+			"unexpected": "Etwas ist schiefgelaufen. Der Link ist möglicherweise abgelaufen oder wurde bereits verwendet."
+		},
+		"expired": {
+			"title": "Diese Einladung ist abgelaufen",
+			"description": "Der Einladungslink ist nicht mehr gültig. Bitten Sie den Hauptmanager des Arbeitsbereichs, Ihnen einen neuen zu senden.",
+			"loginLink": "Zur Anmeldung"
+		},
+		"alreadySignedIn": "Bereits ein Konto?",
+		"signInLink": "Stattdessen anmelden"
+	},
 	"manager": {
 		"dashboard": {
 			"errors": {
@@ -777,7 +807,8 @@
 			"header": {
 				"eyebrow": "Manager-Dashboard",
 				"description": "Geteilte Kontenansicht über Projekte, Orte, Auditoren und aktuelle Einreichungen hinweg.",
-				"viewProjects": "Projekte anzeigen"
+				"viewProjects": "Projekte anzeigen",
+				"inviteManager": "Manager einladen"
 			},
 			"stats": {
 				"projects": {
@@ -892,7 +923,7 @@
 			"rowActions": {
 				"view": "Prüfer anzeigen",
 				"edit": "Prüfer bearbeiten",
-				"delete": "Prüfer löschen"
+				"delete": "Aus Konto entfernen"
 			},
 			"dialogs": {
 				"create": {
@@ -907,10 +938,10 @@
 				}
 			},
 			"deleteConfirm": {
-				"title": "Prüfer löschen",
-				"descriptionWithLabel": "\"{label}\" löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
-				"descriptionGeneric": "Diesen Prüfer löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
-				"confirmLabel": "Prüfer löschen"
+				"title": "Prüfer aus Konto entfernen",
+				"descriptionWithLabel": "\"{label}\" aus diesem Konto entfernen? Eingereichte Audits und Berichte bleiben erhalten. Der Prüfer kann sich nicht mehr anmelden.",
+				"descriptionGeneric": "Diesen Prüfer aus dem Konto entfernen? Eingereichte Audits und Berichte bleiben erhalten. Der Prüfer kann sich nicht mehr anmelden.",
+				"confirmLabel": "Aus Konto entfernen"
 			}
 		},
 		"auditorDetail": {
@@ -926,7 +957,8 @@
 			"actions": {
 				"backToAuditors": "Zurück zur Prüferliste",
 				"editProfile": "Profil bearbeiten",
-				"assignToProject": "Projekt zuweisen"
+				"assignToProject": "Projekt zuweisen",
+				"removeFromAccount": "Aus Konto entfernen"
 			},
 			"profile": {
 				"emailPending": "E-Mail ausstehend"
@@ -969,6 +1001,12 @@
 				"descriptionWithScope": "Zuweisung für \"{scopeName}\" entfernen? Diese Aktion kann nicht rückgängig gemacht werden.",
 				"descriptionGeneric": "Diese Zuweisung entfernen? Diese Aktion kann nicht rückgängig gemacht werden.",
 				"confirmLabel": "Zuweisung entfernen"
+			},
+			"removeAuditorConfirm": {
+				"title": "Prüfer aus Konto entfernen",
+				"descriptionWithLabel": "\"{label}\" aus diesem Konto entfernen? Eingereichte Audits und Berichte bleiben erhalten. Der Prüfer kann sich nicht mehr anmelden.",
+				"descriptionGeneric": "Diesen Prüfer aus dem Konto entfernen? Eingereichte Audits und Berichte bleiben erhalten. Der Prüfer kann sich nicht mehr anmelden.",
+				"confirmLabel": "Aus Konto entfernen"
 			}
 		},
 		"audits": {
@@ -1872,7 +1910,39 @@
 			"empty": "Informationen zu Manager-Kontakten werden hier angezeigt, sobald das Kontoverzeichnis konfiguriert ist.",
 			"primaryContactBadge": "Hauptansprechpartner",
 			"managerBadge": "Manager",
-			"positionPending": "Position ausstehend"
+			"positionPending": "Position ausstehend",
+			"inviteButton": "Manager einladen",
+			"inviteDialog": {
+				"title": "Manager einladen",
+				"description": "Geben Sie die E-Mail-Adresse der Person ein, die Sie als sekundären Manager für diesen Arbeitsbereich hinzufügen möchten. Sie erhalten einen Link zur Einrichtung ihres Kontos.",
+				"emailLabel": "E-Mail-Adresse",
+				"emailPlaceholder": "kollege@organisation.com",
+				"cancelButton": "Abbrechen",
+				"sendButton": "Einladung senden",
+				"sendingButton": "Wird gesendet\u2026",
+				"errors": {
+					"emailRequired": "E-Mail-Adresse ist erforderlich.",
+					"emailInvalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+					"generic": "Einladung konnte nicht gesendet werden. Bitte versuchen Sie es erneut."
+				}
+			},
+			"pendingInvites": {
+				"sectionTitle": "Ausstehende Einladungen",
+				"emptyPending": "Keine ausstehenden Einladungen.",
+				"invitedAt": "Eingeladen {date}",
+				"statusPending": "Ausstehend",
+				"statusExpired": "Abgelaufen",
+				"statusAccepted": "Angenommen",
+				"revokeButton": "Widerrufen",
+				"resendButton": "Erneut senden",
+				"revokeConfirmTitle": "Einladung widerrufen",
+				"revokeConfirmDescription": "Möchten Sie die Einladung für {email} widerrufen? Der Link funktioniert danach nicht mehr.",
+				"revokeConfirmLabel": "Einladung widerrufen",
+				"inviteSuccess": "Einladung an {email} gesendet.",
+				"resendSuccess": "Einladung erfolgreich erneut gesendet.",
+				"revokeError": "Die Einladung konnte nicht widerrufen werden.",
+				"resendError": "Die Einladung konnte nicht erneut gesendet werden."
+			}
 		},
 		"adminWorkspace": {
 			"title": "Administratorzugriff",

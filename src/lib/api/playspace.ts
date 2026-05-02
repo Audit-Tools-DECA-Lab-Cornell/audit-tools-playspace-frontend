@@ -33,12 +33,16 @@ import {
 	changePasswordRequestSchema,
 	myAuditorProfileSchema,
 	myAuditorProfileUpdateSchema,
+	myManagerProfileSchema,
+	myManagerProfileUpdateSchema,
 	auditorUpdateRequestSchema,
 	bulkAssignmentWriteSchema,
 	instrumentCreateRequestSchema,
 	instrumentResponseSchema,
 	instrumentUpdateRequestSchema,
 	managerAuditsListSchema,
+	managerInviteCreatedResponseSchema,
+	managerInviteListItemSchema,
 	managerPlacesListSchema,
 	managerProfileSchema,
 	paginatedResponseSchema,
@@ -89,9 +93,13 @@ import {
 	type ManagerAuditsList,
 	type MyAuditorProfile,
 	type MyAuditorProfileUpdate,
+	type MyManagerProfile,
+	type MyManagerProfileUpdate,
 	type ManagerAuditsQuery,
 	type ManagerPlacesList,
 	type ManagerPlacesQuery,
+	type ManagerInviteCreatedResponse,
+	type ManagerInviteListItem,
 	type ManagerProfile,
 	type PaginatedResponse,
 	type PlayspaceInstrument,
@@ -462,6 +470,53 @@ export const playspaceApi = {
 				method: "POST",
 				body: JSON.stringify(expectedRevision === undefined ? {} : { expected_revision: expectedRevision })
 			})
+	},
+	manager: {
+		myProfile: async (): Promise<MyManagerProfile> =>
+			fetchValidatedJson("/playspace/me/manager-profile", myManagerProfileSchema),
+
+		updateMyProfile: async (payload: MyManagerProfileUpdate): Promise<MyManagerProfile> => {
+			const parsedPayload = myManagerProfileUpdateSchema.parse(payload);
+			return fetchValidatedJson("/playspace/me/manager-profile", myManagerProfileSchema, {
+				method: "PATCH",
+				body: JSON.stringify(parsedPayload)
+			});
+		},
+
+		completeOnboarding: async (): Promise<MyManagerProfile> =>
+			fetchValidatedJson("/playspace/me/complete-manager-onboarding", myManagerProfileSchema, {
+				method: "POST"
+			}),
+
+		changePassword: async (payload: ChangePasswordRequest): Promise<void> => {
+			const parsedPayload = changePasswordRequestSchema.parse(payload);
+			await fetchNoContent("/playspace/me/change-password", {
+				method: "POST",
+				body: JSON.stringify(parsedPayload)
+			});
+		}
+	},
+	managerInvites: {
+		list: async (): Promise<ManagerInviteListItem[]> =>
+			fetchValidatedJson("/playspace/manager-invites", z.array(managerInviteListItemSchema)),
+
+		create: async (email: string): Promise<ManagerInviteCreatedResponse> =>
+			fetchValidatedJson("/playspace/manager-invites", managerInviteCreatedResponseSchema, {
+				method: "POST",
+				body: JSON.stringify({ email })
+			}),
+
+		revoke: async (inviteId: string): Promise<void> =>
+			fetchNoContent(`/playspace/manager-invites/${encodeURIComponent(inviteId)}`, {
+				method: "DELETE"
+			}),
+
+		resend: async (inviteId: string): Promise<ManagerInviteListItem> =>
+			fetchValidatedJson(
+				`/playspace/manager-invites/${encodeURIComponent(inviteId)}/resend`,
+				managerInviteListItemSchema,
+				{ method: "POST" }
+			)
 	},
 	management: {
 		accounts: {

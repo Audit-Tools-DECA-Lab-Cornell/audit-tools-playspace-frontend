@@ -7,7 +7,6 @@ import { ArrowRight, Check, KeyRound, ShieldCheck, UserRound } from "lucide-reac
 
 import { playspaceApi, type MyAuditorProfile } from "@/lib/api/playspace";
 import { getBrowserAuthSession, setBrowserAuthSession } from "@/lib/auth/browser-session";
-import { useAuthSession } from "@/components/app/auth-session-provider";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -520,16 +519,18 @@ function CodeStep({ profile }: Readonly<{ profile: MyAuditorProfile | null }>) {
 }
 
 export default function AuditorOnboardingPage() {
-	const session = useAuthSession();
 	const [step, setStep] = React.useState<OnboardingStep>("password");
 	const [completedProfile, setCompletedProfile] = React.useState<MyAuditorProfile | null>(null);
+
+	const browserSession = getBrowserAuthSession();
 	const initialDraft = React.useMemo(
-		() => getInitialProfileDraft(session?.userName ?? null, session?.userEmail ?? null),
-		[session?.userEmail, session?.userName]
+		() => getInitialProfileDraft(browserSession?.userName ?? null, browserSession?.userEmail ?? null),
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+		[]
 	);
 
 	return (
-		<div className="mx-auto flex w-full max-w-5xl flex-col gap-6">
+		<div className="flex flex-col gap-6">
 			<StepHeader
 				step={
 					step === "password"
@@ -544,7 +545,7 @@ export default function AuditorOnboardingPage() {
 				description="Finish your web dashboard setup with the same auditor onboarding flow used in the mobile app."
 			/>
 			<div className="grid gap-3 md:grid-cols-4">
-				{["password", "profile", "terms", "code"].map((item, index) => (
+				{(["password", "profile", "terms", "code"] as const).map((item, index) => (
 					<div
 						key={item}
 						className={

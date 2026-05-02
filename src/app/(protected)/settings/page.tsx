@@ -16,11 +16,20 @@ import {
 	ShieldCheck,
 	Sun,
 	Type,
+	UserPlus,
 	UserRound,
 	type LucideIcon
 } from "lucide-react";
 
-import { playspaceApi, type AccountDetail, type ManagerProfile, type MyAuditorProfile } from "@/lib/api/playspace";
+import {
+	playspaceApi,
+	type AccountDetail,
+	type ManagerInviteListItem,
+	type ManagerInviteStatus,
+	type ManagerProfile,
+	type MyAuditorProfile,
+	type MyManagerProfile
+} from "@/lib/api/playspace";
 import { clearBrowserAuthSession, getBrowserAuthSession, setBrowserAuthSession } from "@/lib/auth/browser-session";
 import type { AuthSession } from "@/lib/auth/session";
 import { useAuthSession } from "@/components/app/auth-session-provider";
@@ -33,7 +42,9 @@ import {
 	type ThemeMode
 } from "@/components/app/preferences-provider";
 import { BackButton } from "@/components/dashboard/back-button";
+import { ConfirmDialog } from "@/components/dashboard/confirm-dialog";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
+import { InviteManagerDialog } from "@/components/dashboard/invite-manager-dialog";
 import { formatDateLabel, type DashboardTranslator } from "@/components/dashboard/utils";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -41,6 +52,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
@@ -218,6 +230,41 @@ function getAvatarFallbackLabel(value: string): string {
 		.join("");
 
 	return initials || trimmedValue.slice(0, 2).toUpperCase();
+}
+
+/**
+ * Returns true when the session user is the primary manager for this account.
+ */
+function isCurrentUserPrimaryManager(
+	session: AuthSession | null | undefined,
+	managerProfiles: ManagerProfile[]
+): boolean {
+	if (!session?.userEmail) return false;
+	const normalizedEmail = session.userEmail.toLowerCase();
+	return managerProfiles.some(profile => profile.is_primary && profile.email.toLowerCase() === normalizedEmail);
+}
+
+/**
+ * Map an invite status string to badge content and styling.
+ */
+function InviteStatusBadge({ status, t }: Readonly<{ status: ManagerInviteStatus; t: (key: string) => string }>) {
+	if (status === "ACCEPTED") {
+		return (
+			<Badge variant="secondary" className="text-green-700 dark:text-green-400">
+				{t("pendingInvites.statusAccepted")}
+			</Badge>
+		);
+	}
+
+	if (status === "EXPIRED") {
+		return (
+			<Badge variant="outline" className="text-amber-600 dark:text-amber-400">
+				{t("pendingInvites.statusExpired")}
+			</Badge>
+		);
+	}
+
+	return <Badge variant="secondary">{t("pendingInvites.statusPending")}</Badge>;
 }
 
 /**
@@ -680,7 +727,8 @@ function ManagerWorkspaceSection({
 	managerProfilesIsLoading,
 	accountErrorMessage,
 	managerProfilesErrorMessage,
-	formatT
+	formatT,
+	session
 }: Readonly<{
 	account: AccountDetail | null;
 	managerProfiles: ManagerProfile[];
@@ -689,6 +737,7 @@ function ManagerWorkspaceSection({
 	accountErrorMessage: string | null;
 	managerProfilesErrorMessage: string | null;
 	formatT: DashboardTranslator;
+	session: AuthSession;
 }>) {
 	const t = useTranslations("settings.managerOrganization");
 	const queryClient = useQueryClient();
@@ -808,6 +857,7 @@ function ManagerWorkspaceSection({
 				managerProfiles={managerProfiles}
 				isLoading={managerProfilesIsLoading}
 				errorMessage={managerProfilesErrorMessage}
+				session={session}
 			/>
 		</div>
 	);
@@ -996,71 +1046,437 @@ function ManagerOrganizationCard({
 function ManagerContactsCard({
 	managerProfiles,
 	isLoading,
-	errorMessage
+	errorMessage,
+	session
 }: Readonly<{
 	managerProfiles: ManagerProfile[];
 	isLoading: boolean;
 	errorMessage: string | null;
+	session: AuthSession;
 }>) {
 	const t = useTranslations("settings.managerContacts");
+	const formatT = useTranslations("common.format");
+	const queryClient = useQueryClient();
+
+	const isPrimary = isCurrentUserPrimaryManager(session, managerProfiles);
+
+	const [isInviteOpen, setIsInviteOpen] = React.useState(false);
+	const [revokeTargetId, setRevokeTargetId] = React.useState<string | null>(null);
+	const [actionMessage, setActionMessage] = React.useState<string | null>(null);
+
+	const invitesQuery = useQuery({
+		queryKey: ["auth", "managerInvites"],
+		queryFn: () => playspaceApi.managerInvites.list(),
+		enabled: isPrimary
+	});
+
+	const revokeMutation = useMutation({
+		mutationFn: (inviteId: string) => playspaceApi.managerInvites.revoke(inviteId),
+		onSuccess: async () => {
+			setRevokeTargetId(null);
+			await queryClient.invalidateQueries({ queryKey: ["auth", "managerInvites"] });
+		},
+		onError: () => {
+			setRevokeTargetId(null);
+		}
+	});
+
+	const resendMutation = useMutation({
+		mutationFn: (inviteId: string) => playspaceApi.managerInvites.resend(inviteId),
+		onSuccess: async () => {
+			await queryClient.invalidateQueries({ queryKey: ["auth", "managerInvites"] });
+			setActionMessage(t("pendingInvites.resendSuccess"));
+			setTimeout(() => setActionMessage(null), 4000);
+		}
+	});
+
+	function handleInviteSuccess(email: string) {
+		setActionMessage(t("pendingInvites.inviteSuccess", { email }));
+		setTimeout(() => setActionMessage(null), 5000);
+	}
+
+	const allInvites: ManagerInviteListItem[] = invitesQuery.data ?? [];
+	const visibleInvites = allInvites.filter(invite => invite.status !== "ACCEPTED");
+	const revokeTarget = allInvites.find(invite => invite.id === revokeTargetId) ?? null;
 
 	return (
-		<Card>
-			<CardHeader>
-				<CardTitle>{t("title")}</CardTitle>
-				<CardDescription>{t("description")}</CardDescription>
-				<CardAction>
-					<Building2 className="h-4 w-4 text-primary" aria-hidden="true" />
-				</CardAction>
-			</CardHeader>
-			<CardContent className="space-y-3">
-				{isLoading ? (
-					<>
-						{MANAGER_CONTACT_SKELETON_IDS.map(skeletonId => (
-							<div
-								key={`manager-profile-skeleton-${skeletonId}`}
-								className="flex items-start gap-3 rounded-card border border-border bg-card p-4">
-								<SettingsInlineSkeleton className="size-6 rounded-full" />
-								<div className="min-w-0 flex-1 space-y-2">
-									<SettingsInlineSkeleton className="h-4 w-32" />
-									<SettingsInlineSkeleton className="h-4 w-28" />
-									<SettingsInlineSkeleton className="h-4 w-44" />
-								</div>
-							</div>
-						))}
-					</>
-				) : errorMessage ? (
-					<p className="text-sm text-muted-foreground">{errorMessage}</p>
-				) : managerProfiles.length === 0 ? (
-					<p className="text-sm text-muted-foreground">{t("empty")}</p>
-				) : null}
-				{errorMessage
-					? null
-					: managerProfiles.map(profile => (
-							<div
-								key={profile.id}
-								className="flex items-start gap-3 rounded-card border border-border bg-card p-4">
-								<Avatar size="sm">
-									<AvatarFallback>{getAvatarFallbackLabel(profile.full_name)}</AvatarFallback>
-								</Avatar>
-								<div className="min-w-0 flex-1 space-y-1">
-									<div className="flex flex-wrap items-center gap-2">
-										<p className="font-medium text-foreground">{profile.full_name}</p>
-										{profile.is_primary ? (
-											<Badge>{t("primaryContactBadge")}</Badge>
-										) : (
-											<Badge variant="secondary">{t("managerBadge")}</Badge>
-										)}
+		<>
+			<Card>
+				<CardHeader>
+					<CardTitle>{t("title")}</CardTitle>
+					<CardDescription>{t("description")}</CardDescription>
+					<CardAction>
+						{isPrimary ? (
+							<Button type="button" variant="outline" size="sm" onClick={() => setIsInviteOpen(true)}>
+								<UserPlus className="h-3.5 w-3.5" aria-hidden="true" />
+								{t("inviteButton")}
+							</Button>
+						) : (
+							<Building2 className="h-4 w-4 text-primary" aria-hidden="true" />
+						)}
+					</CardAction>
+				</CardHeader>
+
+				<CardContent className="space-y-3">
+					{/* Manager profiles */}
+					{isLoading ? (
+						<>
+							{MANAGER_CONTACT_SKELETON_IDS.map(skeletonId => (
+								<div
+									key={`manager-profile-skeleton-${skeletonId}`}
+									className="flex items-start gap-3 rounded-card border border-border bg-card p-4">
+									<SettingsInlineSkeleton className="size-6 rounded-full" />
+									<div className="min-w-0 flex-1 space-y-2">
+										<SettingsInlineSkeleton className="h-4 w-32" />
+										<SettingsInlineSkeleton className="h-4 w-28" />
+										<SettingsInlineSkeleton className="h-4 w-44" />
 									</div>
-									<p className="text-sm text-muted-foreground">
-										{profile.position ?? t("positionPending")}
-									</p>
-									<p className="text-sm text-muted-foreground">{profile.email}</p>
 								</div>
+							))}
+						</>
+					) : errorMessage ? (
+						<p className="text-sm text-muted-foreground">{errorMessage}</p>
+					) : managerProfiles.length === 0 ? (
+						<p className="text-sm text-muted-foreground">{t("empty")}</p>
+					) : null}
+					{errorMessage
+						? null
+						: managerProfiles.map(profile => (
+								<div
+									key={profile.id}
+									className="flex items-start gap-3 rounded-card border border-border bg-card p-4">
+									<Avatar size="sm">
+										<AvatarFallback>{getAvatarFallbackLabel(profile.full_name)}</AvatarFallback>
+									</Avatar>
+									<div className="min-w-0 flex-1 space-y-1">
+										<div className="flex flex-wrap items-center gap-2">
+											<p className="font-medium text-foreground">{profile.full_name}</p>
+											{profile.is_primary ? (
+												<Badge>{t("primaryContactBadge")}</Badge>
+											) : (
+												<Badge variant="secondary">{t("managerBadge")}</Badge>
+											)}
+										</div>
+										<p className="text-sm text-muted-foreground">
+											{profile.position ?? t("positionPending")}
+										</p>
+										<p className="text-sm text-muted-foreground">{profile.email}</p>
+									</div>
+								</div>
+							))}
+
+					{/* Pending invitations section — primary manager only */}
+					{isPrimary ? (
+						<>
+							<Separator className="my-1" />
+							<div className="space-y-2.5">
+								<p className="text-xs font-semibold tracking-[0.08em] text-foreground/60">
+									{t("pendingInvites.sectionTitle")}
+								</p>
+
+								{invitesQuery.isLoading ? (
+									<SettingsInlineSkeleton className="h-14 w-full rounded-card" />
+								) : visibleInvites.length === 0 ? (
+									<p className="text-sm text-muted-foreground">{t("pendingInvites.emptyPending")}</p>
+								) : (
+									<div className="space-y-2">
+										{visibleInvites.map(invite => (
+											<div
+												key={invite.id}
+												className="flex items-center gap-3 rounded-card border border-border bg-card/60 px-3 py-2.5">
+												<div className="min-w-0 flex-1 space-y-1">
+													<p className="truncate text-sm font-medium text-foreground">
+														{invite.email}
+													</p>
+													<div className="flex flex-wrap items-center gap-2">
+														<InviteStatusBadge status={invite.status} t={t} />
+														<span className="text-xs text-muted-foreground">
+															{t("pendingInvites.invitedAt", {
+																date: formatDateLabel(invite.created_at, formatT)
+															})}
+														</span>
+													</div>
+												</div>
+												<div className="flex shrink-0 items-center gap-1">
+													{invite.status === "EXPIRED" ? (
+														<Button
+															type="button"
+															variant="outline"
+															size="sm"
+															className="h-7 px-2 text-xs"
+															disabled={resendMutation.isPending}
+															aria-busy={resendMutation.isPending}
+															onClick={() => resendMutation.mutate(invite.id)}>
+															{t("pendingInvites.resendButton")}
+														</Button>
+													) : null}
+													<Button
+														type="button"
+														variant="ghost"
+														size="sm"
+														className="h-7 px-2 text-xs text-muted-foreground hover:text-destructive"
+														onClick={() => setRevokeTargetId(invite.id)}>
+														{t("pendingInvites.revokeButton")}
+													</Button>
+												</div>
+											</div>
+										))}
+									</div>
+								)}
+
+								{actionMessage ? (
+									<p aria-live="polite" className="text-sm text-green-600 dark:text-green-400">
+										{actionMessage}
+									</p>
+								) : null}
 							</div>
-						))}
-			</CardContent>
-		</Card>
+						</>
+					) : null}
+				</CardContent>
+			</Card>
+
+			{isPrimary ? (
+				<InviteManagerDialog
+					open={isInviteOpen}
+					onOpenChange={setIsInviteOpen}
+					onSuccess={handleInviteSuccess}
+				/>
+			) : null}
+
+			<ConfirmDialog
+				open={revokeTargetId !== null}
+				onOpenChange={open => {
+					if (!open) setRevokeTargetId(null);
+				}}
+				title={t("pendingInvites.revokeConfirmTitle")}
+				description={t("pendingInvites.revokeConfirmDescription", {
+					email: revokeTarget?.email ?? ""
+				})}
+				confirmLabel={t("pendingInvites.revokeConfirmLabel")}
+				isPending={revokeMutation.isPending}
+				onConfirm={() => {
+					if (revokeTargetId !== null) {
+						revokeMutation.mutate(revokeTargetId);
+					}
+				}}
+			/>
+		</>
+	);
+}
+
+/**
+ * Manager self-service profile editing and password change.
+ * Mirrors AuditorSelfServiceCard but targets the manager profile endpoint.
+ */
+function ManagerSelfServiceCard({ profile }: Readonly<{ profile: MyManagerProfile | null }>) {
+	const queryClient = useQueryClient();
+	const t = useTranslations("settings.managerProfile");
+	const tPass = useTranslations("settings.managerPassword");
+
+	const [fullName, setFullName] = React.useState(profile?.full_name ?? "");
+	const [email, setEmail] = React.useState(profile?.email ?? "");
+	const [phone, setPhone] = React.useState(profile?.phone ?? "");
+	const [position, setPosition] = React.useState(profile?.position ?? "");
+	const [profileMessage, setProfileMessage] = React.useState<{ text: string; isError: boolean } | null>(null);
+	const [currentPassword, setCurrentPassword] = React.useState("");
+	const [newPassword, setNewPassword] = React.useState("");
+	const [passwordMessage, setPasswordMessage] = React.useState<{ text: string; isError: boolean } | null>(null);
+
+	React.useEffect(() => {
+		setFullName(profile?.full_name ?? "");
+		setEmail(profile?.email ?? "");
+		setPhone(profile?.phone ?? "");
+		setPosition(profile?.position ?? "");
+	}, [profile?.email, profile?.full_name, profile?.phone, profile?.position]);
+
+	const updateProfileMutation = useMutation({
+		mutationFn: () =>
+			playspaceApi.manager.updateMyProfile({
+				full_name: fullName.trim(),
+				email: email.trim() || undefined,
+				phone: phone.trim() || undefined,
+				position: position.trim() || undefined
+			}),
+		onSuccess: async updatedProfile => {
+			setProfileMessage({ text: t("messages.saved"), isError: false });
+			const currentSession = getBrowserAuthSession();
+			if (currentSession) {
+				setBrowserAuthSession({
+					...currentSession,
+					userName: updatedProfile.full_name,
+					userEmail: updatedProfile.email
+				});
+			}
+			await queryClient.invalidateQueries({ queryKey: ["playspace", "settings", "managerProfile"] });
+		},
+		onError: error => {
+			setProfileMessage({
+				text: error instanceof Error ? error.message : t("messages.unableToSave"),
+				isError: true
+			});
+		}
+	});
+
+	const changePasswordMutation = useMutation({
+		mutationFn: () =>
+			playspaceApi.manager.changePassword({
+				current_password: currentPassword,
+				new_password: newPassword
+			}),
+		onSuccess: () => {
+			setCurrentPassword("");
+			setNewPassword("");
+			setPasswordMessage({ text: tPass("messages.updated"), isError: false });
+		},
+		onError: error => {
+			setPasswordMessage({
+				text: error instanceof Error ? error.message : tPass("messages.unableToUpdate"),
+				isError: true
+			});
+		}
+	});
+
+	const canSaveProfile = fullName.trim().length > 0;
+	const canChangePassword = currentPassword.length > 0 && newPassword.length >= 8;
+
+	return (
+		<div className="grid gap-4 xl:grid-cols-2">
+			<Card>
+				<CardHeader>
+					<CardTitle>{t("title")}</CardTitle>
+					<CardDescription>{t("description")}</CardDescription>
+				</CardHeader>
+				<CardContent>
+					<form
+						className="flex flex-col gap-4"
+						onSubmit={event => {
+							event.preventDefault();
+							setProfileMessage(null);
+							if (!canSaveProfile) return;
+							updateProfileMutation.mutate();
+						}}>
+						<div className="grid gap-4 md:grid-cols-2">
+							<div className="flex flex-col gap-2">
+								<Label htmlFor="settings_manager_name">{t("fields.fullName")}</Label>
+								<Input
+									id="settings_manager_name"
+									autoComplete="name"
+									value={fullName}
+									onChange={event => setFullName(event.target.value)}
+								/>
+							</div>
+							<div className="flex flex-col gap-2">
+								<Label htmlFor="settings_manager_email">{t("fields.email")}</Label>
+								<Input
+									id="settings_manager_email"
+									type="email"
+									autoComplete="email"
+									value={email}
+									onChange={event => setEmail(event.target.value)}
+								/>
+							</div>
+							<div className="flex flex-col gap-2">
+								<Label htmlFor="settings_manager_phone">{t("fields.phone")}</Label>
+								<Input
+									id="settings_manager_phone"
+									type="tel"
+									autoComplete="tel"
+									value={phone}
+									onChange={event => setPhone(event.target.value)}
+								/>
+							</div>
+							<div className="flex flex-col gap-2">
+								<Label htmlFor="settings_manager_position">{t("fields.position")}</Label>
+								<Input
+									id="settings_manager_position"
+									autoComplete="organization-title"
+									value={position}
+									onChange={event => setPosition(event.target.value)}
+								/>
+							</div>
+						</div>
+						{profileMessage ? (
+							<p
+								aria-live="polite"
+								className={
+									profileMessage.isError
+										? "text-sm text-destructive"
+										: "text-sm text-green-600 dark:text-green-400"
+								}>
+								{profileMessage.text}
+							</p>
+						) : null}
+						<div className="flex justify-end">
+							<Button
+								type="submit"
+								disabled={!canSaveProfile || updateProfileMutation.isPending}
+								aria-busy={updateProfileMutation.isPending}>
+								{updateProfileMutation.isPending ? t("actions.saving") : t("actions.save")}
+							</Button>
+						</div>
+					</form>
+				</CardContent>
+			</Card>
+
+			<Card>
+				<CardHeader>
+					<CardTitle>{tPass("title")}</CardTitle>
+					<CardDescription>{tPass("description")}</CardDescription>
+				</CardHeader>
+				<CardContent>
+					<form
+						className="flex flex-col gap-4"
+						onSubmit={event => {
+							event.preventDefault();
+							setPasswordMessage(null);
+							if (!canChangePassword) return;
+							changePasswordMutation.mutate();
+						}}>
+						<div className="flex flex-col gap-2">
+							<Label htmlFor="settings_manager_current_password">{tPass("fields.currentPassword")}</Label>
+							<Input
+								id="settings_manager_current_password"
+								type="password"
+								autoComplete="current-password"
+								value={currentPassword}
+								onChange={event => setCurrentPassword(event.target.value)}
+							/>
+						</div>
+						<div className="flex flex-col gap-2">
+							<Label htmlFor="settings_manager_new_password">{tPass("fields.newPassword")}</Label>
+							<Input
+								id="settings_manager_new_password"
+								type="password"
+								autoComplete="new-password"
+								value={newPassword}
+								onChange={event => setNewPassword(event.target.value)}
+							/>
+							<p className="text-xs text-muted-foreground">{tPass("hints.newPassword")}</p>
+						</div>
+						{passwordMessage ? (
+							<p
+								aria-live="polite"
+								className={
+									passwordMessage.isError
+										? "text-sm text-destructive"
+										: "text-sm text-green-600 dark:text-green-400"
+								}>
+								{passwordMessage.text}
+							</p>
+						) : null}
+						<div className="flex justify-end">
+							<Button
+								type="submit"
+								variant="secondary"
+								disabled={!canChangePassword || changePasswordMutation.isPending}
+								aria-busy={changePasswordMutation.isPending}>
+								{changePasswordMutation.isPending ? tPass("actions.updating") : tPass("actions.update")}
+							</Button>
+						</div>
+					</form>
+				</CardContent>
+			</Card>
+		</div>
 	);
 }
 
@@ -1326,6 +1742,12 @@ export default function SettingsPage() {
 		enabled: preferences.isHydrated && session?.role === "auditor"
 	});
 
+	const managerProfileQuery = useQuery({
+		queryKey: ["playspace", "settings", "managerProfile"],
+		queryFn: () => playspaceApi.manager.myProfile(),
+		enabled: preferences.isHydrated && session?.role === "manager"
+	});
+
 	const managerProfilesQuery = useQuery({
 		queryKey: ["playspace", "settings", "account", managerAccountId, "managerProfiles"],
 		queryFn: async () => {
@@ -1349,6 +1771,7 @@ export default function SettingsPage() {
 	const managerAccount = accountQuery.data ?? null;
 	const managerProfiles = managerProfilesQuery.data ?? [];
 	const auditorProfile = auditorProfileQuery.data ?? null;
+	const managerProfile = managerProfileQuery.data ?? null;
 	return (
 		<div className="space-y-6">
 			<DashboardHeader
@@ -1384,15 +1807,19 @@ export default function SettingsPage() {
 			</div>
 
 			{session.role === "manager" ? (
-				<ManagerWorkspaceSection
-					account={managerAccount}
-					managerProfiles={managerProfiles}
-					accountIsLoading={accountQuery.isLoading}
-					managerProfilesIsLoading={managerProfilesQuery.isLoading}
-					accountErrorMessage={getErrorMessageFromUnknown(accountQuery.error)}
-					managerProfilesErrorMessage={getErrorMessageFromUnknown(managerProfilesQuery.error)}
-					formatT={formatT}
-				/>
+				<>
+					<ManagerSelfServiceCard profile={managerProfile} />
+					<ManagerWorkspaceSection
+						account={managerAccount}
+						managerProfiles={managerProfiles}
+						accountIsLoading={accountQuery.isLoading}
+						managerProfilesIsLoading={managerProfilesQuery.isLoading}
+						accountErrorMessage={getErrorMessageFromUnknown(accountQuery.error)}
+						managerProfilesErrorMessage={getErrorMessageFromUnknown(managerProfilesQuery.error)}
+						formatT={formatT}
+						session={session}
+					/>
+				</>
 			) : session.role === "admin" ? (
 				<AdminWorkspaceCard />
 			) : (

@@ -54,6 +54,56 @@ export async function loginWithCredentials(email: string, password: string): Pro
 	return payload as AuthResponse;
 }
 
+export interface ManagerInvitePreview {
+	email: string;
+	organization: string | null;
+	invited_by_name: string | null;
+	expires_at: string;
+	accepted: boolean;
+}
+
+export async function getManagerInvitePreview(token: string): Promise<ManagerInvitePreview> {
+	const response = await fetch(`${getApiBaseUrl()}/playspace/auth/manager-invites/${encodeURIComponent(token)}`, {
+		method: "GET"
+	});
+
+	const payload: unknown = await response.json().catch(() => null);
+
+	if (!response.ok) {
+		const detail = getErrorDetail(payload);
+		throw new Error(detail || "This invite link is no longer valid.");
+	}
+
+	return payload as ManagerInvitePreview;
+}
+
+export async function acceptManagerInvite(
+	token: string,
+	input: {
+		name: string;
+		password: string;
+		position?: string | undefined;
+	}
+): Promise<AuthResponse> {
+	const response = await fetch(
+		`${getApiBaseUrl()}/playspace/auth/manager-invites/${encodeURIComponent(token)}/accept`,
+		{
+			method: "POST",
+			headers: { "Content-Type": "application/json" },
+			body: JSON.stringify(input)
+		}
+	);
+
+	const payload: unknown = await response.json().catch(() => null);
+
+	if (!response.ok) {
+		const detail = getErrorDetail(payload);
+		throw new Error(detail || "Unable to accept the invitation. The link may have expired.");
+	}
+
+	return payload as AuthResponse;
+}
+
 export async function signupWithCredentials(input: {
 	email: string;
 	password: string;
