@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { useForm } from "@tanstack/react-form";
+import { useTranslations } from "next-intl";
 import { z } from "zod";
 
 import { CheckCircle2Icon, ClipboardCopyIcon, LockIcon, MailIcon } from "lucide-react";
@@ -23,19 +24,21 @@ import { getValidationMessage, getZodFieldErrors } from "./tanstack-form-utils";
 
 const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
-const auditorDialogSchema = z.object({
-	email: z
-		.string()
-		.trim()
-		.refine(value => EMAIL_PATTERN.test(value), "Enter a valid email address."),
-	fullName: z.string().trim().min(1, "Full name is required."),
-	role: z.string(),
-	ageRange: z.string(),
-	gender: z.string(),
-	country: z.string()
-});
+function createAuditorDialogSchema(messages: { emailInvalid: string; fullNameRequired: string }) {
+	return z.object({
+		email: z
+			.string()
+			.trim()
+			.refine(value => EMAIL_PATTERN.test(value), messages.emailInvalid),
+		fullName: z.string().trim().min(1, messages.fullNameRequired),
+		role: z.string(),
+		ageRange: z.string(),
+		gender: z.string(),
+		country: z.string()
+	});
+}
 
-type AuditorDialogFormValues = z.infer<typeof auditorDialogSchema>;
+type AuditorDialogFormValues = z.infer<ReturnType<typeof createAuditorDialogSchema>>;
 
 export interface AuditorDialogInitialValues {
 	email?: string | null;
@@ -90,9 +93,10 @@ export interface AuditorDialogProps {
  * Convert schema issues into TanStack Form field error strings.
  */
 function validateAuditorValues(
-	values: AuditorDialogFormValues
+	values: AuditorDialogFormValues,
+	schema: z.ZodType<AuditorDialogFormValues>
 ): Partial<Record<keyof AuditorDialogFormValues, string>> | undefined {
-	const parsedValues = auditorDialogSchema.safeParse(values);
+	const parsedValues = schema.safeParse(values);
 	if (parsedValues.success) {
 		return undefined;
 	}
@@ -129,10 +133,19 @@ export function AuditorDialog({
 	isPending = false,
 	onSubmit
 }: Readonly<AuditorDialogProps>) {
+	const t = useTranslations("shared.auditorDialog");
 	const [submitError, setSubmitError] = React.useState<string | null>(null);
 	const [createdSummary, setCreatedSummary] = React.useState<AuditorCreatedSummary | null>(null);
 	const [codeCopied, setCodeCopied] = React.useState(false);
 	const isCreateMode = mode === "create";
+	const validationSchema = React.useMemo(
+		() =>
+			createAuditorDialogSchema({
+				emailInvalid: t("validation.emailInvalid"),
+				fullNameRequired: t("validation.fullNameRequired")
+			}),
+		[t]
+	);
 	const initialEmail = initialValues?.email ?? "";
 	const initialFullName = initialValues?.fullName ?? "";
 	const initialAuditorCode = initialValues?.auditorCode ?? "";
@@ -155,7 +168,7 @@ export function AuditorDialog({
 	const form = useForm({
 		defaultValues,
 		validators: {
-			onSubmit: ({ value }) => validateAuditorValues(value)
+			onSubmit: ({ value }) => validateAuditorValues(value, validationSchema)
 		},
 		onSubmit: async ({ value }) => {
 			try {
@@ -174,7 +187,7 @@ export function AuditorDialog({
 					onOpenChange(false);
 				}
 			} catch (error) {
-				setSubmitError(error instanceof Error ? error.message : "Unable to save auditor profile.");
+				setSubmitError(error instanceof Error ? error.message : t("errors.unableToSave"));
 			}
 		}
 	});
@@ -221,13 +234,7 @@ export function AuditorDialog({
 								event.stopPropagation();
 								await form.handleSubmit();
 							}}>
-							<p className="text-xs text-muted-foreground">
-								Fields marked with{" "}
-								<span className="text-destructive" aria-hidden="true">
-									*
-								</span>{" "}
-								are required.
-							</p>
+							<p className="text-xs text-muted-foreground">{t("requiredFieldsHint")}</p>
 							<div className="grid gap-6 md:grid-cols-2 items-start">
 								<form.Field name="email">
 									{field => {
@@ -236,7 +243,7 @@ export function AuditorDialog({
 										return (
 											<div className="grid gap-2 items-start">
 												<Label htmlFor={field.name}>
-													Email{" "}
+													{t("fields.email")}{" "}
 													<span className="text-destructive" aria-hidden="true">
 														*
 													</span>
@@ -247,7 +254,7 @@ export function AuditorDialog({
 													type="email"
 													autoComplete="email"
 													spellCheck={false}
-													placeholder="jane@organization.com"
+													placeholder={t("placeholders.email")}
 													value={field.state.value}
 													onBlur={field.handleBlur}
 													onChange={event => field.handleChange(event.target.value)}
@@ -263,18 +270,16 @@ export function AuditorDialog({
 								</form.Field>
 								{!isCreateMode && (
 									<div className="grid gap-2 items-start">
-										<Label>Auditor code</Label>
+										<Label>{t("fields.auditorCode")}</Label>
 										<div
 											className="flex h-9 select-all items-center gap-2 rounded-md border border-input bg-muted px-3 font-mono text-sm tracking-wider text-muted-foreground"
-											aria-label={`Auditor code: ${initialAuditorCode} (read-only)`}
+											aria-label={t("aria.auditorCodeReadonly", { code: initialAuditorCode })}
 											aria-readonly="true"
 											tabIndex={-1}>
 											<LockIcon className="size-3.5 shrink-0 opacity-50" aria-hidden="true" />
 											{initialAuditorCode}
 										</div>
-										<p className="text-xs text-muted-foreground">
-											Assigned automatically and cannot be changed.
-										</p>
+										<p className="text-xs text-muted-foreground">{t("hints.codeReadOnly")}</p>
 									</div>
 								)}
 								<form.Field name="fullName">
@@ -284,7 +289,7 @@ export function AuditorDialog({
 										return (
 											<div className="grid gap-2 items-start md:col-span-2">
 												<Label htmlFor={field.name}>
-													Full name{" "}
+													{t("fields.fullName")}{" "}
 													<span className="text-destructive" aria-hidden="true">
 														*
 													</span>
@@ -293,7 +298,7 @@ export function AuditorDialog({
 													id={field.name}
 													name="auditorFullName"
 													autoComplete="name"
-													placeholder="Jane Smith"
+													placeholder={t("placeholders.fullName")}
 													value={field.state.value}
 													onBlur={field.handleBlur}
 													onChange={event => field.handleChange(event.target.value)}
@@ -311,14 +316,14 @@ export function AuditorDialog({
 									{field => (
 										<div className="grid gap-2 items-start">
 											<Label htmlFor={field.name}>
-												Role/Profession{" "}
+												{t("fields.roleProfession")}{" "}
 												<span className="text-xs font-normal text-muted-foreground">
-													(optional)
+													{t("fields.optional")}
 												</span>
 											</Label>
 											<Input
 												id={field.name}
-												placeholder="e.g. Field Researcher"
+												placeholder={t("placeholders.role")}
 												value={field.state.value}
 												onBlur={field.handleBlur}
 												onChange={event => field.handleChange(event.target.value)}
@@ -330,14 +335,14 @@ export function AuditorDialog({
 									{field => (
 										<div className="grid gap-2 items-start">
 											<Label htmlFor={field.name}>
-												Country{" "}
+												{t("fields.country")}{" "}
 												<span className="text-xs font-normal text-muted-foreground">
-													(optional)
+													{t("fields.optional")}
 												</span>
 											</Label>
 											<Input
 												id={field.name}
-												placeholder="e.g. Canada"
+												placeholder={t("placeholders.country")}
 												autoComplete="country-name"
 												value={field.state.value}
 												onBlur={field.handleBlur}
@@ -350,20 +355,20 @@ export function AuditorDialog({
 									{field => (
 										<div className="grid gap-2 items-start">
 											<Label htmlFor={field.name}>
-												Age range{" "}
+												{t("fields.ageRange")}{" "}
 												<span className="text-xs font-normal text-muted-foreground">
-													(optional)
+													{t("fields.optional")}
 												</span>
 											</Label>
 											<Input
 												id={field.name}
-												placeholder="e.g. 25–34"
+												placeholder={t("placeholders.ageRange")}
 												value={field.state.value}
 												onBlur={field.handleBlur}
 												onChange={event => field.handleChange(event.target.value)}
 											/>
 											<p className="text-xs text-muted-foreground">
-												Used for demographic reporting only.
+												{t("hints.demographicReporting")}
 											</p>
 										</div>
 									)}
@@ -372,20 +377,20 @@ export function AuditorDialog({
 									{field => (
 										<div className="grid gap-2 items-start">
 											<Label htmlFor={field.name}>
-												Gender{" "}
+												{t("fields.gender")}{" "}
 												<span className="text-xs font-normal text-muted-foreground">
-													(optional)
+													{t("fields.optional")}
 												</span>
 											</Label>
 											<Input
 												id={field.name}
-												placeholder="e.g. Female, Male, Non-binary"
+												placeholder={t("placeholders.gender")}
 												value={field.state.value}
 												onBlur={field.handleBlur}
 												onChange={event => field.handleChange(event.target.value)}
 											/>
 											<p className="text-xs text-muted-foreground">
-												Used for demographic reporting only.
+												{t("hints.demographicReporting")}
 											</p>
 										</div>
 									)}
@@ -402,7 +407,7 @@ export function AuditorDialog({
 									variant="outline"
 									disabled={isPending}
 									onClick={() => onOpenChange(false)}>
-									Cancel
+									{t("actions.cancel")}
 								</Button>
 								<Button type="submit" disabled={isPending}>
 									{submitLabel}
@@ -437,6 +442,7 @@ function AuditorCreatedConfirmation({
 	onCopyCode,
 	onDone
 }: Readonly<AuditorCreatedConfirmationProps>) {
+	const t = useTranslations("shared.auditorDialog.confirm");
 	return (
 		<div className="flex flex-col gap-6 py-2" role="status" aria-live="polite">
 			{/* Header */}
@@ -445,9 +451,9 @@ function AuditorCreatedConfirmation({
 					<CheckCircle2Icon className="size-7" aria-hidden="true" />
 				</span>
 				<div>
-					<DialogTitle className="text-lg font-semibold">Auditor invited</DialogTitle>
+					<DialogTitle className="text-lg font-semibold">{t("title")}</DialogTitle>
 					<DialogDescription className="mt-1 text-sm text-muted-foreground">
-						The account is ready. Share the details below so the auditor can sign in.
+						{t("description")}
 					</DialogDescription>
 				</div>
 			</div>
@@ -459,12 +465,12 @@ function AuditorCreatedConfirmation({
 					<MailIcon className="mt-0.5 size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
 					<div className="min-w-0 flex-1">
 						<p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">
-							Invitation sent to
+							{t("invitationSentTo")}
 						</p>
 						<p className="truncate text-sm font-medium">{summary.email}</p>
 					</div>
 					<span className="shrink-0 rounded-full bg-amber-100 px-2.5 py-0.5 text-xs font-medium text-amber-700 dark:bg-amber-950 dark:text-amber-400">
-						Awaiting sign-up
+						{t("awaitingSignup")}
 					</span>
 				</div>
 
@@ -473,7 +479,7 @@ function AuditorCreatedConfirmation({
 					<LockIcon className="size-4 shrink-0 text-muted-foreground" aria-hidden="true" />
 					<div className="min-w-0 flex-1">
 						<p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-0.5">
-							Auditor code
+							{t("auditorCodeLabel")}
 						</p>
 						<p className="font-mono text-sm font-medium tracking-wider">{summary.auditorCode}</p>
 					</div>
@@ -483,21 +489,18 @@ function AuditorCreatedConfirmation({
 						size="sm"
 						className="h-8 shrink-0 gap-1.5 text-xs"
 						onClick={() => onCopyCode(summary.auditorCode)}
-						aria-label="Copy auditor code">
+						aria-label={t("copyCodeAria")}>
 						<ClipboardCopyIcon className="size-3.5" aria-hidden="true" />
-						{codeCopied ? "Copied!" : "Copy"}
+						{codeCopied ? t("copied") : t("copy")}
 					</Button>
 				</div>
 			</div>
 
-			<p className="text-center text-xs text-muted-foreground">
-				An email with a temporary password has been sent. The auditor must complete sign-up before they can
-				access the platform.
-			</p>
+			<p className="text-center text-xs text-muted-foreground">{t("footerNote")}</p>
 
 			<DialogFooter>
 				<Button type="button" onClick={onDone} className="w-full sm:w-auto">
-					Done
+					{t("done")}
 				</Button>
 			</DialogFooter>
 		</div>

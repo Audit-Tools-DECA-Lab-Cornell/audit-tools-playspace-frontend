@@ -3,6 +3,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { FileTextIcon, FolderOpenIcon, PencilLineIcon, PlusIcon, Trash2Icon, XIcon } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import * as React from "react";
 
 import { playspaceApi, type AuditorSummary, type ManagerPlaceRow } from "@/lib/api/playspace";
@@ -22,6 +23,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
 export default function ManagerAuditorsPage() {
+	const t = useTranslations("manager.auditors");
+	const workspaceT = useTranslations("common.workspace");
+	const navT = useTranslations("shell.navigation");
 	const session = useAuthSession();
 	const queryClient = useQueryClient();
 	const accountId = session?.role === "manager" ? session.accountId : null;
@@ -175,16 +179,17 @@ export default function ManagerAuditorsPage() {
 		return (
 			<div className="space-y-6">
 				<DashboardHeader
-					eyebrow="Manager Workspace"
-					title="Auditor management"
-					description="Create auditors and review their assignment and activity footprint."
-					breadcrumbs={[{ label: "Dashboard", href: "/manager/dashboard" }, { label: "Auditors" }]}
+					eyebrow={workspaceT("manager")}
+					title={t("header.title")}
+					description={t("header.descriptionSecondary")}
+					breadcrumbs={[
+						{ label: navT("dashboard"), href: "/manager/dashboard" },
+						{ label: navT("auditors") }
+					]}
 				/>
 				<Card>
 					<CardContent className="py-8">
-						<p className="text-sm text-muted-foreground">
-							Manager account context is missing from the current session.
-						</p>
+						<p className="text-sm text-muted-foreground">{t("missingAccount.body")}</p>
 					</CardContent>
 				</Card>
 			</div>
@@ -195,10 +200,13 @@ export default function ManagerAuditorsPage() {
 		return (
 			<div className="space-y-6">
 				<DashboardHeader
-					eyebrow="Manager Workspace"
-					title="Auditor management"
-					description="Create auditors and review their assignment and activity footprint."
-					breadcrumbs={[{ label: "Dashboard", href: "/manager/dashboard" }, { label: "Auditors" }]}
+					eyebrow={workspaceT("manager")}
+					title={t("header.title")}
+					description={t("header.descriptionSecondary")}
+					breadcrumbs={[
+						{ label: navT("dashboard"), href: "/manager/dashboard" },
+						{ label: navT("auditors") }
+					]}
 				/>
 				<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
 					{Array.from({ length: 4 }).map((_, index) => (
@@ -216,11 +224,11 @@ export default function ManagerAuditorsPage() {
 	if (auditorsQuery.isError) {
 		return (
 			<EmptyState
-				title="Auditors unavailable"
-				description="Unable to load the auditor roster. Refresh and try again."
+				title={t("error.title")}
+				description={t("error.description")}
 				action={
 					<Button type="button" onClick={() => globalThis.location.reload()}>
-						Try again
+						{t("error.retry")}
 					</Button>
 				}
 			/>
@@ -230,65 +238,65 @@ export default function ManagerAuditorsPage() {
 	return (
 		<div className="space-y-6">
 			<DashboardHeader
-				eyebrow="Manager Workspace"
-				title="Auditor management"
-				description="Manage roster identity, workload, and assignment operations from a single workspace."
-				breadcrumbs={[{ label: "Dashboard", href: "/manager/dashboard" }, { label: "Auditors" }]}
+				eyebrow={workspaceT("manager")}
+				title={t("header.title")}
+				description={t("header.description")}
+				breadcrumbs={[{ label: navT("dashboard"), href: "/manager/dashboard" }, { label: navT("auditors") }]}
 				actions={
 					<div className="flex gap-2">
 						<Button type="button" variant="outline" className="gap-2" asChild>
 							<Link href="/manager/reports">
 								<FileTextIcon className="size-4" />
-								<span>View Reports</span>
+								<span>{t("actions.viewReports")}</span>
 							</Link>
 						</Button>
 						<Button type="button" className="gap-2" onClick={() => setIsCreateDialogOpen(true)}>
 							<PlusIcon className="size-4" />
-							<span>Invite new auditor</span>
+							<span>{t("actions.inviteNewAuditor")}</span>
 						</Button>
 					</div>
 				}
 			/>
 			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
 				<StatCard
-					title="Total Auditors"
+					title={t("stats.total.title")}
 					value={String(auditors.length)}
-					helper="Profiles currently linked to this account."
+					helper={t("stats.total.helper")}
 					tone="info"
 				/>
 				<StatCard
-					title="Active Recently"
+					title={t("stats.activeRecently.title")}
 					value={String(activeAuditors)}
-					helper="Auditors with recent visible activity."
+					helper={t("stats.activeRecently.helper")}
 					tone="success"
 				/>
 				<StatCard
-					title="Assignments"
+					title={t("stats.assignments.title")}
 					value={String(totalAssignments)}
-					helper="Project and place-level assignments across the roster."
+					helper={t("stats.assignments.helper")}
 					tone="warning"
 				/>
 				<StatCard
-					title="Completed Audits"
+					title={t("stats.completedAudits.title")}
 					value={String(completedAudits)}
-					helper="Submitted audits delivered by this roster."
+					helper={t("stats.completedAudits.helper")}
 					tone="violet"
 				/>
 			</div>
 			<AuditorsTable
 				auditors={auditors}
-				title="Auditor Roster"
-				description="Search, sort, and manage the delivery capacity behind your audit programs."
+				title={t("table.title")}
+				description={t("table.description")}
 				toolbarExtra={
 					<>
 						<FilterPopover
-							title="Projects"
+							title={t("filters.projects")}
 							options={projectOptions}
 							selectedValues={selectedProjectIds}
 							onChange={setSelectedProjectIds}
 						/>
 						<FilterPopover
-							title="Places"
+							title={t("filters.places")}
 							options={placeOptions}
 							selectedValues={selectedPlaceIds}
 							onChange={setSelectedPlaceIds}
@@ -301,24 +309,24 @@ export default function ManagerAuditorsPage() {
 								className="gap-1.5"
 								onClick={clearAllFilters}>
 								<XIcon className="size-3.5" />
-								Clear filters
+								{t("filters.clear")}
 							</Button>
 						)}
 					</>
 				}
 				getRowActions={auditor => [
 					{
-						label: "View auditor",
+						label: t("rowActions.view"),
 						href: `/manager/auditors/${encodeURIComponent(auditor.id)}`,
 						icon: FolderOpenIcon
 					},
 					{
-						label: "Edit auditor",
+						label: t("rowActions.edit"),
 						onSelect: () => setEditingAuditorId(auditor.id),
 						icon: PencilLineIcon
 					},
 					{
-						label: "Delete auditor",
+						label: t("rowActions.delete"),
 						onSelect: () =>
 							setAuditorPendingDelete({
 								id: auditor.id,
@@ -328,15 +336,15 @@ export default function ManagerAuditorsPage() {
 						variant: "destructive"
 					}
 				]}
-				emptyMessage="No auditors yet. Create your first auditor profile to begin staffing projects."
+				emptyMessage={t("table.emptyMessage")}
 			/>
 			<AuditorDialog
 				open={isCreateDialogOpen}
 				onOpenChange={setIsCreateDialogOpen}
 				mode="create"
-				title="Invite new auditor"
-				description="Invite a new auditor to join your organization and start delivering audits."
-				submitLabel="Invite new auditor"
+				title={t("dialogs.create.title")}
+				description={t("dialogs.create.description")}
+				submitLabel={t("dialogs.create.submitLabel")}
 				isPending={createAuditor.isPending}
 				onSubmit={async (payload): Promise<AuditorCreatedSummary | undefined> => {
 					const created = await createAuditor.mutateAsync(payload);
@@ -351,9 +359,9 @@ export default function ManagerAuditorsPage() {
 					}
 				}}
 				mode="edit"
-				title="Edit auditor"
-				description="Update roster identity, profile metadata, and contact details."
-				submitLabel="Save changes"
+				title={t("dialogs.edit.title")}
+				description={t("dialogs.edit.description")}
+				submitLabel={t("dialogs.edit.submitLabel")}
 				initialValues={
 					editingAuditor
 						? {
@@ -387,13 +395,13 @@ export default function ManagerAuditorsPage() {
 						setAuditorPendingDelete(null);
 					}
 				}}
-				title="Delete auditor"
+				title={t("deleteConfirm.title")}
 				description={
 					auditorPendingDelete
-						? `Delete "${auditorPendingDelete.label}"? This action cannot be undone.`
-						: "Delete this auditor? This action cannot be undone."
+						? t("deleteConfirm.descriptionWithLabel", { label: auditorPendingDelete.label })
+						: t("deleteConfirm.descriptionGeneric")
 				}
-				confirmLabel="Delete auditor"
+				confirmLabel={t("deleteConfirm.confirmLabel")}
 				isPending={deleteAuditor.isPending}
 				onConfirm={() => {
 					if (!auditorPendingDelete) {

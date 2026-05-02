@@ -42,6 +42,9 @@ function getErrorMessage(error: unknown, fallback: string): string {
 
 export default function ManagerAuditorDetailPage({ params }: Readonly<ManagerAuditorDetailPageProps>) {
 	const formatT = useTranslations("common.format");
+	const t = useTranslations("manager.auditorDetail");
+	const workspaceT = useTranslations("common.workspace");
+	const navT = useTranslations("shell.navigation");
 	const resolvedParams = use(params);
 	const auditorId = resolvedParams.auditorId;
 	const session = useAuthSession();
@@ -126,13 +129,13 @@ export default function ManagerAuditorDetailPage({ params }: Readonly<ManagerAud
 	if (auditorsQuery.isError || !auditor) {
 		return (
 			<EmptyState
-				title="Auditor not found"
+				title={t("empty.notFoundTitle")}
 				description={
 					auditorsQuery.isError
-						? getErrorMessage(auditorsQuery.error, "Unable to load auditor details.")
-						: "The auditor profile was not found in this account."
+						? getErrorMessage(auditorsQuery.error, t("empty.loadErrorFallback"))
+						: t("empty.notFoundDescription")
 				}
-				action={<BackButton href="/manager/auditors" label="Back to auditors" />}
+				action={<BackButton href="/manager/auditors" label={t("empty.backToAuditors")} />}
 			/>
 		);
 	}
@@ -140,28 +143,28 @@ export default function ManagerAuditorDetailPage({ params }: Readonly<ManagerAud
 	return (
 		<div className="space-y-6">
 			<DashboardHeader
-				eyebrow="Manager Workspace"
+				eyebrow={workspaceT("manager")}
 				title={auditor.full_name}
-				description={`Auditor profile overview, assignments, and activity for ${auditor.auditor_code}.`}
+				description={t("header.description", { code: auditor.auditor_code })}
 				breadcrumbs={[
-					{ label: "Dashboard", href: "/manager/dashboard" },
-					{ label: "Auditors", href: "/manager/auditors" },
+					{ label: navT("dashboard"), href: "/manager/dashboard" },
+					{ label: navT("auditors"), href: "/manager/auditors" },
 					{ label: auditor.full_name }
 				]}
 				actions={
 					<div className="flex flex-wrap items-center gap-2">
-						<BackButton href="/manager/auditors" label="Back to auditors" />
+						<BackButton href="/manager/auditors" label={t("actions.backToAuditors")} />
 						<Button
 							type="button"
 							variant="outline"
 							className="gap-2"
 							onClick={() => setIsEditDialogOpen(true)}>
 							<PencilLineIcon className="size-4" />
-							<span>Edit profile</span>
+							<span>{t("actions.editProfile")}</span>
 						</Button>
 						<Button type="button" className="gap-2" onClick={() => setIsAssignDialogOpen(true)}>
 							<PlusIcon className="size-4" />
-							<span>Assign to project</span>
+							<span>{t("actions.assignToProject")}</span>
 						</Button>
 					</div>
 				}
@@ -184,7 +187,7 @@ export default function ManagerAuditorDetailPage({ params }: Readonly<ManagerAud
 								</Badge>
 							) : null}
 						</div>
-						<p className="text-sm text-muted-foreground">{auditor.email ?? "Email pending"}</p>
+						<p className="text-sm text-muted-foreground">{auditor.email ?? t("profile.emailPending")}</p>
 						<div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
 							{auditor.country ? <span>{auditor.country}</span> : null}
 							{auditor.age_range ? <span>{auditor.age_range}</span> : null}
@@ -197,22 +200,22 @@ export default function ManagerAuditorDetailPage({ params }: Readonly<ManagerAud
 			{/* ── Stats ── */}
 			<div className="grid gap-4 md:grid-cols-3">
 				<StatCard
-					title="Assignments"
+					title={t("stats.assignments.title")}
 					value={String(auditor.assignments_count)}
-					helper="Current project and place assignments."
+					helper={t("stats.assignments.helper")}
 					tone="warning"
 				/>
 				<StatCard
-					title="Completed Audits"
+					title={t("stats.completedAudits.title")}
 					value={String(auditor.completed_audits)}
-					helper="Submitted audits by this auditor."
+					helper={t("stats.completedAudits.helper")}
 					tone="success"
 				/>
 				<StatCard
-					title="Last Active"
+					title={t("stats.lastActive.title")}
 					value={formatDateTimeLabel(auditor.last_active_at, formatT)}
 					valueClassName="font-sans text-lg leading-snug md:text-xl"
-					helper="Most recent activity recorded."
+					helper={t("stats.lastActive.helper")}
 					tone="info"
 				/>
 			</div>
@@ -220,24 +223,24 @@ export default function ManagerAuditorDetailPage({ params }: Readonly<ManagerAud
 			{/* ── Assignments list ── */}
 			<Card>
 				<CardHeader className="flex flex-row items-center justify-between gap-2">
-					<CardTitle>Assignments</CardTitle>
+					<CardTitle>{t("assignmentsCard.title")}</CardTitle>
 					<Button type="button" size="sm" className="gap-1.5" onClick={() => setIsAssignDialogOpen(true)}>
 						<PlusIcon className="size-3.5" />
-						<span>Add assignment</span>
+						<span>{t("assignmentsCard.addAssignment")}</span>
 					</Button>
 				</CardHeader>
 				<CardContent className="space-y-3">
 					{assignmentsQuery.isLoading ? (
-						<p className="text-sm text-muted-foreground">Loading assignments...</p>
+						<p className="text-sm text-muted-foreground">{t("assignmentsCard.loading")}</p>
 					) : assignmentsQuery.isError ? (
 						<p className="text-sm text-destructive">
-							{getErrorMessage(assignmentsQuery.error, "Unable to load assignments.")}
+							{getErrorMessage(assignmentsQuery.error, t("assignmentsCard.loadErrorFallback"))}
 						</p>
 					) : assignments.length === 0 ? (
 						<div className="rounded-field border border-dashed border-border p-6 text-center">
-							<p className="font-medium text-foreground">No assignments yet</p>
+							<p className="font-medium text-foreground">{t("assignmentsCard.emptyTitle")}</p>
 							<p className="mt-1 text-sm text-muted-foreground">
-								Assign this auditor to a project and its places to get started.
+								{t("assignmentsCard.emptyDescription")}
 							</p>
 						</div>
 					) : (
@@ -248,15 +251,17 @@ export default function ManagerAuditorDetailPage({ params }: Readonly<ManagerAud
 								<div className="space-y-1">
 									<p className="font-medium text-foreground">{assignment.scope_name}</p>
 									<p className="text-xs text-muted-foreground">
-										{`${assignment.project_name} · Place`}
+										{t("assignmentsCard.placeMeta", { projectName: assignment.project_name })}
 									</p>
 									<p className="text-xs text-muted-foreground">
-										{`Assigned ${formatDateTimeLabel(assignment.assigned_at, formatT)}`}
+										{t("assignmentsCard.assignedAt", {
+											value: formatDateTimeLabel(assignment.assigned_at, formatT)
+										})}
 									</p>
 								</div>
 								<div className="flex flex-wrap items-center gap-2">
 									<Badge variant="outline" className="font-medium">
-										Place assignment
+										{t("assignmentsCard.placeBadge")}
 									</Badge>
 									<Button
 										type="button"
@@ -270,7 +275,7 @@ export default function ManagerAuditorDetailPage({ params }: Readonly<ManagerAud
 											});
 										}}>
 										<Trash2Icon className="mr-1.5 size-3.5" />
-										Remove
+										{t("assignmentsCard.remove")}
 									</Button>
 								</div>
 							</div>
@@ -297,9 +302,9 @@ export default function ManagerAuditorDetailPage({ params }: Readonly<ManagerAud
 				open={isEditDialogOpen}
 				onOpenChange={setIsEditDialogOpen}
 				mode="edit"
-				title="Edit auditor"
-				description="Update roster identity, profile metadata, and contact details."
-				submitLabel="Save changes"
+				title={t("dialogs.edit.title")}
+				description={t("dialogs.edit.description")}
+				submitLabel={t("dialogs.edit.submitLabel")}
 				initialValues={{
 					email: auditor.email,
 					fullName: auditor.full_name,
@@ -322,13 +327,15 @@ export default function ManagerAuditorDetailPage({ params }: Readonly<ManagerAud
 						setAssignmentPendingDelete(null);
 					}
 				}}
-				title="Remove assignment"
+				title={t("removeAssignmentConfirm.title")}
 				description={
 					assignmentPendingDelete
-						? `Remove the assignment for "${assignmentPendingDelete.scopeName}"? This action cannot be undone.`
-						: "Remove this assignment? This action cannot be undone."
+						? t("removeAssignmentConfirm.descriptionWithScope", {
+								scopeName: assignmentPendingDelete.scopeName
+							})
+						: t("removeAssignmentConfirm.descriptionGeneric")
 				}
-				confirmLabel="Remove assignment"
+				confirmLabel={t("removeAssignmentConfirm.confirmLabel")}
 				isPending={deleteAssignment.isPending}
 				onConfirm={() => {
 					if (!assignmentPendingDelete) {

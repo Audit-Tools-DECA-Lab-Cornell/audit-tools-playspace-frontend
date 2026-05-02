@@ -88,6 +88,56 @@
 		},
 		"entityRowActions": {
 			"label": "Aktionen"
+		},
+		"auditorDialog": {
+			"validation": {
+				"emailInvalid": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+				"fullNameRequired": "Der vollständige Name ist erforderlich."
+			},
+			"errors": {
+				"unableToSave": "Prüferprofil konnte nicht gespeichert werden."
+			},
+			"requiredFieldsHint": "Mit * markierte Felder sind Pflichtfelder.",
+			"fields": {
+				"email": "E-Mail",
+				"auditorCode": "Prüfer-Code",
+				"fullName": "Vollständiger Name",
+				"roleProfession": "Rolle/Beruf",
+				"country": "Land",
+				"ageRange": "Altersgruppe",
+				"gender": "Geschlecht",
+				"optional": "(optional)"
+			},
+			"placeholders": {
+				"email": "jane@organisation.de",
+				"fullName": "Jane Smith",
+				"role": "z. B. Feldresearcher",
+				"country": "z. B. Deutschland",
+				"ageRange": "z. B. 25–34",
+				"gender": "z. B. weiblich, männlich, divers"
+			},
+			"hints": {
+				"codeReadOnly": "Wird automatisch vergeben und kann nicht geändert werden.",
+				"demographicReporting": "Nur für demografische Auswertungen."
+			},
+			"actions": {
+				"cancel": "Abbrechen"
+			},
+			"aria": {
+				"auditorCodeReadonly": "Prüfer-Code: {code} (schreibgeschützt)"
+			},
+			"confirm": {
+				"title": "Prüfer eingeladen",
+				"description": "Das Konto ist bereit. Teilen Sie die folgenden Angaben, damit sich der Prüfer anmelden kann.",
+				"invitationSentTo": "Einladung gesendet an",
+				"awaitingSignup": "Registrierung ausstehend",
+				"auditorCodeLabel": "Prüfer-Code",
+				"copy": "Kopieren",
+				"copied": "Kopiert!",
+				"copyCodeAria": "Prüfer-Code kopieren",
+				"footerNote": "Es wurde eine E-Mail mit einem temporären Passwort gesendet. Der Prüfer muss die Registrierung abschließen, bevor er auf die Plattform zugreifen kann.",
+				"done": "Fertig"
+			}
 		}
 	},
 	"tables": {
@@ -791,6 +841,134 @@
 				"submitted": "Eingereicht",
 				"score": "Score {value}",
 				"empty": "Noch keine eingereichten Audits."
+			}
+		},
+		"auditors": {
+			"header": {
+				"title": "Prüferverwaltung",
+				"description": "Verwalten Sie Stammdaten, Auslastung und Zuweisungen aus einem Arbeitsbereich.",
+				"descriptionSecondary": "Erstellen Sie Prüfer und prüfen Sie deren Zuweisungen und Aktivität."
+			},
+			"missingAccount": {
+				"body": "Der Kontext des Manager-Kontos fehlt in der aktuellen Sitzung."
+			},
+			"error": {
+				"title": "Prüfer nicht verfügbar",
+				"description": "Die Prüferliste konnte nicht geladen werden. Seite aktualisieren und erneut versuchen.",
+				"retry": "Erneut versuchen"
+			},
+			"stats": {
+				"total": {
+					"title": "Prüfer gesamt",
+					"helper": "Profile, die derzeit mit diesem Konto verknüpft sind."
+				},
+				"activeRecently": {
+					"title": "Kürzlich aktiv",
+					"helper": "Prüfer mit kürzlich sichtbarer Aktivität."
+				},
+				"assignments": {
+					"title": "Zuweisungen",
+					"helper": "Projekt- und ortsbezogene Zuweisungen im Team."
+				},
+				"completedAudits": {
+					"title": "Abgeschlossene Audits",
+					"helper": "Eingereichte Audits dieses Teams."
+				}
+			},
+			"actions": {
+				"viewReports": "Berichte anzeigen",
+				"inviteNewAuditor": "Neuen Prüfer einladen"
+			},
+			"table": {
+				"title": "Prüferliste",
+				"description": "Suchen, sortieren und steuern Sie die Kapazität Ihrer Audit-Programme.",
+				"emptyMessage": "Noch keine Prüfer. Legen Sie das erste Profil an, um Projekte zu besetzen."
+			},
+			"filters": {
+				"projects": "Projekte",
+				"places": "Orte",
+				"clear": "Filter zurücksetzen"
+			},
+			"rowActions": {
+				"view": "Prüfer anzeigen",
+				"edit": "Prüfer bearbeiten",
+				"delete": "Prüfer löschen"
+			},
+			"dialogs": {
+				"create": {
+					"title": "Neuen Prüfer einladen",
+					"description": "Laden Sie einen neuen Prüfer ein, um Audits für Ihre Organisation durchzuführen.",
+					"submitLabel": "Neuen Prüfer einladen"
+				},
+				"edit": {
+					"title": "Prüfer bearbeiten",
+					"description": "Aktualisieren Sie Stammdaten, Profilfelder und Kontaktdaten.",
+					"submitLabel": "Änderungen speichern"
+				}
+			},
+			"deleteConfirm": {
+				"title": "Prüfer löschen",
+				"descriptionWithLabel": "\"{label}\" löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+				"descriptionGeneric": "Diesen Prüfer löschen? Diese Aktion kann nicht rückgängig gemacht werden.",
+				"confirmLabel": "Prüfer löschen"
+			}
+		},
+		"auditorDetail": {
+			"empty": {
+				"notFoundTitle": "Prüfer nicht gefunden",
+				"loadErrorFallback": "Prüferdetails konnten nicht geladen werden.",
+				"notFoundDescription": "Das Prüferprofil wurde in diesem Konto nicht gefunden.",
+				"backToAuditors": "Zurück zur Prüferliste"
+			},
+			"header": {
+				"description": "Profilübersicht, Zuweisungen und Aktivität für {code}."
+			},
+			"actions": {
+				"backToAuditors": "Zurück zur Prüferliste",
+				"editProfile": "Profil bearbeiten",
+				"assignToProject": "Projekt zuweisen"
+			},
+			"profile": {
+				"emailPending": "E-Mail ausstehend"
+			},
+			"stats": {
+				"assignments": {
+					"title": "Zuweisungen",
+					"helper": "Aktuelle Projekt- und Ortszuweisungen."
+				},
+				"completedAudits": {
+					"title": "Abgeschlossene Audits",
+					"helper": "Von diesem Prüfer eingereichte Audits."
+				},
+				"lastActive": {
+					"title": "Zuletzt aktiv",
+					"helper": "Zuletzt erfasste Aktivität."
+				}
+			},
+			"assignmentsCard": {
+				"title": "Zuweisungen",
+				"addAssignment": "Zuweisung hinzufügen",
+				"loading": "Zuweisungen werden geladen...",
+				"loadErrorFallback": "Zuweisungen konnten nicht geladen werden.",
+				"emptyTitle": "Noch keine Zuweisungen",
+				"emptyDescription": "Weisen Sie diesen Prüfer einem Projekt und dessen Orten zu.",
+				"placeMeta": "{projectName} · Ort",
+				"assignedAt": "Zugewiesen {value}",
+				"placeBadge": "Ortszuweisung",
+				"remove": "Entfernen"
+			},
+			"dialogs": {
+				"edit": {
+					"title": "Prüfer bearbeiten",
+					"description": "Aktualisieren Sie Stammdaten, Profilfelder und Kontaktdaten.",
+					"submitLabel": "Änderungen speichern"
+				}
+			},
+			"removeAssignmentConfirm": {
+				"title": "Zuweisung entfernen",
+				"descriptionWithScope": "Zuweisung für \"{scopeName}\" entfernen? Diese Aktion kann nicht rückgängig gemacht werden.",
+				"descriptionGeneric": "Diese Zuweisung entfernen? Diese Aktion kann nicht rückgängig gemacht werden.",
+				"confirmLabel": "Zuweisung entfernen"
 			}
 		},
 		"audits": {

@@ -88,6 +88,56 @@
 		},
 		"entityRowActions": {
 			"label": "Actions"
+		},
+		"auditorDialog": {
+			"validation": {
+				"emailInvalid": "Enter a valid email address.",
+				"fullNameRequired": "Full name is required."
+			},
+			"errors": {
+				"unableToSave": "Unable to save auditor profile."
+			},
+			"requiredFieldsHint": "Fields marked with * are required.",
+			"fields": {
+				"email": "Email",
+				"auditorCode": "Auditor code",
+				"fullName": "Full name",
+				"roleProfession": "Role/Profession",
+				"country": "Country",
+				"ageRange": "Age range",
+				"gender": "Gender",
+				"optional": "(optional)"
+			},
+			"placeholders": {
+				"email": "jane@organization.com",
+				"fullName": "Jane Smith",
+				"role": "e.g. Field Researcher",
+				"country": "e.g. Canada",
+				"ageRange": "e.g. 25–34",
+				"gender": "e.g. Female, Male, Non-binary"
+			},
+			"hints": {
+				"codeReadOnly": "Assigned automatically and cannot be changed.",
+				"demographicReporting": "Used for demographic reporting only."
+			},
+			"actions": {
+				"cancel": "Cancel"
+			},
+			"aria": {
+				"auditorCodeReadonly": "Auditor code: {code} (read-only)"
+			},
+			"confirm": {
+				"title": "Auditor invited",
+				"description": "The account is ready. Share the details below so the auditor can sign in.",
+				"invitationSentTo": "Invitation sent to",
+				"awaitingSignup": "Awaiting sign-up",
+				"auditorCodeLabel": "Auditor code",
+				"copy": "Copy",
+				"copied": "Copied!",
+				"copyCodeAria": "Copy auditor code",
+				"footerNote": "An email with a temporary password has been sent. The auditor must complete sign-up before they can access the platform.",
+				"done": "Done"
+			}
 		}
 	},
 	"tables": {
@@ -809,6 +859,134 @@
 				"submitted": "Submitted",
 				"score": "Score {value}",
 				"empty": "No submitted audits yet."
+			}
+		},
+		"auditors": {
+			"header": {
+				"title": "Auditor management",
+				"description": "Manage roster identity, workload, and assignment operations from a single workspace.",
+				"descriptionSecondary": "Create auditors and review their assignment and activity footprint."
+			},
+			"missingAccount": {
+				"body": "Manager account context is missing from the current session."
+			},
+			"error": {
+				"title": "Auditors unavailable",
+				"description": "Unable to load the auditor roster. Refresh and try again.",
+				"retry": "Try again"
+			},
+			"stats": {
+				"total": {
+					"title": "Total Auditors",
+					"helper": "Profiles currently linked to this account."
+				},
+				"activeRecently": {
+					"title": "Active Recently",
+					"helper": "Auditors with recent visible activity."
+				},
+				"assignments": {
+					"title": "Assignments",
+					"helper": "Project and place-level assignments across the roster."
+				},
+				"completedAudits": {
+					"title": "Completed Audits",
+					"helper": "Submitted audits delivered by this roster."
+				}
+			},
+			"actions": {
+				"viewReports": "View Reports",
+				"inviteNewAuditor": "Invite new auditor"
+			},
+			"table": {
+				"title": "Auditor Roster",
+				"description": "Search, sort, and manage the delivery capacity behind your audit programs.",
+				"emptyMessage": "No auditors yet. Create your first auditor profile to begin staffing projects."
+			},
+			"filters": {
+				"projects": "Projects",
+				"places": "Places",
+				"clear": "Clear filters"
+			},
+			"rowActions": {
+				"view": "View auditor",
+				"edit": "Edit auditor",
+				"delete": "Delete auditor"
+			},
+			"dialogs": {
+				"create": {
+					"title": "Invite new auditor",
+					"description": "Invite a new auditor to join your organization and start delivering audits.",
+					"submitLabel": "Invite new auditor"
+				},
+				"edit": {
+					"title": "Edit auditor",
+					"description": "Update roster identity, profile metadata, and contact details.",
+					"submitLabel": "Save changes"
+				}
+			},
+			"deleteConfirm": {
+				"title": "Delete auditor",
+				"descriptionWithLabel": "Delete \"{label}\"? This action cannot be undone.",
+				"descriptionGeneric": "Delete this auditor? This action cannot be undone.",
+				"confirmLabel": "Delete auditor"
+			}
+		},
+		"auditorDetail": {
+			"empty": {
+				"notFoundTitle": "Auditor not found",
+				"loadErrorFallback": "Unable to load auditor details.",
+				"notFoundDescription": "The auditor profile was not found in this account.",
+				"backToAuditors": "Back to auditors"
+			},
+			"header": {
+				"description": "Auditor profile overview, assignments, and activity for {code}."
+			},
+			"actions": {
+				"backToAuditors": "Back to auditors",
+				"editProfile": "Edit profile",
+				"assignToProject": "Assign to project"
+			},
+			"profile": {
+				"emailPending": "Email pending"
+			},
+			"stats": {
+				"assignments": {
+					"title": "Assignments",
+					"helper": "Current project and place assignments."
+				},
+				"completedAudits": {
+					"title": "Completed Audits",
+					"helper": "Submitted audits by this auditor."
+				},
+				"lastActive": {
+					"title": "Last Active",
+					"helper": "Most recent activity recorded."
+				}
+			},
+			"assignmentsCard": {
+				"title": "Assignments",
+				"addAssignment": "Add assignment",
+				"loading": "Loading assignments...",
+				"loadErrorFallback": "Unable to load assignments.",
+				"emptyTitle": "No assignments yet",
+				"emptyDescription": "Assign this auditor to a project and its places to get started.",
+				"placeMeta": "{projectName} · Place",
+				"assignedAt": "Assigned {value}",
+				"placeBadge": "Place assignment",
+				"remove": "Remove"
+			},
+			"dialogs": {
+				"edit": {
+					"title": "Edit auditor",
+					"description": "Update roster identity, profile metadata, and contact details.",
+					"submitLabel": "Save changes"
+				}
+			},
+			"removeAssignmentConfirm": {
+				"title": "Remove assignment",
+				"descriptionWithScope": "Remove the assignment for \"{scopeName}\"? This action cannot be undone.",
+				"descriptionGeneric": "Remove this assignment? This action cannot be undone.",
+				"confirmLabel": "Remove assignment"
 			}
 		},
 		"audits": {
