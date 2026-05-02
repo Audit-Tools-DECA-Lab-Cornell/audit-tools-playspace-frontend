@@ -482,16 +482,36 @@ export function countUniqueScaledQuestionsWithDomains(instrument: PlayspaceInstr
 }
 
 /**
+ * Determine whether an instrument question is applicable to a given execution mode.
+ * Mirrors the backend `_get_visible_questions` mode-gate logic.
+ *
+ * @param questionMode - The mode field on the instrument question ("audit" | "survey" | "both").
+ * @param executionMode - The submission's execution mode, or null when not set.
+ * @returns `true` when the question should be shown for the given execution mode.
+ */
+function isQuestionApplicableToMode(
+	questionMode: "audit" | "survey" | "both",
+	executionMode: "audit" | "survey" | "both" | null
+): boolean {
+	if (executionMode === null || executionMode === "both") {
+		return true;
+	}
+	return questionMode === "both" || questionMode === executionMode;
+}
+
+/**
  * Build ordered domain rows from session scores and the instrument definition.
  *
  * @param auditSession - Loaded audit with scores and aggregate responses.
  * @param instrument - Localized instrument definition.
  * @returns One row per domain in first-seen instrument order, plus orphan `by_domain` keys.
  *          Questions may belong to multiple domains; each domain row lists every question
- *          that includes that domain.
+ *          that includes that domain, filtered to the submission's execution mode so that
+ *          survey-only questions are excluded from Place Audit rows and vice versa.
  */
 export function buildDomainReportRows(auditSession: AuditSession, instrument: PlayspaceInstrument): DomainReportRow[] {
 	const byDomain = auditSession.scores.by_domain;
+	const executionMode = auditSession.scores.execution_mode;
 	const normalizedScoreByDomain = new Map<string, AuditScoreTotals | null>();
 	Object.entries(byDomain).forEach(([rawDomainKey, totals]) => {
 		const normalizedKey = normalizeDomainKey(rawDomainKey);
@@ -519,6 +539,9 @@ export function buildDomainReportRows(auditSession: AuditSession, instrument: Pl
 		let sectionOrderCounter = 0;
 
 		section.questions.forEach(question => {
+			if (!isQuestionApplicableToMode(question.mode, executionMode)) {
+				return;
+			}
 			getQuestionDomainKeys(question).forEach(domainKey => {
 				sectionDomainCounts.set(domainKey, (sectionDomainCounts.get(domainKey) ?? 0) + 1);
 				if (!sectionFirstSeenIndex.has(domainKey)) {
@@ -596,6 +619,9 @@ export function buildDomainReportRows(auditSession: AuditSession, instrument: Pl
 		instrument.sections.forEach((section, sectionIndex) => {
 			let sectionTouchesDomain = false;
 			section.questions.forEach(question => {
+				if (!isQuestionApplicableToMode(question.mode, executionMode)) {
+					return;
+				}
 				const domainKeysForQuestion = getQuestionDomainKeys(question);
 				if (!domainKeysForQuestion.includes(domainKey)) {
 					return;
