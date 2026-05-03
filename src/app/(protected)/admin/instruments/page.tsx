@@ -26,6 +26,7 @@ import {
 	X
 } from "lucide-react";
 
+import { formatQuestionKeyForDisplay } from "@/lib/audit/selectors";
 import { exportInstrument } from "@/lib/export/instrument";
 import { playspaceApi } from "@/lib/api/playspace";
 import type {
@@ -108,14 +109,6 @@ function formatSectionKey(key: string): string {
 		.split("_")
 		.map(w => w.charAt(0).toUpperCase() + w.slice(1))
 		.join(" ");
-}
-
-/**
- * Convert raw instrument question keys into a human-readable audit label.
- */
-function formatQuestionKey(questionKey: string): string {
-	const sections = questionKey.slice(2).split("_"); // Remove "q_" prefix
-	return `Q ${sections.map(section => section.toUpperCase()).join(".")}`;
 }
 
 function countTotalQuestions(sections: InstrumentSection[]): number {
@@ -1130,7 +1123,7 @@ function SpreadsheetView({
 			const section = sections[si];
 			for (let qi = 0; qi < section.questions.length; qi++) {
 				const question = section.questions[qi];
-				const questionLabel = formatQuestionKey(question.question_key);
+				const questionLabel = formatQuestionKeyForDisplay(question.question_key);
 				const questionType = question.question_type ?? "scaled";
 
 				const hasCustomScales = question.scales.some(scale => {
@@ -1866,7 +1859,7 @@ function ViewerQuestionCard({
 	scaleGuidanceMap: Map<string, ScaleDefinition>;
 }>) {
 	const t = useTranslations("admin.instruments.content");
-	const questionLabel = formatQuestionKey(question.question_key);
+	const questionLabel = formatQuestionKeyForDisplay(question.question_key);
 	const questionType = question.question_type ?? "scaled";
 	const isChecklist = questionType === "checklist";
 
@@ -3253,7 +3246,7 @@ function QuestionEditor({
 }>) {
 	const t = useTranslations("admin.instruments.content");
 	const [expanded, setExpanded] = useState(false);
-	const questionLabel = formatQuestionKey(question.question_key);
+	const questionLabel = formatQuestionKeyForDisplay(question.question_key);
 	const questionType = question.question_type ?? "scaled";
 	const isChecklist = questionType === "checklist";
 

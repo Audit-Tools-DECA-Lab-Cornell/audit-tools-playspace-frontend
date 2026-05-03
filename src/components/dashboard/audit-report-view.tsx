@@ -35,7 +35,8 @@ import {
 	reportBarScoreTier,
 	roundedPercentOfMax
 } from "@/lib/audit/report-helpers";
-import { downloadSingleAuditExport, type AuditExportFormat } from "@/lib/audit/export";
+import { downloadSingleAuditExport, type AuditExportFormat } from "@/lib/export/audit";
+import { parsePromptSegments } from "@/lib/audit/prompt-segments";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -401,7 +402,15 @@ function DomainItemsTable({ questions }: Readonly<{ questions: DomainQuestionRow
 								<td
 									className="border-r border-border px-3 py-2 text-foreground"
 									style={{ maxWidth: 360 }}>
-									<span className="line-clamp-2">{q.questionText}</span>
+									<span className="line-clamp-2">
+										{parsePromptSegments(q.questionText).map((segment, index) => (
+											<React.Fragment key={`${q.questionKey}-seg-${index.toString()}`}>
+												<span className={segment.bold ? "font-semibold" : undefined}>
+													{segment.text}
+												</span>
+											</React.Fragment>
+										))}
+									</span>
 								</td>
 								<td className="border-r border-border px-3 py-2 text-center text-muted-foreground">
 									{q.provisionLabel ?? "—"}

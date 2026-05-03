@@ -7,35 +7,13 @@ import { useTranslations } from "next-intl";
 import type { InstrumentQuestion, QuestionResponsePayload, QuestionScale } from "@/types/audit";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-
-interface PromptSegment {
-	readonly text: string;
-	readonly bold: boolean;
-}
+import { parsePromptSegments } from "@/lib/audit/prompt-segments";
 
 export interface AuditQuestionCardProps {
 	question: InstrumentQuestion;
 	selectedAnswers: QuestionResponsePayload;
 	onChangeAnswers: (questionKey: string, nextAnswers: QuestionResponsePayload) => void;
 	disabled?: boolean;
-}
-
-/**
- * Parse `**bold**` prompt markers into renderable text segments.
- */
-function parsePromptSegments(raw: string): PromptSegment[] {
-	const segments: PromptSegment[] = [];
-	const parts = raw.split("**");
-
-	for (let index = 0; index < parts.length; index += 1) {
-		const part = parts[index] ?? "";
-		if (part.length === 0) {
-			continue;
-		}
-		segments.push({ text: part, bold: index % 2 === 1 });
-	}
-
-	return segments;
 }
 
 /**

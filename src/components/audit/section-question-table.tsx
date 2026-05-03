@@ -8,11 +8,7 @@ import { getActiveScaleKeysForQuestion } from "@/lib/audit/selectors";
 import { cn } from "@/lib/utils";
 import type { InstrumentQuestion, QuestionResponsePayload, ScaleKey } from "@/types/audit";
 import { formatQuestionKeyForDisplay } from "@/lib/audit/selectors";
-
-interface PromptSegment {
-	readonly text: string;
-	readonly bold: boolean;
-}
+import { parsePromptSegments } from "@/lib/audit/prompt-segments";
 
 interface QuestionTableRow {
 	readonly question: InstrumentQuestion;
@@ -183,25 +179,6 @@ function QuestionPrompt({ question }: Readonly<QuestionPromptProps>) {
 			</p>
 		</div>
 	);
-}
-
-/**
- * Parse `**bold**` prompt markers into renderable text segments.
- */
-function parsePromptSegments(raw: string): PromptSegment[] {
-	const segments: PromptSegment[] = [];
-	const parts = raw.split("**");
-
-	for (let index = 0; index < parts.length; index += 1) {
-		const part = parts[index] ?? "";
-		if (part.length === 0) {
-			continue;
-		}
-
-		segments.push({ text: part, bold: index % 2 === 1 });
-	}
-
-	return segments;
 }
 
 /**

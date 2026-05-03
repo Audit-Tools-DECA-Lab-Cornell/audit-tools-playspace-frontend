@@ -24,7 +24,8 @@ import { Separator } from "@/components/ui/separator";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { StatCard } from "./stat-card";
 import { formatDateTimeLabel, formatScoreLabel, formatScorePairLabel, type DashboardTranslator } from "./utils";
-import { downloadSingleAuditExport, type AuditExportFormat } from "@/lib/audit/export";
+import { downloadSingleAuditExport, type AuditExportFormat } from "@/lib/export/audit";
+import { parsePromptSegments } from "@/lib/audit/prompt-segments";
 
 // ── Internal Helpers ──────────────────────────────────────────────────
 
@@ -387,7 +388,19 @@ function SectionResponses({ audit, instrument }: SectionResponsesProps) {
 							<AccordionItem key={section.section_key} value={section.section_key}>
 								<AccordionTrigger className="text-sm font-semibold">
 									<div className="flex items-center gap-3">
-										<span>{section.title.replaceAll("**", "")}</span>
+										<span>
+											{parsePromptSegments(section.title).map((segment, index) => (
+												<React.Fragment
+													key={`${section.section_key}-title-${index.toString()}`}>
+													<span
+														className={
+															segment.bold ? "font-semibold text-primary" : undefined
+														}>
+														{segment.text}
+													</span>
+												</React.Fragment>
+											))}
+										</span>
 										{sectionScores ? (
 											<Badge variant="outline" className="font-mono text-xs">
 												PV {Math.round(sectionScores.play_value_total * 10) / 10} | U{" "}
@@ -440,12 +453,22 @@ interface QuestionRowProps {
  * Single question display with the prompt and its answer(s).
  */
 function QuestionRow({ question, answers }: QuestionRowProps) {
-	const prompt = question.prompt.replaceAll("**", "").trim();
+	const promptSegments = parsePromptSegments(question.prompt);
+
+	const promptNode = (
+		<p className="text-sm font-medium text-foreground">
+			{promptSegments.map((segment, index) => (
+				<React.Fragment key={`${question.question_key}-seg-${index.toString()}`}>
+					<span className={segment.bold ? "font-semibold text-primary" : undefined}>{segment.text}</span>
+				</React.Fragment>
+			))}
+		</p>
+	);
 
 	if (question.question_type === "checklist") {
 		return (
 			<div className="rounded-lg border border-border/40 bg-card p-4">
-				<p className="text-sm font-medium text-foreground">{prompt}</p>
+				{promptNode}
 				<p className="mt-1.5 text-sm text-muted-foreground">{formatChecklistAnswerText(question, answers)}</p>
 			</div>
 		);
@@ -464,7 +487,7 @@ function QuestionRow({ question, answers }: QuestionRowProps) {
 
 	return (
 		<div className="rounded-lg border border-border/40 bg-card p-4">
-			<p className="text-sm font-medium text-foreground">{prompt}</p>
+			{promptNode}
 			{answerEntries.length > 0 ? (
 				<div className="mt-2 flex flex-wrap gap-2">
 					{answerEntries.map(entry => (
