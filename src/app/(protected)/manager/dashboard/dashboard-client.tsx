@@ -17,6 +17,7 @@ import { BezelCard, BezelCardBody } from "@/components/ui/bezel-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ProjectStatusPanel } from "@/components/app/project-status-panel";
 import { ScoreDisplayCompact } from "@/components/ui/score-display";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -276,55 +277,66 @@ export function ManagerDashboardClient({
 				</BezelCard>
 			</div>
 
-			<Card>
-				<CardHeader>
-					<CardTitle>{t("recentActivity.title")}</CardTitle>
-					<CardAction>
-						<Button asChild size="sm" variant="outline">
-							<Link href="/manager/audits">{t("recentActivity.viewAll")}</Link>
-						</Button>
-					</CardAction>
-				</CardHeader>
-				<CardContent className="space-y-0 divide-y divide-edge">
-					{account.recent_activity.length > 0 ? (
-						account.recent_activity.map(activity => (
-							<Link
-								key={activity.audit_id}
-								href={`/manager/audits/${encodeURIComponent(activity.audit_id)}`}
-								className="flex flex-col gap-3 rounded-0 px-0 py-4 first:pt-0 last:pb-0 transition-colors hover:bg-accent/5">
-								<div className="flex items-start justify-between gap-4">
-									<div className="flex-1 space-y-1">
-										<p className="font-heading text-[14px] font-semibold text-text-primary">
-											{activity.place_name}
-										</p>
-										<p className="font-sans text-[12px] text-text-secondary">
-											{activity.project_name}
-										</p>
-										<p className="font-sans text-[11px] text-text-muted">
-											{formatDateTimeLabel(activity.completed_at, formatT)}
-										</p>
-										<p className="font-sans text-[11px] text-text-muted opacity-60">
-											{activity.audit_code}
-										</p>
+			<div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+				<Card>
+					<CardHeader>
+						<CardTitle>{t("recentActivity.title")}</CardTitle>
+						<CardAction>
+							<Button asChild size="sm" variant="outline">
+								<Link href="/manager/audits">{t("recentActivity.viewAll")}</Link>
+							</Button>
+						</CardAction>
+					</CardHeader>
+					<CardContent className="space-y-0 divide-y divide-edge">
+						{account.recent_activity.length > 0 ? (
+							account.recent_activity.map(activity => (
+								<Link
+									key={activity.audit_id}
+									href={`/manager/audits/${encodeURIComponent(activity.audit_id)}`}
+									className="flex flex-col gap-3 rounded-0 px-0 py-4 first:pt-0 last:pb-0 transition-colors hover:bg-accent/5">
+									<div className="flex items-start justify-between gap-4">
+										<div className="flex-1 space-y-1">
+											<p className="font-heading text-[14px] font-semibold text-text-primary">
+												{activity.place_name}
+											</p>
+											<p className="font-sans text-[12px] text-text-secondary">
+												{activity.project_name}
+											</p>
+											<p className="font-sans text-[11px] text-text-muted">
+												{formatDateTimeLabel(activity.completed_at, formatT)}
+											</p>
+											<p className="font-sans text-[11px] text-text-muted opacity-60">
+												{activity.audit_code}
+											</p>
+										</div>
+										<div className="flex items-center gap-3 flex-shrink-0">
+											<ScoreDisplayCompact
+												pv={activity.score_pair?.pv}
+												u={activity.score_pair?.u}
+												size="sm"
+											/>
+											<Badge className="font-sans text-[11px] font-medium whitespace-nowrap">
+												{t("recentActivity.submitted")}
+											</Badge>
+										</div>
 									</div>
-									<div className="flex items-center gap-3 flex-shrink-0">
-										<ScoreDisplayCompact
-											pv={activity.score_pair?.pv}
-											u={activity.score_pair?.u}
-											size="sm"
-										/>
-										<Badge className="font-sans text-[11px] font-medium whitespace-nowrap">
-											{t("recentActivity.submitted")}
-										</Badge>
-									</div>
-								</div>
-							</Link>
-						))
-					) : (
-						<p className="text-sm text-muted-foreground">{t("recentActivity.empty")}</p>
-					)}
-				</CardContent>
-			</Card>
+								</Link>
+							))
+						) : (
+							<p className="text-sm text-muted-foreground">{t("recentActivity.empty")}</p>
+						)}
+					</CardContent>
+				</Card>
+
+				<ProjectStatusPanel
+					projects={projects.map((p) => ({
+						name: p.name,
+						completedPlaces: p.audits_completed ?? 0,
+						inProgressPlaces: 0,
+						totalPlaces: p.places_count ?? 0,
+					}))}
+				/>
+			</div>
 
 			<div className="flex flex-col gap-6">
 				<Tabs defaultValue={projects.length > 0 ? "projects" : "auditors"} className="gap-4">
