@@ -277,10 +277,10 @@ export function AppShell({ role, auditorCode, userName, userEmail, children }: R
 						<div className={cn("flex-1 overflow-auto p-3", isSidebarCollapsed && "px-2")}>
 							<p
 								className={cn(
-									"px-3 pb-2 text-(length:--workspace-label-size) font-semibold tracking-(--workspace-label-tracking) text-text-secondary uppercase",
+									"px-3 pb-3 font-sans text-[11px] font-medium tracking-[0.04em] text-text-muted uppercase",
 									isSidebarCollapsed && "sr-only"
 								)}>
-								{shellT("workspaceLabel")}
+								{roleLabel}
 							</p>
 							<NavLinks items={navItems} isCollapsed={isSidebarCollapsed} />
 						</div>
