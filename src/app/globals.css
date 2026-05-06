@@ -80,6 +80,12 @@
 	--font-sans: var(--font-body-active);
 	--font-heading: var(--font-heading-active);
 	--font-mono: var(--font-code-active);
+	--font-eyebrow: var(--text-eyebrow-font);
+	--font-badge: var(--text-badge-font);
+	--font-meta: var(--text-meta-font);
+	--ease-spring: var(--ease-spring);
+	--ease-out-fast: var(--ease-out-fast);
+	--ease-in-fast: var(--ease-in-fast);
 	--radius-sm: 4px;
 	--radius-md: 6px;
 	--radius-lg: 8px;

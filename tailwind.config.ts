@@ -16,7 +16,10 @@ const config = {
 				press: "inset 0 2px 6px rgba(0, 0, 0, 0.18)"
 			},
 			transitionTimingFunction: {
-				field: "cubic-bezier(0.2, 0.8, 0.2, 1)"
+				field: "cubic-bezier(0.2, 0.8, 0.2, 1)",
+				spring: "cubic-bezier(0.32, 0.72, 0, 1)",
+				"out-fast": "cubic-bezier(0.0, 0.0, 0.2, 1.0)",
+				"in-fast": "cubic-bezier(0.4, 0.0, 1.0, 1.0)"
 			}
 		}
 	},
