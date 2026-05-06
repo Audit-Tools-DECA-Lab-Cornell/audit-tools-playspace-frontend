@@ -56,7 +56,9 @@ export function AuditSectionBlock({
 		};
 	}, [autoSaveStatus]);
 
-	const showAutoSave = autoSaveStatus === "saving" || (autoSaveStatus === "saved" && savedMessageVisible);
+	let autoSaveMessage: string | null = null;
+	if (autoSaveStatus === "saving") autoSaveMessage = "Saving...";
+	if (autoSaveStatus === "saved" && savedMessageVisible) autoSaveMessage = "Saved locally";
 
 	const provisionLabels: Record<0 | 1 | 2 | 3, string> = {
 		0: "None",
@@ -133,11 +135,8 @@ export function AuditSectionBlock({
 				{children}
 			</div>
 
-			{showAutoSave && (
-				<div className="absolute bottom-6 right-6 font-sans text-[11px] text-text-muted">
-					{autoSaveStatus === "saving" && "Saving..."}
-					{autoSaveStatus === "saved" && "Saved locally"}
-				</div>
+			{autoSaveMessage !== null && (
+				<div className="absolute bottom-6 right-6 font-sans text-[11px] text-text-muted">{autoSaveMessage}</div>
 			)}
 		</div>
 	);

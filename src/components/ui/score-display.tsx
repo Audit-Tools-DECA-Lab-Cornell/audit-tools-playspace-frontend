@@ -88,7 +88,7 @@ function ScoreDimension({
 
 	if (value === null) {
 		return (
-			<div className="flex items-baseline gap-2">
+			<div className="flex items-baseline gap-2" aria-label={label}>
 				<div className="font-heading text-[10px] font-semibold tracking-[0.02em] text-accent-violet">
 					{shortLabel}
 				</div>
@@ -99,7 +99,7 @@ function ScoreDimension({
 	}
 
 	return (
-		<div className="flex items-baseline gap-2">
+		<div className="flex items-baseline gap-2" aria-label={label}>
 			<div className="font-heading text-[10px] font-semibold tracking-[0.02em] text-accent-violet">
 				{shortLabel}
 			</div>
