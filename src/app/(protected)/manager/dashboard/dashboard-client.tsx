@@ -285,34 +285,38 @@ export function ManagerDashboardClient({
 						</Button>
 					</CardAction>
 				</CardHeader>
-				<CardContent className="space-y-3">
+				<CardContent className="space-y-0 divide-y divide-edge">
 					{account.recent_activity.length > 0 ? (
 						account.recent_activity.map(activity => (
 							<Link
 								key={activity.audit_id}
 								href={`/manager/audits/${encodeURIComponent(activity.audit_id)}`}
-								className="flex flex-col gap-3 rounded-card border border-border/70 bg-card/60 p-4 transition-colors hover:border-primary/30 hover:bg-primary/5">
-								<div className="space-y-1">
-									<p className="font-medium text-foreground">{activity.place_name}</p>
-									<p className="text-sm text-muted-foreground">{activity.project_name}</p>
-									<div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground">
-										<code
-											title={activity.audit_code}
-											className="rounded-sm bg-muted-foreground px-1 py-1 font-mono text-[13px] tracking-[0.04em] text-secondary">
-											{formatAuditCodeReference(activity.audit_code)}
-										</code>
-										<span>{formatDateTimeLabel(activity.completed_at, formatT)}</span>
+								className="flex flex-col gap-3 rounded-0 px-0 py-4 first:pt-0 last:pb-0 transition-colors hover:bg-accent/5">
+								<div className="flex items-start justify-between gap-4">
+									<div className="flex-1 space-y-1">
+										<p className="font-heading text-[14px] font-semibold text-text-primary">
+											{activity.place_name}
+										</p>
+										<p className="font-sans text-[12px] text-text-secondary">
+											{activity.project_name}
+										</p>
+										<p className="font-sans text-[11px] text-text-muted">
+											{formatDateTimeLabel(activity.completed_at, formatT)}
+										</p>
+										<p className="font-sans text-[11px] text-text-muted opacity-60">
+											{activity.audit_code}
+										</p>
 									</div>
-								</div>
-								<div className="flex items-center justify-between gap-2">
-									<Badge variant="secondary" className="font-medium">
-										{t("recentActivity.submitted")}
-									</Badge>
-									<Badge className="font-mono tabular-nums">
-										{t("recentActivity.score", {
-											value: formatScorePairLabel(activity.score_pair, formatT)
-										})}
-									</Badge>
+									<div className="flex items-center gap-3 flex-shrink-0">
+										<ScoreDisplayCompact
+											pv={activity.score_pair?.pv}
+											u={activity.score_pair?.u}
+											size="sm"
+										/>
+										<Badge className="font-sans text-[11px] font-medium whitespace-nowrap">
+											{t("recentActivity.submitted")}
+										</Badge>
+									</div>
 								</div>
 							</Link>
 						))
