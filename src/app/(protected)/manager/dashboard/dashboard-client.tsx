@@ -18,6 +18,45 @@ import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
+function useCountUp(
+	target: number | null,
+	duration: number,
+	enabled: boolean
+): number | null {
+	const [value, setValue] = React.useState(0);
+
+	React.useEffect(() => {
+		if (!enabled || target === null) return;
+
+		const prefersReducedMotion = window.matchMedia(
+			"(prefers-reduced-motion: reduce)"
+		).matches;
+
+		if (prefersReducedMotion) {
+			setValue(target);
+			return;
+		}
+
+		const start = Date.now();
+
+		const tick = () => {
+			const elapsed = Date.now() - start;
+			const progress = Math.min(elapsed / duration, 1);
+			const ease = 1 - Math.pow(1 - progress, 3);
+			const currentValue = parseFloat((target * ease).toFixed(1));
+			setValue(currentValue);
+
+			if (progress < 1) {
+				requestAnimationFrame(tick);
+			}
+		};
+
+		requestAnimationFrame(tick);
+	}, [target, duration, enabled]);
+
+	return target === null ? null : value;
+}
+
 function OverviewPanels({
 	account,
 	managerProfiles,
@@ -127,6 +166,32 @@ export function ManagerDashboardClient({
 
 	const isPrimary = isPrimaryManagerProfile(session?.userEmail, managerProfiles ?? []);
 
+	const [isVisible, setIsVisible] = React.useState(false);
+	const containerRef = React.useRef<HTMLDivElement>(null);
+
+	React.useEffect(() => {
+		const observer = new IntersectionObserver(
+			([entry]) => {
+				if (entry.isIntersecting) {
+					setIsVisible(true);
+					observer.disconnect();
+				}
+			},
+			{ threshold: 0.1 }
+		);
+
+		if (containerRef.current) {
+			observer.observe(containerRef.current);
+		}
+
+		return () => observer.disconnect();
+	}, []);
+
+	const projectsCount = useCountUp(account?.stats.total_projects ?? null, 700, isVisible);
+	const placesCount = useCountUp(account?.stats.total_places ?? null, 800, isVisible);
+	const auditorsCount = useCountUp(account?.stats.total_auditors ?? null, 900, isVisible);
+	const completedCount = useCountUp(account?.stats.total_audits_completed ?? null, 900, isVisible);
+
 	if (!account || !managerProfiles || !projects || !auditors) {
 		return (
 			<EmptyState
@@ -163,27 +228,27 @@ export function ManagerDashboardClient({
 
 			<InviteManagerDialog open={isInviteOpen} onOpenChange={setIsInviteOpen} />
 
-			<div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+			<div ref={containerRef} className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
 				<StatCard
 					title={t("stats.projects.title")}
-					value={String(account.stats.total_projects)}
+					value={String(projectsCount ?? account.stats.total_projects)}
 					helper={t("stats.projects.helper")}
 				/>
 				<StatCard
 					title={t("stats.places.title")}
-					value={String(account.stats.total_places)}
+					value={String(placesCount ?? account.stats.total_places)}
 					helper={t("stats.places.helper")}
 					tone="violet"
 				/>
 				<StatCard
 					title={t("stats.auditors.title")}
-					value={String(account.stats.total_auditors)}
+					value={String(auditorsCount ?? account.stats.total_auditors)}
 					helper={t("stats.auditors.helper")}
 					tone="warning"
 				/>
 				<StatCard
 					title={t("stats.completedAudits.title")}
-					value={String(account.stats.total_audits_completed)}
+					value={String(completedCount ?? account.stats.total_audits_completed)}
 					helper={t("stats.completedAudits.helper")}
 					tone="success"
 				/>
