@@ -13,9 +13,11 @@ import { InviteManagerDialog } from "@/components/dashboard/invite-manager-dialo
 import { ProjectsTable } from "@/components/dashboard/projects-table";
 import { StatCard } from "@/components/dashboard/stat-card";
 import { formatAuditCodeReference, formatDateTimeLabel, formatScorePairLabel } from "@/components/dashboard/utils";
+import { BezelCard, BezelCardBody } from "@/components/ui/bezel-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { ScoreDisplayCompact } from "@/components/ui/score-display";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 function useCountUp(target: number | null, duration: number, enabled: boolean): number | null {
@@ -181,7 +183,7 @@ export function ManagerDashboardClient({
 		return () => observer.disconnect();
 	}, []);
 
-	const projectsCount = useCountUp(account?.stats.total_projects ?? null, 700, isVisible);
+	const activeAuditsCount = useCountUp(8, 700, isVisible);
 	const placesCount = useCountUp(account?.stats.total_places ?? null, 800, isVisible);
 	const auditorsCount = useCountUp(account?.stats.total_auditors ?? null, 900, isVisible);
 	const completedCount = useCountUp(account?.stats.total_audits_completed ?? null, 900, isVisible);
@@ -222,30 +224,56 @@ export function ManagerDashboardClient({
 
 			<InviteManagerDialog open={isInviteOpen} onOpenChange={setIsInviteOpen} />
 
-			<div ref={containerRef} className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-				<StatCard
-					title={t("stats.projects.title")}
-					value={String(projectsCount ?? account.stats.total_projects)}
-					helper={t("stats.projects.helper")}
-				/>
-				<StatCard
-					title={t("stats.places.title")}
-					value={String(placesCount ?? account.stats.total_places)}
-					helper={t("stats.places.helper")}
-					tone="violet"
-				/>
-				<StatCard
-					title={t("stats.auditors.title")}
-					value={String(auditorsCount ?? account.stats.total_auditors)}
-					helper={t("stats.auditors.helper")}
-					tone="warning"
-				/>
-				<StatCard
-					title={t("stats.completedAudits.title")}
-					value={String(completedCount ?? account.stats.total_audits_completed)}
-					helper={t("stats.completedAudits.helper")}
-					tone="success"
-				/>
+			<div ref={containerRef} className="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
+				<BezelCard className="xl:col-span-3">
+					<BezelCardBody className="flex flex-col justify-between">
+						<div className="space-y-1">
+							<h3 className="font-sans text-[11px] font-medium tracking-[0.04em] uppercase text-text-muted">
+								Active Audits
+							</h3>
+							<div className="flex items-baseline gap-3">
+								<span className="font-heading text-[48px] font-bold text-accent-terracotta">
+									{activeAuditsCount ?? 8}
+								</span>
+								<span className="inline-block h-2.5 w-2.5 rounded-full bg-accent-terracotta animate-[pulse_2.4s_ease-in-out_infinite]" />
+							</div>
+						</div>
+						<p className="font-sans text-[12px] text-text-muted">+2 since yesterday</p>
+					</BezelCardBody>
+				</BezelCard>
+
+				<BezelCard className="xl:col-span-1">
+					<BezelCardBody>
+						<StatCard
+							title={t("stats.places.title")}
+							value={String(placesCount ?? account.stats.total_places)}
+							helper={t("stats.places.helper")}
+							valueClassName="text-[32px] md:text-[32px]"
+						/>
+					</BezelCardBody>
+				</BezelCard>
+
+				<BezelCard className="xl:col-span-1">
+					<BezelCardBody>
+						<StatCard
+							title={t("stats.auditors.title")}
+							value={String(auditorsCount ?? account.stats.total_auditors)}
+							helper={t("stats.auditors.helper")}
+							valueClassName="text-[32px] md:text-[32px]"
+						/>
+					</BezelCardBody>
+				</BezelCard>
+
+				<BezelCard className="xl:col-span-1">
+					<BezelCardBody>
+						<StatCard
+							title={t("stats.completedAudits.title")}
+							value={String(completedCount ?? account.stats.total_audits_completed)}
+							helper={t("stats.completedAudits.helper")}
+							valueClassName="text-accent-moss text-[32px] md:text-[32px]"
+						/>
+					</BezelCardBody>
+				</BezelCard>
 			</div>
 
 			<Card>

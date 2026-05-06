@@ -191,25 +191,25 @@ export default function ManagerProjectsPage() {
 					title="Total Projects"
 					value={String(projects.length)}
 					helper="Planned and active project workstreams in this account."
-					tone="info"
+ 
 				/>
 				<StatCard
 					title="Active"
 					value={String(activeProjectsCount)}
 					helper="Projects currently underway."
-					tone="warning"
+ 
 				/>
 				<StatCard
 					title="Completed"
 					value={String(completedProjectsCount)}
 					helper="Projects with completed lifecycle status."
-					tone="success"
+ 
 				/>
 				<StatCard
 					title="Portfolio Mean"
 					value={meanScoreAcrossProjects}
 					helper="Average across projects with submitted scoring."
-					tone="violet"
+ 
 				/>
 			</div>
 			<ProjectsTable

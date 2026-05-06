@@ -57,25 +57,21 @@ export function AdminDashboardClient({ overview, latestAudits, errorMessage }: R
 					title={t("stats.accounts.title")}
 					value={String(overview.total_accounts)}
 					helper={t("stats.accounts.helper")}
-					tone="info"
 				/>
 				<StatCard
 					title={t("stats.projects.title")}
 					value={String(overview.total_projects)}
 					helper={t("stats.projects.helper")}
-					tone="primary"
 				/>
 				<StatCard
 					title={t("stats.places.title")}
 					value={String(overview.total_places)}
 					helper={t("stats.places.helper")}
-					tone="violet"
 				/>
 				<StatCard
 					title={t("stats.auditors.title")}
 					value={String(overview.total_auditors)}
 					helper={t("stats.auditors.helper")}
-					tone="warning"
 				/>
 				<StatCard
 					title={t("stats.submitted.title")}
@@ -86,7 +82,6 @@ export function AdminDashboardClient({ overview, latestAudits, errorMessage }: R
 					title={t("stats.inProgress.title")}
 					value={String(overview.in_progress_audits)}
 					helper={t("stats.inProgress.helper")}
-					tone="violet"
 				/>
 			</div>
 			<Card>

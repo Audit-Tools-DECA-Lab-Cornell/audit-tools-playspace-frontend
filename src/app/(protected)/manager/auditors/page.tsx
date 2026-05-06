@@ -262,25 +262,25 @@ export default function ManagerAuditorsPage() {
 					title={t("stats.total.title")}
 					value={String(auditors.length)}
 					helper={t("stats.total.helper")}
-					tone="info"
+ 
 				/>
 				<StatCard
 					title={t("stats.activeRecently.title")}
 					value={String(activeAuditors)}
 					helper={t("stats.activeRecently.helper")}
-					tone="success"
+ 
 				/>
 				<StatCard
 					title={t("stats.assignments.title")}
 					value={String(totalAssignments)}
 					helper={t("stats.assignments.helper")}
-					tone="warning"
+ 
 				/>
 				<StatCard
 					title={t("stats.completedAudits.title")}
 					value={String(completedAudits)}
 					helper={t("stats.completedAudits.helper")}
-					tone="violet"
+ 
 				/>
 			</div>
 			<AuditorsTable

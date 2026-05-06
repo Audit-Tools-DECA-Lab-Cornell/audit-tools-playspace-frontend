@@ -274,31 +274,31 @@ export default function AuditorReportsPage() {
 					title={t("stats.totalReports")}
 					value={String(totalSubmitted)}
 					helper={t("stats.totalReportsHelper")}
-					tone="info"
+ 
 				/>
 				<StatCard
 					title={t("stats.avgPlayValue")}
 					value={aggregateStats.avgPv !== null ? String(aggregateStats.avgPv) : formatT("pending")}
 					helper={t("stats.avgPlayValueHelper")}
-					tone="success"
+ 
 				/>
 				<StatCard
 					title={t("stats.avgUsability")}
 					value={aggregateStats.avgU !== null ? String(aggregateStats.avgU) : formatT("pending")}
 					helper={t("stats.avgUsabilityHelper")}
-					tone="violet"
+ 
 				/>
 				<StatCard
 					title={t("stats.places")}
 					value={String(aggregateStats.uniquePlaces)}
 					helper={t("stats.placesHelper")}
-					tone="warning"
+ 
 				/>
 				<StatCard
 					title={t("stats.projects")}
 					value={String(aggregateStats.uniqueProjects)}
 					helper={t("stats.projectsHelper")}
-					tone="info"
+ 
 				/>
 			</div>
 

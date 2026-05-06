@@ -218,19 +218,19 @@ export default function ManagerProjectDetailPage({ params }: Readonly<ManagerPro
 					title={t("stats.auditsCompleted.title")}
 					value={String(stats.audits_completed)}
 					helper={t("stats.auditsCompleted.helper", { count: stats.in_progress_audits })}
-					tone="success"
+ 
 				/>
 				<StatCard
 					title={t("stats.auditorsAssigned.title")}
 					value={String(stats.auditors_count)}
 					helper={t("stats.auditorsAssigned.helper")}
-					tone="warning"
+ 
 				/>
 				<StatCard
 					title={t("stats.overallMeanScore.title")}
 					value={formatScorePairLabel(stats.average_scores, formatT)}
 					helper={t("stats.overallMeanScore.helper")}
-					tone="info"
+ 
 				/>
 			</div>
 			<Tabs defaultValue="overview" className="gap-4">
