@@ -18,19 +18,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardAction, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-function useCountUp(
-	target: number | null,
-	duration: number,
-	enabled: boolean
-): number | null {
+function useCountUp(target: number | null, duration: number, enabled: boolean): number | null {
 	const [value, setValue] = React.useState(0);
 
 	React.useEffect(() => {
 		if (!enabled || target === null) return;
 
-		const prefersReducedMotion = window.matchMedia(
-			"(prefers-reduced-motion: reduce)"
-		).matches;
+		const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 		if (prefersReducedMotion) {
 			setValue(target);

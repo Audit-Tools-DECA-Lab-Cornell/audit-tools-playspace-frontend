@@ -1,13 +1,228 @@
 # CLAUDE.md — audit-tools-playspace-frontend
 
-## Design System Implementation Brief
+## Phase 3 & 4 Implementation Brief
 
-This file instructs Claude Code on how to implement the PVUA design system
-update across the frontend. Read it fully before writing any code.
+Read PVUA_DESIGN_SYSTEM_PHASE3.md and PVUA_DESIGN_SYSTEM_PHASE4.md fully
+before writing any code. Phase 1 and 2 are already implemented.
 
------
+---
 
-## What this session is about
+## Repo context (unchanged from Phase 1/2 brief)
+- Next.js 15 App Router, TypeScript, Tailwind v4, shadcn/ui
+- Design tokens in src/lib/design-system.ts (already updated)
+- Package manager: pnpm
+
+---
+
+## Task sequence
+
+### Task 1 — Manager dashboard bento grid
+
+File: src/app/(dashboard)/manager/dashboard/page.tsx
+(and any child components it uses for the stat cards)
+
+Replace the current 4-equal-column stat grid with a 6-column asymmetric
+bento grid.
+
+Grid spec:
+  Active Audits:  grid-column span 3, BezelCard, 48px Space Grotesk number
+                  accentTerracotta color, breathing dot (10px, 2.4s)
+                  Sub-line: "+N since yesterday" if data available
+  Places:         grid-column span 1, BezelCard, 32px textPrimary
+  Auditors:       grid-column span 1, BezelCard, 32px textPrimary
+  Completed:      grid-column span 1, BezelCard, 32px accentMoss
+
+Remove ALL top border accent colors from stat cards. No terracotta/violet/
+gold/teal borders. The number color carries the semantic signal.
+
+Responsive:
+  ≥1280px: 6-column layout as above
+  768–1279px: Active Audits full-width, others 2-col
+  <768px: single column, Active Audits first
+
+---
+
+### Task 2 — Recent activity row redesign
+
+Find: the recent activity list component on the manager dashboard.
+Redesign the row information hierarchy:
+
+NEW row structure (top to bottom, left to right):
+  Left column:
+    Line 1: Place name — Space Grotesk 14px 600, textPrimary
+    Line 2: Project name — Geist 12px, textSecondary
+    Line 3: Auditor name · timestamp — Geist 11px, textMuted
+    Line 4: audit code — Geist 11px, textMuted, opacity 0.6, NO background
+
+  Right column (flex-end):
+    Score: ScoreDisplayCompact (violet PV/U labels, moss numbers)
+           Shows NORMALIZED score (e.g. 4.2) not raw total (e.g. 16)
+    Status badge: Geist 11px 500, sentence case
+
+REMOVE:
+  The black/dark pill badge around the audit code completely.
+  The "Score PV 16 | U 128" raw total string format.
+
+Row hover: background var(--table-row-hover), no card lift.
+Row separator: 0.5px var(--edge) border-bottom.
+
+---
+
+### Task 3 — Project status panel
+
+Create a new component: src/components/app/project-status-panel.tsx
+
+This replaces or supplements whatever is in the right column of the
+dashboard bottom row.
+
+Per project row:
+  Project name:   Geist 13px 500, textPrimary
+  Progress bar:   4px height, border-radius 2px
+                  Three segments: moss (complete) + terracotta (in-progress)
+                  + edge (remaining). All in one track.
+  Sub-label:      "N of M places audited" — Geist 11px, textMuted
+                  Percentage right-aligned: moss if ≥75%, terracotta if <75%
+
+Data shape needed: { name, completedPlaces, inProgressPlaces, totalPlaces }
+
+Card: SpotlightCard wrapper (not double-bezel — it's a list).
+Header: "Projects" Space Grotesk 15px 600 + "View all →" link.
+
+---
+
+### Task 4 — Chart color tokens
+
+Find all Recharts usages in the codebase.
+Search for: <BarChart, <LineChart, <RadialBar, fill="#, stroke="#
+
+Create: src/lib/chart-colors.ts
+
+  export const CHART_COLORS = {
+    primary:       "var(--accent-terracotta)",
+    secondary:     "var(--accent-moss)",
+    provision:     "var(--accent-terracotta)",
+    diversity:     "var(--accent-slate)",
+    challenge:     "var(--accent-moss)",
+    sociability:   "var(--accent-violet)",
+    playValue:     "var(--accent-terracotta)",
+    usability:     "var(--accent-slate)",
+    scoreHigh:     "var(--status-success)",
+    scoreMid:      "var(--status-warning)",
+    scoreLow:      "var(--status-danger)",
+    grid:          "var(--edge)",
+    axis:          "var(--text-muted)",
+    tooltipBg:     "var(--surface-raised)",
+    tooltipBorder: "var(--edge)",
+  } as const
+
+Replace all hardcoded Recharts colors with values from CHART_COLORS.
+For CSS variable strings in Recharts fill props, resolve them via
+getComputedStyle if Recharts requires actual hex values.
+
+---
+
+### Task 5 — Domain card header redesign (report view)
+
+Find: "Best & Worst Scored Domains" section and domain breakdown cards.
+
+Replace the full-width terracotta background header bars with:
+  Surface card background
+  3px left border in the domain's assigned accent color
+  Domain name: Space Grotesk 13px 600, textPrimary, left-aligned
+
+Domain → border color map (import from CHART_COLORS or define locally):
+  Provision:           var(--accent-terracotta)
+  Diversity:           var(--accent-slate)
+  Challenge Opp.:      var(--accent-moss)
+  Sociability Support: var(--accent-violet)
+  Play Value:          var(--accent-terracotta)
+  Usability:           var(--accent-slate)
+
+Important: left border only → border-radius: 0 on the left side.
+Use border-left: 3px solid [color] with border-radius only on right corners.
+
+---
+
+### Task 6 — Domain section transition animation
+
+File: wherever the execute/audit form section navigation is handled.
+
+On advancing to next domain (not just next question — domain boundary only):
+
+  Exiting section:
+    animation: translateX(0)→(-24px) + opacity 1→0
+    duration: 220ms, ease: cubic-bezier(0.4,0.0,1.0,1.0)
+
+  Entering section:
+    animation: translateX(24px)→(0) + opacity 0→1
+    duration: 280ms, ease: cubic-bezier(0.32,0.72,0,1)
+    delay: 160ms
+
+Use CSS @keyframes + className swap, or framer-motion if already in the
+project. Check package.json before adding framer-motion.
+
+Reduced motion: wrap translate values in
+  @media (prefers-reduced-motion: reduce) { transform: none }
+  Fade-only fallback.
+
+---
+
+### Task 7 — Score reveal animation (report page)
+
+File: src/app/(dashboard)/auditor/reports/[auditId]/page.tsx or its
+score display component.
+
+On page mount (IntersectionObserver trigger):
+  1. Score cards entrance: scale 0.96→1.0, opacity 0→1, 200ms spring
+  2. After 300ms: ScoreDisplayFull count-up 0→score, 900ms spring
+     (use the useCountUp hook from Phase 2)
+  3. Domain bars grow 0→final width, staggered 60ms per bar, 500ms spring
+     Triggered 200ms after count-up starts.
+
+Count-up fires on first mount only — not on refetch.
+Respect prefers-reduced-motion: skip animation, show final values.
+
+---
+
+### Task 8 — Submission moment
+
+File: wherever the audit submission confirmation UI lives.
+
+Sequence on successful submission:
+  1. Submit button: scale 0.97 press (150ms spring)
+  2. Button enters loading state: terracotta spinner, keep button width
+  3. On API success: button shows moss checkmark icon
+     Scale 1.0→1.04→1.0 (spring overshoot, 400ms)
+     Color: terracotta→moss on the button background/border
+  4. After 600ms: navigate to /auditor/reports/[newAuditId]
+
+---
+
+## Global constraints (all phases)
+
+- Never hardcode hex values in component files
+- All transitions use --ease-spring curve
+- prefers-reduced-motion respected on every new animation
+- No new npm dependencies without checking package.json first
+- pnpm typecheck must pass after each task
+- Do not modify design-system.ts (Phase 1 locked it)
+
+## Verification
+
+- [ ] Dashboard stat grid is asymmetric — Active Audits visibly larger
+- [ ] No top border accent colors on any stat card
+- [ ] Recent activity rows show place name as headline, audit code as plain muted text
+- [ ] Chart bars use design system colors (warm terracotta/moss/slate/violet)
+- [ ] Domain card headers have left border, not full colored background
+- [ ] Score displays show normalized scores (4.2) in feed contexts
+- [ ] Section transitions animate on domain boundary only
+- [ ] Score reveals count up on report page load
+- [ ] Submission moment transitions to moss on success
+- [ ] pnpm build passes
+
+---
+
+The following briefing was used for the phase 1 and phase 2 implementation of the design system.
 
 Implementing Phase 1 (color tokens + typography tokens) and Phase 2 (elevated
 component patterns) of the PVUA design system update. The full specifications
@@ -455,16 +670,16 @@ hook created in Task 5.
 
 ## Verification checklist after all tasks
 
-- [ ] `pnpm typecheck` passes
-- [ ] `pnpm lint` passes
-- [ ] `pnpm build` passes
-- [ ] Dark mode: surfaces have visible depth hierarchy (canvas < surface < raised)
-- [ ] Accent moss reads as clearly distinct from the previous lighter moss
-- [ ] Status badges use Geist font, not mono
-- [ ] Score dimension labels use Space Grotesk, not mono
-- [ ] Domain eyebrow in AuditSectionBlock uses Space Grotesk, not mono
-- [ ] JetBrains Mono only appears on: auditor codes, timestamps, raw totals
-- [ ] All transitions use `ease-spring` curve
-- [ ] No hardcoded hex values in any new component file
-- [ ] High-contrast dark mode still renders correctly
-- [ ] High-contrast light mode still renders correctly
+- [x] `pnpm typecheck` passes
+- [x] `pnpm lint` passes
+- [x] `pnpm build` passes
+- [x] Dark mode: surfaces have visible depth hierarchy (canvas < surface < raised)
+- [x] Accent moss reads as clearly distinct from the previous lighter moss
+- [x] Status badges use Geist font, not mono
+- [x] Score dimension labels use Space Grotesk, not mono
+- [x] Domain eyebrow in AuditSectionBlock uses Space Grotesk, not mono
+- [x] JetBrains Mono only appears on: auditor codes, timestamps, raw totals
+- [x] All transitions use `ease-spring` curve
+- [x] No hardcoded hex values in any new component file
+- [x] High-contrast dark mode still renders correctly
+- [x] High-contrast light mode still renders correctly

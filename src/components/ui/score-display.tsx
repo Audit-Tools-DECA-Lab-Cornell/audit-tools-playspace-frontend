@@ -1,7 +1,7 @@
 "use client";
 
 import { clsx } from "clsx";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useSyncExternalStore } from "react";
 
 interface ScoreDisplayCompactProps {
 	pv?: number | null;
@@ -22,25 +22,29 @@ interface ScoreDisplayFullProps {
 	animate?: boolean;
 }
 
-function useCountUp(
-	target: number | null,
-	duration: number,
-	enabled: boolean
-): number | null {
+/**
+ * Subscribes to the user's reduced-motion preference (client only; SSR assumes motion is allowed).
+ */
+function usePrefersReducedMotion(): boolean {
+	return useSyncExternalStore(
+		onStoreChange => {
+			const mediaQueryList = window.matchMedia("(prefers-reduced-motion: reduce)");
+			mediaQueryList.addEventListener("change", onStoreChange);
+			return () => mediaQueryList.removeEventListener("change", onStoreChange);
+		},
+		() => window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+		() => false
+	);
+}
+
+function useCountUp(target: number | null, duration: number, enabled: boolean): number | null {
 	const [value, setValue] = useState(0);
+	const prefersReducedMotion = usePrefersReducedMotion();
 
 	useEffect(() => {
-		if (!enabled || target === null) return;
+		if (!enabled || target === null || prefersReducedMotion) return;
 
-		const prefersReducedMotion = window.matchMedia(
-			"(prefers-reduced-motion: reduce)"
-		).matches;
-
-		if (prefersReducedMotion) {
-			setValue(target);
-			return;
-		}
-
+		let rafId = 0;
 		const start = Date.now();
 
 		const tick = () => {
@@ -51,14 +55,17 @@ function useCountUp(
 			setValue(currentValue);
 
 			if (progress < 1) {
-				requestAnimationFrame(tick);
+				rafId = requestAnimationFrame(tick);
 			}
 		};
 
-		requestAnimationFrame(tick);
-	}, [target, duration, enabled]);
+		rafId = requestAnimationFrame(tick);
+		return () => cancelAnimationFrame(rafId);
+	}, [target, duration, enabled, prefersReducedMotion]);
 
-	return target === null ? null : value;
+	if (target === null) return null;
+	if (!enabled || prefersReducedMotion) return target;
+	return value;
 }
 
 function ScoreDimension({
@@ -66,7 +73,7 @@ function ScoreDimension({
 	shortLabel,
 	value,
 	total,
-	size = "md",
+	size = "md"
 }: {
 	label: string;
 	shortLabel: string;
@@ -76,7 +83,7 @@ function ScoreDimension({
 }) {
 	const sizeClasses = {
 		sm: "text-[16px]",
-		md: "text-[22px]",
+		md: "text-[22px]"
 	};
 
 	if (value === null) {
@@ -85,12 +92,8 @@ function ScoreDimension({
 				<div className="font-heading text-[10px] font-semibold tracking-[0.02em] text-accent-violet">
 					{shortLabel}
 				</div>
-				<div className={clsx("font-heading font-bold text-text-muted", sizeClasses[size])}>
-					—
-				</div>
-				{total && (
-					<div className="font-mono text-[10px] text-text-muted">{total}</div>
-				)}
+				<div className={clsx("font-heading font-bold text-text-muted", sizeClasses[size])}>—</div>
+				{total && <div className="font-mono text-[10px] text-text-muted">{total}</div>}
 			</div>
 		);
 	}
@@ -100,51 +103,26 @@ function ScoreDimension({
 			<div className="font-heading text-[10px] font-semibold tracking-[0.02em] text-accent-violet">
 				{shortLabel}
 			</div>
-			<div className={clsx("font-heading font-bold text-accent-moss", sizeClasses[size])}>
-				{value.toFixed(1)}
-			</div>
-			{total && (
-				<div className="font-mono text-[10px] text-text-muted">{total}</div>
-			)}
+			<div className={clsx("font-heading font-bold text-accent-moss", sizeClasses[size])}>{value.toFixed(1)}</div>
+			{total && <div className="font-mono text-[10px] text-text-muted">{total}</div>}
 		</div>
 	);
 }
 
-export function ScoreDisplayCompact({
-	pv,
-	u,
-	s,
-	size = "md",
-	animate = false,
-}: ScoreDisplayCompactProps) {
+export function ScoreDisplayCompact({ pv, u, s, size = "md", animate = false }: ScoreDisplayCompactProps) {
 	const pvAnimated = useCountUp(pv ?? null, 700, animate);
 	const uAnimated = useCountUp(u ?? null, 700, animate);
 	const sAnimated = useCountUp(s ?? null, 700, animate);
 
 	return (
 		<div className="flex flex-wrap items-baseline gap-4">
-			<ScoreDimension
-				label="Play Value"
-				shortLabel="PV"
-				value={pvAnimated}
-				size={size}
-			/>
+			<ScoreDimension label="Play Value" shortLabel="PV" value={pvAnimated} size={size} />
 			<span className="text-text-muted opacity-50">·</span>
-			<ScoreDimension
-				label="Usability"
-				shortLabel="U"
-				value={uAnimated}
-				size={size}
-			/>
+			<ScoreDimension label="Usability" shortLabel="U" value={uAnimated} size={size} />
 			{s !== undefined && s !== null && (
 				<>
 					<span className="text-text-muted opacity-50">·</span>
-					<ScoreDimension
-						label="Sociability"
-						shortLabel="S"
-						value={sAnimated}
-						size={size}
-					/>
+					<ScoreDimension label="Sociability" shortLabel="S" value={sAnimated} size={size} />
 				</>
 			)}
 		</div>
@@ -159,7 +137,7 @@ export function ScoreDisplayFull({
 	uTotal,
 	sTotal,
 	auditLabel,
-	animate = true,
+	animate = true
 }: ScoreDisplayFullProps) {
 	const pvAnimated = useCountUp(pv ?? null, 1000, animate);
 	const uAnimated = useCountUp(u ?? null, 1000, animate);
@@ -167,11 +145,7 @@ export function ScoreDisplayFull({
 
 	return (
 		<div className="space-y-6">
-			{auditLabel && (
-				<div className="font-mono text-[11px] text-text-muted">
-					{auditLabel}
-				</div>
-			)}
+			{auditLabel && <div className="font-mono text-[11px] text-text-muted">{auditLabel}</div>}
 			<div className="grid grid-cols-3 gap-8">
 				<div className="space-y-2">
 					<div className="font-heading text-[10px] font-semibold tracking-[0.02em] uppercase text-accent-violet">
@@ -180,11 +154,7 @@ export function ScoreDisplayFull({
 					<div className="font-heading text-[36px] font-bold text-accent-moss">
 						{pvAnimated === null ? "—" : pvAnimated.toFixed(1)}
 					</div>
-					{pvTotal && (
-						<div className="font-mono text-[10px] text-text-muted">
-							{pvTotal}
-						</div>
-					)}
+					{pvTotal && <div className="font-mono text-[10px] text-text-muted">{pvTotal}</div>}
 				</div>
 				<div className="space-y-2">
 					<div className="font-heading text-[10px] font-semibold tracking-[0.02em] uppercase text-accent-violet">
@@ -193,11 +163,7 @@ export function ScoreDisplayFull({
 					<div className="font-heading text-[36px] font-bold text-accent-moss">
 						{uAnimated === null ? "—" : uAnimated.toFixed(1)}
 					</div>
-					{uTotal && (
-						<div className="font-mono text-[10px] text-text-muted">
-							{uTotal}
-						</div>
-					)}
+					{uTotal && <div className="font-mono text-[10px] text-text-muted">{uTotal}</div>}
 				</div>
 				<div className="space-y-2">
 					<div className="font-heading text-[10px] font-semibold tracking-[0.02em] uppercase text-accent-violet">
@@ -206,11 +172,7 @@ export function ScoreDisplayFull({
 					<div className="font-heading text-[36px] font-bold text-accent-moss">
 						{sAnimated === null ? "—" : sAnimated.toFixed(1)}
 					</div>
-					{sTotal && (
-						<div className="font-mono text-[10px] text-text-muted">
-							{sTotal}
-						</div>
-					)}
+					{sTotal && <div className="font-mono text-[10px] text-text-muted">{sTotal}</div>}
 				</div>
 			</div>
 		</div>

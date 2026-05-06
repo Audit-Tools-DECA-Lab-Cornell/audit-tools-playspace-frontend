@@ -35,28 +35,34 @@ export function AuditSectionBlock({
 	onProvisionSelect,
 	provisionValue,
 	autoSaveStatus = "idle",
-	children,
+	children
 }: AuditSectionBlockProps) {
 	const [provisionOpen, setProvisionOpen] = useState(false);
-	const [showAutoSave, setShowAutoSave] = useState(false);
+	const [savedMessageVisible, setSavedMessageVisible] = useState(false);
 
 	useEffect(() => {
-		if (autoSaveStatus === "idle") {
-			setShowAutoSave(false);
+		if (autoSaveStatus !== "saved") {
 			return;
 		}
-		setShowAutoSave(true);
-		if (autoSaveStatus === "saved") {
-			const timer = setTimeout(() => setShowAutoSave(false), 2000);
-			return () => clearTimeout(timer);
-		}
+		const showFrame = requestAnimationFrame(() => {
+			setSavedMessageVisible(true);
+		});
+		const hideTimer = window.setTimeout(() => {
+			setSavedMessageVisible(false);
+		}, 2000);
+		return () => {
+			cancelAnimationFrame(showFrame);
+			window.clearTimeout(hideTimer);
+		};
 	}, [autoSaveStatus]);
+
+	const showAutoSave = autoSaveStatus === "saving" || (autoSaveStatus === "saved" && savedMessageVisible);
 
 	const provisionLabels: Record<0 | 1 | 2 | 3, string> = {
 		0: "None",
 		1: "Limited",
 		2: "Moderate",
-		3: "High",
+		3: "High"
 	};
 
 	return (
@@ -65,12 +71,9 @@ export function AuditSectionBlock({
 				<div className="font-heading text-[11px] font-medium tracking-[0.03em] text-accent-violet">
 					Domain {domainNumber} · {domainName}
 				</div>
-				<h2 className="font-heading text-[22px] font-semibold text-text-primary">
-					{sectionHeading}
-				</h2>
+				<h2 className="font-heading text-[22px] font-semibold text-text-primary">{sectionHeading}</h2>
 				<div className="font-sans text-[12px] font-normal text-text-muted">
-					Question {questionNumber} of {totalQuestions} · Section{" "}
-					{sectionNumber} of {totalSections}
+					Question {questionNumber} of {totalQuestions} · Section {sectionNumber} of {totalSections}
 				</div>
 
 				<div className="h-[2px] overflow-hidden rounded-[1px] bg-edge">
@@ -82,16 +85,13 @@ export function AuditSectionBlock({
 			</div>
 
 			<div className="space-y-4">
-				<p className="font-sans text-[13px] font-normal leading-relaxed text-text-secondary">
-					{questionText}
-				</p>
+				<p className="font-sans text-[13px] font-normal leading-relaxed text-text-secondary">{questionText}</p>
 
 				{hasProvisionScale && (
 					<div className="space-y-2">
 						<button
 							onClick={() => setProvisionOpen(!provisionOpen)}
-							className="flex items-center gap-2 font-sans text-[13px] font-normal text-text-primary transition-colors duration-[200ms] ease-spring hover:text-accent-violet"
-						>
+							className="flex items-center gap-2 font-sans text-[13px] font-normal text-text-primary transition-colors duration-[200ms] ease-spring hover:text-accent-violet">
 							<ChevronDown
 								size={16}
 								className={clsx(
@@ -106,13 +106,10 @@ export function AuditSectionBlock({
 							className={clsx(
 								"overflow-hidden transition-all duration-[300ms] ease-spring",
 								provisionOpen ? "max-h-16 opacity-100" : "max-h-0 opacity-0"
-							)}
-						>
+							)}>
 							<div className="space-y-2 pt-3">
 								<div className="flex gap-2">
-									{(
-										[0, 1, 2, 3] as const
-									).map((value) => (
+									{([0, 1, 2, 3] as const).map(value => (
 										<button
 											key={value}
 											onClick={() => {
@@ -123,8 +120,7 @@ export function AuditSectionBlock({
 												provisionValue === value
 													? "border-accent-violet bg-accent-violet/10 text-accent-violet"
 													: "border-edge bg-surface text-text-secondary hover:border-accent-violet hover:text-accent-violet"
-											)}
-										>
+											)}>
 											{value} {provisionLabels[value]}
 										</button>
 									))}
@@ -137,13 +133,8 @@ export function AuditSectionBlock({
 				{children}
 			</div>
 
-			{showAutoSave && autoSaveStatus !== "idle" && (
-				<div
-					className={clsx(
-						"absolute bottom-6 right-6 font-sans text-[11px] text-text-muted transition-opacity duration-[300ms] ease-spring",
-						autoSaveStatus === "saved" ? "opacity-100" : "opacity-100"
-					)}
-				>
+			{showAutoSave && (
+				<div className="absolute bottom-6 right-6 font-sans text-[11px] text-text-muted">
 					{autoSaveStatus === "saving" && "Saving..."}
 					{autoSaveStatus === "saved" && "Saved locally"}
 				</div>
