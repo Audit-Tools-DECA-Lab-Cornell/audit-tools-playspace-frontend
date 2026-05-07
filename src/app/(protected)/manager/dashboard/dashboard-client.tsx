@@ -12,7 +12,7 @@ import { EmptyState } from "@/components/dashboard/empty-state";
 import { InviteManagerDialog } from "@/components/dashboard/invite-manager-dialog";
 import { ProjectsTable } from "@/components/dashboard/projects-table";
 import { StatCard } from "@/components/dashboard/stat-card";
-import { formatAuditCodeReference, formatDateTimeLabel, formatScorePairLabel } from "@/components/dashboard/utils";
+import { formatDateTimeLabel } from "@/components/dashboard/utils";
 import { BezelCard, BezelCardBody } from "@/components/ui/bezel-card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
