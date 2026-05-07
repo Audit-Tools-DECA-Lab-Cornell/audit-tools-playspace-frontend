@@ -1660,7 +1660,8 @@
 				"backToPlaces": "Zurück zu den Orten",
 				"saveNow": "Jetzt speichern",
 				"submitting": "Wird eingereicht...",
-				"submitAudit": "Audit einreichen"
+				"submitAudit": "Audit einreichen",
+				"submitted": "Eingereicht"
 			},
 			"header": {
 				"title": "Audit durchführen",

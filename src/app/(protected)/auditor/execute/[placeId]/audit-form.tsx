@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery } from "@tanstack/react-query";
 import Link from "next/link";
-import { CheckCircle2Icon } from "lucide-react";
+import { CheckCircle2Icon, Loader2 } from "lucide-react";
 import { useTranslations } from "next-intl";
 import * as React from "react";
 
@@ -709,8 +709,25 @@ export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFo
 									auditId: session.audit_id,
 									expectedRevision: session.revision
 								});
-							}}>
-							{submitAudit.isPending ? t("actions.submitting") : t("actions.submitAudit")}
+							}}
+							className={cn(
+								"min-w-[140px] gap-2 transition-all duration-300 ease-spring active:scale-[0.97]",
+								submitAudit.isSuccess &&
+									"animate-submission-success bg-accent-moss border-accent-moss text-white hover:bg-accent-moss"
+							)}>
+							{submitAudit.isSuccess ? (
+								<>
+									<CheckCircle2Icon className="size-4" aria-hidden="true" />
+									{t("actions.submitted")}
+								</>
+							) : submitAudit.isPending ? (
+								<>
+									<Loader2 className="size-4 animate-spin" aria-hidden="true" />
+									{t("actions.submitting")}
+								</>
+							) : (
+								t("actions.submitAudit")
+							)}
 						</Button>
 					</div>
 				</div>

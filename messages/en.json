@@ -1704,7 +1704,8 @@
 				"backToPlaces": "Back to places",
 				"saveNow": "Save now",
 				"submitting": "Submitting...",
-				"submitAudit": "Submit audit"
+				"submitAudit": "Submit audit",
+				"submitted": "Submitted"
 			},
 			"header": {
 				"title": "Execute Audit",
