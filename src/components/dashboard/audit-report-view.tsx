@@ -173,7 +173,10 @@ function AlignedBarCell({
 				aria-valuemax={max}
 				aria-label={`${metric.label}: ${isNa ? "not assessed" : `${percentage}%`}`}>
 				{!isNa && fillHeight > 0 ? (
-					<div className={cn("w-full rounded-b-sm opacity-90", color)} style={{ height: fillHeight }} />
+					<div
+						className={cn("w-full rounded-b-sm opacity-90 transition-[height] duration-500 ease-spring", color)}
+						style={{ height: fillHeight }}
+					/>
 				) : isNa ? (
 					<div className="flex h-full w-full items-center justify-center text-xs text-muted-foreground/50">
 						—
@@ -333,18 +336,24 @@ function ReportStatCard({
 	label,
 	value,
 	helper,
-	accent = "bg-primary"
-}: Readonly<{ label: string; value: string; helper?: string; accent?: string }>) {
+	valueColor,
+	stagger = 0
+}: Readonly<{ label: string; value: string; helper?: string; valueColor?: string; stagger?: number }>) {
 	return (
-		<Card className="relative flex flex-col justify-between gap-3 overflow-hidden border-border bg-card/95">
-			<div className={cn("absolute inset-x-0 top-0 h-1", accent)} aria-hidden="true" />
+		<Card
+			className="animate-score-reveal relative flex flex-col justify-between gap-3 overflow-hidden border-border bg-card/95"
+			style={{ animationDelay: `${stagger}ms` }}>
 			<CardHeader className="gap-1 pb-0 pt-5">
 				<CardTitle className="text-[11px] font-semibold uppercase tracking-[0.08em] text-muted-foreground">
 					{label}
 				</CardTitle>
 			</CardHeader>
 			<CardContent className="space-y-1.5 pb-4">
-				<div className="font-mono text-xl font-semibold leading-none tracking-tight text-foreground tabular-nums sm:text-2xl">
+				<div
+					className={cn(
+						"font-heading text-2xl font-bold leading-none tracking-tight tabular-nums sm:text-3xl",
+						valueColor ?? "text-foreground"
+					)}>
 					{value}
 				</div>
 				{helper !== undefined ? <p className="text-[11px] leading-4 text-muted-foreground">{helper}</p> : null}
@@ -773,25 +782,29 @@ export function AuditReportView({ audit, instrument = null, basePath }: Readonly
 								? `Max PV = ${overall.play_value_total_max}, Max U = ${overall.usability_total_max}`
 								: undefined
 						}
-						accent="bg-accent-terracotta"
+						valueColor="text-accent-terracotta"
+						stagger={0}
 					/>
 					<ReportStatCard
 						label="Play Value"
 						value={overall !== null ? `${overall.play_value_total} (${overallPvPct})` : "—"}
 						helper={overall !== null ? `Max score = ${overall.play_value_total_max}` : undefined}
-						accent="bg-amber-500"
+						valueColor="text-accent-terracotta"
+						stagger={60}
 					/>
 					<ReportStatCard
 						label="Usability"
 						value={overall !== null ? `${overall.usability_total} (${overallUPct})` : "—"}
 						helper={overall !== null ? `Max score = ${overall.usability_total_max}` : undefined}
-						accent="bg-primary"
+						valueColor="text-accent-slate"
+						stagger={120}
 					/>
 					<ReportStatCard
 						label="Sociability"
 						value={overall !== null ? `${overall.sociability_total} (${overallSocPct})` : "—"}
 						helper={overall !== null ? `Max score = ${overall.sociability_total_max}` : undefined}
-						accent="bg-emerald-500"
+						valueColor="text-accent-violet"
+						stagger={180}
 					/>
 				</div>
 			</div>
