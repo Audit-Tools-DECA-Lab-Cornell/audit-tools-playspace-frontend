@@ -968,7 +968,7 @@ export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFo
 			</Card>
 
 			{activeSection ? (
-				<Card>
+				<Card key={activeSection.section.section_key} className="animate-domain-enter">
 					<CardHeader>
 						<CardTitle>{activeSection.section.title}</CardTitle>
 					</CardHeader>
