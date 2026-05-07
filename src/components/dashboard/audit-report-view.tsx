@@ -482,10 +482,14 @@ function BestWorstSection({ rankings }: Readonly<{ rankings: ConstructRanking[] 
 							<div key={`bw-row-${rowIdx}`} className="grid gap-3 sm:grid-cols-3">
 								{row.map(key => {
 									const ranking = rankingByKey.get(key);
+									const constructBorderColor = getDomainBorderColor(key);
 									return (
-										<div key={key} className="overflow-hidden rounded-lg border border-border">
-											<div className="bg-primary px-3 py-2">
-												<p className="text-center text-xs font-bold text-primary-foreground">
+										<div
+											key={key}
+											className="overflow-hidden rounded-r-lg border-y border-r border-l-[3px] border-border bg-surface"
+											style={{ borderLeftColor: constructBorderColor }}>
+											<div className="px-3 py-2.5 bg-surface">
+												<p className="text-left font-heading text-[13px] font-semibold text-text-primary">
 													{CONSTRUCT_LABELS[key]}
 												</p>
 											</div>
@@ -870,6 +874,17 @@ export function AuditReportView({ audit, instrument = null, basePath }: Readonly
 
 // ── Domain accordion item ────────────────────────────────────────────────────
 
+function getDomainBorderColor(domainKey: string): string {
+	const normalized = domainKey.toLowerCase();
+	if (normalized.includes("provision")) return "var(--accent-terracotta)";
+	if (normalized.includes("diversity")) return "var(--accent-slate)";
+	if (normalized.includes("challenge")) return "var(--accent-moss)";
+	if (normalized.includes("sociability") || normalized.includes("social")) return "var(--accent-violet)";
+	if (normalized.includes("play_value") || normalized.includes("playvalue")) return "var(--accent-terracotta)";
+	if (normalized.includes("usability")) return "var(--accent-slate)";
+	return "var(--accent-terracotta)";
+}
+
 function DomainAccordionItem({
 	domainKey,
 	title,
@@ -887,12 +902,14 @@ function DomainAccordionItem({
 	showItems: boolean;
 	onToggleItems: () => void;
 }>) {
+	const borderColor = getDomainBorderColor(domainKey);
+
 	return (
-		<AccordionItem value={domainKey}>
-			<AccordionTrigger className="text-sm">
+		<AccordionItem value={domainKey} className="overflow-hidden rounded-r-md border-y-0 border-r-0 border-l-[3px] bg-surface" style={{ borderLeftColor: borderColor }}>
+			<AccordionTrigger className="px-4 hover:no-underline">
 				<div className="flex flex-1 items-center justify-between gap-3 pr-2">
-					<span className="text-left font-bold text-foreground">{title}</span>
-					<span className="shrink-0 rounded-md bg-primary/10 px-2 py-0.5 text-xs font-mono tabular-nums text-primary">
+					<span className="text-left font-heading text-[13px] font-semibold text-text-primary">{title}</span>
+					<span className="shrink-0 font-mono text-xs tabular-nums text-text-muted">
 						{scores !== null
 							? `PV ${pct(scores.play_value_total, scores.play_value_total_max)} · U ${pct(scores.usability_total, scores.usability_total_max)}`
 							: "Pending"}
