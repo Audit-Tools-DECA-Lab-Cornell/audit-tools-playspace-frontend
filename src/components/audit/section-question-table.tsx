@@ -3,11 +3,12 @@
 import { useTranslations } from "next-intl";
 import { Fragment } from "react";
 
+import { ScaleMultiSelect } from "@/components/audit/scale-multi-select";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { parsePromptSegments } from "@/lib/audit/prompt-segments";
-import { getActiveScaleKeysForQuestion } from "@/lib/audit/selectors";
-import { formatQuestionKeyForDisplay } from "@/lib/audit/selectors";
+import { getActiveScaleKeysForQuestion, isMultipleSelectionScale } from "@/lib/audit/selectors";
+import { formatQuestionKeyForDisplay, readMultipleScaleSelection } from "@/lib/audit/selectors";
 import { cn } from "@/lib/utils";
 import type { InstrumentQuestion, QuestionResponsePayload, ScaleKey } from "@/types/audit";
 
@@ -20,6 +21,7 @@ export interface SectionQuestionTableProps {
 	readonly rows: readonly QuestionTableRow[];
 	readonly disabled?: boolean;
 	readonly onSelectAnswer: (questionKey: string, scaleKey: string, optionKey: string) => void;
+	readonly onToggleMultipleOption: (questionKey: string, scaleKey: string, optionKey: string) => void;
 	readonly onChangeQuestionNote?: (questionKey: string, nextNote: string) => void;
 }
 
@@ -32,20 +34,27 @@ export function SectionQuestionTable({
 	rows,
 	disabled = false,
 	onSelectAnswer,
+	onToggleMultipleOption,
 	onChangeQuestionNote
 }: Readonly<SectionQuestionTableProps>) {
 	const t = useTranslations("auditor.execute.sectionTable");
 	const visibleScaleKeys = getVisibleScaleKeys(rows);
+	const multipleScaleKeys = getMultipleScaleKeys(rows);
+	// Stacked checkbox labels need more room than a single-select column of short option pills.
+	const minimumTableWidth = 980 + multipleScaleKeys.length * 110;
 
 	return (
 		<div className="space-y-4">
 			<div className="overflow-x-auto">
 				<div
-					className="grid min-w-[980px] rounded-card border border-edge/40 bg-card"
+					className="grid rounded-card border border-edge/40 bg-card"
 					style={{
+						minWidth: `${minimumTableWidth.toString()}px`,
 						gridTemplateColumns: [
 							"minmax(320px, 1.8fr)",
-							...visibleScaleKeys.map(() => "minmax(170px, 1fr)")
+							...visibleScaleKeys.map(scaleKey =>
+								multipleScaleKeys.includes(scaleKey) ? "minmax(280px, 1.5fr)" : "minmax(170px, 1fr)"
+							)
 						].join(" ")
 					}}>
 					<div className="border-r border-edge/40 bg-secondary/50 px-4 py-3 text-center text-xs font-semibold uppercase tracking-[0.08em] text-text-secondary">
@@ -101,6 +110,32 @@ export function SectionQuestionTable({
 												key={`${row.question.question_key}.${scaleKey}`}
 												className={cellClassName}>
 												<p className="text-sm text-muted-foreground">{t("followUpPending")}</p>
+											</div>
+										);
+									}
+
+									if (isMultipleSelectionScale(scale)) {
+										return (
+											<div
+												key={`${row.question.question_key}.${scaleKey}`}
+												className={cellClassName}>
+												<ScaleMultiSelect
+													scale={scale}
+													density="table"
+													showTitle={false}
+													selectedOptionKeys={readMultipleScaleSelection(
+														row.selectedAnswers,
+														scale
+													)}
+													disabled={disabled}
+													onToggleOption={optionKey => {
+														onToggleMultipleOption(
+															row.question.question_key,
+															scale.key,
+															optionKey
+														);
+													}}
+												/>
 											</div>
 										);
 									}
@@ -217,5 +252,16 @@ function QuestionPrompt({ question, selectedAnswers, disabled, onChangeQuestionN
 function getVisibleScaleKeys(rows: readonly QuestionTableRow[]): ScaleKey[] {
 	return SCALE_COLUMN_ORDER.filter(scaleKey => {
 		return rows.some(row => row.question.scales.some(scale => scale.key === scaleKey));
+	});
+}
+
+/**
+ * Resolve which scale columns render stacked checkboxes instead of single-select options.
+ */
+function getMultipleScaleKeys(rows: readonly QuestionTableRow[]): ScaleKey[] {
+	return SCALE_COLUMN_ORDER.filter(scaleKey => {
+		return rows.some(row =>
+			row.question.scales.some(scale => scale.key === scaleKey && isMultipleSelectionScale(scale))
+		);
 	});
 }

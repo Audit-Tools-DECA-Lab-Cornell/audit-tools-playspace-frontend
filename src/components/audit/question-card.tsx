@@ -3,9 +3,15 @@
 import { useTranslations } from "next-intl";
 import { Fragment } from "react";
 
+import { ScaleMultiSelect } from "@/components/audit/scale-multi-select";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { parsePromptSegments } from "@/lib/audit/prompt-segments";
+import {
+	isMultipleSelectionScale,
+	readMultipleScaleSelection,
+	toggleMultipleScaleOption
+} from "@/lib/audit/selectors";
 import { cn } from "@/lib/utils";
 import type { InstrumentQuestion, QuestionResponsePayload, QuestionScale } from "@/types/audit";
 
@@ -65,6 +71,26 @@ export function AuditQuestionCard({
 							}
 
 							const selectedScaleValue = selectedAnswers[scale.key];
+
+							if (isMultipleSelectionScale(scale)) {
+								return (
+									<div
+										key={`${question.question_key}.${scale.key}`}
+										className="rounded-field border border-edge/50 bg-secondary/40 p-4 md:p-5">
+										<ScaleMultiSelect
+											scale={scale}
+											selectedOptionKeys={readMultipleScaleSelection(selectedAnswers, scale)}
+											disabled={disabled}
+											onToggleOption={optionKey => {
+												onChangeAnswers(
+													question.question_key,
+													toggleMultipleScaleOption(selectedAnswers, scale, optionKey)
+												);
+											}}
+										/>
+									</div>
+								);
+							}
 
 							return (
 								<ScaleSelector

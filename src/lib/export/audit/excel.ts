@@ -118,14 +118,20 @@ export function calculateDynamicColumnWidths(rows: readonly SpreadsheetRow[]): {
 // ── Worksheet styling ─────────────────────────────────────────────────────────
 
 /**
- * Maps Responses-sheet col indices to PV scale keys.
- * Cols 7–10 are Provision / Variety / Sociability / Challenge.
+ * Maps Responses-sheet col indices to PV scale keys for cell tinting.
+ *
+ * Cols 7-8 are Provision and Variety; col 9 is the Sociability aggregate and cols 10-12 are its
+ * three play opportunities, which share the Sociability tint so the sheet reads them as one equal
+ * group; col 13 is Challenge.
  */
 const SCALE_COLUMN_MAP: Record<number, PvScaleKey> = {
 	7: "provision",
 	8: "variety",
 	9: "sociability",
-	10: "challenge"
+	10: "sociability",
+	11: "sociability",
+	12: "sociability",
+	13: "challenge"
 };
 
 const SCALE_SOFT_HEX: Record<PvScaleKey, string> = {
@@ -220,7 +226,7 @@ export function styleWorkbookSheet(sheet: XLSX.WorkSheet, table: WorkbookTable, 
 
 			const scaleKey = SCALE_COLUMN_MAP[colIndex];
 			const isScaleCol = scaleKey !== undefined;
-			const isPvUCol = colIndex === 11 || colIndex === 12;
+			const isPvUCol = colIndex === 14 || colIndex === 15;
 
 			const baseStyle = {
 				alignment: {

@@ -18,6 +18,7 @@ import { ActivateDialog } from "./activate-dialog";
 import { INSTRUMENTS_LIST_QUERY_KEY } from "./constants";
 import { InstrumentEditor } from "./instrument-editor";
 import { InstrumentOverview } from "./instrument-overview";
+import { contentUsesMultipleSelection } from "./sociability-multi-select";
 import type { InstrumentContent, InstrumentVersionRow } from "./types";
 import { UploadDialog } from "./upload-dialog";
 import { suggestNextDraftVersion, suggestNextPublishedVersion } from "./utils";
@@ -260,6 +261,7 @@ export function InstrumentsAdminClient() {
 							version={editingVersion}
 							lockVersion={true}
 							isPending={isMutating}
+							saveError={setInstrumentMutation.error?.message ?? null}
 							onSave={handleSaveDraft}
 							onCancel={() => {
 								setEditingContent(null);
@@ -283,6 +285,9 @@ export function InstrumentsAdminClient() {
 			<ActivateDialog
 				open={isActivateDialogOpen}
 				isPending={isMutating}
+				requiresMultiSelectClients={
+					versionToActivate ? contentUsesMultipleSelection(versionToActivate.content) : false
+				}
 				versionLabel={versionToActivate?.version ?? null}
 				nextPublishedVersion={
 					// Only a draft gets a fresh publication number on activation.

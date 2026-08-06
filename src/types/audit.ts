@@ -1,5 +1,16 @@
 import { z } from "zod";
 
+import { selectionModeSchema, sociabilityBreakdownSchema } from "./sociability";
+
+export type { SelectionMode, SociabilityBreakdown, SociabilityDimensionKey } from "./sociability";
+export {
+	selectionModeSchema,
+	SOCIABILITY_DIMENSION_KEYS,
+	sociabilityBreakdownSchema,
+	sociabilityCategoryTotalsSchema,
+	sociabilityDimensionKeySchema
+} from "./sociability";
+
 export type DirtySections = Record<string, Record<string, number>>;
 export type DirtyPreAudit = Record<string, number>;
 
@@ -33,6 +44,7 @@ export const scaleDefinitionSchema = z.object({
 	title: z.string().min(1),
 	prompt: z.string().min(1),
 	description: z.string().min(1),
+	selection_mode: selectionModeSchema.default("single"),
 	options: z.array(scaleOptionSchema)
 });
 
@@ -52,6 +64,7 @@ export const questionScaleSchema = z.object({
 	key: scaleKeySchema,
 	title: z.string().min(1),
 	prompt: z.string().min(1),
+	selection_mode: selectionModeSchema.default("single"),
 	options: z.array(scaleOptionSchema)
 });
 
@@ -178,6 +191,7 @@ export const auditScoreTotalsSchema = z.object({
 	challenge_total_max: z.number(),
 	sociability_total: z.number(),
 	sociability_total_max: z.number(),
+	sociability_breakdown: sociabilityBreakdownSchema.nullable().optional().default(null),
 	play_value_total: z.number(),
 	play_value_total_max: z.number(),
 	usability_total: z.number(),
@@ -348,13 +362,30 @@ export type PreAuditPageKey = z.infer<typeof preAuditPageKeySchema>;
 export type QuestionType = z.infer<typeof questionTypeSchema>;
 export type ChoiceOption = z.infer<typeof choiceOptionSchema>;
 export type ScaleOption = z.infer<typeof scaleOptionSchema>;
-export type ScaleDefinition = z.infer<typeof scaleDefinitionSchema>;
+export type ParsedScaleDefinition = z.output<typeof scaleDefinitionSchema>;
+export type ScaleDefinitionInput = z.input<typeof scaleDefinitionSchema>;
+export type ScaleDefinition = Omit<ParsedScaleDefinition, "selection_mode"> & {
+	selection_mode?: ParsedScaleDefinition["selection_mode"];
+};
 export type PreAuditQuestion = z.infer<typeof preAuditQuestionSchema>;
-export type QuestionScale = z.infer<typeof questionScaleSchema>;
+export type ParsedQuestionScale = z.output<typeof questionScaleSchema>;
+export type QuestionScaleInput = z.input<typeof questionScaleSchema>;
+export type QuestionScale = Omit<ParsedQuestionScale, "selection_mode"> & {
+	selection_mode?: ParsedQuestionScale["selection_mode"];
+};
 export type QuestionDisplayCondition = z.infer<typeof questionDisplayConditionSchema>;
-export type InstrumentQuestion = z.infer<typeof instrumentQuestionSchema>;
-export type InstrumentSection = z.infer<typeof instrumentSectionSchema>;
-export type PlayspaceInstrument = z.infer<typeof playspaceInstrumentSchema>;
+export type ParsedInstrumentQuestion = z.output<typeof instrumentQuestionSchema>;
+export type InstrumentQuestionInput = z.input<typeof instrumentQuestionSchema>;
+export type InstrumentQuestion = Omit<ParsedInstrumentQuestion, "scales"> & { scales: QuestionScale[] };
+export type ParsedInstrumentSection = z.output<typeof instrumentSectionSchema>;
+export type InstrumentSectionInput = z.input<typeof instrumentSectionSchema>;
+export type InstrumentSection = Omit<ParsedInstrumentSection, "questions"> & { questions: InstrumentQuestion[] };
+export type ParsedPlayspaceInstrument = z.output<typeof playspaceInstrumentSchema>;
+export type PlayspaceInstrumentInput = z.input<typeof playspaceInstrumentSchema>;
+export type PlayspaceInstrument = Omit<ParsedPlayspaceInstrument, "scale_guidance" | "sections"> & {
+	scale_guidance: ScaleDefinition[];
+	sections: InstrumentSection[];
+};
 export type AuditSectionProgress = z.infer<typeof auditSectionProgressSchema>;
 export type AuditProgress = z.infer<typeof auditProgressSchema>;
 export type AuditMeta = z.infer<typeof auditMetaSchema>;

@@ -236,7 +236,16 @@ export function flattenInstrument(instrument: PlayspaceInstrument): FlatRow[] {
 
 			const optionsStr = q.options?.map(o => o.label).join(" | ") || "";
 			const constructsStr = q.constructs?.map(formatLabel).join(", ") || "";
-			const scalesStr = q.scales?.map(s => formatLabel(s.key)).join(", ") || "";
+			// Multi-answer scales are annotated inline so a printed or spreadsheet copy of the
+			// instrument states the answering rule, not just the scale name.
+			const scalesStr =
+				q.scales
+					?.map(s =>
+						s.selection_mode === "multiple"
+							? `${formatLabel(s.key)} (choose any that apply)`
+							: formatLabel(s.key)
+					)
+					.join(", ") || "";
 			const modeStr = formatLabel(q.mode || "");
 			const typeStr = formatLabel(q.question_type || "scaled");
 			const conditionStr = q.display_if

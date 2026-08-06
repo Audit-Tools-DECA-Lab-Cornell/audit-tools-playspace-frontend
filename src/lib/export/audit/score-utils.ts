@@ -11,8 +11,7 @@ import {
 	createEmptyScoreTotals,
 	deriveSummaryScore
 } from "@/lib/audit/question-scoring";
-
-import type { ExecutionMode, InstrumentQuestion, QuestionResponsePayload } from "./types";
+import type { ExecutionMode, ParsedInstrumentQuestion, QuestionResponsePayload } from "@/types/audit";
 
 export { addScoreTotals, calculateQuestionScores, createEmptyScoreTotals, deriveSummaryScore };
 
@@ -24,7 +23,7 @@ export { addScoreTotals, calculateQuestionScores, createEmptyScoreTotals, derive
  * - the sibling responses in the same section (for conditional display logic)
  */
 export function isQuestionVisible(
-	question: InstrumentQuestion,
+	question: ParsedInstrumentQuestion,
 	executionMode: ExecutionMode | null,
 	sectionResponses: Record<string, QuestionResponsePayload>
 ): boolean {

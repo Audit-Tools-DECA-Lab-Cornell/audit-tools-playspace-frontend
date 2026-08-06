@@ -1,11 +1,19 @@
 import type {
 	AuditScoreTotals,
 	AuditSession,
-	InstrumentQuestion,
+	ParsedInstrumentQuestion,
+	ParsedQuestionScale,
 	QuestionResponsePayload,
-	QuestionScale,
 	ScaleOption
 } from "@/types/audit";
+import {
+	addSociabilityBreakdowns,
+	createEmptySociabilityBreakdown,
+	hasCanonicalSociabilityDimensionKeys,
+	SOCIABILITY_DIMENSION_KEYS,
+	type SociabilityBreakdown,
+	validateAndNormalizeMultipleScaleAnswer
+} from "@/types/sociability";
 
 export type UnsurePolicy = "unsure_as_excluded" | "unsure_as_zero" | "unsure_as_max";
 
@@ -25,6 +33,7 @@ const EMPTY_SCORE_TOTALS: AuditScoreTotals = {
 	challenge_total_max: 0,
 	sociability_total: 0,
 	sociability_total_max: 0,
+	sociability_breakdown: null,
 	play_value_total: 0,
 	play_value_total_max: 0,
 	usability_total: 0,
@@ -45,6 +54,7 @@ export function addScoreTotals(left: AuditScoreTotals, right: AuditScoreTotals):
 		challenge_total_max: left.challenge_total_max + right.challenge_total_max,
 		sociability_total: left.sociability_total + right.sociability_total,
 		sociability_total_max: left.sociability_total_max + right.sociability_total_max,
+		sociability_breakdown: addSociabilityBreakdowns(left.sociability_breakdown, right.sociability_breakdown),
 		play_value_total: left.play_value_total + right.play_value_total,
 		play_value_total_max: left.play_value_total_max + right.play_value_total_max,
 		usability_total: left.usability_total + right.usability_total,
@@ -60,11 +70,14 @@ export function deriveSummaryScore(auditSession: AuditSession): number | string 
 	return Math.round((overall.play_value_total + overall.usability_total) * 100) / 100;
 }
 
-export function findScale(question: InstrumentQuestion, scaleKey: QuestionScale["key"]): QuestionScale | undefined {
+export function findScale(
+	question: ParsedInstrumentQuestion,
+	scaleKey: ParsedQuestionScale["key"]
+): ParsedQuestionScale | undefined {
 	return question.scales.find(scale => scale.key === scaleKey);
 }
 
-export function findScaleOption(scale: QuestionScale, optionKey: string): ScaleOption | undefined {
+export function findScaleOption(scale: ParsedQuestionScale, optionKey: string): ScaleOption | undefined {
 	return scale.options.find(option => option.key === optionKey);
 }
 
@@ -76,7 +89,7 @@ function maxCandidateOptions(options: readonly ScaleOption[]): readonly ScaleOpt
 	return options.filter(option => option.is_not_applicable !== true && option.is_unsure !== true);
 }
 
-function readProvisionScaleMaximum(question: InstrumentQuestion): number {
+function readProvisionScaleMaximum(question: ParsedInstrumentQuestion): number {
 	const scale = findScale(question, "provision");
 	if (scale === undefined) {
 		return 0;
@@ -85,7 +98,7 @@ function readProvisionScaleMaximum(question: InstrumentQuestion): number {
 }
 
 function readMultiplierScaleMaximum(
-	question: InstrumentQuestion,
+	question: ParsedInstrumentQuestion,
 	scaleKey: "variety" | "challenge"
 ): Pick<MultiplierScaleResult, "columnTotalMax" | "boostValueMax"> {
 	const scale = findScale(question, scaleKey);
@@ -100,7 +113,7 @@ function readMultiplierScaleMaximum(
 }
 
 function readMultiplierScaleResult(
-	question: InstrumentQuestion,
+	question: ParsedInstrumentQuestion,
 	answers: QuestionResponsePayload,
 	scaleKey: "variety" | "challenge",
 	unsurePolicy: UnsurePolicy
@@ -162,10 +175,14 @@ function readMultiplierScaleResult(
 	};
 }
 
-function readSociabilityScaleMaximum(question: InstrumentQuestion): number {
+function readSociabilityScaleMaximum(question: ParsedInstrumentQuestion): number {
 	const scale = findScale(question, "sociability");
 	if (scale === undefined) {
 		return 0;
+	}
+	if (scale.selection_mode === "multiple") {
+		assertCanonicalSociabilityOptions(scale);
+		return SOCIABILITY_DIMENSION_KEYS.length;
 	}
 	return maxCandidateOptions(scale.options).reduce(
 		(max, option) => Math.max(max, Math.max(option.addition_value - 1, 0)),
@@ -173,46 +190,87 @@ function readSociabilityScaleMaximum(question: InstrumentQuestion): number {
 	);
 }
 
+function assertCanonicalSociabilityOptions(scale: ParsedQuestionScale): void {
+	const optionKeys = scale.options.map(option => option.key);
+	if (!hasCanonicalSociabilityDimensionKeys(optionKeys)) {
+		throw new Error("Multiple Sociability options must use the canonical ordered dimension keys.");
+	}
+}
+
 function readSociabilityScaleResult(
-	question: InstrumentQuestion,
+	question: ParsedInstrumentQuestion,
 	answers: QuestionResponsePayload,
 	unsurePolicy: UnsurePolicy
-): { readonly total: number; readonly totalMax: number } {
+): { readonly total: number; readonly totalMax: number; readonly breakdown: SociabilityBreakdown | null } {
 	const scale = findScale(question, "sociability");
 	if (scale === undefined) {
-		return { total: 0, totalMax: 0 };
+		return { total: 0, totalMax: 0, breakdown: null };
 	}
 
 	const totalMax = readSociabilityScaleMaximum(question);
+	if (scale.selection_mode === "multiple") {
+		assertCanonicalSociabilityOptions(scale);
+		if (!("sociability" in answers)) {
+			return { total: 0, totalMax, breakdown: createEmptySociabilityBreakdown({ eligible: true }) };
+		}
+
+		const normalizedAnswer = validateAndNormalizeMultipleScaleAnswer(
+			answers.sociability,
+			SOCIABILITY_DIMENSION_KEYS
+		);
+		if (!normalizedAnswer.ok) {
+			throw new Error(`Invalid multiple Sociability answer: ${normalizedAnswer.reason}.`);
+		}
+
+		const selectedKeys = new Set(normalizedAnswer.value);
+		return {
+			total: normalizedAnswer.value.length,
+			totalMax,
+			breakdown: {
+				model: "multi_select_v1",
+				play_alone: { total: selectedKeys.has("play_alone") ? 1 : 0, max: 1 },
+				small_group: { total: selectedKeys.has("small_group") ? 1 : 0, max: 1 },
+				large_group: { total: selectedKeys.has("large_group") ? 1 : 0, max: 1 },
+				captured_question_count: 1,
+				eligible_question_count: 1
+			}
+		};
+	}
+
 	const rawAnswer = answers.sociability;
 	const answerKey = typeof rawAnswer === "string" ? rawAnswer : undefined;
 	if (answerKey === undefined) {
-		return { total: 0, totalMax };
+		return { total: 0, totalMax, breakdown: null };
 	}
 
 	const selectedOption = findScaleOption(scale, answerKey);
 	if (selectedOption === undefined) {
-		return { total: 0, totalMax };
+		return { total: 0, totalMax, breakdown: null };
 	}
 
 	if (isExcludingOption(selectedOption, unsurePolicy)) {
-		return { total: 0, totalMax: 0 };
+		return { total: 0, totalMax: 0, breakdown: null };
 	}
 
 	if (selectedOption.is_unsure === true) {
-		return unsurePolicy === "unsure_as_max" ? { total: totalMax, totalMax } : { total: 0, totalMax };
+		return unsurePolicy === "unsure_as_max"
+			? { total: totalMax, totalMax, breakdown: null }
+			: { total: 0, totalMax, breakdown: null };
 	}
 
-	return { total: Math.max(selectedOption.addition_value - 1, 0), totalMax };
+	return { total: Math.max(selectedOption.addition_value - 1, 0), totalMax, breakdown: null };
 }
 
 export function calculateQuestionScores(
-	question: InstrumentQuestion,
+	question: ParsedInstrumentQuestion,
 	answers: QuestionResponsePayload,
 	unsurePolicy: UnsurePolicy = "unsure_as_excluded"
 ): AuditScoreTotals {
+	const sociabilityScale = findScale(question, "sociability");
+	const capturesSociabilityBreakdown = sociabilityScale?.selection_mode === "multiple";
+	const emptySociabilityBreakdown = capturesSociabilityBreakdown ? createEmptySociabilityBreakdown() : null;
 	if (question.question_type !== "scaled" || question.scales.length === 0) {
-		return createEmptyScoreTotals();
+		return { ...createEmptyScoreTotals(), sociability_breakdown: emptySociabilityBreakdown };
 	}
 
 	const provisionScale = findScale(question, "provision");
@@ -224,7 +282,7 @@ export function calculateQuestionScores(
 			: findScaleOption(provisionScale, provisionAnswerKey);
 
 	if (provisionOption === undefined || isExcludingOption(provisionOption, unsurePolicy)) {
-		return createEmptyScoreTotals();
+		return { ...createEmptyScoreTotals(), sociability_breakdown: emptySociabilityBreakdown };
 	}
 
 	const provisionTotalMax = readProvisionScaleMaximum(question);
@@ -243,6 +301,7 @@ export function calculateQuestionScores(
 	let challengeBoostMax = challengeMaximum.boostValueMax;
 	let sociabilityTotal = 0;
 	let effectiveSociabilityTotalMax = sociabilityTotalMax;
+	let sociabilityBreakdown = emptySociabilityBreakdown;
 
 	if (provisionOption.is_unsure === true && unsurePolicy === "unsure_as_max") {
 		provisionTotal = provisionTotalMax;
@@ -251,6 +310,16 @@ export function calculateQuestionScores(
 		challengeTotal = challengeTotalMax;
 		challengeBoost = challengeBoostMax;
 		sociabilityTotal = sociabilityTotalMax;
+		if (capturesSociabilityBreakdown) {
+			sociabilityBreakdown = {
+				model: "multi_select_v1",
+				play_alone: { total: 1, max: 1 },
+				small_group: { total: 1, max: 1 },
+				large_group: { total: 1, max: 1 },
+				captured_question_count: 0,
+				eligible_question_count: 1
+			};
+		}
 	} else if (provisionOption.allows_follow_up_scales === true) {
 		const varietyResult = readMultiplierScaleResult(question, answers, "variety", unsurePolicy);
 		const challengeResult = readMultiplierScaleResult(question, answers, "challenge", unsurePolicy);
@@ -265,6 +334,11 @@ export function calculateQuestionScores(
 		challengeBoostMax = challengeResult.boostValueMax;
 		sociabilityTotal = sociabilityResult.total;
 		effectiveSociabilityTotalMax = sociabilityResult.totalMax;
+		sociabilityBreakdown = sociabilityResult.breakdown;
+	} else if (capturesSociabilityBreakdown && provisionOption.is_unsure === true) {
+		sociabilityBreakdown = createEmptySociabilityBreakdown({ eligible: true });
+	} else if (capturesSociabilityBreakdown) {
+		effectiveSociabilityTotalMax = 0;
 	}
 
 	const constructTotal = provisionTotal * varietyBoost * challengeBoost;
@@ -279,6 +353,7 @@ export function calculateQuestionScores(
 		challenge_total_max: challengeTotalMax,
 		sociability_total: sociabilityTotal,
 		sociability_total_max: effectiveSociabilityTotalMax,
+		sociability_breakdown: sociabilityBreakdown,
 		play_value_total: question.constructs.includes("play_value") ? constructTotal : 0,
 		play_value_total_max: question.constructs.includes("play_value") ? constructTotalMax : 0,
 		usability_total: question.constructs.includes("usability") ? constructTotal : 0,

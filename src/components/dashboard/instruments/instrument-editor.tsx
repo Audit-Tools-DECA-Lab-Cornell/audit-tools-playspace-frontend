@@ -1,4 +1,17 @@
-import { Check, Download, FileJson, FileSpreadsheet, FileText, Lock, Pencil, Plus, Save, X } from "lucide-react";
+import {
+	AlertTriangle,
+	Check,
+	Download,
+	FileJson,
+	FileSpreadsheet,
+	FileText,
+	ListChecks,
+	Lock,
+	Pencil,
+	Plus,
+	Save,
+	X
+} from "lucide-react";
 import { useTranslations } from "next-intl";
 import { useMemo, useState } from "react";
 
@@ -34,6 +47,13 @@ import { ScaleGuidanceEditor } from "./editors/scale-guidance-editor";
 import { SectionEditorList } from "./editors/section-editor-list";
 import { InstrumentEditProvider, languageLabel, resolveBaseLang } from "./instrument-edit-context";
 import { InstrumentChange, ReviewChangesDialog } from "./review-changes-dialog";
+import { SociabilityBulkDialog } from "./sociability-bulk-dialog";
+import {
+	applySociabilityMultiSelectToContent,
+	findSociabilityMultiSelectTargets,
+	findUntranslatedSociabilityLabels,
+	validateSociabilityMultiSelect
+} from "./sociability-multi-select";
 import { SpreadsheetView } from "./spreadsheet-view";
 import { type InstrumentContent, Lang } from "./types";
 import { buildScaleGuidanceMap, getInstrumentChanges, getTranslationCoverage } from "./utils";
@@ -45,6 +65,7 @@ export function InstrumentEditor({
 	version,
 	lockVersion = false,
 	isPending,
+	saveError = null,
 	onSave,
 	onCancel
 }: Readonly<{
@@ -52,6 +73,8 @@ export function InstrumentEditor({
 	version: string;
 	lockVersion?: boolean;
 	isPending: boolean;
+	/** Backend rejection (for example a 422 semantic validation failure) for the last save attempt. */
+	saveError?: string | null;
 	onSave: (version: string, content: InstrumentContent, activate?: boolean) => void;
 	onCancel: () => void;
 }>) {
@@ -67,6 +90,7 @@ export function InstrumentEditor({
 
 	const [reviewModalOpen, setReviewModalOpen] = useState(false);
 	const [pendingChanges, setPendingChanges] = useState<InstrumentChange[]>([]);
+	const [sociabilityBulkOpen, setSociabilityBulkOpen] = useState(false);
 
 	const instrument = draftContent[activeLang] as PlayspaceInstrument | undefined;
 
@@ -83,6 +107,30 @@ export function InstrumentEditor({
 		() =>
 			isTranslation && baseInstrument && instrument ? getTranslationCoverage(baseInstrument, instrument) : null,
 		[isTranslation, baseInstrument, instrument]
+	);
+
+	const sociabilityTargets = useMemo(
+		() => (instrument ? findSociabilityMultiSelectTargets(instrument) : []),
+		[instrument]
+	);
+	const sociabilityPendingCount = sociabilityTargets.filter(target => !target.alreadyApplied).length;
+
+	const sociabilityPreview = useMemo(
+		() => applySociabilityMultiSelectToContent(draftContent),
+		[draftContent]
+	);
+	const sociabilityBulkChanges = useMemo(
+		() => getInstrumentChanges(draftContent, sociabilityPreview),
+		[draftContent, sociabilityPreview]
+	);
+
+	const sociabilityIssues = useMemo(
+		() => (instrument ? validateSociabilityMultiSelect(instrument) : []),
+		[instrument]
+	);
+	const untranslatedSociabilityLangs = useMemo(
+		() => findUntranslatedSociabilityLabels(draftContent, baseLang),
+		[draftContent, baseLang]
 	);
 
 	function updateInstrument(updater: (i: PlayspaceInstrument) => void) {
@@ -152,6 +200,11 @@ export function InstrumentEditor({
 	function handlePublishConfirm() {
 		onSave(draftVersion, draftContent, true);
 		setReviewModalOpen(false);
+	}
+
+	function handleApplySociabilityMultiSelect() {
+		setDraftContent(sociabilityPreview);
+		setSociabilityBulkOpen(false);
 	}
 
 	function renderLanguageSwitcher() {
@@ -356,6 +409,21 @@ export function InstrumentEditor({
 						<AdminToolbarGroup>
 							{isTranslation && <AiTranslateButton targetLang={activeLang} baseLang={baseLang} />}
 							{renderExportMenu()}
+							{sociabilityTargets.length > 0 && !isTranslation ? (
+								<Button
+									type="button"
+									variant="outline"
+									size="sm"
+									className="h-10 gap-2"
+									onClick={() => setSociabilityBulkOpen(true)}
+									disabled={isPending || sociabilityPendingCount === 0}>
+									<ListChecks className="h-4 w-4" aria-hidden="true" />
+									{t("sociabilityBulk.action")}
+									<span className="rounded-full bg-muted px-1.5 py-0.5 text-[10px] font-semibold tabular-nums text-muted-foreground">
+										{sociabilityPendingCount}
+									</span>
+								</Button>
+							) : null}
 						</AdminToolbarGroup>
 
 						<AdminToolbarGroup className="lg:justify-end">
@@ -399,6 +467,58 @@ export function InstrumentEditor({
 					onConfirm={handlePublishConfirm}
 					onCancel={() => setReviewModalOpen(false)}
 				/>
+
+				<SociabilityBulkDialog
+					open={sociabilityBulkOpen}
+					targets={sociabilityTargets}
+					changes={sociabilityBulkChanges}
+					onConfirm={handleApplySociabilityMultiSelect}
+					onCancel={() => setSociabilityBulkOpen(false)}
+				/>
+
+				{saveError ? (
+					<div
+						role="alert"
+						className="flex items-start gap-2 rounded-md border border-status-error-border bg-status-error-surface/20 px-3 py-2">
+						<AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-destructive" aria-hidden="true" />
+						<div className="min-w-0">
+							<p className="text-sm font-medium text-foreground">{t("saveRejectedTitle")}</p>
+							<p className="text-xs leading-relaxed text-muted-foreground">{saveError}</p>
+						</div>
+					</div>
+				) : null}
+
+				{sociabilityIssues.length > 0 ? (
+					<div
+						role="alert"
+						className="space-y-1.5 rounded-md border border-status-warning-border bg-status-warning-surface/20 px-3 py-2">
+						<p className="flex items-center gap-2 text-sm font-medium text-foreground">
+							<AlertTriangle className="h-4 w-4 shrink-0 text-status-warning" aria-hidden="true" />
+							{t("sociabilityBulk.issuesTitle")}
+						</p>
+						<ul className="list-disc space-y-1 pl-6 text-xs leading-relaxed text-muted-foreground">
+							{sociabilityIssues.map((issue, index) => (
+								<li key={`${issue.code}-${index.toString()}`}>
+									<span className="font-medium text-foreground">{issue.location}</span> —{" "}
+									{t(`sociabilityBulk.issues.${issue.code}`)}
+								</li>
+							))}
+						</ul>
+					</div>
+				) : null}
+
+				{untranslatedSociabilityLangs.length > 0 ? (
+					<div className="flex items-start gap-2 rounded-md border border-status-warning-border bg-status-warning-surface/10 px-3 py-2">
+						<AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-status-warning" aria-hidden="true" />
+						<p className="min-w-0 text-xs leading-relaxed text-muted-foreground">
+							{t("sociabilityBulk.translationApprovalNeeded", {
+								languages: untranslatedSociabilityLangs
+									.map(lang => languageLabel(lang))
+									.join(", ")
+							})}
+						</p>
+					</div>
+				) : null}
 
 				{isTranslation && (
 					<div className="flex items-start gap-2 rounded-md border border-violet-400/25 bg-violet-500/5 px-3 py-2">

@@ -2,9 +2,9 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { calculateQuestionScores } from "@/lib/audit/question-scoring";
-import type { InstrumentQuestion, QuestionResponsePayload } from "@/types/audit";
+import type { ParsedInstrumentQuestion, QuestionResponsePayload } from "@/types/audit";
 
-function buildQuestion(): InstrumentQuestion {
+function buildQuestion(): ParsedInstrumentQuestion {
 	return {
 		question_key: "q_unsure",
 		mode: "audit",
@@ -22,6 +22,7 @@ function buildQuestion(): InstrumentQuestion {
 				key: "provision",
 				title: "Provision",
 				prompt: "Provision",
+				selection_mode: "single",
 				options: [
 					{
 						key: "some",
@@ -65,6 +66,7 @@ function buildQuestion(): InstrumentQuestion {
 				key: "variety",
 				title: "Variety",
 				prompt: "Variety",
+				selection_mode: "single",
 				options: [
 					{
 						key: "not_applicable",
@@ -108,6 +110,7 @@ function buildQuestion(): InstrumentQuestion {
 				key: "challenge",
 				title: "Challenge",
 				prompt: "Challenge",
+				selection_mode: "single",
 				options: [
 					{
 						key: "some_challenge",
@@ -142,6 +145,7 @@ function buildQuestion(): InstrumentQuestion {
 				key: "sociability",
 				title: "Sociability",
 				prompt: "Sociability",
+				selection_mode: "single",
 				options: [
 					{
 						key: "pairs",

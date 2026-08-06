@@ -1,26 +1,7 @@
 import type { AuditSession, ScoreTotals } from "@/lib/api/playspace-types";
+import { addScoreTotals } from "@/lib/audit/question-scoring";
 import type { CombinedReportSources } from "@/lib/audit/report-source-sessions";
 import type { AuditScores, AuditScoreVariantBuckets } from "@/types/audit";
-
-/**
- * Add two score-total objects together field by field.
- */
-function addScoreTotals(a: ScoreTotals, b: ScoreTotals): ScoreTotals {
-	return {
-		provision_total: a.provision_total + b.provision_total,
-		provision_total_max: a.provision_total_max + b.provision_total_max,
-		variety_total: a.variety_total + b.variety_total,
-		variety_total_max: a.variety_total_max + b.variety_total_max,
-		challenge_total: a.challenge_total + b.challenge_total,
-		challenge_total_max: a.challenge_total_max + b.challenge_total_max,
-		sociability_total: a.sociability_total + b.sociability_total,
-		sociability_total_max: a.sociability_total_max + b.sociability_total_max,
-		play_value_total: a.play_value_total + b.play_value_total,
-		play_value_total_max: a.play_value_total_max + b.play_value_total_max,
-		usability_total: a.usability_total + b.usability_total,
-		usability_total_max: a.usability_total_max + b.usability_total_max
-	};
-}
 
 function mergeVariantBuckets(
 	auditVariant: AuditScoreVariantBuckets | null | undefined,

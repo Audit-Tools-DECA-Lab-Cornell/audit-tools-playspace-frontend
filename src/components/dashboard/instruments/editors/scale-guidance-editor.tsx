@@ -9,7 +9,7 @@ import type { ScaleDefinition, ScaleKey } from "@/types/audit";
 import { makeDefaultScaleDefinition } from "../defaults";
 import { useInstrumentEdit } from "../instrument-edit-context";
 import { EditableField } from "../shared-components";
-import { ScaleOptionsEditor } from "./shared-editors";
+import { ScaleOptionsEditor, SelectionModeField } from "./shared-editors";
 
 export function ScaleGuidanceEditor({
 	scales,
@@ -79,6 +79,15 @@ export function ScaleGuidanceEditor({
 										onChange={v =>
 											updateScale(sIdx, s => {
 												s.title = v;
+											})
+										}
+									/>
+									<SelectionModeField
+										value={scale.selection_mode ?? "single"}
+										disabled={translationMode}
+										onChange={mode =>
+											updateScale(sIdx, s => {
+												s.selection_mode = mode;
 											})
 										}
 									/>

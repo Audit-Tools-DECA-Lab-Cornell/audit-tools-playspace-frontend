@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { type PlayspaceInstrument, playspaceInstrumentSchema } from "@/types/audit";
+import { sociabilityBreakdownSchema } from "@/types/sociability";
 
 export { playspaceInstrumentSchema };
 export type { PlayspaceInstrument };
@@ -174,6 +175,7 @@ export const scoreTotalsSchema = z.object({
 	challenge_total_max: z.number(),
 	sociability_total: z.number(),
 	sociability_total_max: z.number(),
+	sociability_breakdown: sociabilityBreakdownSchema.nullable().optional().default(null),
 	play_value_total: z.number(),
 	play_value_total_max: z.number(),
 	usability_total: z.number(),

@@ -24,11 +24,18 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { AuditSession } from "@/lib/api/playspace";
 import { parsePromptSegments } from "@/lib/audit/prompt-segments";
-import type { ConstructRanking, DomainQuestionRow } from "@/lib/audit/report-helpers";
+import type {
+	ConstructRanking,
+	DomainQuestionRow,
+	RankedDomain,
+	SociabilityDimensionRanking
+} from "@/lib/audit/report-helpers";
 import {
 	buildConstructRankings,
 	buildDomainReportRows,
+	buildSociabilityDimensionRankings,
 	formatConstructDomainLine,
+	getSociabilityCoverage,
 	roundedPercentOfMax,
 	toDomainTitle
 } from "@/lib/audit/report-helpers";
@@ -42,6 +49,7 @@ import {
 import { SCALE_ACCENT_COLORS } from "@/lib/export/audit/types";
 import { cn } from "@/lib/utils";
 import type { AuditScoreTotals, PlayspaceInstrument } from "@/types/audit";
+import type { SociabilityDimensionKey } from "@/types/sociability";
 
 import { JsonViewer } from "./raw-json";
 
@@ -106,7 +114,16 @@ function formatDateTime(iso: string): string {
 
 // ── Metric configuration ────────────────────────────────────────────────────
 
-type MetricKey = "provision" | "variety" | "challenge" | "sociability" | "play_value" | "usability";
+type MetricKey =
+	| "provision"
+	| "variety"
+	| "challenge"
+	| "sociability"
+	| "sociability_play_alone"
+	| "sociability_small_group"
+	| "sociability_large_group"
+	| "play_value"
+	| "usability";
 
 interface MetricDef {
 	readonly key: MetricKey;
@@ -134,7 +151,38 @@ const SCALE_METRICS: readonly MetricDef[] = [
 		labelKey: "metricChallenge",
 		getValue: t => t.challenge_total,
 		getMax: t => t.challenge_total_max
+	}
+];
+
+/**
+ * Sociability as three independent opportunities.
+ *
+ * Order here is storage order, not rank. All three share one colour and one column width so the
+ * chart never suggests that larger-group play is worth more than playing alone.
+ */
+const SOCIABILITY_DIMENSION_METRICS: readonly MetricDef[] = [
+	{
+		key: "sociability_play_alone",
+		labelKey: "metricSociabilityPlayAlone",
+		getValue: t => t.sociability_breakdown?.play_alone.total ?? 0,
+		getMax: t => t.sociability_breakdown?.play_alone.max ?? 0
 	},
+	{
+		key: "sociability_small_group",
+		labelKey: "metricSociabilitySmallGroup",
+		getValue: t => t.sociability_breakdown?.small_group.total ?? 0,
+		getMax: t => t.sociability_breakdown?.small_group.max ?? 0
+	},
+	{
+		key: "sociability_large_group",
+		labelKey: "metricSociabilityLargeGroup",
+		getValue: t => t.sociability_breakdown?.large_group.total ?? 0,
+		getMax: t => t.sociability_breakdown?.large_group.max ?? 0
+	}
+];
+
+/** Sociability as one aggregate, for instruments that never captured the three opportunities. */
+const SOCIABILITY_TOTAL_METRICS: readonly MetricDef[] = [
 	{
 		key: "sociability",
 		labelKey: "metricSociability",
@@ -241,7 +289,12 @@ const BAR_COLORS: Record<MetricKey, string> = {
 	provision: SCALE_ACCENT_COLORS.provision,
 	variety: SCALE_ACCENT_COLORS.variety,
 	challenge: SCALE_ACCENT_COLORS.challenge,
+	// One colour for all four Sociability bars: the three opportunities are equal measures, so a
+	// per-dimension palette would read as a ranking.
 	sociability: SCALE_ACCENT_COLORS.sociability,
+	sociability_play_alone: SCALE_ACCENT_COLORS.sociability,
+	sociability_small_group: SCALE_ACCENT_COLORS.sociability,
+	sociability_large_group: SCALE_ACCENT_COLORS.sociability,
 	play_value: "#2E7D78",
 	usability: "#C7972F"
 };
@@ -376,24 +429,36 @@ function BarGroup({
 
 // ── Aligned score display (bars + table) ─────────────────────────────────────
 
+/**
+ * Score chart in three independent groups: the three scored scales, the three Sociability
+ * opportunities, and the two headline constructs.
+ *
+ * Each group is its own block so the eight measures never collapse into one narrow table. The
+ * groups wrap onto separate lines when the viewport is narrow instead of forcing a page-wide
+ * horizontal scroll.
+ */
 function AlignedScoreDisplay({
 	scores,
 	showLabels = true
 }: Readonly<{ scores: AuditScoreTotals | null; showLabels?: boolean }>) {
 	const t = useTranslations("shared.reportView");
+	const capturesDimensions = scores?.sociability_breakdown != null;
+	const sociabilityMetrics = capturesDimensions ? SOCIABILITY_DIMENSION_METRICS : SOCIABILITY_TOTAL_METRICS;
+
 	const scaleTableW = LABEL_COL_W + SCALE_DATA_COL_W * SCALE_METRICS.length;
+	// The Sociability group keeps one footprint whether it shows three opportunities or the single
+	// legacy aggregate: the column widens instead of the group shrinking, so a 5.31 report has no
+	// stranded narrow column and the "not captured" note has full width to wrap in.
+	const sociabilityTableW = LABEL_COL_W + SCALE_DATA_COL_W * SOCIABILITY_DIMENSION_METRICS.length;
+	const sociabilityDataColW = (sociabilityTableW - LABEL_COL_W) / sociabilityMetrics.length;
 	const constructTableW = LABEL_COL_W + CONSTRUCT_DATA_COL_W * CONSTRUCT_METRICS.length;
 
 	return (
-		<div className="overflow-x-auto">
-			<div className="flex items-end gap-4" style={{ minWidth: scaleTableW + constructTableW + 16 }}>
-				{/* Scale group */}
+		<div className="flex flex-wrap items-end gap-x-4 gap-y-6">
+			{/* Provision, Variety, Challenge */}
+			<div className="max-w-full overflow-x-auto">
 				<div style={{ width: scaleTableW }}>
-					{showLabels ? (
-						<p className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-							{t("scaleScores")}
-						</p>
-					) : null}
+					{showLabels ? <GroupHeading>{t("scaleScores")}</GroupHeading> : null}
 					<BarGroup metrics={SCALE_METRICS} scores={scores} colWidth={SCALE_DATA_COL_W} />
 					<ScoreSubTable
 						metrics={SCALE_METRICS}
@@ -402,14 +467,31 @@ function AlignedScoreDisplay({
 						tableW={scaleTableW}
 					/>
 				</div>
+			</div>
 
-				{/* Construct group */}
-				<div style={{ width: constructTableW }}>
-					{showLabels ? (
-						<p className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">
-							{t("playValueUsability")}
+			{/* Sociability: three equal opportunities, or the legacy aggregate */}
+			<div className="max-w-full overflow-x-auto">
+				<div style={{ width: sociabilityTableW }}>
+					{showLabels ? <GroupHeading>{t("sociabilityScores")}</GroupHeading> : null}
+					<BarGroup metrics={sociabilityMetrics} scores={scores} colWidth={sociabilityDataColW} />
+					<ScoreSubTable
+						metrics={sociabilityMetrics}
+						scores={scores}
+						dataColW={sociabilityDataColW}
+						tableW={sociabilityTableW}
+					/>
+					{capturesDimensions ? null : (
+						<p className="mt-2 text-[11px] leading-4 text-muted-foreground">
+							{t("sociabilityBreakdownNotCaptured")}
 						</p>
-					) : null}
+					)}
+				</div>
+			</div>
+
+			{/* Play Value, Usability */}
+			<div className="max-w-full overflow-x-auto">
+				<div style={{ width: constructTableW }}>
+					{showLabels ? <GroupHeading>{t("playValueUsability")}</GroupHeading> : null}
 					<BarGroup metrics={CONSTRUCT_METRICS} scores={scores} colWidth={CONSTRUCT_DATA_COL_W} />
 					<ScoreSubTable
 						metrics={CONSTRUCT_METRICS}
@@ -421,6 +503,10 @@ function AlignedScoreDisplay({
 			</div>
 		</div>
 	);
+}
+
+function GroupHeading({ children }: Readonly<{ children: React.ReactNode }>) {
+	return <p className="mb-2 text-xs font-bold uppercase tracking-wider text-muted-foreground">{children}</p>;
 }
 
 function ScoreSubTable({
@@ -648,15 +734,19 @@ function DomainItemsTable({ questions }: Readonly<{ questions: DomainQuestionRow
 									})}
 								</td>
 								<td className="border-r border-edge/40 px-3 py-2 text-center text-muted-foreground">
-									{renderScaleCellState({
-										label: q.sociabilityLabel,
-										applicable: q.sociabilityApplicable,
-										isNotApplicable: q.sociabilityIsNotApplicable,
-										isUnsure: q.sociabilityIsUnsure,
-										followUpScalesAsked: q.followUpScalesAsked,
-										notApplicableLabel,
-										unsureLabel
-									})}
+									{q.sociabilityLabels !== null ? (
+										<SociabilitySelectionCell labels={q.sociabilityLabels} />
+									) : (
+										renderScaleCellState({
+											label: q.sociabilityLabel,
+											applicable: q.sociabilityApplicable,
+											isNotApplicable: q.sociabilityIsNotApplicable,
+											isUnsure: q.sociabilityIsUnsure,
+											followUpScalesAsked: q.followUpScalesAsked,
+											notApplicableLabel,
+											unsureLabel
+										})
+									)}
 								</td>
 								<td className="border-r border-edge/40 px-3 py-2 text-center font-mono tabular-nums">
 									{q.playValueScore !== null && q.playValueMax !== null
@@ -674,6 +764,30 @@ function DomainItemsTable({ questions }: Readonly<{ questions: DomainQuestionRow
 				</tbody>
 			</table>
 		</div>
+	);
+}
+
+/**
+ * List the play opportunities an auditor selected for one item.
+ *
+ * Selections are stacked, unnumbered, and identically styled - the auditor may pick any combination
+ * and no combination outranks another.
+ */
+function SociabilitySelectionCell({ labels }: Readonly<{ labels: readonly string[] }>) {
+	const t = useTranslations("shared.reportView");
+
+	if (labels.length === 0) {
+		return <span className="text-muted-foreground">{t("sociabilityNoneSelected")}</span>;
+	}
+
+	return (
+		<ul className="space-y-0.5 text-left">
+			{labels.map(label => (
+				<li key={label} className="text-[11px] leading-4 text-foreground">
+					{label}
+				</li>
+			))}
+		</ul>
 	);
 }
 
@@ -695,6 +809,118 @@ const CONSTRUCT_GRID: readonly (readonly [ConstructKey, ConstructKey, ConstructK
 	["provision", "variety", "challenge"],
 	["sociability", "play_value", "usability"]
 ];
+
+/** Translation key suffix (under `shared.reportView`) per Sociability opportunity. */
+const SOCIABILITY_DIMENSION_LABEL_KEYS: Record<SociabilityDimensionKey, string> = {
+	play_alone: "metricSociabilityPlayAlone",
+	small_group: "metricSociabilitySmallGroup",
+	large_group: "metricSociabilityLargeGroup"
+};
+
+/**
+ * Highest and lowest domains for each Sociability opportunity, side by side.
+ *
+ * Each opportunity gets its own card with its own examples - the three are separate measures, so a
+ * single "best Sociability domain" would hide which opportunity a place actually supports.
+ */
+function SociabilityBestWorstSection({ rankings }: Readonly<{ rankings: readonly SociabilityDimensionRanking[] }>) {
+	const t = useTranslations("shared.reportView");
+
+	if (rankings.length === 0) {
+		return null;
+	}
+
+	return (
+		<Card>
+			<CardHeader>
+				<CardTitle className="text-base">{t("sociabilityHighestLowest")}</CardTitle>
+			</CardHeader>
+			<CardContent>
+				<div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+					{rankings.map(ranking => (
+						<div
+							key={ranking.dimensionKey}
+							className="flex flex-col overflow-hidden rounded-lg border border-edge/40">
+							<div className="bg-primary px-3 py-2">
+								<p className="text-center text-xs font-bold text-primary-foreground">
+									{t(SOCIABILITY_DIMENSION_LABEL_KEYS[ranking.dimensionKey])}
+								</p>
+							</div>
+							{!ranking.hasSufficientData ? (
+								<div className="flex-1 px-3 py-4">
+									<p className="text-xs leading-5 text-muted-foreground">
+										{ranking.comparableDomainCount === 0
+											? t("sociabilityRankingNoData")
+											: t("sociabilityRankingSingleDomain", {
+													domain: ranking.bestDomains[0]?.domainTitle ?? ""
+												})}
+									</p>
+								</div>
+							) : ranking.allTied ? (
+								<div className="flex-1 px-3 py-4">
+									<p className="mb-1.5 text-xs font-bold text-muted-foreground">
+										{t("sociabilityRankingAllTiedTitle")}
+									</p>
+									<RankedDomainList domains={ranking.bestDomains} />
+								</div>
+							) : (
+								<>
+									<div className="border-b border-edge/40 bg-emerald-50 px-3 py-2.5 dark:bg-emerald-950/20">
+										<div className="mb-1 flex items-center gap-1.5">
+											<div className="size-2 rounded-full bg-emerald-500" aria-hidden />
+											<span className="text-xs font-bold text-muted-foreground">
+												{t("highestScored")}
+											</span>
+										</div>
+										<RankedDomainList domains={ranking.bestDomains} />
+									</div>
+									<div className="flex-1 bg-rose-50 px-3 py-2.5 dark:bg-rose-950/20">
+										<div className="mb-1 flex items-center gap-1.5">
+											<div className="size-2 rounded-full bg-rose-500" aria-hidden />
+											<span className="text-xs font-bold text-muted-foreground">
+												{t("lowestScored")}
+											</span>
+										</div>
+										<RankedDomainList domains={ranking.worstDomains} />
+									</div>
+								</>
+							)}
+						</div>
+					))}
+				</div>
+			</CardContent>
+		</Card>
+	);
+}
+
+/** Every domain tied at one rank, each with its raw score and percentage. */
+function RankedDomainList({ domains }: Readonly<{ domains: readonly RankedDomain[] }>) {
+	const t = useTranslations("shared.reportView");
+
+	if (domains.length === 0) {
+		return <p className="text-sm text-muted-foreground">-</p>;
+	}
+
+	return (
+		<ul className="space-y-1.5">
+			{domains.map(domain => (
+				<li key={domain.domainTitle}>
+					<p className="text-sm leading-5 text-foreground">{domain.domainTitle}</p>
+					<p className="text-xs tabular-nums text-muted-foreground">
+						{formatConstructDomainLine(domain.score, domain.max)}
+						{" · "}
+						{domain.percent}%
+					</p>
+				</li>
+			))}
+			{domains.length > 1 ? (
+				<li className="text-[11px] italic leading-4 text-muted-foreground">
+					{t("rankingTiedCount", { count: domains.length })}
+				</li>
+			) : null}
+		</ul>
+	);
+}
 
 function BestWorstSection({ rankings }: Readonly<{ rankings: ConstructRanking[] }>) {
 	const t = useTranslations("shared.reportView");
@@ -829,6 +1055,14 @@ export function AuditReportView({ audit, instrument = null, basePath }: Readonly
 		if (domainRows.length < 2) return [];
 		return buildConstructRankings(domainRows);
 	}, [domainRows]);
+
+	// Only instruments that captured the three opportunities can be ranked per opportunity.
+	const sociabilityRankings = React.useMemo(() => {
+		if (overall?.sociability_breakdown == null) return [];
+		return buildSociabilityDimensionRankings(domainRows);
+	}, [domainRows, overall]);
+
+	const sociabilityCoverage = getSociabilityCoverage(overall);
 
 	const domainKeys = Object.keys(displayAudit.scores.by_domain);
 	const hasDomains = domainKeys.length > 0;
@@ -1053,13 +1287,22 @@ export function AuditReportView({ audit, instrument = null, basePath }: Readonly
 				<CardHeader>
 					<CardTitle className="text-base">{t("overallScores")}</CardTitle>
 				</CardHeader>
-				<CardContent>
+				<CardContent className="space-y-3">
 					<AlignedScoreDisplay scores={overall} />
+					{sociabilityCoverage !== null ? (
+						<p className="text-xs text-muted-foreground">
+							{t("sociabilityCoverage", {
+								captured: sociabilityCoverage.captured,
+								eligible: sociabilityCoverage.eligible
+							})}
+						</p>
+					) : null}
 				</CardContent>
 			</Card>
 
 			{/* ── 6. Best & Worst ─────────────────────────────────── */}
 			{rankings.length > 0 ? <BestWorstSection rankings={rankings} /> : null}
+			<SociabilityBestWorstSection rankings={sociabilityRankings} />
 
 			{/* ── 7. Raw JSON toggle ──────────────────────────────── */}
 			<JsonViewer data={audit.scores} title="audit-scores.json" defaultOpen={true} />

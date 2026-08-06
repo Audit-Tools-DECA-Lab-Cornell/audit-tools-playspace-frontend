@@ -46,6 +46,9 @@ export function makeDefaultQuestionScale(): QuestionScale {
 		key: "provision",
 		title: "Provision",
 		prompt: "How many?",
+		// `single` is the backward-compatible default: instruments written before multi-select
+		// omit the field entirely and are read as single-select.
+		selection_mode: "single",
 		options: [makeDefaultScaleOption()]
 	};
 }
@@ -84,6 +87,7 @@ export function makeDefaultScaleDefinition(): ScaleDefinition {
 		title: "New Scale",
 		prompt: "Scale prompt",
 		description: "Scale description",
+		selection_mode: "single",
 		options: [makeDefaultScaleOption()]
 	};
 }
