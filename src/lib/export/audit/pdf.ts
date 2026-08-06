@@ -42,6 +42,7 @@ import {
 import { hexToRgb, type PvScaleKey, SCALE_ACCENT_COLORS, SCALE_SOFT_COLORS } from "@/lib/audit/scale-colors";
 import { getEffectiveScoreTotals, hasUnsureVariants, type ScoreVariantKey } from "@/lib/audit/score-mode-helpers";
 import { formatQuestionKeyForDisplay } from "@/lib/audit/selectors";
+import type { ParsedInstrumentQuestion, QuestionResponsePayload } from "@/types/audit";
 
 import {
 	formatAuditStatusLabel,
@@ -55,9 +56,38 @@ import {
 	formatTimestampForDisplay,
 	stripPromptMarkup
 } from "./format-utils";
-import { buildSpaceAuditRows } from "./row-builders";
+import {
+	buildSociabilityBreakdownScoreRows,
+	buildSociabilityResponseColumns,
+	buildSpaceAuditRows,
+	SOCIABILITY_DIMENSION_LABELS
+} from "./row-builders";
 import { addScoreTotals, calculateQuestionScores, createEmptyScoreTotals, deriveSummaryScore } from "./score-utils";
 import type { AuditScoreTotals, ExportableAudit, PlayspaceInstrument } from "./types";
+
+/** True when a question's Sociability scale accepts any combination of its answers. */
+function isMultipleSociabilityQuestion(question: ParsedInstrumentQuestion): boolean {
+	return question.scales.some(scale => scale.key === "sociability" && scale.selection_mode === "multiple");
+}
+
+/**
+ * Render the play opportunities an auditor selected, one per line.
+ *
+ * The selection text comes from the shared column builder, so the printed answer, the spreadsheet
+ * cells, and the on-screen report all describe the same state.
+ */
+function formatSociabilitySelectionsForPdf(
+	question: ParsedInstrumentQuestion,
+	answers: QuestionResponsePayload
+): string {
+	const columns = buildSociabilityResponseColumns(question, answers);
+	const selected = columns.filter(column => column.selected === true);
+	if (selected.length > 0) {
+		return selected.map(column => SOCIABILITY_DIMENSION_LABELS[column.dimensionKey]).join("\n");
+	}
+	// Every column carries the same non-selection state ("Not captured" / "Not answered").
+	return columns[0]?.value ?? "";
+}
 
 function buildScaleRgbMap(colorMap: Record<PvScaleKey, string>): Record<PvScaleKey, [number, number, number]> {
 	return {
@@ -462,6 +492,39 @@ export async function generatePdfBlob(
 	const summaryFill = AUDIT_PDF_PALETTE.summaryFill;
 	const summaryText = AUDIT_PDF_PALETTE.summaryText;
 
+	/**
+	 * One score row per play opportunity, or a single "not captured" line when the source
+	 * instrument scored Sociability as one scalar answer.
+	 *
+	 * Legacy audits never produced these three numbers, so printing three zeros would invent data.
+	 */
+	function buildSociabilityBreakdownSummaryRows(totals: AuditScoreTotals | null): ScoreRow[] {
+		const sociabilityFill = AUDIT_PDF_PALETTE.scaleFill.sociability;
+		const sociabilityText = AUDIT_PDF_PALETTE.scaleAccent.sociability;
+
+		if (totals === null || totals.sociability_breakdown === null) {
+			return [
+				{
+					cells: ["Sociability Breakdown", "Not captured by this instrument"],
+					labelFill: sociabilityFill,
+					valueFill: sociabilityFill,
+					labelText: sociabilityText,
+					valueText: sociabilityText,
+					bold: false
+				}
+			];
+		}
+
+		return buildSociabilityBreakdownScoreRows(totals).map(row => ({
+			cells: [String(row[0] ?? ""), `${String(row[1] ?? "")} / ${String(row[2] ?? "")} (${String(row[3] ?? "")})`],
+			labelFill: sociabilityFill,
+			valueFill: sociabilityFill,
+			labelText: sociabilityText,
+			valueText: sociabilityText,
+			bold: false
+		}));
+	}
+
 	const scoreRows: ScoreRow[] = [
 		{
 			cells: ["Summary Score", String(deriveSummaryScore(auditSession))],
@@ -518,7 +581,10 @@ export async function generatePdfBlob(
 			labelText: AUDIT_PDF_PALETTE.scaleAccent.challenge,
 			valueText: AUDIT_PDF_PALETTE.scaleAccent.challenge,
 			bold: false
-		}
+		},
+		// The three play opportunities follow the Sociability aggregate as their own block. All
+		// three share the Sociability fill so the printed page reads them as equal measures.
+		...buildSociabilityBreakdownSummaryRows(overallScores)
 	];
 
 	// ── Page 1: Space Audit Setup (before scores; only when space-setup questions exist) ─
@@ -969,14 +1035,18 @@ export async function generatePdfBlob(
 							"variety",
 							typeof rawVariety === "string" ? rawVariety : undefined
 						);
+			// A multi-answer Sociability scale stores an array, so the shared column builder decides
+			// what the cell says; the scalar path stays untouched for historical instruments.
 			const sociabilityAnswer =
 				question.question_type === "checklist"
 					? ""
-					: formatQuestionAnswer(
-							question,
-							"sociability",
-							typeof rawSociability === "string" ? rawSociability : undefined
-						);
+					: isMultipleSociabilityQuestion(question)
+						? formatSociabilitySelectionsForPdf(question, answers)
+						: formatQuestionAnswer(
+								question,
+								"sociability",
+								typeof rawSociability === "string" ? rawSociability : undefined
+							);
 			const challengeAnswer =
 				question.question_type === "checklist"
 					? ""

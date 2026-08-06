@@ -25,7 +25,8 @@ import {
 	getPreAuditValues,
 	getVisiblePreAuditQuestions,
 	getVisibleSections,
-	isRequiredPreAuditComplete
+	isRequiredPreAuditComplete,
+	toggleMultipleScaleOption
 } from "@/lib/audit/selectors";
 import { useLocalizedInstrument } from "@/lib/instrument-translations";
 import { cn } from "@/lib/utils";
@@ -1037,6 +1038,33 @@ export function AuditExecuteForm({ placeId, projectId }: Readonly<AuditExecuteFo
 												)?.selectedAnswers ?? {},
 												question,
 												scaleKey,
+												optionKey
+											)
+										);
+									}}
+									onToggleMultipleOption={(
+										questionKey: string,
+										scaleKey: string,
+										optionKey: string
+									) => {
+										const question = activeSection.section.questions.find(
+											currentQuestion => currentQuestion.question_key === questionKey
+										);
+										const scale = question?.scales.find(
+											currentScale => currentScale.key === scaleKey
+										);
+										if (!scale) {
+											return;
+										}
+
+										handleQuestionAnswer(
+											activeSection.section.section_key,
+											questionKey,
+											toggleMultipleScaleOption(
+												activeSectionQuestionRows.find(
+													row => row.question.question_key === questionKey
+												)?.selectedAnswers ?? {},
+												scale,
 												optionKey
 											)
 										);

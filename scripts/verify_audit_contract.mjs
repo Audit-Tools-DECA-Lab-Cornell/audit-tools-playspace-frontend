@@ -15,7 +15,7 @@ const BACKEND_INSTRUMENT_PATH = path.resolve(
 	"products",
 	"playspace",
 	"instruments",
-	"pvua_v5_2.instrument.json"
+	"pvua_v5_2__v5.32.instrument.json"
 );
 const MODULE_CACHE = new Map();
 
@@ -86,8 +86,15 @@ const rawBackendInstrument = loadJsonFile(BACKEND_INSTRUMENT_PATH);
 const BASE_PLAYSPACE_INSTRUMENT =
 	rawBackendInstrument.sections !== undefined ? rawBackendInstrument : rawBackendInstrument.en;
 assert(BASE_PLAYSPACE_INSTRUMENT?.sections !== undefined, "Expected backend instrument fixture to expose sections.");
-const { auditDraftPatchSchema, auditDraftSaveSchema, auditSessionSchema } = loadTsModule(
-	path.resolve(REPO_ROOT, "src/types/audit.ts")
+const {
+	auditDraftPatchSchema,
+	auditDraftSaveSchema,
+	auditScoreTotalsSchema,
+	auditSessionSchema,
+	playspaceInstrumentSchema
+} = loadTsModule(path.resolve(REPO_ROOT, "src/types/audit.ts"));
+const { SOCIABILITY_DIMENSION_KEYS, validateAndNormalizeMultipleScaleAnswer } = loadTsModule(
+	path.resolve(REPO_ROOT, "src/types/sociability.ts")
 );
 const { buildNextQuestionAnswers, getVisibleSections, getInstrumentSectionLocalProgress } = loadTsModule(
 	path.resolve(REPO_ROOT, "src/lib/audit/selectors.ts")
@@ -96,6 +103,76 @@ const { buildNextQuestionAnswers, getVisibleSections, getInstrumentSectionLocalP
 const targetSection = BASE_PLAYSPACE_INSTRUMENT.sections[0];
 const targetQuestion = targetSection.questions.find(question => question.scales.length > 1);
 assert(targetQuestion !== undefined, "Expected an instrument question with follow-up scales.");
+const multipleSociabilityQuestion = BASE_PLAYSPACE_INSTRUMENT.sections
+	.flatMap(section => section.questions)
+	.find(question =>
+		question.scales.some(scale => scale.key === "sociability" && scale.selection_mode === "multiple")
+	);
+assert(multipleSociabilityQuestion !== undefined, "Expected a multiple-select Sociability question.");
+
+const parsedNewInstrument = playspaceInstrumentSchema.parse(BASE_PLAYSPACE_INSTRUMENT);
+assert(
+	parsedNewInstrument.sections
+		.flatMap(section => section.questions)
+		.some(question => question.scales.some(scale => scale.selection_mode === "multiple")),
+	"Expected the new instrument selection mode to parse."
+);
+
+const oldInstrumentFixture = structuredClone(BASE_PLAYSPACE_INSTRUMENT);
+for (const scale of oldInstrumentFixture.scale_guidance) {
+	delete scale.selection_mode;
+}
+for (const section of oldInstrumentFixture.sections) {
+	for (const question of section.questions) {
+		for (const scale of question.scales) {
+			delete scale.selection_mode;
+		}
+	}
+}
+const parsedOldInstrument = playspaceInstrumentSchema.parse(oldInstrumentFixture);
+assert(
+	parsedOldInstrument.sections.every(section =>
+		section.questions.every(question => question.scales.every(scale => scale.selection_mode === "single"))
+	),
+	"Expected missing selection modes to default to single."
+);
+
+const scoreTotalsFixture = {
+	provision_total: 1,
+	provision_total_max: 2,
+	variety_total: 0,
+	variety_total_max: 0,
+	challenge_total: 0,
+	challenge_total_max: 0,
+	sociability_total: 1,
+	sociability_total_max: 3,
+	play_value_total: 1,
+	play_value_total_max: 2,
+	usability_total: 0,
+	usability_total_max: 0
+};
+assert(
+	auditScoreTotalsSchema.parse(scoreTotalsFixture).sociability_breakdown === null,
+	"Expected missing Sociability breakdowns to parse as legacy null."
+);
+assert(
+	auditScoreTotalsSchema.parse({
+		...scoreTotalsFixture,
+		sociability_breakdown: {
+			model: "multi_select_v1",
+			play_alone: { total: 1, max: 1 },
+			small_group: { total: 0, max: 1 },
+			large_group: { total: 0, max: 1 },
+			captured_question_count: 1,
+			eligible_question_count: 1
+		}
+	}).sociability_breakdown?.model === "multi_select_v1",
+	"Expected the versioned Sociability breakdown to parse."
+);
+assert(
+	validateAndNormalizeMultipleScaleAnswer("play_alone", SOCIABILITY_DIMENSION_KEYS).ok === false,
+	"Expected scalar multiple-select writes to be rejected."
+);
 
 const sessionFixture = {
 	audit_id: "11111111-1111-4111-8111-111111111111",

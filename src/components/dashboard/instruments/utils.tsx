@@ -193,6 +193,10 @@ export function renderInlineMarkdown(text: string): React.ReactNode {
  */
 export function isScaleCustomized(questionScale: QuestionScale, defaultScale: ScaleDefinition | undefined): boolean {
 	if (!defaultScale) return true;
+	// Answering rules differ from the shared guidance: one answer versus any combination.
+	if ((questionScale.selection_mode ?? "single") !== (defaultScale.selection_mode ?? "single")) {
+		return true;
+	}
 	// Customized = the question introduces an option key the default scale lacks.
 	return !questionScale.options.every(opt => defaultScale.options.some(dopt => dopt.key === opt.key));
 }

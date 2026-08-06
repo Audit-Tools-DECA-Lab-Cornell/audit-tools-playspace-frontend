@@ -18,6 +18,24 @@ export interface AuditJsonExport {
 	readonly audit: ExportableAudit["auditSession"];
 }
 
+export function buildAuditJsonExport(
+	exportableAudit: ExportableAudit,
+	instrument: PlayspaceInstrument,
+	exportedAt: string
+): AuditJsonExport {
+	const instrumentRef = instrument as unknown as { id?: string; version?: number };
+	return {
+		exported_at: exportedAt,
+		instrument: {
+			id: instrumentRef.id ?? null,
+			version: instrumentRef.version ?? null
+		},
+		context: exportableAudit.context,
+		auditor_profile: exportableAudit.auditorProfile,
+		audit: exportableAudit.auditSession
+	};
+}
+
 /**
  * Generates a JSON blob for a single audit. The instrument is referenced by
  * id/version only - the full instrument definition is not embedded, since the
@@ -28,18 +46,7 @@ export function generateJsonBlob(
 	instrument: PlayspaceInstrument,
 	exportedAt: string
 ): Blob {
-	const instrumentRef = instrument as unknown as { id?: string; version?: number };
-
-	const payload: AuditJsonExport = {
-		exported_at: exportedAt,
-		instrument: {
-			id: instrumentRef.id ?? null,
-			version: instrumentRef.version ?? null
-		},
-		context: exportableAudit.context,
-		auditor_profile: exportableAudit.auditorProfile,
-		audit: exportableAudit.auditSession
-	};
+	const payload = buildAuditJsonExport(exportableAudit, instrument, exportedAt);
 
 	return new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
 }

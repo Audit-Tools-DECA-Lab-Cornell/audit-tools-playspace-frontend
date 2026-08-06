@@ -17,6 +17,7 @@ function createScoreTotals(seed: number): ScoreTotals {
 		challenge_total_max: seed + 13,
 		sociability_total: seed + 4,
 		sociability_total_max: seed + 14,
+		sociability_breakdown: null,
 		play_value_total: seed + 5,
 		play_value_total_max: seed + 15,
 		usability_total: seed + 6,

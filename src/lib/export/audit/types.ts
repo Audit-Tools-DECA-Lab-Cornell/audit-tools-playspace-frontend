@@ -142,7 +142,13 @@ export function getWebScaleAccentColor(
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-/** Column headers for the PVUA response matrix (CSV, XLSX Responses sheet, PDF). */
+/**
+ * Column headers for the PVUA response matrix (CSV, XLSX Responses sheet, PDF).
+ *
+ * The Sociability aggregate is followed by one structural column per play opportunity. The three
+ * stay present for every instrument: a scalar-Sociability audit marks them "Not captured" rather
+ * than dropping the columns, so a mixed export keeps one stable shape.
+ */
 export const SINGLE_RESPONSE_HEADERS = [
 	"ID_Number",
 	"Survey or Audit",
@@ -154,6 +160,9 @@ export const SINGLE_RESPONSE_HEADERS = [
 	"Provision",
 	"Variety",
 	"Sociability",
+	"Sociability - Play Alone",
+	"Sociability - Small Group",
+	"Sociability - Large Group",
 	"Challenge Opportunities",
 	"Play Value (PV) Construct Score",
 	"Usability (U) Construct Score"
@@ -172,7 +181,7 @@ export const OVERVIEW_COLUMN_WIDTHS = [28, 56] as const;
 export const SPACE_AUDIT_COLUMN_WIDTHS = [44, 56] as const;
 
 /** Fixed column widths (characters) for the Responses worksheet. */
-export const SINGLE_RESPONSE_COLUMN_WIDTHS = [12, 16, 16, 28, 64, 40, 72, 22, 22, 22, 26, 22, 22] as const;
+export const SINGLE_RESPONSE_COLUMN_WIDTHS = [12, 16, 16, 28, 64, 40, 72, 22, 22, 22, 24, 24, 24, 26, 22, 22] as const;
 
 /** jsPDF autoTable header fill colour (blue). */
 export const PDF_HEADER_RGB: [number, number, number] = [37, 99, 235];

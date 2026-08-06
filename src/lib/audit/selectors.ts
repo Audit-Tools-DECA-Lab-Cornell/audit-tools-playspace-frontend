@@ -8,6 +8,7 @@ import type {
 	QuestionResponsePayload,
 	QuestionScale
 } from "@/types/audit";
+import { validateAndNormalizeMultipleScaleAnswer } from "@/types/sociability";
 
 export interface InstrumentSectionLocalProgress {
 	readonly visibleQuestionCount: number;
@@ -171,8 +172,20 @@ export function isInstrumentQuestionComplete(
 	}
 
 	return requiredKeys.every(scaleKey => {
+		const scale = question.scales.find(candidate => candidate.key === scaleKey);
+		if (scale === undefined) {
+			return false;
+		}
 		const value = selectedAnswers[scaleKey];
-		return typeof value === "string" && value.trim().length > 0;
+		if (scale.selection_mode === "multiple") {
+			return validateAndNormalizeMultipleScaleAnswer(
+				value,
+				scale.options.map(option => option.key)
+			).ok;
+		}
+		return (
+			typeof value === "string" && value.trim().length > 0 && scale.options.some(option => option.key === value)
+		);
 	});
 }
 
@@ -263,6 +276,53 @@ export function buildNextQuestionAnswers(
 
 	const questionNote = typeof currentAnswers.question_note === "string" ? currentAnswers.question_note : null;
 	return questionNote === null ? { provision: optionKey } : { provision: optionKey, question_note: questionNote };
+}
+
+/**
+ * Report whether a scale captures an array answer instead of a single option key.
+ */
+export function isMultipleSelectionScale(scale: Pick<QuestionScale, "selection_mode">): boolean {
+	return scale.selection_mode === "multiple";
+}
+
+/**
+ * Read the stored selections of a multiple-selection scale in instrument option order.
+ */
+export function readMultipleScaleSelection(answers: QuestionResponsePayload, scale: QuestionScale): string[] {
+	const rawAnswer = answers[scale.key];
+	if (!Array.isArray(rawAnswer)) {
+		return [];
+	}
+
+	const storedOptionKeys = new Set(rawAnswer.filter((entry): entry is string => typeof entry === "string"));
+	return scale.options.filter(option => storedOptionKeys.has(option.key)).map(option => option.key);
+}
+
+/**
+ * Toggle one option of a multiple-selection scale, keeping instrument option order.
+ *
+ * Clearing the last selection removes the scale key so the question reads as unanswered; the
+ * backend rejects empty arrays, and an empty array would otherwise be sent as a real answer.
+ */
+export function toggleMultipleScaleOption(
+	currentAnswers: QuestionResponsePayload,
+	scale: QuestionScale,
+	optionKey: string
+): QuestionResponsePayload {
+	const selectedOptionKeys = readMultipleScaleSelection(currentAnswers, scale);
+	const nextSelectedOptionKeys = selectedOptionKeys.includes(optionKey)
+		? selectedOptionKeys.filter(currentKey => currentKey !== optionKey)
+		: scale.options
+				.filter(option => option.key === optionKey || selectedOptionKeys.includes(option.key))
+				.map(option => option.key);
+
+	if (nextSelectedOptionKeys.length === 0) {
+		const clearedAnswers: QuestionResponsePayload = { ...currentAnswers };
+		delete clearedAnswers[scale.key];
+		return clearedAnswers;
+	}
+
+	return { ...currentAnswers, [scale.key]: nextSelectedOptionKeys };
 }
 
 /**

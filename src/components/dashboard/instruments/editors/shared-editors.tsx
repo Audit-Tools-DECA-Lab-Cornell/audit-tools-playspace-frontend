@@ -26,7 +26,8 @@ import type {
 	QuestionDisplayCondition,
 	QuestionScale,
 	ScaleDefinition,
-	ScaleOption
+	ScaleOption,
+	SelectionMode
 } from "@/types/audit";
 
 import { AiTranslateFieldButton } from "../ai-translate-button";
@@ -475,6 +476,42 @@ export function DisplayConditionEditor({
 	);
 }
 
+/**
+ * Choose whether a scale accepts one answer or any combination of its answers.
+ *
+ * `single` is the backward-compatible default: an instrument that omits the field is read as
+ * single-select everywhere, so switching to `multiple` is always an explicit act.
+ */
+export function SelectionModeField({
+	value,
+	disabled,
+	onChange
+}: Readonly<{
+	value: SelectionMode;
+	disabled: boolean;
+	onChange: (mode: SelectionMode) => void;
+}>) {
+	const t = useTranslations("admin.instruments.content");
+
+	return (
+		<div className="space-y-1">
+			<Label className="text-xs text-muted-foreground">{t("selectionMode")}</Label>
+			<Select value={value} disabled={disabled} onValueChange={v => onChange(v as SelectionMode)}>
+				<SelectTrigger className="w-full text-sm data-[size=default]:h-10">
+					<SelectValue />
+				</SelectTrigger>
+				<SelectContent>
+					<SelectItem value="single">{t("selectionModeSingle")}</SelectItem>
+					<SelectItem value="multiple">{t("selectionModeMultiple")}</SelectItem>
+				</SelectContent>
+			</Select>
+			<p className="text-[11px] leading-4 text-muted-foreground">
+				{value === "multiple" ? t("selectionModeMultipleHint") : t("selectionModeSingleHint")}
+			</p>
+		</div>
+	);
+}
+
 export function QuestionScalesEditor({
 	scales,
 	scaleGuidanceMap,
@@ -566,6 +603,15 @@ export function QuestionScalesEditor({
 									onChange={v =>
 										updateScale(sIdx, s => {
 											s.prompt = v;
+										})
+									}
+								/>
+								<SelectionModeField
+									value={scale.selection_mode ?? "single"}
+									disabled={translationMode}
+									onChange={mode =>
+										updateScale(sIdx, s => {
+											s.selection_mode = mode;
 										})
 									}
 								/>

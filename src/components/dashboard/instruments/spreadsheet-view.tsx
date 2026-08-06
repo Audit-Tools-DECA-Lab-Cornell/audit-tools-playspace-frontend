@@ -626,6 +626,14 @@ export function SpreadsheetView({
 																	className="inline-flex items-center gap-0.5"
 																	data-testid={`scale-item-${scale.key}`}>
 																	<ScaleKeyBadge scaleKey={scale.key} />
+																	{scale.selection_mode === "multiple" && (
+																		<Badge
+																			variant="outline"
+																			className="border-primary/40 bg-primary/10 text-primary text-[9px] px-1 py-0"
+																			data-testid={`badge-multi-select-${scale.key}`}>
+																			{t("multiSelectBadge")}
+																		</Badge>
+																	)}
 																	{customized && (
 																		<Badge
 																			variant="outline"

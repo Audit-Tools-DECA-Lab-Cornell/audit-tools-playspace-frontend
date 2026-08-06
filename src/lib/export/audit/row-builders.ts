@@ -15,6 +15,12 @@ import {
 } from "@/lib/audit/report-source-sessions";
 import { getEffectiveScoreTotals, hasUnsureVariants, type ScoreVariantKey } from "@/lib/audit/score-mode-helpers";
 import { formatQuestionKeyForDisplay } from "@/lib/audit/selectors";
+import {
+	hasCanonicalSociabilityDimensionKeys,
+	SOCIABILITY_DIMENSION_KEYS,
+	type SociabilityDimensionKey,
+	validateAndNormalizeMultipleScaleAnswer
+} from "@/types/sociability";
 
 import {
 	formatAuditStatusLabel,
@@ -46,6 +52,19 @@ interface ResponseTableBuildResult {
 	readonly rows: readonly SpreadsheetRow[];
 	readonly rowMetadata: readonly (WorkbookRowMetadata | null)[];
 }
+
+export interface SociabilityResponseColumn {
+	readonly dimensionKey: SociabilityDimensionKey;
+	readonly header: string;
+	readonly selected: boolean | null;
+	readonly value: string;
+}
+
+export const SOCIABILITY_DIMENSION_LABELS: Readonly<Record<SociabilityDimensionKey, string>> = {
+	play_alone: "Play Alone",
+	small_group: "Small Group",
+	large_group: "Large Group"
+};
 
 function formatVariantScoreRow(
 	label: string,
@@ -168,6 +187,63 @@ export function buildSpaceAuditRows(
 			resolveSpaceAuditDisplayValues(question, readSpaceAuditQuestionValues(auditSession, question))
 		)
 	]);
+}
+
+export function buildSociabilityResponseColumns(
+	question: import("@/types/audit").ParsedInstrumentQuestion,
+	answers: import("@/types/audit").QuestionResponsePayload
+): readonly SociabilityResponseColumn[] {
+	const scale = question.scales.find(candidate => candidate.key === "sociability");
+	if (scale?.selection_mode !== "multiple") {
+		return SOCIABILITY_DIMENSION_KEYS.map(dimensionKey => ({
+			dimensionKey,
+			header: `Sociability - ${SOCIABILITY_DIMENSION_LABELS[dimensionKey]}`,
+			selected: null,
+			value: scale === undefined ? "N/A" : "Not captured"
+		}));
+	}
+	if (!hasCanonicalSociabilityDimensionKeys(scale.options.map(option => option.key))) {
+		throw new Error("Multiple Sociability options must use the canonical ordered dimension keys.");
+	}
+	if (!("sociability" in answers)) {
+		return SOCIABILITY_DIMENSION_KEYS.map(dimensionKey => ({
+			dimensionKey,
+			header: `Sociability - ${SOCIABILITY_DIMENSION_LABELS[dimensionKey]}`,
+			selected: null,
+			value: "Not answered"
+		}));
+	}
+
+	const normalizedAnswer = validateAndNormalizeMultipleScaleAnswer(answers.sociability, SOCIABILITY_DIMENSION_KEYS);
+	if (!normalizedAnswer.ok) {
+		throw new Error(`Invalid multiple Sociability answer: ${normalizedAnswer.reason}.`);
+	}
+	const selectedKeys = new Set(normalizedAnswer.value);
+	return SOCIABILITY_DIMENSION_KEYS.map(dimensionKey => ({
+		dimensionKey,
+		header: `Sociability - ${SOCIABILITY_DIMENSION_LABELS[dimensionKey]}`,
+		selected: selectedKeys.has(dimensionKey),
+		value: selectedKeys.has(dimensionKey) ? "Selected" : "Not selected"
+	}));
+}
+
+export function buildSociabilityBreakdownScoreRows(totals: AuditScoreTotals): readonly SpreadsheetRow[] {
+	const breakdown = totals.sociability_breakdown;
+	if (breakdown === null) {
+		return [];
+	}
+
+	return SOCIABILITY_DIMENSION_KEYS.map(dimensionKey => {
+		const categoryTotals = breakdown[dimensionKey];
+		return [
+			`Sociability - ${SOCIABILITY_DIMENSION_LABELS[dimensionKey]}`,
+			categoryTotals.total,
+			categoryTotals.max,
+			formatPercentage(categoryTotals.total, categoryTotals.max),
+			breakdown.captured_question_count,
+			breakdown.eligible_question_count
+		];
+	});
 }
 
 // ── Responses sheet ───────────────────────────────────────────────────────────
@@ -329,6 +405,9 @@ export function buildSectionHeaderRow(
 		"",
 		"",
 		"",
+		"",
+		"",
+		"",
 		""
 	];
 }
@@ -337,10 +416,11 @@ export function buildSectionHeaderRow(
 export function buildQuestionResponseRow(
 	_sectionIndex: number,
 	_questionIndex: number,
-	question: import("@/types/audit").InstrumentQuestion,
+	question: import("@/types/audit").ParsedInstrumentQuestion,
 	answers: import("@/types/audit").QuestionResponsePayload,
 	questionScores: AuditScoreTotals
 ): SpreadsheetRow {
+	const sociabilityColumns = buildSociabilityResponseColumns(question, answers);
 	if (question.question_type === "checklist") {
 		return [
 			formatQuestionKeyForDisplay(question.question_key),
@@ -353,6 +433,7 @@ export function buildQuestionResponseRow(
 			formatChecklistAnswer(question, answers),
 			"",
 			"",
+			...sociabilityColumns.map(column => column.value),
 			"",
 			"N/A",
 			"N/A"
@@ -363,6 +444,18 @@ export function buildQuestionResponseRow(
 	const rawVariety = answers.variety;
 	const rawSociability = answers.sociability;
 	const rawChallenge = answers.challenge;
+	const sociabilityScale = question.scales.find(scale => scale.key === "sociability");
+	const sociabilityAnswer =
+		Array.isArray(rawSociability) && sociabilityScale?.selection_mode === "multiple"
+			? rawSociability
+					.filter((answer): answer is string => typeof answer === "string")
+					.map(answer => formatQuestionAnswer(question, "sociability", answer))
+					.join(" | ")
+			: formatQuestionAnswer(
+					question,
+					"sociability",
+					typeof rawSociability === "string" ? rawSociability : undefined
+				);
 
 	return [
 		formatQuestionKeyForDisplay(question.question_key),
@@ -374,7 +467,8 @@ export function buildQuestionResponseRow(
 		stripPromptMarkup(question.prompt),
 		formatQuestionAnswer(question, "provision", typeof rawProvision === "string" ? rawProvision : undefined),
 		formatQuestionAnswer(question, "variety", typeof rawVariety === "string" ? rawVariety : undefined),
-		formatQuestionAnswer(question, "sociability", typeof rawSociability === "string" ? rawSociability : undefined),
+		sociabilityAnswer,
+		...sociabilityColumns.map(column => column.value),
 		formatQuestionAnswer(question, "challenge", typeof rawChallenge === "string" ? rawChallenge : undefined),
 		question.constructs.includes("play_value") ? questionScores.play_value_total : "N/A",
 		question.constructs.includes("usability") ? questionScores.usability_total : "N/A"
@@ -413,7 +507,24 @@ export function buildQuestionCommentRow(
 	sourceComponent: ReportSourceComponent | null
 ): SpreadsheetRow {
 	const sourcePrefix = sourceComponent === null ? "" : `${getReportSourceLabel(sourceComponent)}: `;
-	return [questionKey, COMMENT_ROW_SENTINEL, "", "", "", "", `${sourcePrefix}${comment}`, "", "", "", "", "", ""];
+	return [
+		questionKey,
+		COMMENT_ROW_SENTINEL,
+		"",
+		"",
+		"",
+		"",
+		`${sourcePrefix}${comment}`,
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		"",
+		""
+	];
 }
 
 /**
@@ -433,7 +544,7 @@ export function buildSectionNoteRow(
 	notesPrompt: string,
 	submittedComment: string
 ): readonly SpreadsheetRow[] {
-	const BLANK = ["", "", "", "", "", "", "", "", "", "", ""] as const;
+	const BLANK = ["", "", "", "", "", "", "", "", "", "", "", "", "", ""] as const;
 	const rows: SpreadsheetRow[] = [];
 
 	if (notesPrompt.length > 0) {
@@ -495,6 +606,16 @@ export function buildScoreSummaryRow(
 	rowKind: ScoreRowKind
 ): SpreadsheetRow {
 	const base = [idLabel, modeLabel, SCORE_ROW_SENTINEL, "", "", "", ""] as const;
+	const breakdown = totals.sociability_breakdown;
+	const sociabilityBreakdownCells =
+		breakdown === null
+			? (["Not captured", "Not captured", "Not captured"] as const)
+			: SOCIABILITY_DIMENSION_KEYS.map(dimensionKey => {
+					const dimension = breakdown[dimensionKey];
+					if (rowKind === "raw") return dimension.total;
+					if (rowKind === "maximum") return dimension.max;
+					return formatPercentage(dimension.total, dimension.max);
+				});
 
 	if (rowKind === "raw") {
 		return [
@@ -502,6 +623,7 @@ export function buildScoreSummaryRow(
 			totals.provision_total,
 			totals.variety_total,
 			totals.sociability_total,
+			...sociabilityBreakdownCells,
 			totals.challenge_total,
 			totals.play_value_total,
 			totals.usability_total
@@ -514,6 +636,7 @@ export function buildScoreSummaryRow(
 			totals.provision_total_max,
 			totals.variety_total_max,
 			totals.sociability_total_max,
+			...sociabilityBreakdownCells,
 			totals.challenge_total_max,
 			totals.play_value_total_max,
 			totals.usability_total_max
@@ -525,13 +648,13 @@ export function buildScoreSummaryRow(
 		formatPercentage(totals.provision_total, totals.provision_total_max),
 		formatPercentage(totals.variety_total, totals.variety_total_max),
 		formatPercentage(totals.sociability_total, totals.sociability_total_max),
+		...sociabilityBreakdownCells,
 		formatPercentage(totals.challenge_total, totals.challenge_total_max),
 		formatPercentage(totals.play_value_total, totals.play_value_total_max),
 		formatPercentage(totals.usability_total, totals.usability_total_max)
 	];
 }
 
-/** Produces a blank separator row (13 empty cells). */
 export function buildEmptyResponseRow(): SpreadsheetRow {
-	return ["", "", "", "", "", "", "", "", "", "", "", "", ""];
+	return ["", "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""];
 }
