@@ -1225,6 +1225,7 @@
 			"unknownRole": "Unbekannter Kontotyp vom Server zurückgegeben.",
 			"unexpected": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
 		},
+		"accountDeletedConfirmation": "Ihr Konto wurde dauerhaft gelöscht. Für eine Rückkehr benötigen Sie eine neue Einladung.",
 		"noAccount": "Noch kein Konto?",
 		"signUpLink": "Registrieren",
 		"demoPasswordHint": "Demo-Passwort:",

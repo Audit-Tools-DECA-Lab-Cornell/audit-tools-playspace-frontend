@@ -1243,6 +1243,7 @@
 			"unknownRole": "Unrecognized account type returned by the server.",
 			"unexpected": "Something went wrong. Please try again."
 		},
+		"accountDeletedConfirmation": "Your account has been permanently deleted. You'll need a new invitation if you want to return.",
 		"noAccount": "Don't have an account?",
 		"signUpLink": "Sign up",
 		"demoPasswordHint": "Demo password:",

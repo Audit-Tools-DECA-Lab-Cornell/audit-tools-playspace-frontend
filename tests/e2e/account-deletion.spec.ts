@@ -110,6 +110,14 @@ test.describe("@account-deletion refusals leave the account intact", () => {
 });
 
 test.describe("@account-deletion danger zone on the settings page", () => {
+	test("login confirms a completed deletion when the redirect flag is present", async ({ page }) => {
+		await page.goto("/login?account_deleted=1");
+
+		const confirmation = page.getByTestId("account-deleted-confirmation");
+		await expect(confirmation).toBeVisible();
+		await expect(confirmation).toContainText(/permanently deleted/i);
+	});
+
 	test("an auditor sees the danger zone and a two-step confirmation", async ({ page }) => {
 		await loginAsAuditor(page);
 		await page.goto("/settings");

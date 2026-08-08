@@ -1,5 +1,6 @@
 "use client";
 
+import { CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
@@ -73,6 +74,8 @@ function applyAuthResponse(authResponse: AuthResponse): UserRole | null {
 
 export interface LoginFormProps {
 	nextParam: string | null;
+	/** True when the user arrived after permanently deleting their own account. */
+	accountDeleted?: boolean;
 }
 
 interface PendingButtonLabelProps {
@@ -250,7 +253,7 @@ function RoleLoginCard({
 	);
 }
 
-export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
+export function LoginForm({ nextParam, accountDeleted = false }: Readonly<LoginFormProps>) {
 	const t = useTranslations("login");
 	const [activeCard, setActiveCard] = React.useState<string | null>(null);
 
@@ -258,6 +261,17 @@ export function LoginForm({ nextParam }: Readonly<LoginFormProps>) {
 		<div className="min-h-dvh bg-background">
 			<div className="mx-auto flex min-h-dvh w-full max-w-5xl items-center px-4 py-10">
 				<div className="w-full space-y-6">
+					{accountDeleted ? (
+						<div
+							role="status"
+							aria-live="polite"
+							data-testid="account-deleted-confirmation"
+							className="flex items-start gap-3 rounded-md border border-status-success-border bg-status-success-surface/20 px-4 py-3 text-sm text-foreground">
+							<CheckCircle2 className="mt-0.5 size-4 shrink-0 text-status-success" aria-hidden="true" />
+							<p>{t("accountDeletedConfirmation")}</p>
+						</div>
+					) : null}
+
 					<div className="grid w-full gap-6 lg:grid-cols-3">
 						<RoleLoginCard
 							roleKey="admin"
