@@ -421,6 +421,8 @@
 			"notYetSubmitted": "Not yet submitted",
 			"progress": "Progress",
 			"questions": "questions",
+			"playspaceContext": "Playspace Context",
+			"notProvided": "Not provided",
 			"scoreInterpretation": "Score interpretation",
 			"interpretationHelp": "Choose how Unsure answers affect the report totals. The saved score uses Unsure excluded.",
 			"unsureInterpretations": "Unsure interpretations",
@@ -2379,6 +2381,97 @@
 		}
 	},
 	"settings": {
+		"deleteAccount": {
+			"eyebrow": "Danger zone",
+			"title": "Delete your account",
+			"description": "Remove your sign-in and personal details. Audits your organisation has already collected stay where they are.",
+			"transferSuccess": "{name} is now your organisation's main contact. You can delete your account below.",
+			"actions": {
+				"start": "Delete my account",
+				"back": "Back",
+				"cancel": "Keep my account",
+				"continue": "Continue",
+				"confirm": "Delete my account",
+				"deleting": "Deleting…"
+			},
+			"loadError": {
+				"title": "We couldn't load your account summary",
+				"body": "Nothing has changed. Check your connection and try again.",
+				"retry": "Try again"
+			},
+			"blockers": {
+				"title": "One thing first",
+				"recheck": "Check again",
+				"generic": {
+					"body": "You can't delete your account right now. Please contact your administrator."
+				},
+				"primaryManagerTransferRequired": {
+					"body": "You're the main contact for {organization}. Choose another manager to take over before you can delete your account.",
+					"bodyGeneric": "You're your organisation's main contact. Choose another manager to take over before you can delete your account.",
+					"action": "Choose who takes over"
+				},
+				"pendingSubmissionDelivery": {
+					"body": "{count, plural, one {One finished audit is still being saved.} other {# finished audits are still being saved.}} Try again in a few minutes, once it's safely stored."
+				},
+				"personalAccountHasDependencies": {
+					"body": "Your account still holds work that belongs to your organisation. Please contact your administrator to hand it over first."
+				}
+			},
+			"ledger": {
+				"keptTitle": "What stays with {organization}",
+				"keptTitleGeneric": "What stays with your organisation",
+				"keptAudits": "{count, plural, =0 {No submitted audits} one {One submitted audit} other {# submitted audits}}",
+				"keptAuditsHint": "Reports, scores, and exports keep working. Your name is replaced with a placeholder.",
+				"removedTitle": "What is removed",
+				"removedProfile": "Your sign-in and personal details",
+				"removedDrafts": "{count, plural, =0 {No unsent drafts} one {One unsent draft} other {# unsent drafts}}",
+				"removedAssignments": "{count, plural, =0 {No open place assignments} one {One open place assignment} other {# open place assignments}}",
+				"removedNothingElse": "Nothing else in your organisation changes."
+			},
+			"dialog": {
+				"stepLabel": "Step {current} of {total}",
+				"reviewTitle": "Before you delete your account",
+				"reviewDescription": "Check what stays and what goes. This can't be undone.",
+				"confirmTitle": "Confirm it's you",
+				"confirmDescription": "Enter your password and type {word} to delete your account for good.",
+				"passwordLabel": "Your password",
+				"confirmLabel": "Type {word} to confirm",
+				"confirmHint": "Type {word} in capital letters.",
+				"finalWarning": "Selecting {action} permanently removes your sign-in. You'd need a new invitation to return."
+			},
+			"errors": {
+				"passwordRequired": "Enter your password to continue.",
+				"confirmationMismatch": "Type {word} exactly, in capital letters.",
+				"wrongPassword": "That password doesn't match. Please try again.",
+				"notAllowed": "This account can't be deleted here. Please contact your administrator.",
+				"blockedNow": "Something on your account changed. Close this and check the summary again.",
+				"generic": "We couldn't delete your account. Please try again."
+			}
+		},
+		"primaryTransfer": {
+			"title": "Choose a new main contact",
+			"description": "Pick the manager who takes over {organization}. They become the main contact straight away, and you stay on as a manager.",
+			"descriptionGeneric": "Pick the manager who takes over your organisation. They become the main contact straight away, and you stay on as a manager.",
+			"loading": "Loading managers…",
+			"successorLabel": "New main contact",
+			"successorPlaceholder": "Select a manager",
+			"successorGroupLabel": "Managers in your organisation",
+			"empty": {
+				"title": "No one else can take over yet",
+				"body": "Your organisation needs a second manager before the main contact can change. Invite one from Manager Contacts."
+			},
+			"actions": {
+				"cancel": "Cancel",
+				"confirm": "Make them the main contact",
+				"transferring": "Transferring…"
+			},
+			"errors": {
+				"successorRequired": "Choose a manager to take over.",
+				"emailConflict": "{name}'s email address is already used by another organisation, so they can't take over. Ask them to sign in with a different address.",
+				"notAllowed": "Only the current main contact can hand this over.",
+				"generic": "We couldn't change the main contact. Please try again."
+			}
+		},
 		"errors": {
 			"accountContextUnavailable": "Manager account context is unavailable."
 		},

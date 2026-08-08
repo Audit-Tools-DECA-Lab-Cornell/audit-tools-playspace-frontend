@@ -15,7 +15,7 @@ const BACKEND_INSTRUMENT_PATH = path.resolve(
 	"products",
 	"playspace",
 	"instruments",
-	"pvua_v5_2__v5.32.instrument.json"
+	"pvua_v5_2__v5.33.instrument.json"
 );
 const MODULE_CACHE = new Map();
 

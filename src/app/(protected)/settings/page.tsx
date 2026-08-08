@@ -30,6 +30,7 @@ import {
 	WEB_MAX_FONT_SCALE,
 	WEB_MIN_FONT_SCALE
 } from "@/components/app/preferences-provider";
+import { AccountDeletionCard } from "@/components/dashboard/account-deletion/account-deletion-card";
 import { BackButton } from "@/components/dashboard/back-button";
 import { ConfirmDialog } from "@/components/dashboard/confirm-dialog";
 import { DashboardHeader } from "@/components/dashboard/dashboard-header";
@@ -1870,6 +1871,20 @@ export default function SettingsPage() {
 					<AuditorWorkspaceCard session={session} />
 					<AuditorSelfServiceCard profile={auditorProfile} />
 				</div>
+			)}
+
+			{/*
+			 * Last on the page, and never for administrators: an admin login is
+			 * platform infrastructure rather than a personal account, and the
+			 * backend refuses to delete one.
+			 */}
+			{session.role === "admin" ? null : (
+				<AccountDeletionCard
+					session={session}
+					organizationName={managerAccount?.name ?? null}
+					managerProfiles={managerProfiles}
+					managerProfilesIsLoading={managerProfilesQuery.isLoading}
+				/>
 			)}
 		</div>
 	);

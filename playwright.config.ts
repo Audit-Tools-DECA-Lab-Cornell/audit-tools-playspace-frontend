@@ -29,6 +29,11 @@ export default defineConfig({
 		{ name: "auditor-chromium", testMatch: /.*auditor.*\.spec\.ts/, use: { ...devices["Desktop Chrome"] } },
 		{ name: "auditor-mobile-web", testMatch: /.*auditor.*\.spec\.ts/, use: { ...devices["iPhone 15"] } },
 		{ name: "reports-chromium", testMatch: /.*reports.*\.spec\.ts/, use: { ...devices["Desktop Chrome"] } },
+		{
+			name: "account-deletion-chromium",
+			testMatch: /.*account-deletion.*\.spec\.ts/,
+			use: { ...devices["Desktop Chrome"] }
+		},
 		{ name: "web-ui-chromium", testMatch: /.*web-ui.*\.spec\.ts/, use: { ...devices["Desktop Chrome"] } },
 		{
 			name: "visual-chromium",

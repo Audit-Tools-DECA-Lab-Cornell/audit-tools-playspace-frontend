@@ -162,7 +162,13 @@ function auditSheetRecord(r: AdminAuditExportRecord): Record<string, unknown> {
 		audit_pv_score: r.audit_pv_score ?? "",
 		audit_u_score: r.audit_u_score ?? "",
 		survey_pv_score: r.survey_pv_score ?? "",
-		survey_u_score: r.survey_u_score ?? ""
+		survey_u_score: r.survey_u_score ?? "",
+		place_size: r.place_size ?? "",
+		current_users_0_5: r.current_users_0_5 ?? "",
+		current_users_6_12: r.current_users_6_12 ?? "",
+		current_users_13_17: r.current_users_13_17 ?? "",
+		current_users_18_plus: r.current_users_18_plus ?? "",
+		weather_conditions: r.weather_conditions.join(" | ")
 	};
 }
 
