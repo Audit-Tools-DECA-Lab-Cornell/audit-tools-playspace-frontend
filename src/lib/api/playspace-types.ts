@@ -115,6 +115,11 @@ export const projectDetailSchema = z.object({
 	est_places: z.number().int().nonnegative().nullable(),
 	est_auditors: z.number().int().nonnegative().nullable(),
 	auditor_description: z.string().nullable(),
+	/**
+	 * Empty once the person who created the project has deleted their account.
+	 * The project itself and every audit under it are unaffected.
+	 */
+	created_by_user_id: z.string().uuid().nullable().optional().default(null),
 	created_at: z.string().datetime()
 });
 
@@ -427,6 +432,47 @@ export const myManagerProfileUpdateSchema = z.object({
 export const changePasswordRequestSchema = z.object({
 	current_password: z.string().min(1),
 	new_password: z.string().min(8)
+});
+
+/**
+ * Reasons the backend refuses to delete the signed-in user's account.
+ *
+ * Never render these values directly - each one maps to guidance copy in the
+ * `settings.deleteAccount.blockers.*` namespace.
+ */
+export const accountDeletionBlockerSchema = z.enum([
+	"PRIMARY_MANAGER_TRANSFER_REQUIRED",
+	"PENDING_SUBMISSION_DELIVERY",
+	"PERSONAL_ACCOUNT_HAS_DEPENDENCIES"
+]);
+
+/**
+ * Impact summary for deleting the signed-in user's own account.
+ *
+ * `submitted_audits_preserved` counts audits that stay with the organization so
+ * its reports keep working; the other counts are removed along with the account.
+ */
+export const accountDeletionPreviewSchema = z.object({
+	role: z.enum(["AUDITOR", "MANAGER"]),
+	submitted_audits_preserved: z.number().int().nonnegative(),
+	draft_audits_to_delete: z.number().int().nonnegative(),
+	active_assignments_to_delete: z.number().int().nonnegative(),
+	pending_submissions: z.number().int().nonnegative(),
+	is_primary_manager: z.boolean(),
+	can_delete: z.boolean(),
+	blocker: accountDeletionBlockerSchema.nullable()
+});
+
+/** Literal word the user must type to confirm account deletion. */
+export const ACCOUNT_DELETION_CONFIRMATION = "DELETE";
+
+export const accountDeletionRequestSchema = z.object({
+	current_password: z.string().min(1),
+	confirmation: z.literal(ACCOUNT_DELETION_CONFIRMATION)
+});
+
+export const primaryManagerTransferRequestSchema = z.object({
+	successor_manager_profile_id: z.string().uuid()
 });
 
 export const auditorProfileDetailSchema = z.object({
@@ -942,7 +988,13 @@ export const adminAuditExportRecordSchema = z.object({
 	audit_pv_score: z.number().nullable(),
 	audit_u_score: z.number().nullable(),
 	survey_pv_score: z.number().nullable(),
-	survey_u_score: z.number().nullable()
+	survey_u_score: z.number().nullable(),
+	place_size: z.string().nullable(),
+	current_users_0_5: z.string().nullable(),
+	current_users_6_12: z.string().nullable(),
+	current_users_13_17: z.string().nullable(),
+	current_users_18_plus: z.string().nullable(),
+	weather_conditions: z.array(z.string())
 });
 
 export const adminAuditsExportResponseSchema = z.object({
@@ -1065,7 +1117,13 @@ export const managerAuditExportRecordSchema = z.object({
 	audit_pv_score: z.number().nullable(),
 	audit_u_score: z.number().nullable(),
 	survey_pv_score: z.number().nullable(),
-	survey_u_score: z.number().nullable()
+	survey_u_score: z.number().nullable(),
+	place_size: z.string().nullable(),
+	current_users_0_5: z.string().nullable(),
+	current_users_6_12: z.string().nullable(),
+	current_users_13_17: z.string().nullable(),
+	current_users_18_plus: z.string().nullable(),
+	weather_conditions: z.array(z.string())
 });
 
 export const managerProjectsExportBundleSchema = z.object({
@@ -1304,6 +1362,10 @@ export type MyAuditorProfileUpdate = z.infer<typeof myAuditorProfileUpdateSchema
 export type MyManagerProfile = z.infer<typeof myManagerProfileSchema>;
 export type MyManagerProfileUpdate = z.infer<typeof myManagerProfileUpdateSchema>;
 export type ChangePasswordRequest = z.infer<typeof changePasswordRequestSchema>;
+export type AccountDeletionBlocker = z.infer<typeof accountDeletionBlockerSchema>;
+export type AccountDeletionPreview = z.infer<typeof accountDeletionPreviewSchema>;
+export type AccountDeletionRequest = z.infer<typeof accountDeletionRequestSchema>;
+export type PrimaryManagerTransferRequest = z.infer<typeof primaryManagerTransferRequestSchema>;
 export type ManagerProfile = z.infer<typeof managerProfileSchema>;
 export type AccountDetail = z.infer<typeof accountDetailSchema>;
 export type ProjectSummary = z.infer<typeof projectSummarySchema>;

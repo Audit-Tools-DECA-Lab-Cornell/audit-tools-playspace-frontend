@@ -8,6 +8,7 @@ import {
 	ChevronsUpDownIcon,
 	ChevronUpIcon,
 	ClipboardListIcon,
+	CloudSunIcon,
 	HashIcon,
 	LayersIcon,
 	ListIcon,
@@ -46,6 +47,11 @@ import {
 	hasUnsureVariants,
 	type ScoreVariantKey
 } from "@/lib/audit/score-mode-helpers";
+import {
+	joinSpaceAuditDisplayValues,
+	readSpaceAuditQuestionValues,
+	resolveSpaceAuditDisplayValues
+} from "@/lib/export/audit/format-utils";
 import { SCALE_ACCENT_COLORS } from "@/lib/export/audit/types";
 import { cn } from "@/lib/utils";
 import type { AuditScoreTotals, PlayspaceInstrument } from "@/types/audit";
@@ -595,6 +601,47 @@ function MetadataRow({
 				<div className="text-sm text-foreground">{children}</div>
 			</div>
 		</div>
+	);
+}
+
+function PlayspaceContextCard({
+	audit,
+	instrument
+}: Readonly<{ audit: AuditSession; instrument: PlayspaceInstrument | null }>) {
+	const t = useTranslations("shared.reportView");
+	const questions = instrument?.pre_audit_questions.filter(question => question.page_key === "space_setup") ?? [];
+	const rows = questions.map(question => ({
+		key: question.key,
+		label: question.label,
+		value:
+			joinSpaceAuditDisplayValues(
+				resolveSpaceAuditDisplayValues(question, readSpaceAuditQuestionValues(audit, question))
+			) || t("notProvided")
+	}));
+
+	if (rows.length === 0) return null;
+
+	return (
+		<Card>
+			<CardHeader>
+				<CardTitle className="flex items-center gap-2 text-base">
+					<CloudSunIcon className="size-4 text-primary" />
+					{t("playspaceContext")}
+				</CardTitle>
+			</CardHeader>
+			<CardContent>
+				<div className="grid gap-x-8 gap-y-4 sm:grid-cols-2 lg:grid-cols-3">
+					{rows.map(row => (
+						<div key={row.key} className="space-y-1">
+							<p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+								{row.label}
+							</p>
+							<p className="text-sm text-foreground">{row.value}</p>
+						</div>
+					))}
+				</div>
+			</CardContent>
+		</Card>
 	);
 }
 
@@ -1162,6 +1209,8 @@ export function AuditReportView({ audit, instrument = null, basePath }: Readonly
 					</div>
 				</CardContent>
 			</Card>
+
+			<PlayspaceContextCard audit={audit} instrument={instrument} />
 
 			{hasUnsureVariants(audit.scores) ? (
 				<Card>

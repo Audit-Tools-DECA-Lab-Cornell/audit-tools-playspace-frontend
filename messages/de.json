@@ -421,6 +421,8 @@
 			"notYetSubmitted": "Noch nicht eingereicht",
 			"progress": "Fortschritt",
 			"questions": "Fragen",
+			"playspaceContext": "Spielplatz-Kontext",
+			"notProvided": "Nicht angegeben",
 			"scoreInterpretation": "Punktwert-Interpretation",
 			"interpretationHelp": "Wählen Sie, wie sich „Unsicher“-Antworten auf die Berichtssummen auswirken. Der gespeicherte Punktwert schließt „Unsicher“ aus.",
 			"unsureInterpretations": "Unsicher-Interpretationen",
@@ -1223,6 +1225,7 @@
 			"unknownRole": "Unbekannter Kontotyp vom Server zurückgegeben.",
 			"unexpected": "Etwas ist schiefgelaufen. Bitte versuchen Sie es erneut."
 		},
+		"accountDeletedConfirmation": "Ihr Konto wurde dauerhaft gelöscht. Für eine Rückkehr benötigen Sie eine neue Einladung.",
 		"noAccount": "Noch kein Konto?",
 		"signUpLink": "Registrieren",
 		"demoPasswordHint": "Demo-Passwort:",
@@ -2298,6 +2301,97 @@
 		}
 	},
 	"settings": {
+		"deleteAccount": {
+			"eyebrow": "Gefahrenbereich",
+			"title": "Konto löschen",
+			"description": "Entfernen Sie Ihre Anmeldung und Ihre persönlichen Daten. Bereits erfasste Prüfungen Ihrer Organisation bleiben erhalten.",
+			"transferSuccess": "{name} ist jetzt die Hauptkontaktperson Ihrer Organisation. Sie können Ihr Konto unten löschen.",
+			"actions": {
+				"start": "Mein Konto löschen",
+				"back": "Zurück",
+				"cancel": "Konto behalten",
+				"continue": "Weiter",
+				"confirm": "Mein Konto löschen",
+				"deleting": "Wird gelöscht …"
+			},
+			"loadError": {
+				"title": "Ihre Kontoübersicht konnte nicht geladen werden",
+				"body": "Es hat sich nichts geändert. Prüfen Sie Ihre Verbindung und versuchen Sie es erneut.",
+				"retry": "Erneut versuchen"
+			},
+			"blockers": {
+				"title": "Zuerst noch eine Sache",
+				"recheck": "Erneut prüfen",
+				"generic": {
+					"body": "Sie können Ihr Konto derzeit nicht löschen. Bitte wenden Sie sich an Ihre Administratorin oder Ihren Administrator."
+				},
+				"primaryManagerTransferRequired": {
+					"body": "Sie sind die Hauptkontaktperson für {organization}. Wählen Sie eine andere Managerin oder einen anderen Manager zur Übernahme, bevor Sie Ihr Konto löschen können.",
+					"bodyGeneric": "Sie sind die Hauptkontaktperson Ihrer Organisation. Wählen Sie eine andere Managerin oder einen anderen Manager zur Übernahme, bevor Sie Ihr Konto löschen können.",
+					"action": "Nachfolge auswählen"
+				},
+				"pendingSubmissionDelivery": {
+					"body": "{count, plural, one {Eine abgeschlossene Prüfung wird noch gespeichert.} other {# abgeschlossene Prüfungen werden noch gespeichert.}} Versuchen Sie es in einigen Minuten erneut, sobald alles sicher gespeichert ist."
+				},
+				"personalAccountHasDependencies": {
+					"body": "Ihr Konto enthält noch Arbeit, die Ihrer Organisation gehört. Bitte wenden Sie sich zur Übergabe an Ihre Administratorin oder Ihren Administrator."
+				}
+			},
+			"ledger": {
+				"keptTitle": "Was bei {organization} bleibt",
+				"keptTitleGeneric": "Was bei Ihrer Organisation bleibt",
+				"keptAudits": "{count, plural, =0 {Keine eingereichten Prüfungen} one {Eine eingereichte Prüfung} other {# eingereichte Prüfungen}}",
+				"keptAuditsHint": "Berichte, Bewertungen und Exporte funktionieren weiterhin. Ihr Name wird durch einen Platzhalter ersetzt.",
+				"removedTitle": "Was entfernt wird",
+				"removedProfile": "Ihre Anmeldung und Ihre persönlichen Daten",
+				"removedDrafts": "{count, plural, =0 {Keine nicht gesendeten Entwürfe} one {Ein nicht gesendeter Entwurf} other {# nicht gesendete Entwürfe}}",
+				"removedAssignments": "{count, plural, =0 {Keine offenen Ortszuweisungen} one {Eine offene Ortszuweisung} other {# offene Ortszuweisungen}}",
+				"removedNothingElse": "Sonst ändert sich nichts in Ihrer Organisation."
+			},
+			"dialog": {
+				"stepLabel": "Schritt {current} von {total}",
+				"reviewTitle": "Bevor Sie Ihr Konto löschen",
+				"reviewDescription": "Prüfen Sie, was bleibt und was entfernt wird. Dies kann nicht rückgängig gemacht werden.",
+				"confirmTitle": "Bestätigen Sie, dass Sie es sind",
+				"confirmDescription": "Geben Sie Ihr Passwort ein und tippen Sie {word}, um Ihr Konto endgültig zu löschen.",
+				"passwordLabel": "Ihr Passwort",
+				"confirmLabel": "Geben Sie zur Bestätigung {word} ein",
+				"confirmHint": "Geben Sie {word} in Großbuchstaben ein.",
+				"finalWarning": "Mit „{action}“ wird Ihre Anmeldung dauerhaft entfernt. Für eine Rückkehr bräuchten Sie eine neue Einladung."
+			},
+			"errors": {
+				"passwordRequired": "Geben Sie Ihr Passwort ein, um fortzufahren.",
+				"confirmationMismatch": "Geben Sie genau {word} in Großbuchstaben ein.",
+				"wrongPassword": "Dieses Passwort stimmt nicht. Bitte versuchen Sie es erneut.",
+				"notAllowed": "Dieses Konto kann hier nicht gelöscht werden. Bitte wenden Sie sich an Ihre Administratorin oder Ihren Administrator.",
+				"blockedNow": "An Ihrem Konto hat sich etwas geändert. Schließen Sie dieses Fenster und prüfen Sie die Übersicht erneut.",
+				"generic": "Ihr Konto konnte nicht gelöscht werden. Bitte versuchen Sie es erneut."
+			}
+		},
+		"primaryTransfer": {
+			"title": "Neue Hauptkontaktperson auswählen",
+			"description": "Wählen Sie die Person, die {organization} übernimmt. Sie wird sofort zur Hauptkontaktperson, und Sie bleiben weiterhin Managerin oder Manager.",
+			"descriptionGeneric": "Wählen Sie die Person, die Ihre Organisation übernimmt. Sie wird sofort zur Hauptkontaktperson, und Sie bleiben weiterhin Managerin oder Manager.",
+			"loading": "Managerinnen und Manager werden geladen …",
+			"successorLabel": "Neue Hauptkontaktperson",
+			"successorPlaceholder": "Person auswählen",
+			"successorGroupLabel": "Managerinnen und Manager Ihrer Organisation",
+			"empty": {
+				"title": "Es kann noch niemand übernehmen",
+				"body": "Ihre Organisation braucht eine zweite Managerin oder einen zweiten Manager, bevor die Hauptkontaktperson wechseln kann. Laden Sie jemanden über die Manager-Kontakte ein."
+			},
+			"actions": {
+				"cancel": "Abbrechen",
+				"confirm": "Als Hauptkontaktperson festlegen",
+				"transferring": "Wird übertragen …"
+			},
+			"errors": {
+				"successorRequired": "Wählen Sie eine Person zur Übernahme aus.",
+				"emailConflict": "Die E-Mail-Adresse von {name} wird bereits von einer anderen Organisation verwendet, daher ist eine Übernahme nicht möglich. Bitten Sie die Person, sich mit einer anderen Adresse anzumelden.",
+				"notAllowed": "Nur die aktuelle Hauptkontaktperson kann diese Rolle übergeben.",
+				"generic": "Die Hauptkontaktperson konnte nicht geändert werden. Bitte versuchen Sie es erneut."
+			}
+		},
 		"errors": {
 			"accountContextUnavailable": "Der Manager-Konto-Kontext ist nicht verfügbar."
 		},

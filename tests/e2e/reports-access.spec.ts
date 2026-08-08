@@ -2,9 +2,10 @@ import { expect, test } from "@playwright/test";
 
 import { e2eIds } from "../fixtures/ids";
 import { bearerHeaders, expectOk, getApiBaseUrl, loginViaApi } from "../helpers/api";
+import { loginAsManager } from "../helpers/auth";
 
 test.describe("@reports seeded report access", () => {
-	test("admin and manager can access a submitted audit detail used as report source", async ({ request }) => {
+	test("admin and manager can access a submitted audit detail used as report source", async ({ page, request }) => {
 		const managerToken = await loginViaApi(request, "manager");
 		const managerHeaders = bearerHeaders(managerToken);
 		const audits = await request.get(
@@ -27,5 +28,12 @@ test.describe("@reports seeded report access", () => {
 			expect(detail).toEqual(expect.objectContaining({ audit_id: auditId, status: "SUBMITTED" }));
 			expect(role).toBeTruthy();
 		}
+
+		await loginAsManager(page);
+		await page.goto(`/manager/reports/${auditId}`);
+		await expect(page.getByText("Playspace Context", { exact: true })).toBeVisible();
+		await expect(page.getByText("How large is the playspace?", { exact: true })).toBeVisible();
+		await expect(page.getByText("0-5 years", { exact: true })).toBeVisible();
+		await expect(page.getByText("Current weather conditions", { exact: true })).toBeVisible();
 	});
 });

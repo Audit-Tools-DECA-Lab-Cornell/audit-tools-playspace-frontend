@@ -61,7 +61,7 @@ export function SectionEditorList({
 
 			<Accordion type="single" collapsible className="w-full">
 				{sections.map((section, sIdx) => (
-					<AccordionItem key={section.section_key} value={section.section_key}>
+					<AccordionItem key={`section-${sIdx}`} value={`section-${sIdx}`}>
 						<AccordionTrigger className="text-sm hover:no-underline border border-edge/50 bg-card rounded-t-lg px-4 data-[state=closed]:rounded-b-lg">
 							<span className="flex items-center gap-3">
 								<span className="font-mono text-xs tabular-nums text-muted-foreground bg-muted px-1.5 py-0.5 rounded">

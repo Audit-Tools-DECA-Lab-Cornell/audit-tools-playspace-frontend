@@ -8,6 +8,10 @@ import { api } from "@/lib/api/api-client";
 import {
 	type AccountDetail,
 	accountDetailSchema,
+	type AccountDeletionPreview,
+	accountDeletionPreviewSchema,
+	type AccountDeletionRequest,
+	accountDeletionRequestSchema,
 	type AccountManagementResponse,
 	accountManagementResponseSchema,
 	accountUpdateRequestSchema,
@@ -132,6 +136,8 @@ import {
 	PlayspaceApiError,
 	type PlayspaceInstrument,
 	playspaceInstrumentSchema,
+	type PrimaryManagerTransferRequest,
+	primaryManagerTransferRequestSchema,
 	projectCreateRequestSchema,
 	type ProjectDetail,
 	projectDetailSchema,
@@ -560,6 +566,26 @@ export const playspaceApi = {
 				body: JSON.stringify(expectedRevision === undefined ? {} : { expected_revision: expectedRevision })
 			})
 	},
+	accountDeletion: {
+		/**
+		 * Summarize what deleting the signed-in user's own account would keep and
+		 * remove, plus whether anything currently blocks it.
+		 */
+		preview: async (): Promise<AccountDeletionPreview> =>
+			fetchValidatedJson("/playspace/me/account-deletion", accountDeletionPreviewSchema),
+		/**
+		 * Delete the signed-in user's own account. Resolves on 204; rejects with a
+		 * `PlayspaceApiError` carrying the HTTP status so callers can map
+		 * wrong-password (400), blocked (409), and bad-confirmation (422) cases.
+		 */
+		remove: async (payload: AccountDeletionRequest): Promise<void> => {
+			const parsedPayload = accountDeletionRequestSchema.parse(payload);
+			await fetchNoContent("/playspace/me/account-deletion", {
+				method: "POST",
+				body: JSON.stringify(parsedPayload)
+			});
+		}
+	},
 	manager: {
 		myProfile: async (): Promise<MyManagerProfile> =>
 			fetchValidatedJson("/playspace/me/manager-profile", myManagerProfileSchema),
@@ -568,6 +594,19 @@ export const playspaceApi = {
 			const parsedPayload = myManagerProfileUpdateSchema.parse(payload);
 			return fetchValidatedJson("/playspace/me/manager-profile", myManagerProfileSchema, {
 				method: "PATCH",
+				body: JSON.stringify(parsedPayload)
+			});
+		},
+
+		/**
+		 * Hand the primary-manager role to another manager profile on the same
+		 * account. Resolves on 204; a 409 means the chosen successor cannot take
+		 * the role because of an email conflict.
+		 */
+		transferPrimaryRole: async (payload: PrimaryManagerTransferRequest): Promise<void> => {
+			const parsedPayload = primaryManagerTransferRequestSchema.parse(payload);
+			await fetchNoContent("/playspace/me/manager-profile/primary-transfer", {
+				method: "POST",
 				body: JSON.stringify(parsedPayload)
 			});
 		},

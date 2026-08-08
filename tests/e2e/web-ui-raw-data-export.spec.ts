@@ -80,11 +80,31 @@ test.describe("@web-ui raw-data export data path", () => {
 		const reportsResponse = await request.get(`${base}/playspace/admin/export/reports`, { headers });
 		await expectOk(reportsResponse);
 		const reports = (await reportsResponse.json()) as {
-			records: Array<{ audit_id: string; status: string }>;
+			records: Array<{
+				audit_id: string;
+				status: string;
+				place_size: string | null;
+				current_users_0_5: string | null;
+				current_users_6_12: string | null;
+				current_users_13_17: string | null;
+				current_users_18_plus: string | null;
+				weather_conditions: string[];
+			}>;
 		};
 
 		const submitted = reports.records.find(r => r.status === "SUBMITTED");
 		test.skip(submitted === undefined, "Seed has no submitted reports to exercise the rich data path.");
+		for (const key of [
+			"place_size",
+			"current_users_0_5",
+			"current_users_6_12",
+			"current_users_13_17",
+			"current_users_18_plus",
+			"weather_conditions"
+		]) {
+			expect(Object.hasOwn(submitted!, key)).toBe(true);
+		}
+		expect(submitted!.weather_conditions).toEqual(expect.any(Array));
 
 		const richResponse = await request.get(`${base}/playspace/audits/${encodeURIComponent(submitted!.audit_id)}`, {
 			headers
@@ -94,10 +114,29 @@ test.describe("@web-ui raw-data export data path", () => {
 			audit_code: string;
 			status: string;
 			scores: unknown;
+			pre_audit: {
+				place_size: string | null;
+				current_users_0_5: string | null;
+				current_users_6_12: string | null;
+				current_users_13_17: string | null;
+				current_users_18_plus: string | null;
+				weather_conditions: string[];
+			};
 		};
 		expect(session.status).toBe("SUBMITTED");
 		expect(session.audit_code).toBeTruthy();
 		// The PDF/Excel/JSON generators read computed scores off the rich session.
 		expect(session.scores).toBeTruthy();
+		for (const key of [
+			"place_size",
+			"current_users_0_5",
+			"current_users_6_12",
+			"current_users_13_17",
+			"current_users_18_plus",
+			"weather_conditions"
+		]) {
+			expect(Object.hasOwn(session.pre_audit, key)).toBe(true);
+		}
+		expect(session.pre_audit.weather_conditions).toEqual(expect.any(Array));
 	});
 });

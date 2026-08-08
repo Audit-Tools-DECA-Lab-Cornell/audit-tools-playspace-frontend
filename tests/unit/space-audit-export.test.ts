@@ -23,6 +23,17 @@ const INSTRUMENT = {
 			]
 		},
 		{
+			key: "current_users_0_5",
+			label: "Current users aged 0-5",
+			input_type: "single_select",
+			required: false,
+			page_key: "space_setup",
+			options: [
+				{ key: "none", label: "None" },
+				{ key: "a_few", label: "A few" }
+			]
+		},
+		{
 			key: "weather_conditions",
 			label: "Weather during the audit",
 			input_type: "multi_select",
@@ -64,15 +75,16 @@ test("buildSpaceAuditRows resolves option labels and skips audit_info questions"
 	const rows = buildSpaceAuditRows(
 		makeExportableAudit({
 			place_size: "large",
+			current_users_0_5: "a_few",
 			weather_conditions: ["sun", "rain"],
 			wind_conditions: "Breezy"
 		}),
 		INSTRUMENT
 	);
 
-	// audit_info question is excluded; the three space_setup questions remain in order.
 	assert.deepEqual(rows, [
 		["Approximate size of the playspace", "Large (over 2000 m²)"],
+		["Current users aged 0-5", "A few"],
 		["Weather during the audit", "Sunny | Rain"],
 		// No options on the question → raw recorded value passes through unchanged.
 		["Wind during the audit", "Breezy"]
@@ -83,6 +95,7 @@ test("buildSpaceAuditRows renders blank answers for unrecorded fields", () => {
 	const rows = buildSpaceAuditRows(
 		makeExportableAudit({
 			place_size: null,
+			current_users_0_5: null,
 			weather_conditions: [],
 			wind_conditions: null
 		}),
@@ -91,6 +104,7 @@ test("buildSpaceAuditRows renders blank answers for unrecorded fields", () => {
 
 	assert.deepEqual(rows, [
 		["Approximate size of the playspace", ""],
+		["Current users aged 0-5", ""],
 		["Weather during the audit", ""],
 		["Wind during the audit", ""]
 	]);
