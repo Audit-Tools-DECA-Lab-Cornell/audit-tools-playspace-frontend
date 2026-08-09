@@ -21,11 +21,7 @@ export interface AccountDeletionLedgerProps {
  * Shown both on the settings card and again inside the confirmation dialog, so
  * the reader never has to remember the numbers from the previous screen.
  */
-export function AccountDeletionLedger({
-	preview,
-	organizationName,
-	className
-}: Readonly<AccountDeletionLedgerProps>) {
+export function AccountDeletionLedger({ preview, organizationName, className }: Readonly<AccountDeletionLedgerProps>) {
 	const t = useTranslations("settings.deleteAccount.ledger");
 	const groupId = React.useId();
 	const keptLabelId = `${groupId}_kept`;
@@ -45,7 +41,10 @@ export function AccountDeletionLedger({
 
 	return (
 		<div className={cn("grid gap-3 md:grid-cols-2", className)}>
-			<div role="group" aria-labelledby={keptLabelId} className="rounded-card border border-edge/40 bg-secondary/40 p-4">
+			<div
+				role="group"
+				aria-labelledby={keptLabelId}
+				className="rounded-card border border-edge/40 bg-secondary/40 p-4">
 				<p id={keptLabelId} className="flex items-center gap-2 text-sm font-semibold text-foreground">
 					<FileCheck2 className="h-4 w-4 shrink-0 text-primary" aria-hidden="true" />
 					{organizationName ? t("keptTitle", { organization: organizationName }) : t("keptTitleGeneric")}

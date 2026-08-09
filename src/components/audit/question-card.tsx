@@ -7,11 +7,7 @@ import { ScaleMultiSelect } from "@/components/audit/scale-multi-select";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { parsePromptSegments } from "@/lib/audit/prompt-segments";
-import {
-	isMultipleSelectionScale,
-	readMultipleScaleSelection,
-	toggleMultipleScaleOption
-} from "@/lib/audit/selectors";
+import { isMultipleSelectionScale, readMultipleScaleSelection, toggleMultipleScaleOption } from "@/lib/audit/selectors";
 import { cn } from "@/lib/utils";
 import type { InstrumentQuestion, QuestionResponsePayload, QuestionScale } from "@/types/audit";
 

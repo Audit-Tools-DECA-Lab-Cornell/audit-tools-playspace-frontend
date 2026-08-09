@@ -45,9 +45,7 @@ function getEligibleSuccessors(
 ): readonly ManagerProfile[] {
 	const ownEmail = session.userEmail?.trim().toLowerCase() ?? "";
 
-	return managerProfiles.filter(
-		profile => !profile.is_primary && profile.email.trim().toLowerCase() !== ownEmail
-	);
+	return managerProfiles.filter(profile => !profile.is_primary && profile.email.trim().toLowerCase() !== ownEmail);
 }
 
 function AccountDeletionCardShell({ children }: Readonly<{ children: React.ReactNode }>) {

@@ -516,7 +516,10 @@ export async function generatePdfBlob(
 		}
 
 		return buildSociabilityBreakdownScoreRows(totals).map(row => ({
-			cells: [String(row[0] ?? ""), `${String(row[1] ?? "")} / ${String(row[2] ?? "")} (${String(row[3] ?? "")})`],
+			cells: [
+				String(row[0] ?? ""),
+				`${String(row[1] ?? "")} / ${String(row[2] ?? "")} (${String(row[3] ?? "")})`
+			],
 			labelFill: sociabilityFill,
 			valueFill: sociabilityFill,
 			labelText: sociabilityText,

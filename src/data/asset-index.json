@@ -33,13 +33,7 @@
 			"bytes": 1436000,
 			"format": "png",
 			"sha256": "0dbb03ecd2babac19081b573258385c4717fa9ce4b43b4e94139ae52370abaad",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-03-home-portrait",
@@ -64,13 +58,7 @@
 			"bytes": 1429947,
 			"format": "png",
 			"sha256": "2c4d275f9972380c3dbf83b8438606aa0dc7d274c29f1941f2367e13153ef774",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-03-home-right",
@@ -95,13 +83,7 @@
 			"bytes": 1081931,
 			"format": "png",
 			"sha256": "65a5e63cf81821c0bb8f9da9fd18cb97787aecfbfde43c0525616f41551005df",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-04-places-landscape",
@@ -126,13 +108,7 @@
 			"bytes": 1535191,
 			"format": "png",
 			"sha256": "751f158c41663a53382cb195035d61108640b09e8e252799620398ff41b070cb",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-04-places-portrait",
@@ -157,13 +133,7 @@
 			"bytes": 1533148,
 			"format": "png",
 			"sha256": "96141590df2a5890665d7ff969d9b76ba3fd38e6cec6ed2286f79bf0a32b9c32",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-04-places-right",
@@ -188,13 +158,7 @@
 			"bytes": 1199570,
 			"format": "png",
 			"sha256": "3037ea439971f6c13f93c10315a65a22289d8680d08dd7d5b80f53942444b38c",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-05-place-detail-landscape",
@@ -219,13 +183,7 @@
 			"bytes": 2780102,
 			"format": "png",
 			"sha256": "0296df72661b432a8d565f00a6336b2a2759873352dc7fff8f3215b40560ae69",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-05-place-detail-portrait",
@@ -250,13 +208,7 @@
 			"bytes": 2704982,
 			"format": "png",
 			"sha256": "282ae37a666b1e3f7aafb62291bfc27f0618265866200e28ff40aef3b64d8721",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-05-place-detail-right",
@@ -281,13 +233,7 @@
 			"bytes": 1931410,
 			"format": "png",
 			"sha256": "b4ca73c9b5d974dba333208af9b798f67469f56ef8a6e9b00d1ff9d858aae1c6",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-06-execute-landscape",
@@ -312,13 +258,7 @@
 			"bytes": 1334978,
 			"format": "png",
 			"sha256": "fb0da241aa318a54bc5ca850084ec0efacdc101c9db4fd7fae102f3f783999d1",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-06-execute-portrait",
@@ -343,13 +283,7 @@
 			"bytes": 1298639,
 			"format": "png",
 			"sha256": "daf2d7e1907d0e70966e667c5727ad9a976ffec320a9913bb35667ecdd510797",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-06-execute-right",
@@ -374,13 +308,7 @@
 			"bytes": 908372,
 			"format": "png",
 			"sha256": "22324397129906e86888a92edfb6b7b9d53c4aa0fe86b65a851697659a643720",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-07-execute-place-landscape",
@@ -405,13 +333,7 @@
 			"bytes": 1500486,
 			"format": "png",
 			"sha256": "7ff157ba2d85636822ae0f83f5a4c6763cd7321b594608e4c7fad66b790b6ba2",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-07-execute-place-portrait",
@@ -436,13 +358,7 @@
 			"bytes": 1503152,
 			"format": "png",
 			"sha256": "efd61d0b4cc54e25ff595a9d3b5280d7a2c0451ed2cad81505e448957aa21807",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-07-execute-place-right",
@@ -467,13 +383,7 @@
 			"bytes": 1111041,
 			"format": "png",
 			"sha256": "5a672d157862c94856f804e036d6ecc89914fef31a344e650fa8891be325e5ed",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-08-execute-pre-audit-landscape",
@@ -498,13 +408,7 @@
 			"bytes": 1428582,
 			"format": "png",
 			"sha256": "f047abeb2f0ae28f261f9f8469e59e4e16f9b8b503891ecee8898c1f1bd8ba32",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-08-execute-pre-audit-portrait",
@@ -529,13 +433,7 @@
 			"bytes": 1397564,
 			"format": "png",
 			"sha256": "c26b1b11e754718ad997c0ee63c9166d59d69b371f94b40b9c81ca6f19b77163",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-08-execute-pre-audit-right",
@@ -560,13 +458,7 @@
 			"bytes": 1056030,
 			"format": "png",
 			"sha256": "4a7f038997a98e56f168d65c44a9e2080da8bc87274ecc215f64655972e61eee",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-09-execute-section-landscape",
@@ -591,13 +483,7 @@
 			"bytes": 1891229,
 			"format": "png",
 			"sha256": "1c4e90f087ab5454393d0284954d366c6a90d60f0d2a2412ff0a4a740e7b74e8",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-09-execute-section-portrait",
@@ -622,13 +508,7 @@
 			"bytes": 1869685,
 			"format": "png",
 			"sha256": "1e617bac878ac2eea6111af6d7eb124dcf3af71f28ff8e83ca9b9ced0bf7b1e1",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-09-execute-section-right",
@@ -653,13 +533,7 @@
 			"bytes": 1514396,
 			"format": "png",
 			"sha256": "e1251dcb4a2907f814a75bbe8d99cad86f4d34262f1ffaf0f4550c291dbc8378",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-10-execute-section-notes-landscape",
@@ -684,13 +558,7 @@
 			"bytes": 1602778,
 			"format": "png",
 			"sha256": "96fd4c780c6616c436baf8f82a7adc678cac903c4c6ea6acde4cace63890a052",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-10-execute-section-notes-portrait",
@@ -715,13 +583,7 @@
 			"bytes": 1568691,
 			"format": "png",
 			"sha256": "d5d4066eeea2896e9d30c653a13bca595cbed8afe055405e81eb236d6a1e5b83",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-10-execute-section-notes-right",
@@ -746,13 +608,7 @@
 			"bytes": 1205322,
 			"format": "png",
 			"sha256": "4baf79edc6b2fd16490882b9e2b6f403d62c06643d5cec74595f22868c1fecee",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-11-reports-landscape",
@@ -777,13 +633,7 @@
 			"bytes": 1649675,
 			"format": "png",
 			"sha256": "d750ff4149389154ee4765916271134e118bbcd2bafbbc86ff9749089ed9367b",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-11-reports-portrait",
@@ -808,13 +658,7 @@
 			"bytes": 1625396,
 			"format": "png",
 			"sha256": "b5be37b983709b588aef15f248126f8b2aa5d498fa8f859f4d5dee2a6228d022",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-11-reports-right",
@@ -839,13 +683,7 @@
 			"bytes": 1270510,
 			"format": "png",
 			"sha256": "d84f67c86c57586abc60d69e7b6d3276de0ffa824cd5d0ab51c4a6b27c7dd424",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-12-report-detail-top-landscape",
@@ -870,13 +708,7 @@
 			"bytes": 1532876,
 			"format": "png",
 			"sha256": "9c7d64e9cea628275113621cec80b1421cf2835708c45b32eb7996ab7a2249a2",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-12-report-detail-top-portrait",
@@ -901,13 +733,7 @@
 			"bytes": 1489155,
 			"format": "png",
 			"sha256": "0c9122be4d681480f27ffaf266dda73a5a9956e312f47b97bb833a07551be0a4",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-12-report-detail-top-right",
@@ -932,13 +758,7 @@
 			"bytes": 1132353,
 			"format": "png",
 			"sha256": "1b0d2e115492f8fdffd2b5c28bb175fbbddfde1915a55fc496e3fb6e259b7cdc",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-13-report-detail-early-landscape",
@@ -963,13 +783,7 @@
 			"bytes": 1422500,
 			"format": "png",
 			"sha256": "861ac4db577aca36e466abdb50ee2eb46f385e7df73a365ba09850fef23f6705",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-13-report-detail-early-portrait",
@@ -994,13 +808,7 @@
 			"bytes": 1420607,
 			"format": "png",
 			"sha256": "7ebdccabe8107de8c0dc36b7e71edc908f5b04adf1e4e0fa0d7d127d0d869902",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-13-report-detail-early-right",
@@ -1025,13 +833,7 @@
 			"bytes": 1144468,
 			"format": "png",
 			"sha256": "6e5488b48c3c89526b4afa6ae99270478f279a6c01b48125d3f3887cec2fb41c",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-14-report-detail-end-landscape",
@@ -1056,13 +858,7 @@
 			"bytes": 1616136,
 			"format": "png",
 			"sha256": "3f207e42738ae95f98d713a7631cbbb4c20c87346ba46cbb95a77d71dda64105",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-14-report-detail-end-portrait",
@@ -1087,13 +883,7 @@
 			"bytes": 1579958,
 			"format": "png",
 			"sha256": "1093d371abaea7d9383a166021e51230152d2b37a6aacf3d4e46c22a98be28a9",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-14-report-detail-end-right",
@@ -1118,13 +908,7 @@
 			"bytes": 1243261,
 			"format": "png",
 			"sha256": "ca63581fba98f2e0dd36bce96ca394e8630ecae58795134088b26bca5d74bf17",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-15-settings-landscape",
@@ -1149,13 +933,7 @@
 			"bytes": 1389943,
 			"format": "png",
 			"sha256": "4e146fb65be2f06990ec082105d933c35150bab98b8e842d005bf2a84efb8cf4",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-15-settings-portrait",
@@ -1180,13 +958,7 @@
 			"bytes": 1403681,
 			"format": "png",
 			"sha256": "ad7f1c2def2503002ceead673871d4d4ec82c2f9dfabde8702c209e4cbbe4cbe",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-15-settings-right",
@@ -1211,13 +983,7 @@
 			"bytes": 1040787,
 			"format": "png",
 			"sha256": "99ce0da884aaacacba0a3474142f70b240d315c0608ecf59c7d3f94aff41268e",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-16-settings-about-landscape",
@@ -1242,13 +1008,7 @@
 			"bytes": 1459077,
 			"format": "png",
 			"sha256": "9e77ab9ce9d5d72d6c36a5560dc9a7c5761ca61a550262b286b8e865103b4a80",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-16-settings-about-portrait",
@@ -1273,13 +1033,7 @@
 			"bytes": 1435221,
 			"format": "png",
 			"sha256": "86b47b0c1fc9e3c9b9a4efeb717ee086a98fa5619e9b06cb3e031087bf193774",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-framed-16-settings-about-right",
@@ -1304,13 +1058,7 @@
 			"bytes": 1054451,
 			"format": "png",
 			"sha256": "3628660e3c918d294c9f52d491821977fa7c19e9842038f4ea502da8ad4700a7",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-03-home-landscape",
@@ -1335,13 +1083,7 @@
 			"bytes": 1684943,
 			"format": "png",
 			"sha256": "c059dd7976acaa41c81da9478c61b997056a9c67def087a03e3faf281da8333d",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-03-home-portrait",
@@ -1366,13 +1108,7 @@
 			"bytes": 1626251,
 			"format": "png",
 			"sha256": "df0330f90f927528eea0d27a53df3f0b8750a1ffaacd301522ed1b609f6c1e67",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-03-home-right",
@@ -1397,13 +1133,7 @@
 			"bytes": 1271427,
 			"format": "png",
 			"sha256": "d2ad6c3ac514f6d79da3255111c0b4783907d31dc2f8023121df80058b7e2b6f",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-04-places-landscape",
@@ -1428,13 +1158,7 @@
 			"bytes": 1689752,
 			"format": "png",
 			"sha256": "383c4b08d073024543ca899b0edd1576249baac6c78e2dbe17712e5f89fe2040",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-04-places-portrait",
@@ -1459,13 +1183,7 @@
 			"bytes": 1682420,
 			"format": "png",
 			"sha256": "03080f9b036eb2c56e734d1d1409e100e4af76905bd70397d5ba6984b225f5bc",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-04-places-right",
@@ -1490,13 +1208,7 @@
 			"bytes": 1337405,
 			"format": "png",
 			"sha256": "49129ad44f26afb277e20c18f32d4660de1c08a8f3064cbba0abb4a7f8ad88f0",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-05-place-detail-landscape",
@@ -1521,13 +1233,7 @@
 			"bytes": 2797221,
 			"format": "png",
 			"sha256": "dfd25d68bc14bedb7ede699c30173aa323ce22449f7828678c089c4de9b51e3c",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-05-place-detail-portrait",
@@ -1552,13 +1258,7 @@
 			"bytes": 2723115,
 			"format": "png",
 			"sha256": "c600297334b97d9b8c0169fa22ad8ac22ba70dd9750ad27ce6b5d3cbef88147d",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-05-place-detail-right",
@@ -1583,13 +1283,7 @@
 			"bytes": 1986282,
 			"format": "png",
 			"sha256": "9318f587e4f1a7591d070fa60c85092c589c716a978340e4304f4dfa8f49b559",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-06-execute-landscape",
@@ -1614,13 +1308,7 @@
 			"bytes": 1493379,
 			"format": "png",
 			"sha256": "cbe0902124a86835a6b501d052d55fae142e5e9fc6153898e3089bffd14faadd",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-06-execute-portrait",
@@ -1645,13 +1333,7 @@
 			"bytes": 1403233,
 			"format": "png",
 			"sha256": "05d6a6beef6fe283945fa56bd93daf9db3f369a09fc56387fd8b8b91e713ba3a",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-06-execute-right",
@@ -1676,13 +1358,7 @@
 			"bytes": 1024246,
 			"format": "png",
 			"sha256": "92cda1363dc8b09c40688a47e97fcf26f992011ae664ab18a3e56110a4ececfd",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-07-execute-place-landscape",
@@ -1707,13 +1383,7 @@
 			"bytes": 1684835,
 			"format": "png",
 			"sha256": "4ae94743df45ffe71f12481df12dd8c71152ff972899b36ac1dbcd82f988f5bb",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-07-execute-place-portrait",
@@ -1738,13 +1408,7 @@
 			"bytes": 1673476,
 			"format": "png",
 			"sha256": "3aeee8ca43bf99c17f32fd108311d93cea6aae9b4f07b5d6f518ed348913dafe",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-07-execute-place-right",
@@ -1769,13 +1433,7 @@
 			"bytes": 1270731,
 			"format": "png",
 			"sha256": "32da66b7daedbb13b9ca1b8254796f38a078a2cf3ff8e75dc483f269af553320",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-08-execute-pre-audit-landscape",
@@ -1800,13 +1458,7 @@
 			"bytes": 1635426,
 			"format": "png",
 			"sha256": "426702b5a14dc0447793c19861d49c868a4dd411bcbde8c6d49518642d4b6fc6",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-08-execute-pre-audit-portrait",
@@ -1831,13 +1483,7 @@
 			"bytes": 1560940,
 			"format": "png",
 			"sha256": "00f55c40e763e3a67e8817037036b43b62758d7ae1bd7e1ff2c350c39f3c0615",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-08-execute-pre-audit-right",
@@ -1862,13 +1508,7 @@
 			"bytes": 1246584,
 			"format": "png",
 			"sha256": "aded7e2edb355f536df8fabfdfe618701ac7ef8ae0a9342b8e61af1c032636bc",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-09-execute-section-landscape",
@@ -1893,13 +1533,7 @@
 			"bytes": 1913109,
 			"format": "png",
 			"sha256": "425769c0e3ed42753813c8f0762626a93336d6023b296bf6909b6f6df1e5b43f",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-09-execute-section-portrait",
@@ -1924,13 +1558,7 @@
 			"bytes": 1887747,
 			"format": "png",
 			"sha256": "efa61d64214db077fdc84281bb3b7e3369d9c6b739419176b2f42f2d718ff4de",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-09-execute-section-right",
@@ -1955,13 +1583,7 @@
 			"bytes": 1564322,
 			"format": "png",
 			"sha256": "d6ce01aef2f327d99b54dd91cb83fa8d5dcaf3268ae6a546ad07c226bf583aef",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-10-execute-section-notes-landscape",
@@ -1986,13 +1608,7 @@
 			"bytes": 1710803,
 			"format": "png",
 			"sha256": "06701eedad7a49ec7a320b85f7826c35112bbf71204eb20ad425f6f68d4bc589",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-10-execute-section-notes-portrait",
@@ -2017,13 +1633,7 @@
 			"bytes": 1630237,
 			"format": "png",
 			"sha256": "f8ebf5ca888d35a700569c4de769350b477f3491ae3089122c9b5d36f3d4b5c6",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-10-execute-section-notes-right",
@@ -2048,13 +1658,7 @@
 			"bytes": 1295786,
 			"format": "png",
 			"sha256": "a3894902a3ac63a9d9f366df4022b53ff19a8d21f34dad82c0f69e6a9aae9a31",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-11-reports-landscape",
@@ -2079,13 +1683,7 @@
 			"bytes": 1945937,
 			"format": "png",
 			"sha256": "7fc454d8919bb9ce6c2f907acc198f34dff08c592afd19d286df34ea6b64893e",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-11-reports-portrait",
@@ -2110,13 +1708,7 @@
 			"bytes": 1850544,
 			"format": "png",
 			"sha256": "4af1c8a2063c75699f150ce7ad30d957c8e59ffd1d45b9c498bb9829a3a4e76e",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-11-reports-right",
@@ -2141,13 +1733,7 @@
 			"bytes": 1481482,
 			"format": "png",
 			"sha256": "0323ed0cb06c26b3a63dfffb77fc1b4b58a8fe0e6a96557c86c7edec37316c82",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-12-report-detail-top-landscape",
@@ -2172,13 +1758,7 @@
 			"bytes": 1814719,
 			"format": "png",
 			"sha256": "0410d5c89bc8f57e03eea0c31e6ba369b3d10d01d153cb0cf0d0009797f9c3cb",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-12-report-detail-top-portrait",
@@ -2203,13 +1783,7 @@
 			"bytes": 1712398,
 			"format": "png",
 			"sha256": "5041f3f1ed130434d1d8a089d8dd7a35269be4c92153e3183543a1034cfa0908",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-12-report-detail-top-right",
@@ -2234,13 +1808,7 @@
 			"bytes": 1348596,
 			"format": "png",
 			"sha256": "924b50805e9231f2381bed15608fe12040659b789aefdb033b917d51958fa25a",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-13-report-detail-early-landscape",
@@ -2265,13 +1833,7 @@
 			"bytes": 1516652,
 			"format": "png",
 			"sha256": "c626d496c99aa0b951f9b179dc981b13f8c6feb75651b1c4759b2d1faa0bbb59",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-13-report-detail-early-portrait",
@@ -2296,13 +1858,7 @@
 			"bytes": 1559301,
 			"format": "png",
 			"sha256": "26e486e39a9036e46a546f3117a79cb3c3b0dc994985f9824e454a1706cee316",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-13-report-detail-early-right",
@@ -2327,13 +1883,7 @@
 			"bytes": 1275597,
 			"format": "png",
 			"sha256": "8a1d2e26f447b195c85c3469fe9c9d9942a53421a150c84ce6c59ef6630f4b2c",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-14-report-detail-end-landscape",
@@ -2358,13 +1908,7 @@
 			"bytes": 1745604,
 			"format": "png",
 			"sha256": "a15e64c9806543e264db61658922cc12aa7d19c2f4defeb903316d6559c86da2",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-14-report-detail-end-portrait",
@@ -2389,13 +1933,7 @@
 			"bytes": 1684280,
 			"format": "png",
 			"sha256": "b82279c3eaa3bf0cb5fe88d2c659f0f0bda6168b56fd64d5c44cc2aebeceab88",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-14-report-detail-end-right",
@@ -2420,13 +1958,7 @@
 			"bytes": 1350896,
 			"format": "png",
 			"sha256": "7b21d477fc787fe6d911a39103cd52a84e93690aef806d5de4a4a8d38e46d145",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-15-settings-landscape",
@@ -2451,13 +1983,7 @@
 			"bytes": 1513148,
 			"format": "png",
 			"sha256": "8678ab3e184b40591bd631f34a4765d120333d60b93d09627c6e1e4766cbf3ca",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-15-settings-portrait",
@@ -2482,13 +2008,7 @@
 			"bytes": 1555947,
 			"format": "png",
 			"sha256": "5b894c56f46b58e35c439e87bc91b212798497050c10f1f860a92e3a07b5b4b1",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-15-settings-right",
@@ -2513,13 +2033,7 @@
 			"bytes": 1175690,
 			"format": "png",
 			"sha256": "3601aca88c9612ff3979b7b2e9063b43b0d4ea5e6b328ff51af7be1b0abd4401",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-16-settings-about-landscape",
@@ -2544,13 +2058,7 @@
 			"bytes": 1672561,
 			"format": "png",
 			"sha256": "0c75a6f44e256dd8982d1d06aa9aa875ad3f6fde136890aebbdaccf4526e7e88",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-16-settings-about-portrait",
@@ -2575,13 +2083,7 @@
 			"bytes": 1636590,
 			"format": "png",
 			"sha256": "15b1d1e6930c33c8027c643e904dfdc8f2b10ea54ab95e1dc4a32434878ae130",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-light-framed-16-settings-about-right",
@@ -2606,13 +2108,7 @@
 			"bytes": 1246892,
 			"format": "png",
 			"sha256": "ff74a6944d8e258112f919be750fbec4f62205a68350fafdd8fabc679816bfe1",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["ipad", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-03-home-landscape",
@@ -2637,13 +2133,7 @@
 			"bytes": 859990,
 			"format": "png",
 			"sha256": "cc679acc45d9d2dc4a24210cd9f4935d6cd3c23ac4e0bad8a9eda4e2a60b5927",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-03-home-left",
@@ -2668,13 +2158,7 @@
 			"bytes": 1258014,
 			"format": "png",
 			"sha256": "4f46eb9149152c86979bf7d9fc10b1bac700fce249a8e28feed25683670588e5",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-03-home-portrait",
@@ -2699,13 +2183,7 @@
 			"bytes": 861427,
 			"format": "png",
 			"sha256": "09125426d8a02f670b7841273d22a8ee6664071d063ffd7b86293ff22de90d47",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-04-home-queue-landscape",
@@ -2730,13 +2208,7 @@
 			"bytes": 753482,
 			"format": "png",
 			"sha256": "f569afc9bfd972bfcb540354b39ff9021dfc24ea1659777a6198585983c35906",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-04-home-queue-left",
@@ -2761,13 +2233,7 @@
 			"bytes": 1167846,
 			"format": "png",
 			"sha256": "84c5e9a222a1abd4838ce13bda00822a0ce45a99c185c48d2f9786c96fa98388",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-04-home-queue-portrait",
@@ -2792,13 +2258,7 @@
 			"bytes": 793069,
 			"format": "png",
 			"sha256": "872af2d3550e272f0c0f777adc7f0b68311e7fc3b060aa3351e3f327055d2676",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-05-places-landscape",
@@ -2823,13 +2283,7 @@
 			"bytes": 827883,
 			"format": "png",
 			"sha256": "1f54bbb011fb7dbd739b7116c5a460e469222746bd48ed2c0917f9be63ceb07d",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-05-places-left",
@@ -2854,13 +2308,7 @@
 			"bytes": 1226956,
 			"format": "png",
 			"sha256": "0e79bfcc49bdb94be2ba15c5b2a8271e5d22ec8165d22b4c8a23652dd5163ada",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-05-places-portrait",
@@ -2885,13 +2333,7 @@
 			"bytes": 833499,
 			"format": "png",
 			"sha256": "8c4c5e909b40d723674cae81714a6858aeac4b44e9a05a2fafe61a0b3490393e",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-06-place-detail-landscape",
@@ -2916,13 +2358,7 @@
 			"bytes": 1273575,
 			"format": "png",
 			"sha256": "f34dd7e658d7317b7ad5b71a615b4da77feffeb61aed5d99d4a8c9b8a4bb245a",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-06-place-detail-left",
@@ -2947,13 +2383,7 @@
 			"bytes": 1642047,
 			"format": "png",
 			"sha256": "4d57a2c7f554bcb3632a331e18223d6c4277c160ce08ddbc5c272f78c83f5aa6",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-06-place-detail-portrait",
@@ -2978,13 +2408,7 @@
 			"bytes": 1252151,
 			"format": "png",
 			"sha256": "901050912783c8597970e3237ee6179173baa74edebe6941723e4fe7fdf998f6",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-07-execute-landscape",
@@ -3009,13 +2433,7 @@
 			"bytes": 895019,
 			"format": "png",
 			"sha256": "059d29912e1dc8799eeca5c6630cd54654d828198a111c79ea3cb9fb16a699da",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-07-execute-left",
@@ -3040,13 +2458,7 @@
 			"bytes": 1331863,
 			"format": "png",
 			"sha256": "7de358065ceab75a74d2923b857b16d692247b2e56cf99b455d2939be871b479",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-07-execute-portrait",
@@ -3071,13 +2483,7 @@
 			"bytes": 897738,
 			"format": "png",
 			"sha256": "e738fa20aa52b527d65840a0cfdbc90b6b09a557ef6904ebea42391e5ecae14e",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-08-execute-place-landscape",
@@ -3102,13 +2508,7 @@
 			"bytes": 886803,
 			"format": "png",
 			"sha256": "02cb9fb1b884d4026c6b9370b7b6f28338b51973450728420c163dd7865cf2fc",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-08-execute-place-left",
@@ -3133,13 +2533,7 @@
 			"bytes": 1317376,
 			"format": "png",
 			"sha256": "ffe866ed22ca925bcc3999e98070cab615b3ac4d90ce2488a322dbf45ec05914",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-08-execute-place-portrait",
@@ -3164,13 +2558,7 @@
 			"bytes": 882943,
 			"format": "png",
 			"sha256": "eacd0b87dba1f69df05750702516c0f338c001412fe0b22649386eb01bcbdffa",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-09-execute-pre-audit-landscape",
@@ -3195,13 +2583,7 @@
 			"bytes": 916239,
 			"format": "png",
 			"sha256": "ba7b1d13998a344fecf3197ae9dacac9d29184cd410e8eabef3d5406f09d19e6",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-09-execute-pre-audit-left",
@@ -3226,13 +2608,7 @@
 			"bytes": 1329881,
 			"format": "png",
 			"sha256": "bdc3cf8f211911c5ce4e07ca5f8a82004c374bbccc385eaeeb96068db333d413",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-09-execute-pre-audit-portrait",
@@ -3257,13 +2633,7 @@
 			"bytes": 924816,
 			"format": "png",
 			"sha256": "1a3a0022e9756cf311d26a049c1db739c432284455a4b770f19155a895eee2fa",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-10-execute-section-landscape",
@@ -3288,13 +2658,7 @@
 			"bytes": 1074131,
 			"format": "png",
 			"sha256": "d1ac7562b740be10d44d9e430fe8a088aa7b306dccdc5f3590fbe9137b036891",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-10-execute-section-left",
@@ -3319,13 +2683,7 @@
 			"bytes": 1526014,
 			"format": "png",
 			"sha256": "ddcac1993d94e1359fff741d33da3dd6a3d6ba83c0a748a3284c5b51518ecda6",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-10-execute-section-portrait",
@@ -3350,13 +2708,7 @@
 			"bytes": 1068022,
 			"format": "png",
 			"sha256": "5456b035ae03baf782cf637058d74f5a34d47692820854eeac802ef529627cd7",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-11-execute-section-questions-landscape",
@@ -3381,13 +2733,7 @@
 			"bytes": 851546,
 			"format": "png",
 			"sha256": "830509cab6f9e0e874c1e263e902e2a6193acd1eeda032905be0069e7d2f3ef0",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-11-execute-section-questions-left",
@@ -3412,13 +2758,7 @@
 			"bytes": 1336693,
 			"format": "png",
 			"sha256": "d64d53337aeeebf6c4fc0c20938b2fb9e116733fceb538e8c9ff31f2db6178cc",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-11-execute-section-questions-portrait",
@@ -3443,13 +2783,7 @@
 			"bytes": 880636,
 			"format": "png",
 			"sha256": "db9e84df69fc9a9677fc9164dda69a57ba496920ce626a3ee8ac127724ada92f",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-12-execute-section-notes-landscape",
@@ -3474,13 +2808,7 @@
 			"bytes": 794648,
 			"format": "png",
 			"sha256": "769c0fa6bcbfe2636427d8180c5e3103638399bf6b10c681749d42980c05b9d2",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-12-execute-section-notes-left",
@@ -3505,13 +2833,7 @@
 			"bytes": 1205476,
 			"format": "png",
 			"sha256": "f2399540fb3129aae558f9c05fea20c69874f4ea6f24e6426cb889861585708d",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-12-execute-section-notes-portrait",
@@ -3536,13 +2858,7 @@
 			"bytes": 808504,
 			"format": "png",
 			"sha256": "28f86a1cfee8eb14c62dff7727644aa4243a1cb1e2a60ab0af3354a418876b8c",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-13-reports-landscape",
@@ -3567,13 +2883,7 @@
 			"bytes": 987065,
 			"format": "png",
 			"sha256": "1670bb6e0c3677d2cd71972cd7302695521e09a359564a43eccb76f3ce115e6d",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-13-reports-left",
@@ -3598,13 +2908,7 @@
 			"bytes": 1377974,
 			"format": "png",
 			"sha256": "a7cb250fe038f8c0b966b9b789249103159010408bcadfe1f280baa4341137d8",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-13-reports-portrait",
@@ -3629,13 +2933,7 @@
 			"bytes": 966359,
 			"format": "png",
 			"sha256": "a11bd38215d7949c276eaa89c96051cb119362b88eff678b0c701f771a21731a",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-14-reports-list-landscape",
@@ -3660,13 +2958,7 @@
 			"bytes": 918209,
 			"format": "png",
 			"sha256": "ee4cb808d07ffa88c89fe5bae3a42f4bf640a3a127cd1b0dcecb07befda09be4",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-14-reports-list-left",
@@ -3691,13 +2983,7 @@
 			"bytes": 1370957,
 			"format": "png",
 			"sha256": "c9767b61adc766fe668dd3d26d5647d2a1a074f66aa208278c894ada20c852b7",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-14-reports-list-portrait",
@@ -3722,13 +3008,7 @@
 			"bytes": 930888,
 			"format": "png",
 			"sha256": "aaaef50e33934292b0ccdb138d5ce7c70fc773fa3e902977f0ce167c48aad944",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-15-report-detail-top-landscape",
@@ -3753,13 +3033,7 @@
 			"bytes": 897029,
 			"format": "png",
 			"sha256": "7ee7a3fb0dd1665c1451e544a5396e62aa11e1157f5498624b0f533a9e641615",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-15-report-detail-top-left",
@@ -3784,13 +3058,7 @@
 			"bytes": 1298482,
 			"format": "png",
 			"sha256": "3f5b447283db7c77382d215abcc1266234ff9653a44633ccc2e0d57ff2a92102",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-15-report-detail-top-portrait",
@@ -3815,13 +3083,7 @@
 			"bytes": 909431,
 			"format": "png",
 			"sha256": "183d50d083116bd7006a23d0f213b773443c5f0ae7b9c3750cbc6ba524a3de16",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-16-report-detail-early-landscape",
@@ -3846,13 +3108,7 @@
 			"bytes": 783948,
 			"format": "png",
 			"sha256": "016b179675bb0b20f86ef1f43400e56fd2a5a5c0652d47ea2a195232d7646eea",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-16-report-detail-early-left",
@@ -3877,13 +3133,7 @@
 			"bytes": 1278064,
 			"format": "png",
 			"sha256": "d5a5b158bc39ecdc36c40b57e6e6b6a7a87bd672ba9d933bda7c8b67fdac91cf",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-16-report-detail-early-portrait",
@@ -3908,13 +3158,7 @@
 			"bytes": 842118,
 			"format": "png",
 			"sha256": "6fa7c8c6e6c06f9fd2e09f7de12f13a21ac935ce97e0240cd97c37fbd498a850",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-17-report-detail-near-end-landscape",
@@ -3939,13 +3183,7 @@
 			"bytes": 759799,
 			"format": "png",
 			"sha256": "a51d38ad2b106321137a3c8c73d42ca21d96d7ad5f640fd7951ccd1c4daf7a58",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-17-report-detail-near-end-left",
@@ -3970,13 +3208,7 @@
 			"bytes": 1255162,
 			"format": "png",
 			"sha256": "b48198e390e83f79dd17dfb4a12c1619d5216b7156efbe0ba4210784b7ab44a4",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-17-report-detail-near-end-portrait",
@@ -4001,13 +3233,7 @@
 			"bytes": 817907,
 			"format": "png",
 			"sha256": "cb1bcde62ea82957f46f64ed108c0cbb21667359e116e0e8f9ab60da1a02f9ac",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-18-report-detail-end-landscape",
@@ -4032,13 +3258,7 @@
 			"bytes": 1025584,
 			"format": "png",
 			"sha256": "979c6a38c51eb5a8f371e8f847c83676dac46881f87cb51973c7a00a8b22fd14",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-18-report-detail-end-left",
@@ -4063,13 +3283,7 @@
 			"bytes": 1486353,
 			"format": "png",
 			"sha256": "32fd186007a42bf8f4707ffd40c9dea4be1b4f25f71dd25b024931c262b4bf75",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-18-report-detail-end-portrait",
@@ -4094,13 +3308,7 @@
 			"bytes": 1033369,
 			"format": "png",
 			"sha256": "53b27ebedc16b9336c813cb4376daeadbd6bdd5653e1336b53861da10d992cbf",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-19-settings-landscape",
@@ -4125,13 +3333,7 @@
 			"bytes": 782573,
 			"format": "png",
 			"sha256": "ac7039ae0d48df026ccfc2084caa4f84049c010a60181310493c45840d3b47ef",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-19-settings-left",
@@ -4156,13 +3358,7 @@
 			"bytes": 1227756,
 			"format": "png",
 			"sha256": "7f7953c3c1f0f424bd8d39b7ce1dc40e16dd37c592e31a4e102c00fe12482171",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-19-settings-portrait",
@@ -4187,13 +3383,7 @@
 			"bytes": 824243,
 			"format": "png",
 			"sha256": "a53c5f754808e14a6bcbb00579ae1ed63d16649fd578846667a80b2bed2d598e",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-20-settings-scrolled-landscape",
@@ -4218,13 +3408,7 @@
 			"bytes": 874217,
 			"format": "png",
 			"sha256": "a9ea6f1e08f7c1be1e7c26409171d8f50904695a14a4e01a07a433a382506700",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-20-settings-scrolled-left",
@@ -4249,13 +3433,7 @@
 			"bytes": 1276499,
 			"format": "png",
 			"sha256": "7ed004d3c4775ab4bec7c492f3be2b67d56ad4825c9abcfcd24c33facef27ab0",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-dark-framed-20-settings-scrolled-portrait",
@@ -4280,13 +3458,7 @@
 			"bytes": 885503,
 			"format": "png",
 			"sha256": "ffb3892dc9c57554b4f3aecedbe87cf814a76475f9785b4af30fdb12e142f833",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "dark", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-01-login-landscape",
@@ -4311,13 +3483,7 @@
 			"bytes": 733115,
 			"format": "png",
 			"sha256": "d052a923b9c97af3d08b87b992b722c53f2687fb290a2c08980ab95e718df5d0",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-01-login-left",
@@ -4342,13 +3508,7 @@
 			"bytes": 1008633,
 			"format": "png",
 			"sha256": "c15b6c7b9bf5ec3c3aa6709f93086fea611a5985a8b9823e1e519062e2e54224",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-01-login-portrait",
@@ -4373,13 +3533,7 @@
 			"bytes": 691366,
 			"format": "png",
 			"sha256": "5dd5d5d675fd64c69512eaf36af304b7ef91a0faad81a3e4f7d31a7e28b3d3f3",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-02-signup-landscape",
@@ -4404,13 +3558,7 @@
 			"bytes": 780713,
 			"format": "png",
 			"sha256": "368d2ae959669e04a1fec18739b7413450618fcce2b21b8846594448c5f0df12",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-02-signup-left",
@@ -4435,13 +3583,7 @@
 			"bytes": 1115298,
 			"format": "png",
 			"sha256": "0b559d037b700ab1ffc9073162cbde5e080880f804060973a47eb4ff45a61b36",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-02-signup-portrait",
@@ -4466,13 +3608,7 @@
 			"bytes": 735897,
 			"format": "png",
 			"sha256": "3cbf5c59f8e63a3ac456dc647fcab94f8e6437b3332e6e7dc1efb2c892959767",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-03-home-landscape",
@@ -4497,13 +3633,7 @@
 			"bytes": 1076233,
 			"format": "png",
 			"sha256": "a6103beadb868d4d2181c4cd7fbc6f3efaace4738dd6e0722bf5eaae1e91ab94",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-03-home-left",
@@ -4528,13 +3658,7 @@
 			"bytes": 1473733,
 			"format": "png",
 			"sha256": "2ab10360de6db37198197b2cff9939e69b920ae4ad19b4585f639d6f27dfc5bb",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-03-home-portrait",
@@ -4559,13 +3683,7 @@
 			"bytes": 1000710,
 			"format": "png",
 			"sha256": "a63fc4194557708dc1a0bf3bf4c50cc58223d9386646dd42cd6f6eece4f8cd53",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-04-home-queue-landscape",
@@ -4590,13 +3708,7 @@
 			"bytes": 912265,
 			"format": "png",
 			"sha256": "f525e18fbba4ccba0e753b8e38a2844c328855b5ad98f269ad1caa8ad98291b8",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-04-home-queue-left",
@@ -4621,13 +3733,7 @@
 			"bytes": 1365631,
 			"format": "png",
 			"sha256": "1e8b220dac8e27198ea240d163a31003bcc855d4d7510a8fcffe66e1923f5dbc",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-04-home-queue-portrait",
@@ -4652,13 +3758,7 @@
 			"bytes": 910303,
 			"format": "png",
 			"sha256": "9ead5414a181641ff2b6fe1c49019b460c2cc51d47fd3aaada3a2b5509484f8b",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-05-places-landscape",
@@ -4683,13 +3783,7 @@
 			"bytes": 965527,
 			"format": "png",
 			"sha256": "c7d4c9a30d8cc97fad93e5637fd864d7125e798417d7152a2f1c7810ba09c45b",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-05-places-left",
@@ -4714,13 +3808,7 @@
 			"bytes": 1348199,
 			"format": "png",
 			"sha256": "969255ac91a295f06429051aeefc4ca2b0d0abdf734dbb67dcb20f69a44334c2",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-05-places-portrait",
@@ -4745,13 +3833,7 @@
 			"bytes": 909631,
 			"format": "png",
 			"sha256": "ef7469df528f028880622d5f5f2492c3236bf42fbad77007987aeafbad678d73",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-06-place-detail-landscape",
@@ -4776,13 +3858,7 @@
 			"bytes": 1539163,
 			"format": "png",
 			"sha256": "064fe1d6293b80aae2a40d397d084ad9c2eae777d068fdde8eab9f5b97c88931",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-06-place-detail-left",
@@ -4807,13 +3883,7 @@
 			"bytes": 1879665,
 			"format": "png",
 			"sha256": "566405bb9789530f6c2ccd1ff2b56237853bf692a661442e8ec15bdf6199da77",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-06-place-detail-portrait",
@@ -4838,13 +3908,7 @@
 			"bytes": 1420862,
 			"format": "png",
 			"sha256": "6c0a66afac088cc94552b05c32c6737fad0e238b8a64337eadcffc41cefb95d4",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-07-execute-landscape",
@@ -4869,13 +3933,7 @@
 			"bytes": 1049275,
 			"format": "png",
 			"sha256": "b6d80fe7b4f907745b183dd286e852b1013de0c9b57ce5c0972fcf94fddb2fa1",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-07-execute-left",
@@ -4900,13 +3958,7 @@
 			"bytes": 1491247,
 			"format": "png",
 			"sha256": "0178041af29b57597ba930b327811d579e818e5799d408c506770db43987a5a7",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-07-execute-portrait",
@@ -4931,13 +3983,7 @@
 			"bytes": 990810,
 			"format": "png",
 			"sha256": "50fcdd35078f5a55c5eaba03eeb84986798df94ac69fb590f8ed5e912439f60d",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-08-execute-place-landscape",
@@ -4962,13 +4008,7 @@
 			"bytes": 1040276,
 			"format": "png",
 			"sha256": "ddf8c88408657b7e666b7ebf51f5b6b7029644e0acd5f166b8d5dcb8e538ee1e",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-08-execute-place-left",
@@ -4993,13 +4033,7 @@
 			"bytes": 1505291,
 			"format": "png",
 			"sha256": "9000f3c2d6092a86e36e1e0aa73a7c3a86a1cebdd161cee14a1dd13a820bea2c",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-08-execute-place-portrait",
@@ -5024,13 +4058,7 @@
 			"bytes": 987340,
 			"format": "png",
 			"sha256": "ba324d5bb5b4162d1c80da98a602a9aeb66b3a56645c1caa8eb04ee5e5c68fa5",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-09-execute-pre-audit-landscape",
@@ -5055,13 +4083,7 @@
 			"bytes": 1105405,
 			"format": "png",
 			"sha256": "3b721f19952dafcf4ba836917eb6db302146bb0e03a264905770a9df9bcec643",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-09-execute-pre-audit-left",
@@ -5086,13 +4108,7 @@
 			"bytes": 1557993,
 			"format": "png",
 			"sha256": "a5f9053cca8cec6da342c5d25c5cae7fc1b1cbeab6f59c5a14787ee84062fc8d",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-09-execute-pre-audit-portrait",
@@ -5117,13 +4133,7 @@
 			"bytes": 1045594,
 			"format": "png",
 			"sha256": "8766179bf0cc105f4bb7f4acfe5c1e78946091dc87a45c456279ffc01d46760a",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-10-execute-section-landscape",
@@ -5148,13 +4158,7 @@
 			"bytes": 1180024,
 			"format": "png",
 			"sha256": "2676dbd0dd16723bb3f7f64ea1843eefe2770061286e605977b4d93e63d955e7",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-10-execute-section-left",
@@ -5179,13 +4183,7 @@
 			"bytes": 1671890,
 			"format": "png",
 			"sha256": "47032f3eda1c6cdce1f7f52916849f80fcf1c59142cc09512b29bda66521f249",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-10-execute-section-portrait",
@@ -5210,13 +4208,7 @@
 			"bytes": 1151007,
 			"format": "png",
 			"sha256": "bbb0058d39f981afaa001da874873b4d9cf511ad3a424a70f56a5f89e6317774",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-11-execute-section-questions-landscape",
@@ -5241,13 +4233,7 @@
 			"bytes": 962073,
 			"format": "png",
 			"sha256": "466651f0739ff0b0c31d4c341dfd198a1b766f4571db4168c7f8304c640cb93e",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-11-execute-section-questions-left",
@@ -5272,13 +4258,7 @@
 			"bytes": 1492730,
 			"format": "png",
 			"sha256": "445b60c88f94a91e13851dc995ed4e0c106c2ddcad062480c5aca5d2cefb35f2",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-11-execute-section-questions-portrait",
@@ -5303,13 +4283,7 @@
 			"bytes": 981809,
 			"format": "png",
 			"sha256": "ed78e0289aa00103d5a6ed0cbe32e53e15731ec72e504bede1068b47e4488646",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-12-execute-section-notes-landscape",
@@ -5334,13 +4308,7 @@
 			"bytes": 888615,
 			"format": "png",
 			"sha256": "f533ad49c12288a57cf2f42560b0f1ae286d5968c766522aa33155baac2da133",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-12-execute-section-notes-left",
@@ -5365,13 +4333,7 @@
 			"bytes": 1326973,
 			"format": "png",
 			"sha256": "f419bb91b2f41dd34e4cc937e852b09606d7b290aa88bd2ddb2a04c5a768aefe",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-12-execute-section-notes-portrait",
@@ -5396,13 +4358,7 @@
 			"bytes": 881860,
 			"format": "png",
 			"sha256": "52c319e7d518fccf46f957743968c334e67034accc431a5eaf48b57d212bf9f2",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-13-reports-landscape",
@@ -5427,13 +4383,7 @@
 			"bytes": 1254757,
 			"format": "png",
 			"sha256": "1d331a5f3d9c7cf8e32afaa64ddf76516740f50e045c8424a0280707fc2154b9",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-13-reports-left",
@@ -5458,13 +4408,7 @@
 			"bytes": 1611728,
 			"format": "png",
 			"sha256": "81b8100fbacabd568790d2fbec6bf7891dfa3274ce6cc9e5e4aabce7ce5cc931",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-13-reports-portrait",
@@ -5489,13 +4433,7 @@
 			"bytes": 1116301,
 			"format": "png",
 			"sha256": "af6e6e96f2a776671d1dfcabbab9917df762b6f27d08df378d606c4e190f99f3",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-14-reports-list-landscape",
@@ -5520,13 +4458,7 @@
 			"bytes": 1192856,
 			"format": "png",
 			"sha256": "bc6f99759d317c14477549802efd734ec1f4996e7b7d59b6912e2d1b3769c5c4",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-14-reports-list-left",
@@ -5551,13 +4483,7 @@
 			"bytes": 1622775,
 			"format": "png",
 			"sha256": "96327de7b9b63e8aea36cd9c412f383dbb3558223a5ec9ac7b05552cf456898a",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-14-reports-list-portrait",
@@ -5582,13 +4508,7 @@
 			"bytes": 1103435,
 			"format": "png",
 			"sha256": "9bef98ffec887d069b7d6af4c5df94232fe9c2c7944dbfb7c535015f32c13d71",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-15-report-detail-top-landscape",
@@ -5613,13 +4533,7 @@
 			"bytes": 1088761,
 			"format": "png",
 			"sha256": "28de9050258a3ff7d4366990cb74015e9bcff5c90666299f7d5de0044bc8ff15",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-15-report-detail-top-left",
@@ -5644,13 +4558,7 @@
 			"bytes": 1494793,
 			"format": "png",
 			"sha256": "4dad63f40faf73f713332285d739c7d0e70f09c39f176526bb1b8b7910be56cf",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-15-report-detail-top-portrait",
@@ -5675,13 +4583,7 @@
 			"bytes": 1037056,
 			"format": "png",
 			"sha256": "f5c51a873af6701844d786d64e5fe7a6ee0803a1539ae06c4633ddc915f91c5e",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-16-report-detail-early-landscape",
@@ -5706,13 +4608,7 @@
 			"bytes": 895645,
 			"format": "png",
 			"sha256": "1edb1777f5232627f7e9b62534a671542dfd55545fdb5899be295a68365bf607",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-16-report-detail-early-left",
@@ -5737,13 +4633,7 @@
 			"bytes": 1413215,
 			"format": "png",
 			"sha256": "b15ec994342fa7409a86a6bc16bdd185012e378ba484e504e3a122425715664e",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-16-report-detail-early-portrait",
@@ -5768,13 +4658,7 @@
 			"bytes": 947131,
 			"format": "png",
 			"sha256": "026453bb2ad4b6807cb201a4c2284916cf31f5480c58da9278e103332175ee39",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-17-report-detail-near-end-landscape",
@@ -5799,13 +4683,7 @@
 			"bytes": 866248,
 			"format": "png",
 			"sha256": "e64831bcea8157c9051c34c7864ea8949c649cba085cc3322b53ac3e622ba6f7",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-17-report-detail-near-end-left",
@@ -5830,13 +4708,7 @@
 			"bytes": 1421896,
 			"format": "png",
 			"sha256": "c18947231cd92663fbe64bd08e9cf1e69e75aae88ed1138fa0524b09a8bb017a",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-17-report-detail-near-end-portrait",
@@ -5861,13 +4733,7 @@
 			"bytes": 933157,
 			"format": "png",
 			"sha256": "f8186baf98013606703314ba852564075dd4fd9cdfc044201344d58a38a6b4ee",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-18-report-detail-end-landscape",
@@ -5892,13 +4758,7 @@
 			"bytes": 1114162,
 			"format": "png",
 			"sha256": "70c41fc1fb939ca67d21d8ae6f7ff846c8ddd2006856b7cc26252fc5df7fbf17",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-18-report-detail-end-left",
@@ -5923,13 +4783,7 @@
 			"bytes": 1590320,
 			"format": "png",
 			"sha256": "8383988479a2610189b03832a9f456d972e6bce096912725a211e2100eaebb9b",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-18-report-detail-end-portrait",
@@ -5954,13 +4808,7 @@
 			"bytes": 1094866,
 			"format": "png",
 			"sha256": "87c1e24471e6074362b925208e70b309a2f69e8a211a93a66c13748c182a28de",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-19-settings-landscape",
@@ -5985,13 +4833,7 @@
 			"bytes": 885923,
 			"format": "png",
 			"sha256": "28041fba2440d6e30dc9842e33ce164f64188e872741b2a902435eebe36888f5",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-19-settings-left",
@@ -6016,13 +4858,7 @@
 			"bytes": 1363821,
 			"format": "png",
 			"sha256": "e2f9a4bb5e7b41c24133abaefa35631d07969ac9a5caa8c5731782125ac028ef",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-19-settings-portrait",
@@ -6047,13 +4883,7 @@
 			"bytes": 917515,
 			"format": "png",
 			"sha256": "d68bc6542ed572c49f428f0641062528051f4b357843c370017b82b0668ee862",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-20-settings-scrolled-landscape",
@@ -6078,13 +4908,7 @@
 			"bytes": 1044139,
 			"format": "png",
 			"sha256": "a4410a0c4d7531d626bac3fb808416f04f0813134a0b216ab9d7a1531719d673",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-20-settings-scrolled-left",
@@ -6109,13 +4933,7 @@
 			"bytes": 1473030,
 			"format": "png",
 			"sha256": "b70a27d0eabba3548b325bb173058f250dd2a2f680daca8e71f8adcc92d186f3",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-iphone-light-framed-20-settings-scrolled-portrait",
@@ -6140,13 +4958,7 @@
 			"bytes": 1012526,
 			"format": "png",
 			"sha256": "41dda8d930e6f619c84a59857dca68b80c00a8611854be9860a6841aafb27b86",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"framed",
-				"screenshots"
-			]
+			"tags": ["iphone", "light", "mobile", "framed", "screenshots"]
 		},
 		{
 			"id": "mobile-ipad-dark-raw-03-home",
@@ -6171,14 +4983,7 @@
 			"bytes": 572023,
 			"format": "png",
 			"sha256": "cda6c269dcce8014b5086092452f906c41e693106e759970a5dbae7ba1e1beab",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"raw",
-				"screenshots",
-				"home"
-			]
+			"tags": ["ipad", "dark", "mobile", "raw", "screenshots", "home"]
 		},
 		{
 			"id": "mobile-ipad-dark-raw-04-places",
@@ -6203,14 +5008,7 @@
 			"bytes": 535940,
 			"format": "png",
 			"sha256": "edecbf43d3a4826af58f939da675a37db8de47f46cd4b2b09f3f74f29f977854",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"raw",
-				"screenshots",
-				"places"
-			]
+			"tags": ["ipad", "dark", "mobile", "raw", "screenshots", "places"]
 		},
 		{
 			"id": "mobile-ipad-dark-raw-05-place-detail",
@@ -6235,14 +5033,7 @@
 			"bytes": 1810708,
 			"format": "png",
 			"sha256": "c140e4fda3c5120acf0f0837ed1456669514e44cdb9fd2d400c9dc1eb1ebb0eb",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"raw",
-				"screenshots",
-				"place-detail"
-			]
+			"tags": ["ipad", "dark", "mobile", "raw", "screenshots", "place-detail"]
 		},
 		{
 			"id": "mobile-ipad-dark-raw-06-execute",
@@ -6267,14 +5058,7 @@
 			"bytes": 346280,
 			"format": "png",
 			"sha256": "1bb8c77f902f304debb95451b3fa8ac6f81df2d6b04d48374d575788986de337",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"raw",
-				"screenshots",
-				"execute"
-			]
+			"tags": ["ipad", "dark", "mobile", "raw", "screenshots", "execute"]
 		},
 		{
 			"id": "mobile-ipad-dark-raw-07-execute-place",
@@ -6299,14 +5083,7 @@
 			"bytes": 488974,
 			"format": "png",
 			"sha256": "08d64efa238ebe0abebd5dd676c1bb194cc3dec713420486e0d8741c42bd879d",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"raw",
-				"screenshots",
-				"execute-place"
-			]
+			"tags": ["ipad", "dark", "mobile", "raw", "screenshots", "execute-place"]
 		},
 		{
 			"id": "mobile-ipad-dark-raw-08-execute-pre-audit",
@@ -6331,14 +5108,7 @@
 			"bytes": 419685,
 			"format": "png",
 			"sha256": "7c1223b96c7e6c0237e3a480052c9647466da3fd9a43567264ef172477eb9782",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"raw",
-				"screenshots",
-				"execute-pre-audit"
-			]
+			"tags": ["ipad", "dark", "mobile", "raw", "screenshots", "execute-pre-audit"]
 		},
 		{
 			"id": "mobile-ipad-dark-raw-09-execute-section",
@@ -6363,14 +5133,7 @@
 			"bytes": 607722,
 			"format": "png",
 			"sha256": "0a07de3680f7b0a8214e64c2968a69e739321b227ec90d47483d5ecb5828a4a2",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"raw",
-				"screenshots",
-				"execute-section"
-			]
+			"tags": ["ipad", "dark", "mobile", "raw", "screenshots", "execute-section"]
 		},
 		{
 			"id": "mobile-ipad-dark-raw-10-execute-section-notes",
@@ -6395,14 +5158,7 @@
 			"bytes": 520502,
 			"format": "png",
 			"sha256": "e97e06d521edbb766b066bb9a73a486ce677df6dd9ccf1fc7a0ca316a2d2df98",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"raw",
-				"screenshots",
-				"execute-section-notes"
-			]
+			"tags": ["ipad", "dark", "mobile", "raw", "screenshots", "execute-section-notes"]
 		},
 		{
 			"id": "mobile-ipad-dark-raw-11-reports",
@@ -6427,14 +5183,7 @@
 			"bytes": 616815,
 			"format": "png",
 			"sha256": "66d071068c8d5d75e9c89230d6d9e3615d292486f558364287390f5eeef601f6",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"raw",
-				"screenshots",
-				"reports"
-			]
+			"tags": ["ipad", "dark", "mobile", "raw", "screenshots", "reports"]
 		},
 		{
 			"id": "mobile-ipad-dark-raw-12-report-detail-top",
@@ -6459,14 +5208,7 @@
 			"bytes": 539460,
 			"format": "png",
 			"sha256": "d5dfac6852897f56e2cf9f6013b3ca6e74d7853ef3f35cb573eaf0a62cbb7889",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"raw",
-				"screenshots",
-				"report-detail-top"
-			]
+			"tags": ["ipad", "dark", "mobile", "raw", "screenshots", "report-detail-top"]
 		},
 		{
 			"id": "mobile-ipad-dark-raw-13-report-detail-early",
@@ -6491,14 +5233,7 @@
 			"bytes": 475965,
 			"format": "png",
 			"sha256": "c5046c481c53056dfd1e977b67207e9919bf97e6aebd2ac6be45207e1362e901",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"raw",
-				"screenshots",
-				"report-detail-early"
-			]
+			"tags": ["ipad", "dark", "mobile", "raw", "screenshots", "report-detail-early"]
 		},
 		{
 			"id": "mobile-ipad-dark-raw-14-report-detail-end",
@@ -6523,14 +5258,7 @@
 			"bytes": 525758,
 			"format": "png",
 			"sha256": "61b44669cde2842842316744bff60518dd78e22bf207a5b725aa59d0b19a68f6",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"raw",
-				"screenshots",
-				"report-detail-end"
-			]
+			"tags": ["ipad", "dark", "mobile", "raw", "screenshots", "report-detail-end"]
 		},
 		{
 			"id": "mobile-ipad-dark-raw-15-settings",
@@ -6555,14 +5283,7 @@
 			"bytes": 489729,
 			"format": "png",
 			"sha256": "a79ee357e5d0bba71d496f1c68a0f3189f1a939d3223c99658b5ba39436f53f3",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"raw",
-				"screenshots",
-				"settings"
-			]
+			"tags": ["ipad", "dark", "mobile", "raw", "screenshots", "settings"]
 		},
 		{
 			"id": "mobile-ipad-dark-raw-16-settings-about",
@@ -6587,14 +5308,7 @@
 			"bytes": 500160,
 			"format": "png",
 			"sha256": "16faeea45ba7ef5b3e11d0c92136eff31f48363c2c343e4c81f55a483eefe329",
-			"tags": [
-				"ipad",
-				"dark",
-				"mobile",
-				"raw",
-				"screenshots",
-				"settings-about"
-			]
+			"tags": ["ipad", "dark", "mobile", "raw", "screenshots", "settings-about"]
 		},
 		{
 			"id": "mobile-ipad-light-raw-03-home",
@@ -6619,14 +5333,7 @@
 			"bytes": 922675,
 			"format": "png",
 			"sha256": "9063c53d6471fb624150649f5dca0f2bc0ced48e8b046c36491cbff964385929",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"raw",
-				"screenshots",
-				"home"
-			]
+			"tags": ["ipad", "light", "mobile", "raw", "screenshots", "home"]
 		},
 		{
 			"id": "mobile-ipad-light-raw-04-places",
@@ -6651,14 +5358,7 @@
 			"bytes": 846822,
 			"format": "png",
 			"sha256": "fd11ffc0c51bbc32fa18e88c26783e22117b0f128a93fe520002c7f6ce9b8d0e",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"raw",
-				"screenshots",
-				"places"
-			]
+			"tags": ["ipad", "light", "mobile", "raw", "screenshots", "places"]
 		},
 		{
 			"id": "mobile-ipad-light-raw-05-place-detail",
@@ -6683,14 +5383,7 @@
 			"bytes": 2119867,
 			"format": "png",
 			"sha256": "9bde870f061a629b2d26c9deff336cd9a1dfabb71cac2f018b651d00d75725b1",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"raw",
-				"screenshots",
-				"place-detail"
-			]
+			"tags": ["ipad", "light", "mobile", "raw", "screenshots", "place-detail"]
 		},
 		{
 			"id": "mobile-ipad-light-raw-06-execute",
@@ -6715,14 +5408,7 @@
 			"bytes": 485218,
 			"format": "png",
 			"sha256": "27cc4036127d7acd2c62025169cdb3cc3f777e002d9979728a2774af917259f2",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"raw",
-				"screenshots",
-				"execute"
-			]
+			"tags": ["ipad", "light", "mobile", "raw", "screenshots", "execute"]
 		},
 		{
 			"id": "mobile-ipad-light-raw-07-execute-place",
@@ -6747,14 +5433,7 @@
 			"bytes": 711950,
 			"format": "png",
 			"sha256": "9fa808f779eb9fb14f26479ac5358d1925566bdf67e00a218d41ae0d5bc40c7a",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"raw",
-				"screenshots",
-				"execute-place"
-			]
+			"tags": ["ipad", "light", "mobile", "raw", "screenshots", "execute-place"]
 		},
 		{
 			"id": "mobile-ipad-light-raw-08-execute-pre-audit",
@@ -6779,14 +5458,7 @@
 			"bytes": 625634,
 			"format": "png",
 			"sha256": "5fb53ee93d76651e4e7db2629091a08bfb37c3db72b24d996706ec01d25289ef",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"raw",
-				"screenshots",
-				"execute-pre-audit"
-			]
+			"tags": ["ipad", "light", "mobile", "raw", "screenshots", "execute-pre-audit"]
 		},
 		{
 			"id": "mobile-ipad-light-raw-09-execute-section",
@@ -6811,14 +5483,7 @@
 			"bytes": 625463,
 			"format": "png",
 			"sha256": "508840c0bd7bfa503fd6c038b961be54677a4391328a044f91e9352451377bf1",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"raw",
-				"screenshots",
-				"execute-section"
-			]
+			"tags": ["ipad", "light", "mobile", "raw", "screenshots", "execute-section"]
 		},
 		{
 			"id": "mobile-ipad-light-raw-10-execute-section-notes",
@@ -6843,14 +5508,7 @@
 			"bytes": 613898,
 			"format": "png",
 			"sha256": "f517b2c2806a62a806104b0c03a7b76e718b7e5defdbc8f3d323e945906bad2d",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"raw",
-				"screenshots",
-				"execute-section-notes"
-			]
+			"tags": ["ipad", "light", "mobile", "raw", "screenshots", "execute-section-notes"]
 		},
 		{
 			"id": "mobile-ipad-light-raw-11-reports",
@@ -6875,14 +5533,7 @@
 			"bytes": 1004594,
 			"format": "png",
 			"sha256": "d41efc7086a9522f69e331aa3113c2f582854a7befb2707f2ae16da4422d1ee8",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"raw",
-				"screenshots",
-				"reports"
-			]
+			"tags": ["ipad", "light", "mobile", "raw", "screenshots", "reports"]
 		},
 		{
 			"id": "mobile-ipad-light-raw-12-report-detail-top",
@@ -6907,14 +5558,7 @@
 			"bytes": 868832,
 			"format": "png",
 			"sha256": "a2a86cef304948ccb7888389e3daab690a82c11b67b792523a53335f427a1ed4",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"raw",
-				"screenshots",
-				"report-detail-top"
-			]
+			"tags": ["ipad", "light", "mobile", "raw", "screenshots", "report-detail-top"]
 		},
 		{
 			"id": "mobile-ipad-light-raw-13-report-detail-early",
@@ -6939,14 +5583,7 @@
 			"bytes": 672997,
 			"format": "png",
 			"sha256": "d1986f68069500412be3f63a422ddcd2fd2d7671c85e975d38ff8599e20914a6",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"raw",
-				"screenshots",
-				"report-detail-early"
-			]
+			"tags": ["ipad", "light", "mobile", "raw", "screenshots", "report-detail-early"]
 		},
 		{
 			"id": "mobile-ipad-light-raw-14-report-detail-end",
@@ -6971,14 +5608,7 @@
 			"bytes": 686292,
 			"format": "png",
 			"sha256": "84d1d44b35426e21ec7a0064c565d116dad452cf3535f8a0ace92417c95c64b8",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"raw",
-				"screenshots",
-				"report-detail-end"
-			]
+			"tags": ["ipad", "light", "mobile", "raw", "screenshots", "report-detail-end"]
 		},
 		{
 			"id": "mobile-ipad-light-raw-15-settings",
@@ -7003,14 +5633,7 @@
 			"bytes": 725597,
 			"format": "png",
 			"sha256": "8ec6dd0c20d724a7546cb9172ccb627125c40df812eb94dcf78ac0a767ddc288",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"raw",
-				"screenshots",
-				"settings"
-			]
+			"tags": ["ipad", "light", "mobile", "raw", "screenshots", "settings"]
 		},
 		{
 			"id": "mobile-ipad-light-raw-16-settings-about",
@@ -7035,14 +5658,7 @@
 			"bytes": 760903,
 			"format": "png",
 			"sha256": "8faa9a827958189ab859010a4b384dc5e5d4c01255a2dc59eb43269829eb6d2b",
-			"tags": [
-				"ipad",
-				"light",
-				"mobile",
-				"raw",
-				"screenshots",
-				"settings-about"
-			]
+			"tags": ["ipad", "light", "mobile", "raw", "screenshots", "settings-about"]
 		},
 		{
 			"id": "mobile-iphone-dark-raw-03-home",
@@ -7067,14 +5683,7 @@
 			"bytes": 390935,
 			"format": "png",
 			"sha256": "6825979b87348db643a5c658d433d248ce2a99bc45324db1381e4e061f480c5f",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"raw",
-				"screenshots",
-				"home"
-			]
+			"tags": ["iphone", "dark", "mobile", "raw", "screenshots", "home"]
 		},
 		{
 			"id": "mobile-iphone-dark-raw-04-home-queue",
@@ -7099,14 +5708,7 @@
 			"bytes": 354659,
 			"format": "png",
 			"sha256": "98a1449ed535e016cc656ba046559943489ddf7abaf3bca161b54904fbc4a44b",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"raw",
-				"screenshots",
-				"home-queue"
-			]
+			"tags": ["iphone", "dark", "mobile", "raw", "screenshots", "home-queue"]
 		},
 		{
 			"id": "mobile-iphone-dark-raw-05-places",
@@ -7131,14 +5733,7 @@
 			"bytes": 337227,
 			"format": "png",
 			"sha256": "1cb19f45ea0bca7950536d912e5ffbce2c95fe1a10fc0ded6636993f2ce712da",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"raw",
-				"screenshots",
-				"places"
-			]
+			"tags": ["iphone", "dark", "mobile", "raw", "screenshots", "places"]
 		},
 		{
 			"id": "mobile-iphone-dark-raw-06-place-detail",
@@ -7163,14 +5758,7 @@
 			"bytes": 891767,
 			"format": "png",
 			"sha256": "fd7d7a9a384f6c8f5f08031c66a63eb49b13a4a8f88eb494755e5539d2eb9e4e",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"raw",
-				"screenshots",
-				"place-detail"
-			]
+			"tags": ["iphone", "dark", "mobile", "raw", "screenshots", "place-detail"]
 		},
 		{
 			"id": "mobile-iphone-dark-raw-07-execute",
@@ -7195,14 +5783,7 @@
 			"bytes": 369258,
 			"format": "png",
 			"sha256": "16e35e045bb014fb8e7fa5acdc45c8aecb3756c1b32ebe952522e34968b9d027",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"raw",
-				"screenshots",
-				"execute"
-			]
+			"tags": ["iphone", "dark", "mobile", "raw", "screenshots", "execute"]
 		},
 		{
 			"id": "mobile-iphone-dark-raw-08-execute-place",
@@ -7227,14 +5808,7 @@
 			"bytes": 366818,
 			"format": "png",
 			"sha256": "01b4c236bb464b13d11a93251f39438b1966d39799bcc465aae57e7ca45f0a44",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"raw",
-				"screenshots",
-				"execute-place"
-			]
+			"tags": ["iphone", "dark", "mobile", "raw", "screenshots", "execute-place"]
 		},
 		{
 			"id": "mobile-iphone-dark-raw-09-execute-pre-audit",
@@ -7259,14 +5833,7 @@
 			"bytes": 384954,
 			"format": "png",
 			"sha256": "e651c8028ffd78527ec8da8c79571f69492ea50fdd604eb9f6056af0ba4bc70e",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"raw",
-				"screenshots",
-				"execute-pre-audit"
-			]
+			"tags": ["iphone", "dark", "mobile", "raw", "screenshots", "execute-pre-audit"]
 		},
 		{
 			"id": "mobile-iphone-dark-raw-10-execute-section",
@@ -7291,14 +5858,7 @@
 			"bytes": 423769,
 			"format": "png",
 			"sha256": "bdaf21e5345ff36385729bc0d4a78b4ebb11255297db72f70e399cf3e94e8bb9",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"raw",
-				"screenshots",
-				"execute-section"
-			]
+			"tags": ["iphone", "dark", "mobile", "raw", "screenshots", "execute-section"]
 		},
 		{
 			"id": "mobile-iphone-dark-raw-11-execute-section-questions",
@@ -7323,14 +5883,7 @@
 			"bytes": 388697,
 			"format": "png",
 			"sha256": "5227a9831e854b0d3fd2a9d83073605ef50380a92c9a262f4cf67fc9130aa5b7",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"raw",
-				"screenshots",
-				"execute-section-questions"
-			]
+			"tags": ["iphone", "dark", "mobile", "raw", "screenshots", "execute-section-questions"]
 		},
 		{
 			"id": "mobile-iphone-dark-raw-12-execute-section-notes",
@@ -7355,14 +5908,7 @@
 			"bytes": 321777,
 			"format": "png",
 			"sha256": "eda1082af2ed7a10777f86cd034de49b09a3b49369d4c95267a13f807d16693b",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"raw",
-				"screenshots",
-				"execute-section-notes"
-			]
+			"tags": ["iphone", "dark", "mobile", "raw", "screenshots", "execute-section-notes"]
 		},
 		{
 			"id": "mobile-iphone-dark-raw-13-reports",
@@ -7387,14 +5933,7 @@
 			"bytes": 420164,
 			"format": "png",
 			"sha256": "b5279a07a95aafec2631993db7798bfdabf38b13715ae5d6f1fa000d84cd4822",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"raw",
-				"screenshots",
-				"reports"
-			]
+			"tags": ["iphone", "dark", "mobile", "raw", "screenshots", "reports"]
 		},
 		{
 			"id": "mobile-iphone-dark-raw-14-reports-list",
@@ -7419,14 +5958,7 @@
 			"bytes": 441287,
 			"format": "png",
 			"sha256": "9c191446f424f3e056d4d3a710298942c708ac42fcf24a856d48f5dbd7a9f34f",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"raw",
-				"screenshots",
-				"reports-list"
-			]
+			"tags": ["iphone", "dark", "mobile", "raw", "screenshots", "reports-list"]
 		},
 		{
 			"id": "mobile-iphone-dark-raw-15-report-detail-top",
@@ -7451,14 +5983,7 @@
 			"bytes": 417090,
 			"format": "png",
 			"sha256": "6edcf27aedfcdd1ad36a5119c70231d0c2f21b80c9c814be580bf794981bbc12",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"raw",
-				"screenshots",
-				"report-detail-top"
-			]
+			"tags": ["iphone", "dark", "mobile", "raw", "screenshots", "report-detail-top"]
 		},
 		{
 			"id": "mobile-iphone-dark-raw-16-report-detail-early",
@@ -7483,14 +6008,7 @@
 			"bytes": 366150,
 			"format": "png",
 			"sha256": "f388f14cccabd30fa65bf5c664c266af17f0a3476761d9624caf1781101a604c",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"raw",
-				"screenshots",
-				"report-detail-early"
-			]
+			"tags": ["iphone", "dark", "mobile", "raw", "screenshots", "report-detail-early"]
 		},
 		{
 			"id": "mobile-iphone-dark-raw-17-report-detail-near-end",
@@ -7515,14 +6033,7 @@
 			"bytes": 376987,
 			"format": "png",
 			"sha256": "bbdcdfdb952d1db66001c09afa0b047a94cc7657c3f37c9b6ff662eac4782e57",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"raw",
-				"screenshots",
-				"report-detail-near-end"
-			]
+			"tags": ["iphone", "dark", "mobile", "raw", "screenshots", "report-detail-near-end"]
 		},
 		{
 			"id": "mobile-iphone-dark-raw-18-report-detail-end",
@@ -7547,14 +6058,7 @@
 			"bytes": 407375,
 			"format": "png",
 			"sha256": "96fe8f5183a994cce2ab145fd1431fe8529b3eaef3a37dd2c031b24176ff24ac",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"raw",
-				"screenshots",
-				"report-detail-end"
-			]
+			"tags": ["iphone", "dark", "mobile", "raw", "screenshots", "report-detail-end"]
 		},
 		{
 			"id": "mobile-iphone-dark-raw-19-settings",
@@ -7579,14 +6083,7 @@
 			"bytes": 352038,
 			"format": "png",
 			"sha256": "6e321efcc0d12d934e5e258d109f93a0506d258e18531602309a20b2b31c57ef",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"raw",
-				"screenshots",
-				"settings"
-			]
+			"tags": ["iphone", "dark", "mobile", "raw", "screenshots", "settings"]
 		},
 		{
 			"id": "mobile-iphone-dark-raw-20-settings-scrolled",
@@ -7611,14 +6108,7 @@
 			"bytes": 403535,
 			"format": "png",
 			"sha256": "914c7d8e334be45d0fcfde3044ea56540a6d67b8d830e8f30de55aa198bc4856",
-			"tags": [
-				"iphone",
-				"dark",
-				"mobile",
-				"raw",
-				"screenshots",
-				"settings-scrolled"
-			]
+			"tags": ["iphone", "dark", "mobile", "raw", "screenshots", "settings-scrolled"]
 		},
 		{
 			"id": "mobile-iphone-light-raw-03-home",
@@ -7643,14 +6133,7 @@
 			"bytes": 591668,
 			"format": "png",
 			"sha256": "e46c81648fc6e3ef9830740d72d800d2298d9bcd6ab7f4baa3c97a4d5f339819",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"raw",
-				"screenshots",
-				"home"
-			]
+			"tags": ["iphone", "light", "mobile", "raw", "screenshots", "home"]
 		},
 		{
 			"id": "mobile-iphone-light-raw-04-home-queue",
@@ -7675,14 +6158,7 @@
 			"bytes": 525908,
 			"format": "png",
 			"sha256": "6561011d1707012359f40736532eda0797118ecd188c90794fe464cd95909bae",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"raw",
-				"screenshots",
-				"home-queue"
-			]
+			"tags": ["iphone", "light", "mobile", "raw", "screenshots", "home-queue"]
 		},
 		{
 			"id": "mobile-iphone-light-raw-05-places",
@@ -7707,14 +6183,7 @@
 			"bytes": 467108,
 			"format": "png",
 			"sha256": "c4d673290f5a979100d3cc7a5646276ce73ca22e72640cc8d69ef1e864d4248c",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"raw",
-				"screenshots",
-				"places"
-			]
+			"tags": ["iphone", "light", "mobile", "raw", "screenshots", "places"]
 		},
 		{
 			"id": "mobile-iphone-light-raw-06-place-detail",
@@ -7739,14 +6208,7 @@
 			"bytes": 1144634,
 			"format": "png",
 			"sha256": "0a1dffe2b9aa1de24dd28ae8eff1160f00f3fb4d9cd8bbf0bdf0e9763f4e2aff",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"raw",
-				"screenshots",
-				"place-detail"
-			]
+			"tags": ["iphone", "light", "mobile", "raw", "screenshots", "place-detail"]
 		},
 		{
 			"id": "mobile-iphone-light-raw-07-execute",
@@ -7771,14 +6233,7 @@
 			"bytes": 502625,
 			"format": "png",
 			"sha256": "bd58ba734f531d0014ab80f315b901720fb1f5c86ec04d3db39e3b879187f8a9",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"raw",
-				"screenshots",
-				"execute"
-			]
+			"tags": ["iphone", "light", "mobile", "raw", "screenshots", "execute"]
 		},
 		{
 			"id": "mobile-iphone-light-raw-08-execute-place",
@@ -7803,14 +6258,7 @@
 			"bytes": 521291,
 			"format": "png",
 			"sha256": "1625c520d8256bab1de2ab4bb293a3d4f6bc6a9fe70aa39b795b72651234ff4e",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"raw",
-				"screenshots",
-				"execute-place"
-			]
+			"tags": ["iphone", "light", "mobile", "raw", "screenshots", "execute-place"]
 		},
 		{
 			"id": "mobile-iphone-light-raw-09-execute-pre-audit",
@@ -7835,14 +6283,7 @@
 			"bytes": 558816,
 			"format": "png",
 			"sha256": "59627ce5ca171b6523c8b9b0dfaa99247f0703a8adf59922611e236b3a6e6ab6",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"raw",
-				"screenshots",
-				"execute-pre-audit"
-			]
+			"tags": ["iphone", "light", "mobile", "raw", "screenshots", "execute-pre-audit"]
 		},
 		{
 			"id": "mobile-iphone-light-raw-10-execute-section",
@@ -7867,14 +6308,7 @@
 			"bytes": 556930,
 			"format": "png",
 			"sha256": "f6d96eddf686c9593c7ed75961adaa43f17cbfc1d33e636debbbe6b4587e3c0d",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"raw",
-				"screenshots",
-				"execute-section"
-			]
+			"tags": ["iphone", "light", "mobile", "raw", "screenshots", "execute-section"]
 		},
 		{
 			"id": "mobile-iphone-light-raw-11-execute-section-questions",
@@ -7899,14 +6333,7 @@
 			"bytes": 551144,
 			"format": "png",
 			"sha256": "82672c8d8b1a4c2ee29f110a9af087f80bfcd5b304e2d4688b31227a16350c21",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"raw",
-				"screenshots",
-				"execute-section-questions"
-			]
+			"tags": ["iphone", "light", "mobile", "raw", "screenshots", "execute-section-questions"]
 		},
 		{
 			"id": "mobile-iphone-light-raw-12-execute-section-notes",
@@ -7931,14 +6358,7 @@
 			"bytes": 435188,
 			"format": "png",
 			"sha256": "4109b3200918d8c8317f382d90683a72abff2c0c0fc1597500b60477850291da",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"raw",
-				"screenshots",
-				"execute-section-notes"
-			]
+			"tags": ["iphone", "light", "mobile", "raw", "screenshots", "execute-section-notes"]
 		},
 		{
 			"id": "mobile-iphone-light-raw-13-reports",
@@ -7963,14 +6383,7 @@
 			"bytes": 660288,
 			"format": "png",
 			"sha256": "0e4d112debecf50c248e86a4e08b2a518fd9dd715a179dd6461854040be74b37",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"raw",
-				"screenshots",
-				"reports"
-			]
+			"tags": ["iphone", "light", "mobile", "raw", "screenshots", "reports"]
 		},
 		{
 			"id": "mobile-iphone-light-raw-14-reports-list",
@@ -7995,14 +6408,7 @@
 			"bytes": 739319,
 			"format": "png",
 			"sha256": "b7057d54e9ef69b3d7a792de4f6c1da240c368ad74d259eb5c500fbdefca0a1d",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"raw",
-				"screenshots",
-				"reports-list"
-			]
+			"tags": ["iphone", "light", "mobile", "raw", "screenshots", "reports-list"]
 		},
 		{
 			"id": "mobile-iphone-light-raw-15-report-detail-top",
@@ -8027,14 +6433,7 @@
 			"bytes": 618284,
 			"format": "png",
 			"sha256": "81d13462698385a2ae1c74c83b3445f4bcbfbc90ea05251b082cfc93aebf8539",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"raw",
-				"screenshots",
-				"report-detail-top"
-			]
+			"tags": ["iphone", "light", "mobile", "raw", "screenshots", "report-detail-top"]
 		},
 		{
 			"id": "mobile-iphone-light-raw-16-report-detail-early",
@@ -8059,14 +6458,7 @@
 			"bytes": 561694,
 			"format": "png",
 			"sha256": "00c168791778b59cc9c0a1ee62744f965b192d1f89992c03dc96fe9779db502a",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"raw",
-				"screenshots",
-				"report-detail-early"
-			]
+			"tags": ["iphone", "light", "mobile", "raw", "screenshots", "report-detail-early"]
 		},
 		{
 			"id": "mobile-iphone-light-raw-17-report-detail-near-end",
@@ -8091,14 +6483,7 @@
 			"bytes": 511625,
 			"format": "png",
 			"sha256": "c70a0176d5999293a038fa91911a4edc8f8497d899c3cfa2291105eba1a43e0d",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"raw",
-				"screenshots",
-				"report-detail-near-end"
-			]
+			"tags": ["iphone", "light", "mobile", "raw", "screenshots", "report-detail-near-end"]
 		},
 		{
 			"id": "mobile-iphone-light-raw-18-report-detail-end",
@@ -8123,14 +6508,7 @@
 			"bytes": 492719,
 			"format": "png",
 			"sha256": "70df5d2bea673bc9ad6e96d3fe8df067d5c8e48b57ed2b4cfa7530990baaf18d",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"raw",
-				"screenshots",
-				"report-detail-end"
-			]
+			"tags": ["iphone", "light", "mobile", "raw", "screenshots", "report-detail-end"]
 		},
 		{
 			"id": "mobile-iphone-light-raw-19-settings",
@@ -8155,14 +6533,7 @@
 			"bytes": 479145,
 			"format": "png",
 			"sha256": "562c1c1941f651f3037fee2c31f6394a26aa090803994771c712f95709fd12b1",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"raw",
-				"screenshots",
-				"settings"
-			]
+			"tags": ["iphone", "light", "mobile", "raw", "screenshots", "settings"]
 		},
 		{
 			"id": "mobile-iphone-light-raw-20-settings-scrolled",
@@ -8187,14 +6558,7 @@
 			"bytes": 567771,
 			"format": "png",
 			"sha256": "ac480aae4f1b4bda7483e697c711661fd8acba538be3252c6d03cd3e8b32d9ef",
-			"tags": [
-				"iphone",
-				"light",
-				"mobile",
-				"raw",
-				"screenshots",
-				"settings-scrolled"
-			]
+			"tags": ["iphone", "light", "mobile", "raw", "screenshots", "settings-scrolled"]
 		},
 		{
 			"id": "web-framed-admin-accounts-01-overview",
@@ -8219,15 +6583,7 @@
 			"bytes": 2099290,
 			"format": "png",
 			"sha256": "a6ca2b8a0eab8b30189ffec9429e18f4a979c044155d766850ccabdae876ea72",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"admin",
-				"accounts"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "admin", "accounts"]
 		},
 		{
 			"id": "web-framed-admin-auditors-01-overview-01",
@@ -8252,15 +6608,7 @@
 			"bytes": 2109924,
 			"format": "png",
 			"sha256": "9a134a8a6f90b62442b6e0843dba1d247fa923ff2a4d835c07c127fbb4b93b5d",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"admin",
-				"auditors/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "admin", "auditors/01-overview"]
 		},
 		{
 			"id": "web-framed-admin-audits-01-overview-01",
@@ -8285,15 +6633,7 @@
 			"bytes": 2306387,
 			"format": "png",
 			"sha256": "a1989fb5185dd5e721c2da3e555d1178172e856d1a309e3108d6f018daac4e26",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"admin",
-				"audits/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "admin", "audits/01-overview"]
 		},
 		{
 			"id": "web-framed-admin-audits-detail-01-overview-01",
@@ -8318,15 +6658,7 @@
 			"bytes": 2236963,
 			"format": "png",
 			"sha256": "5c477cdd5af4307677eade26c77450bc6c43b9ef4c2e69e460598a50bdb4dcec",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"admin",
-				"audits/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "admin", "audits/detail/01-overview"]
 		},
 		{
 			"id": "web-framed-admin-audits-detail-01-overview-04",
@@ -8351,15 +6683,7 @@
 			"bytes": 2248807,
 			"format": "png",
 			"sha256": "8675eb19c5f8fdfe2b7717931258c9d74b820be769ca0afcf0070b07f3c8561b",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"admin",
-				"audits/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "admin", "audits/detail/01-overview"]
 		},
 		{
 			"id": "web-framed-admin-audits-detail-01-overview-07",
@@ -8384,15 +6708,7 @@
 			"bytes": 2302756,
 			"format": "png",
 			"sha256": "9bf45fc8dae2da7db235daee65e7707c9de5ebe02a98d6ca98df386c849ff13a",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"admin",
-				"audits/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "admin", "audits/detail/01-overview"]
 		},
 		{
 			"id": "web-framed-admin-audits-detail-01-overview-10",
@@ -8417,15 +6733,7 @@
 			"bytes": 2233028,
 			"format": "png",
 			"sha256": "442b99a8444bea82d9bf25836d1e2f04b95e5d7d07012c91b89fc2e566c763f6",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"admin",
-				"audits/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "admin", "audits/detail/01-overview"]
 		},
 		{
 			"id": "web-framed-admin-dashboard-01-overview-01",
@@ -8450,15 +6758,7 @@
 			"bytes": 2237933,
 			"format": "png",
 			"sha256": "0ed267311e6828681002a754476f6e4320bcb241263ec82a320fd3006c439ab3",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"admin",
-				"dashboard/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "admin", "dashboard/01-overview"]
 		},
 		{
 			"id": "web-framed-admin-dashboard-02-sidebar-collapsed-01",
@@ -8483,15 +6783,7 @@
 			"bytes": 2155272,
 			"format": "png",
 			"sha256": "232ae7ef236bdb8b836b88303887fb2be61e97078242b25a9dc9a625472a4529",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"admin",
-				"dashboard/02-sidebar-collapsed"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "admin", "dashboard/02-sidebar-collapsed"]
 		},
 		{
 			"id": "web-framed-admin-instruments-01-overview",
@@ -8516,15 +6808,7 @@
 			"bytes": 2034247,
 			"format": "png",
 			"sha256": "40c49475024f6571ec2c1847de87152a45b47c8fcd915da06e066186a91411cb",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"admin",
-				"instruments"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "admin", "instruments"]
 		},
 		{
 			"id": "web-framed-admin-places-01-overview-01",
@@ -8549,15 +6833,7 @@
 			"bytes": 2309457,
 			"format": "png",
 			"sha256": "c7b2a1157c1ef5f67689788fd29dc693efb554e97c3e0ecb5b9d3e1f343a7c85",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"admin",
-				"places/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "admin", "places/01-overview"]
 		},
 		{
 			"id": "web-framed-admin-places-detail-01-overview",
@@ -8582,15 +6858,7 @@
 			"bytes": 1924764,
 			"format": "png",
 			"sha256": "5ea3e018720a72ade8e1aed7d1c532711f1b54133222be734e690507a87b235a",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"admin",
-				"places/detail"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "admin", "places/detail"]
 		},
 		{
 			"id": "web-framed-admin-projects-01-overview-01",
@@ -8615,15 +6883,7 @@
 			"bytes": 2266854,
 			"format": "png",
 			"sha256": "f3115bff94ed6d8d03efa4c341635773227ba1c579d1e1001d68fff77eb0b676",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"admin",
-				"projects/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "admin", "projects/01-overview"]
 		},
 		{
 			"id": "web-framed-admin-raw-data-01-overview-01",
@@ -8648,15 +6908,7 @@
 			"bytes": 2235345,
 			"format": "png",
 			"sha256": "b623f0e1fa6de4abe9545af42352df9155f017d050b94a1cabdeebfdd805f398",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"admin",
-				"raw-data/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "admin", "raw-data/01-overview"]
 		},
 		{
 			"id": "web-framed-admin-reports-01-overview-01",
@@ -8681,15 +6933,7 @@
 			"bytes": 2374686,
 			"format": "png",
 			"sha256": "f2e42b7be4b34bbffcfa66bef936639a9218c8e14485b6b0e8952dc0057e5e99",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"admin",
-				"reports/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "admin", "reports/01-overview"]
 		},
 		{
 			"id": "web-framed-admin-reports-02-combined-builder-pair-selected",
@@ -8714,15 +6958,7 @@
 			"bytes": 2743605,
 			"format": "png",
 			"sha256": "aa323d1a08fe77abf7cc20f3e41fcc4ece201f32117348170ee02e6ffa8010cb",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"admin",
-				"reports"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "admin", "reports"]
 		},
 		{
 			"id": "web-framed-admin-reports-detail-01-overview-01",
@@ -8747,15 +6983,7 @@
 			"bytes": 2255410,
 			"format": "png",
 			"sha256": "0e3f9531b15f00856d59c9e395f7066356eed1b2a23acc30171347bffaa0496c",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"admin",
-				"reports/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "admin", "reports/detail/01-overview"]
 		},
 		{
 			"id": "web-framed-admin-reports-detail-01-overview-02",
@@ -8780,15 +7008,7 @@
 			"bytes": 2090469,
 			"format": "png",
 			"sha256": "2ac7d317c84d2c2dbf1024e702c5b50b9db3a19324c7166fd544e0b6d5534521",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"admin",
-				"reports/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "admin", "reports/detail/01-overview"]
 		},
 		{
 			"id": "web-framed-admin-reports-detail-01-overview-03",
@@ -8813,15 +7033,7 @@
 			"bytes": 2194396,
 			"format": "png",
 			"sha256": "d15dec7ad6b8b19ed2bc4130313e9ec83277c68cb08d719aa36309be76b87e91",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"admin",
-				"reports/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "admin", "reports/detail/01-overview"]
 		},
 		{
 			"id": "web-framed-admin-reports-place-report-01-overview-01",
@@ -8846,15 +7058,7 @@
 			"bytes": 2250724,
 			"format": "png",
 			"sha256": "bce01ffc69a376267dab1f4b9ed7695b2ddc13b1e853d0687988c9232f2503d2",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"admin",
-				"reports/place-report/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "admin", "reports/place-report/01-overview"]
 		},
 		{
 			"id": "web-framed-admin-reports-place-report-01-overview-04",
@@ -8879,15 +7083,7 @@
 			"bytes": 2184481,
 			"format": "png",
 			"sha256": "ef5127d61611c7ac7f275095658d73b9dde20480e1666434cd4a61768826a093",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"admin",
-				"reports/place-report/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "admin", "reports/place-report/01-overview"]
 		},
 		{
 			"id": "web-framed-admin-reports-place-report-01-overview-05",
@@ -8912,15 +7108,7 @@
 			"bytes": 2192568,
 			"format": "png",
 			"sha256": "aa6d3b6fad3a33b74153929a3cb6c8b7a9329f1a786218efcba1e96998751554",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"admin",
-				"reports/place-report/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "admin", "reports/place-report/01-overview"]
 		},
 		{
 			"id": "web-framed-admin-settings-01-overview-01",
@@ -8945,15 +7133,7 @@
 			"bytes": 2324272,
 			"format": "png",
 			"sha256": "c3dfc12b4d41dfbad24f7e7ed1618186db231a8bf9f990eab4377232878f5020",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"admin",
-				"settings/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "admin", "settings/01-overview"]
 		},
 		{
 			"id": "web-framed-admin-settings-02-account-menu-open",
@@ -8978,15 +7158,7 @@
 			"bytes": 2343916,
 			"format": "png",
 			"sha256": "69ca0552588e0db4e28367cff61ee1c7e244f68937f4732a55e8f8be7c0e9132",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"admin",
-				"settings"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "admin", "settings"]
 		},
 		{
 			"id": "web-framed-admin-system-01-overview",
@@ -9011,15 +7183,7 @@
 			"bytes": 2241432,
 			"format": "png",
 			"sha256": "e00ca9cb6e017eba828291283fdc9d18481bfc55e3f438855fb719005c8ed6e6",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"admin",
-				"system"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "admin", "system"]
 		},
 		{
 			"id": "web-framed-auditor-dashboard-01-overview-01",
@@ -9044,15 +7208,7 @@
 			"bytes": 1849663,
 			"format": "png",
 			"sha256": "737cb4bc56a41b2b3e488e9917210244ea62bb2b1679de9e65300b41af05b952",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"auditor",
-				"dashboard/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "auditor", "dashboard/01-overview"]
 		},
 		{
 			"id": "web-framed-auditor-dashboard-01-overview-02",
@@ -9077,15 +7233,7 @@
 			"bytes": 2214437,
 			"format": "png",
 			"sha256": "0fc5a246311c58870a5cd014d6f6bd68a2cda8cc9105f3999959b17886cbae87",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"auditor",
-				"dashboard/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "auditor", "dashboard/01-overview"]
 		},
 		{
 			"id": "web-framed-auditor-dashboard-02-sidebar-collapsed-01",
@@ -9110,15 +7258,7 @@
 			"bytes": 2158398,
 			"format": "png",
 			"sha256": "667fe44e9acb85d0b42bec51861fb7836866188fd78dc3a1969728631aefdc5b",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"auditor",
-				"dashboard/02-sidebar-collapsed"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "auditor", "dashboard/02-sidebar-collapsed"]
 		},
 		{
 			"id": "web-framed-auditor-dashboard-04-account-menu-open",
@@ -9143,15 +7283,7 @@
 			"bytes": 2243736,
 			"format": "png",
 			"sha256": "12031eb3766447be2af6cc229d2e8f051b431cc3af5da5c7a03ec5b390e21091",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"auditor",
-				"dashboard"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "auditor", "dashboard"]
 		},
 		{
 			"id": "web-framed-auditor-reports-01-overview-01",
@@ -9176,15 +7308,7 @@
 			"bytes": 2200596,
 			"format": "png",
 			"sha256": "0d175ddee9925f5efdef2f4bd6f1b19cd4fa006543c7b3d09a2a16b28ea24087",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"auditor",
-				"reports/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "auditor", "reports/01-overview"]
 		},
 		{
 			"id": "web-framed-auditor-reports-detail-01-overview-01",
@@ -9209,15 +7333,7 @@
 			"bytes": 2247665,
 			"format": "png",
 			"sha256": "d9ad0c8d4a20ed346cb8d770d1470e9604eeeb0902b95d1536fc1e61a1938a15",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"auditor",
-				"reports/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "auditor", "reports/detail/01-overview"]
 		},
 		{
 			"id": "web-framed-auditor-reports-detail-01-overview-02",
@@ -9242,15 +7358,7 @@
 			"bytes": 2355100,
 			"format": "png",
 			"sha256": "152ec2e2b01641109530917df73e3fa39e73344ae30e5c84a7bccf614b45765b",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"auditor",
-				"reports/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "auditor", "reports/detail/01-overview"]
 		},
 		{
 			"id": "web-framed-auditor-settings-01-overview-01",
@@ -9275,15 +7383,7 @@
 			"bytes": 2268506,
 			"format": "png",
 			"sha256": "760d38b6ecc110034ac66b766176b1adcda27e1028991bbbfb487c13d971d655",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"auditor",
-				"settings/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "auditor", "settings/01-overview"]
 		},
 		{
 			"id": "web-framed-auditor-settings-02-account-menu-open",
@@ -9308,15 +7408,7 @@
 			"bytes": 2290601,
 			"format": "png",
 			"sha256": "a2a0af87d552aa41f9d969ead9ced0ae3beeb18addaa8545f326135ceb7322d0",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"auditor",
-				"settings"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "auditor", "settings"]
 		},
 		{
 			"id": "web-framed-auth-login-01-overview",
@@ -9341,15 +7433,7 @@
 			"bytes": 1938406,
 			"format": "png",
 			"sha256": "e683dcc665617e41fa77846d28d088a9e202854f470db81ca723c22896777151",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"auth",
-				"login"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "auth", "login"]
 		},
 		{
 			"id": "web-framed-auth-signup-01-overview",
@@ -9374,15 +7458,7 @@
 			"bytes": 1857512,
 			"format": "png",
 			"sha256": "bd49c2d57d0d3d42b2915d0b2caaeb4552a993a00fb011a4fad5abdc54ea288c",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"auth",
-				"signup"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "auth", "signup"]
 		},
 		{
 			"id": "web-framed-manager-auditors-01-overview-01",
@@ -9407,15 +7483,7 @@
 			"bytes": 2204887,
 			"format": "png",
 			"sha256": "468a0071af09a258bc0bf17654889942b1b1bd7114ded2dcd1e1f648cc498fa5",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"manager",
-				"auditors/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "manager", "auditors/01-overview"]
 		},
 		{
 			"id": "web-framed-manager-auditors-02-invite-dialog-open",
@@ -9440,15 +7508,7 @@
 			"bytes": 2569444,
 			"format": "png",
 			"sha256": "85548afd9b1ec0497dbe07b0c60a182e495e5b4bd24c71de07d45e02851957d2",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"manager",
-				"auditors"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "manager", "auditors"]
 		},
 		{
 			"id": "web-framed-manager-auditors-detail-01-overview-01",
@@ -9473,15 +7533,7 @@
 			"bytes": 2212075,
 			"format": "png",
 			"sha256": "13eab5b04b416a177ea5a4c1af00e0eb6a282c11bc1984e65ee741ce49114a32",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"manager",
-				"auditors/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "manager", "auditors/detail/01-overview"]
 		},
 		{
 			"id": "web-framed-manager-audits-01-overview-01",
@@ -9506,15 +7558,7 @@
 			"bytes": 2225406,
 			"format": "png",
 			"sha256": "844f9df89e91d4dd583fb4dbca4e51385b08f0441f51205873146844a14cd4fa",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"manager",
-				"audits/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "manager", "audits/01-overview"]
 		},
 		{
 			"id": "web-framed-manager-audits-01-overview-02",
@@ -9539,15 +7583,7 @@
 			"bytes": 2256432,
 			"format": "png",
 			"sha256": "1491d4d9a949f46da00f7201e9863bfaa8aca6a9a5a4d2d6261e5fe023248918",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"manager",
-				"audits/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "manager", "audits/01-overview"]
 		},
 		{
 			"id": "web-framed-manager-audits-02-filter-popover-open",
@@ -9572,15 +7608,7 @@
 			"bytes": 2250100,
 			"format": "png",
 			"sha256": "62330504c70fc6cb89e779589bf3b81bf9ba2cf86e87f5ce322f0f52ffc157da",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"manager",
-				"audits"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "manager", "audits"]
 		},
 		{
 			"id": "web-framed-manager-audits-detail-01-overview-01",
@@ -9605,15 +7633,7 @@
 			"bytes": 2214137,
 			"format": "png",
 			"sha256": "54deaa96b15e14deed2f73372128bd915026f668e2b97a5cc92e67deb5593c6a",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"manager",
-				"audits/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "manager", "audits/detail/01-overview"]
 		},
 		{
 			"id": "web-framed-manager-audits-detail-01-overview-05",
@@ -9638,15 +7658,7 @@
 			"bytes": 2208253,
 			"format": "png",
 			"sha256": "6432bae7296449498af39a9f18b8e955cebb028e2eca4605473a92b4377956fe",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"manager",
-				"audits/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "manager", "audits/detail/01-overview"]
 		},
 		{
 			"id": "web-framed-manager-audits-detail-01-overview-06",
@@ -9671,15 +7683,7 @@
 			"bytes": 2262939,
 			"format": "png",
 			"sha256": "959d2ee96bb55501cf5b568be5c811a89a761c9406f0a99d39a0fdb5db387554",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"manager",
-				"audits/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "manager", "audits/detail/01-overview"]
 		},
 		{
 			"id": "web-framed-manager-audits-detail-01-overview-07",
@@ -9704,15 +7708,7 @@
 			"bytes": 2243479,
 			"format": "png",
 			"sha256": "8fb68232741425299edfb19daec8047e68e6e87a2e2dc111349b3c3131222728",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"manager",
-				"audits/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "manager", "audits/detail/01-overview"]
 		},
 		{
 			"id": "web-framed-manager-audits-detail-01-overview-08",
@@ -9737,15 +7733,7 @@
 			"bytes": 2183274,
 			"format": "png",
 			"sha256": "99084a5fd2e9d8dbcf12799594e9d65dd8a7ad506c4ac362fdbb5c64d94bdf16",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"manager",
-				"audits/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "manager", "audits/detail/01-overview"]
 		},
 		{
 			"id": "web-framed-manager-audits-detail-01-overview-09",
@@ -9770,15 +7758,7 @@
 			"bytes": 2229457,
 			"format": "png",
 			"sha256": "6d04303388f78a404f1deda7b8c59c17b976a25ee51146901f8b7f0fde33ca6f",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"manager",
-				"audits/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "manager", "audits/detail/01-overview"]
 		},
 		{
 			"id": "web-framed-manager-dashboard-01-overview-01",
@@ -9803,15 +7783,7 @@
 			"bytes": 2213521,
 			"format": "png",
 			"sha256": "19936e15f51272f7fb54b63b258683e24a0d27d547050e6c8e72281d51a32060",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"manager",
-				"dashboard/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "manager", "dashboard/01-overview"]
 		},
 		{
 			"id": "web-framed-manager-dashboard-02-sidebar-collapsed-01",
@@ -9836,15 +7808,7 @@
 			"bytes": 2145886,
 			"format": "png",
 			"sha256": "58953be7c8c3bb02dfe18caebc8f6e47de0e648bd92347bfde122fba3b126890",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"manager",
-				"dashboard/02-sidebar-collapsed"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "manager", "dashboard/02-sidebar-collapsed"]
 		},
 		{
 			"id": "web-framed-manager-places-01-overview-01",
@@ -9869,15 +7833,7 @@
 			"bytes": 2209169,
 			"format": "png",
 			"sha256": "1ceb3b14f5a380b5c35ee5e48e2daedfb3cc0e6641783022dc55eef46ea0978f",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"manager",
-				"places/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "manager", "places/01-overview"]
 		},
 		{
 			"id": "web-framed-manager-places-01-overview-02",
@@ -9902,15 +7858,7 @@
 			"bytes": 2162562,
 			"format": "png",
 			"sha256": "1423853f52325a205d15775884222cd1786d4639c4e4a81ec24c5e3cb39d7217",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"manager",
-				"places/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "manager", "places/01-overview"]
 		},
 		{
 			"id": "web-framed-manager-places-detail-01-overview-01",
@@ -9935,15 +7883,7 @@
 			"bytes": 3028037,
 			"format": "png",
 			"sha256": "1955efcbf7f3a26fc3166ae92cfdc2734acf308380b692654069738d2e633c76",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"manager",
-				"places/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "manager", "places/detail/01-overview"]
 		},
 		{
 			"id": "web-framed-manager-places-detail-01-overview-02",
@@ -9968,15 +7908,7 @@
 			"bytes": 2093554,
 			"format": "png",
 			"sha256": "bb46d4e8589c5b2b8ebe2ee4bf6b84eefb832b7dad787aaac5323d5da39c0f1b",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"manager",
-				"places/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "manager", "places/detail/01-overview"]
 		},
 		{
 			"id": "web-framed-manager-places-detail-01-overview-03",
@@ -10001,15 +7933,7 @@
 			"bytes": 2057116,
 			"format": "png",
 			"sha256": "6866f82d628d239b6788463a5bb72668cad34198cc6ee08e42b9b873c14b9738",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"manager",
-				"places/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "manager", "places/detail/01-overview"]
 		},
 		{
 			"id": "web-framed-manager-projects-01-overview-01",
@@ -10034,15 +7958,7 @@
 			"bytes": 2240168,
 			"format": "png",
 			"sha256": "7b4d81319b71fd44fc8bf6dfd530bb30dd4e6a8d89ed59c9c76d18f38945cd0d",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"manager",
-				"projects/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "manager", "projects/01-overview"]
 		},
 		{
 			"id": "web-framed-manager-projects-01-overview-02",
@@ -10067,15 +7983,7 @@
 			"bytes": 2269224,
 			"format": "png",
 			"sha256": "f53494d031196700590f7b6540e5f54e99f4c17785324c696428a121e132396d",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"manager",
-				"projects/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "manager", "projects/01-overview"]
 		},
 		{
 			"id": "web-framed-manager-projects-02-create-dialog-open",
@@ -10100,15 +8008,7 @@
 			"bytes": 2734942,
 			"format": "png",
 			"sha256": "4754aaaabaf087be40118d62f7b696ee058691b67e4ff2940735acd3be50fb0b",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"manager",
-				"projects"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "manager", "projects"]
 		},
 		{
 			"id": "web-framed-manager-projects-03-create-dialog-closed-01",
@@ -10133,15 +8033,7 @@
 			"bytes": 2269224,
 			"format": "png",
 			"sha256": "f53494d031196700590f7b6540e5f54e99f4c17785324c696428a121e132396d",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"manager",
-				"projects/03-create-dialog-closed"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "manager", "projects/03-create-dialog-closed"]
 		},
 		{
 			"id": "web-framed-manager-projects-detail-01-overview",
@@ -10166,15 +8058,7 @@
 			"bytes": 2225737,
 			"format": "png",
 			"sha256": "8da94cfa36c82520277db202e95691e8aa6f1d2ac44e3965e93b839d950bc989",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"manager",
-				"projects/detail"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "manager", "projects/detail"]
 		},
 		{
 			"id": "web-framed-manager-raw-data-01-overview-01",
@@ -10199,15 +8083,7 @@
 			"bytes": 2209976,
 			"format": "png",
 			"sha256": "95ef8908476f678acd8f46e098be8a57ed1803e0a0dbea9fe0b6c62492f9af9f",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"manager",
-				"raw-data/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "manager", "raw-data/01-overview"]
 		},
 		{
 			"id": "web-framed-manager-reports-01-overview-01",
@@ -10232,15 +8108,7 @@
 			"bytes": 2283595,
 			"format": "png",
 			"sha256": "18dabf47eaf5a7e66bd928a1ef4672f59e46d3e699adb1fd0dbb89e667eadd06",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"manager",
-				"reports/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "manager", "reports/01-overview"]
 		},
 		{
 			"id": "web-framed-manager-reports-01-overview-02",
@@ -10265,15 +8133,7 @@
 			"bytes": 2329700,
 			"format": "png",
 			"sha256": "6774c95fa3ed1a37e15734307464e628e39dbb7d1eb1f6aead713d933c8b3b55",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"manager",
-				"reports/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "manager", "reports/01-overview"]
 		},
 		{
 			"id": "web-framed-manager-reports-01-overview-03",
@@ -10298,15 +8158,7 @@
 			"bytes": 2356530,
 			"format": "png",
 			"sha256": "57abb65436804c5c6352b86302dd3314b22822002c763fe217db9569520b6155",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"manager",
-				"reports/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "manager", "reports/01-overview"]
 		},
 		{
 			"id": "web-framed-manager-reports-02-combined-builder-pair-selected",
@@ -10331,15 +8183,7 @@
 			"bytes": 2734689,
 			"format": "png",
 			"sha256": "32bbe012b6d8e14973b3f6ca16d2abe5f8972dc4be9731ffb5d07a6c0d88ded2",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"manager",
-				"reports"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "manager", "reports"]
 		},
 		{
 			"id": "web-framed-manager-reports-detail-01-overview-01",
@@ -10364,15 +8208,7 @@
 			"bytes": 2234039,
 			"format": "png",
 			"sha256": "667f7ce00d343f1cef8e99709f00d835475fb126a2315b97e00f56f3d95da1e4",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"manager",
-				"reports/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "manager", "reports/detail/01-overview"]
 		},
 		{
 			"id": "web-framed-manager-reports-detail-03-account-menu-open",
@@ -10397,15 +8233,7 @@
 			"bytes": 2248338,
 			"format": "png",
 			"sha256": "1cd139010457a3705d9d8e4d868916b4a7e1929d5e59bc7077694c0e74f4e8a3",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"manager",
-				"reports/detail"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "manager", "reports/detail"]
 		},
 		{
 			"id": "web-framed-manager-reports-place-report-01-overview-01",
@@ -10430,15 +8258,7 @@
 			"bytes": 2228304,
 			"format": "png",
 			"sha256": "ace5a13983c12e3ed4a842b2a476919bcf746d23cc080101c4a1db2db3797648",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"manager",
-				"reports/place-report/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "manager", "reports/place-report/01-overview"]
 		},
 		{
 			"id": "web-framed-manager-reports-place-report-01-overview-03",
@@ -10463,15 +8283,7 @@
 			"bytes": 2028776,
 			"format": "png",
 			"sha256": "3fa2688a64d0d7dc14785641d95dfb4d7c378ce9be417a43fe7f0cbd5d988306",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"manager",
-				"reports/place-report/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "manager", "reports/place-report/01-overview"]
 		},
 		{
 			"id": "web-framed-manager-reports-place-report-01-overview-04",
@@ -10496,15 +8308,7 @@
 			"bytes": 2189250,
 			"format": "png",
 			"sha256": "1052bf68164c52e1dfd65aecadfc0c60f5f9f8955de45aec356c8b195f0d53fa",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"manager",
-				"reports/place-report/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "manager", "reports/place-report/01-overview"]
 		},
 		{
 			"id": "web-framed-manager-reports-place-report-01-overview-05",
@@ -10529,15 +8333,7 @@
 			"bytes": 2187635,
 			"format": "png",
 			"sha256": "41dd8a6b0d171a409877a6fc0107f8c07cc5fbb8eaf992688e09d98805d37974",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"manager",
-				"reports/place-report/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "manager", "reports/place-report/01-overview"]
 		},
 		{
 			"id": "web-framed-manager-settings-01-overview-01",
@@ -10562,15 +8358,7 @@
 			"bytes": 2293911,
 			"format": "png",
 			"sha256": "e3ecfb99b6150c002e7682f82967a1f224e41b9f40ecadd87c625b88620f416f",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"framed",
-				"screenshots",
-				"manager",
-				"settings/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "framed", "screenshots", "manager", "settings/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-accounts-01-overview",
@@ -10595,15 +8383,7 @@
 			"bytes": 297564,
 			"format": "png",
 			"sha256": "132ffa5d53bad1428a990399c479b42cc012ad3c8df6f8e218e4a564abccd5c7",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"accounts"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "accounts"]
 		},
 		{
 			"id": "web-raw-admin-accounts-02-row-menu-open",
@@ -10628,15 +8408,7 @@
 			"bytes": 321312,
 			"format": "png",
 			"sha256": "d18365ad814462a07c1fde7eaec6a685821bc461e46242ec3cb02250f0c66a5c",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"accounts"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "accounts"]
 		},
 		{
 			"id": "web-raw-admin-auditors-01-overview-01",
@@ -10661,15 +8433,7 @@
 			"bytes": 303307,
 			"format": "png",
 			"sha256": "22003a2c50b813f018fb25f3287b36c68fcf69e99174baa0e92148920b089c9c",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"auditors/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "auditors/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-auditors-01-overview-02",
@@ -10694,15 +8458,7 @@
 			"bytes": 258703,
 			"format": "png",
 			"sha256": "0353d20876a55249ba09085a32b94a04f57f3027e916f17e3a0fcd38ac03b1e4",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"auditors/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "auditors/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-audits-01-overview-01",
@@ -10727,15 +8483,7 @@
 			"bytes": 470309,
 			"format": "png",
 			"sha256": "f35eff47ed9063b6a49cd6b14770023358ee98704758351a154dbb3c13233d8e",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"audits/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "audits/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-audits-01-overview-02",
@@ -10760,15 +8508,7 @@
 			"bytes": 486639,
 			"format": "png",
 			"sha256": "dd0bc8458b50f9b0c376111e7110081e7fff55496a504889181ac6ed0049cf57",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"audits/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "audits/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-audits-detail-01-overview-01",
@@ -10793,15 +8533,7 @@
 			"bytes": 408221,
 			"format": "png",
 			"sha256": "dee4a3dc82c35a505f3e216c9fed2bd136ff3c3f9fd5beacb1dd8fa27b672664",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"audits/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "audits/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-audits-detail-01-overview-02",
@@ -10826,15 +8558,7 @@
 			"bytes": 390549,
 			"format": "png",
 			"sha256": "25785373981689efeffe71d756b88e4536a8571da30dfdd352390c5272a8a6b2",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"audits/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "audits/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-audits-detail-01-overview-03",
@@ -10859,15 +8583,7 @@
 			"bytes": 338241,
 			"format": "png",
 			"sha256": "3d22baa59b0f2d5a816aab7ac64a7141c601c9a845b2a41b2e9540cfe2c3cf1d",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"audits/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "audits/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-audits-detail-01-overview-04",
@@ -10892,15 +8608,7 @@
 			"bytes": 441181,
 			"format": "png",
 			"sha256": "b2a63ee4c349696917abed8240f251ba7fc046d0bf4a2d75f710f5d04baa8836",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"audits/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "audits/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-audits-detail-01-overview-05",
@@ -10925,15 +8633,7 @@
 			"bytes": 427111,
 			"format": "png",
 			"sha256": "fac2dabcc6b0cc5f4ba3db3ebdecea6b48670d405dcca05e589fc3ef27d5c714",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"audits/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "audits/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-audits-detail-01-overview-06",
@@ -10958,15 +8658,7 @@
 			"bytes": 486803,
 			"format": "png",
 			"sha256": "8f467f19239c2baa0b39fdad615befab7d9dd7362eee5bfb2468576a59eaca26",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"audits/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "audits/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-audits-detail-01-overview-07",
@@ -10991,15 +8683,7 @@
 			"bytes": 419226,
 			"format": "png",
 			"sha256": "c08fbb8f5fa2a307a7ee72b2ca8b2c776ff46cdb7a01d083a6036da2b3ccf933",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"audits/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "audits/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-audits-detail-01-overview-08",
@@ -11024,15 +8708,7 @@
 			"bytes": 376840,
 			"format": "png",
 			"sha256": "9cfcf3ac558cdebfd05802269b0c45409e8b87d1d57e22d402194dc7b9ff59d1",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"audits/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "audits/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-audits-detail-01-overview-09",
@@ -11057,15 +8733,7 @@
 			"bytes": 377431,
 			"format": "png",
 			"sha256": "31770348e601d62aa08930b8b60c324b4f525e6cb63174dc03206ef768a71374",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"audits/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "audits/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-audits-detail-01-overview-10",
@@ -11090,15 +8758,7 @@
 			"bytes": 424439,
 			"format": "png",
 			"sha256": "3fc5e3d4a15ee89427a1e23bcdce47a68c4f2f1f7e1125d37bd5abc1851582a7",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"audits/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "audits/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-audits-detail-01-overview-11",
@@ -11123,15 +8783,7 @@
 			"bytes": 471094,
 			"format": "png",
 			"sha256": "20792430fbcaf2b16a0a2f4e3f36a138e4f00c0a219bb1694131189e728fcfd6",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"audits/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "audits/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-audits-detail-01-overview-12",
@@ -11156,15 +8808,7 @@
 			"bytes": 412968,
 			"format": "png",
 			"sha256": "f9e257f79960f21bffd6ea6c7452ce0b9031bd689acd0e070a08a5d93806f77d",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"audits/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "audits/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-dashboard-01-overview-01",
@@ -11189,15 +8833,7 @@
 			"bytes": 405169,
 			"format": "png",
 			"sha256": "99165bd0adad3ec978433320658837836c31635e47cfa9bfe523271f2e76c2ce",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"dashboard/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "dashboard/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-dashboard-01-overview-02",
@@ -11222,15 +8858,7 @@
 			"bytes": 385020,
 			"format": "png",
 			"sha256": "f6b497f5a16d546370d99ab759a698af2f788d252cd5978a1bceea5dab0113c4",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"dashboard/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "dashboard/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-dashboard-02-sidebar-collapsed-01",
@@ -11255,15 +8883,7 @@
 			"bytes": 333864,
 			"format": "png",
 			"sha256": "43709861d9ce1513efe43da66b1166737f0899ac8f2396181d4b0f57b4acf72c",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"dashboard/02-sidebar-collapsed"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "dashboard/02-sidebar-collapsed"]
 		},
 		{
 			"id": "web-raw-admin-dashboard-02-sidebar-collapsed-02",
@@ -11288,15 +8908,7 @@
 			"bytes": 351135,
 			"format": "png",
 			"sha256": "d06b80d1408ae13c0df668d22ec783f3d43801ea48b61f9f3dce8e333360aa27",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"dashboard/02-sidebar-collapsed"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "dashboard/02-sidebar-collapsed"]
 		},
 		{
 			"id": "web-raw-admin-dashboard-03-mobile-nav-open",
@@ -11321,15 +8933,7 @@
 			"bytes": 73358,
 			"format": "png",
 			"sha256": "f2eb1a8fc2adffe229b1afeb64a786cb9bd74ec5efccf7808feffed744e225d2",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"dashboard"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "dashboard"]
 		},
 		{
 			"id": "web-raw-admin-dashboard-04-account-menu-open",
@@ -11354,15 +8958,7 @@
 			"bytes": 423227,
 			"format": "png",
 			"sha256": "af46813d2539788196b7bfb44478793e1d72acb59443a2620eed2671152da3a6",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"dashboard"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "dashboard"]
 		},
 		{
 			"id": "web-raw-admin-instruments-01-overview",
@@ -11387,15 +8983,7 @@
 			"bytes": 243106,
 			"format": "png",
 			"sha256": "4449a144e50e304341836a2dd029c279695e127f0cb6afeb67edc6aae65a1a61",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"instruments"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "instruments"]
 		},
 		{
 			"id": "web-raw-admin-places-01-overview-01",
@@ -11420,15 +9008,7 @@
 			"bytes": 472885,
 			"format": "png",
 			"sha256": "4bd54124be41e4711ca3c6073b778f38c642a37c7da0b506d1bc9b3b34636ec2",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"places/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "places/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-places-01-overview-02",
@@ -11453,15 +9033,7 @@
 			"bytes": 515898,
 			"format": "png",
 			"sha256": "b689200cfc250500194faa25a54bbc257865d16b969e68b01a4bb00613a635bd",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"places/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "places/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-places-detail-01-overview",
@@ -11486,15 +9058,7 @@
 			"bytes": 151874,
 			"format": "png",
 			"sha256": "41ef63f2093a9cfa4da1dda601e1a5890861d71a25970d2d7b503b6986988f89",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"places/detail"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "places/detail"]
 		},
 		{
 			"id": "web-raw-admin-projects-01-overview-01",
@@ -11519,15 +9083,7 @@
 			"bytes": 438166,
 			"format": "png",
 			"sha256": "c1128046aa0258bfcae7191baf0cbc57f67d2bdf63794167d3a0744618861a40",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"projects/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "projects/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-projects-01-overview-02",
@@ -11552,15 +9108,7 @@
 			"bytes": 412936,
 			"format": "png",
 			"sha256": "0c5bd50c2ef7d9480d94422dcf8eeaee6acc9c0a06d82951e1028452449f093b",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"projects/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "projects/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-raw-data-01-overview-01",
@@ -11585,15 +9133,7 @@
 			"bytes": 409270,
 			"format": "png",
 			"sha256": "a3bc4252a81946ba01b42169b25cef447005816852105b62e5cc7ea8723a88a3",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"raw-data/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "raw-data/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-raw-data-01-overview-02",
@@ -11618,15 +9158,7 @@
 			"bytes": 389428,
 			"format": "png",
 			"sha256": "c6440ea23f39f48e0e4ee03367160266bfbf83ae4ddd564bf56d77f50e23e6f7",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"raw-data/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "raw-data/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-reports-01-overview-01",
@@ -11651,15 +9183,7 @@
 			"bytes": 532550,
 			"format": "png",
 			"sha256": "fdfb72186861ff69a61292d1f23af7e24c51a4101ef9abd0aa9f03cfe68690d4",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"reports/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "reports/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-reports-01-overview-02",
@@ -11684,15 +9208,7 @@
 			"bytes": 566792,
 			"format": "png",
 			"sha256": "54c29309486974837789fdd83b53ca998c05ce579d57cd89075ba4d94d94ab5c",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"reports/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "reports/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-reports-01-overview-03",
@@ -11717,15 +9233,7 @@
 			"bytes": 552196,
 			"format": "png",
 			"sha256": "4a65de7051469668f2e476247fc9f97c5894c99c8587d2e5ff55c009a2c79d99",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"reports/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "reports/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-reports-01-overview-04",
@@ -11750,15 +9258,7 @@
 			"bytes": 576396,
 			"format": "png",
 			"sha256": "356a0bd4654caf0032097e27f8cd81c1f08a9cc9dc63dce722fac1352c8992db",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"reports/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "reports/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-reports-01-overview-05",
@@ -11783,15 +9283,7 @@
 			"bytes": 549858,
 			"format": "png",
 			"sha256": "bf137ad8246d633955f870fea3f51f2335b68296dccce37664bf17d96215f2c5",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"reports/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "reports/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-reports-02-combined-builder-pair-selected",
@@ -11816,15 +9308,7 @@
 			"bytes": 708637,
 			"format": "png",
 			"sha256": "11afb812c614010c95a86a982f6927ae951e13cfd6d7a476f7b166f5bd17562c",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"reports"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "reports"]
 		},
 		{
 			"id": "web-raw-admin-reports-detail-01-overview-01",
@@ -11849,15 +9333,7 @@
 			"bytes": 420507,
 			"format": "png",
 			"sha256": "39961e3267f93c94bc9c0a96e3c8f4d6b6e6cdd76bc82b6b7fa5d4047769b921",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"reports/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "reports/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-reports-detail-01-overview-02",
@@ -11882,15 +9358,7 @@
 			"bytes": 234036,
 			"format": "png",
 			"sha256": "239e53cd6db7a535f557f35119d3ba29844eb3cea52a8eff6af2c5bd0c131fa5",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"reports/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "reports/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-reports-detail-01-overview-03",
@@ -11915,15 +9383,7 @@
 			"bytes": 364156,
 			"format": "png",
 			"sha256": "6b36e34d1409655d3fad0045efba82db8701e8ee416bd87108fe1c286578c2c6",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"reports/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "reports/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-reports-detail-01-overview-04",
@@ -11948,15 +9408,7 @@
 			"bytes": 357996,
 			"format": "png",
 			"sha256": "0d57b3291c88092514999e5431ce021fb631b3d012e37506e85d8e8b8629921a",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"reports/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "reports/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-reports-place-report-01-overview-01",
@@ -11981,15 +9433,7 @@
 			"bytes": 419629,
 			"format": "png",
 			"sha256": "561805b58cb96a9cda644ac115b996b3bc08449687f6ba3b4337f235f08ee9d6",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"reports/place-report/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "reports/place-report/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-reports-place-report-01-overview-02",
@@ -12014,15 +9458,7 @@
 			"bytes": 285799,
 			"format": "png",
 			"sha256": "5544d8bd136e595cbb9cfa60f2dd6e7c2a8507c30d7808d3c584f7e4267d4fdc",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"reports/place-report/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "reports/place-report/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-reports-place-report-01-overview-03",
@@ -12047,15 +9483,7 @@
 			"bytes": 237317,
 			"format": "png",
 			"sha256": "014e2e47487a6f1aa34b1e28e3eea47a147105c994d0291df812df10a73607a2",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"reports/place-report/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "reports/place-report/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-reports-place-report-01-overview-04",
@@ -12080,15 +9508,7 @@
 			"bytes": 372267,
 			"format": "png",
 			"sha256": "13215163389ff2ced86850cc02c016dad3a44339ca7fba07195c69faee5362b7",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"reports/place-report/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "reports/place-report/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-reports-place-report-01-overview-05",
@@ -12113,15 +9533,7 @@
 			"bytes": 363955,
 			"format": "png",
 			"sha256": "e1167dca4afb0b0cb3bc79320de1b4f32a6aa712fdd96344557f40cab42ed7cb",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"reports/place-report/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "reports/place-report/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-settings-01-overview-01",
@@ -12146,15 +9558,7 @@
 			"bytes": 481724,
 			"format": "png",
 			"sha256": "9d9047ad6b77beeea7060b643de530ba127946f9488c4d2ff19e6f89054254d9",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"settings/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "settings/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-settings-01-overview-02",
@@ -12179,15 +9583,7 @@
 			"bytes": 427082,
 			"format": "png",
 			"sha256": "d46fcc1954d95ba840088a0034fc7983b027087bda75da8e3010a4a28ae71814",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"settings/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "settings/01-overview"]
 		},
 		{
 			"id": "web-raw-admin-settings-02-account-menu-open",
@@ -12212,15 +9608,7 @@
 			"bytes": 498027,
 			"format": "png",
 			"sha256": "f09f7d33af4b45234922c4d3d3c659afbb285ff64c5c76b33dc032ee75fc9bf1",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"settings"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "settings"]
 		},
 		{
 			"id": "web-raw-admin-system-01-overview",
@@ -12245,15 +9633,7 @@
 			"bytes": 408747,
 			"format": "png",
 			"sha256": "a14bcc8f7cd20cf2de2b82899969a1b4f43636ea8e4658842e7215464b7d73ab",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"admin",
-				"system"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "admin", "system"]
 		},
 		{
 			"id": "web-raw-auditor-dashboard-01-overview-01",
@@ -12278,15 +9658,7 @@
 			"bytes": 389543,
 			"format": "png",
 			"sha256": "1bd99553392fc2a1ae7eec51577666a6e99dafe01f9078bac89ce8557a2e56d7",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"auditor",
-				"dashboard/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "auditor", "dashboard/01-overview"]
 		},
 		{
 			"id": "web-raw-auditor-dashboard-01-overview-02",
@@ -12311,15 +9683,7 @@
 			"bytes": 387103,
 			"format": "png",
 			"sha256": "6cea37b473743b1ba9dd1014fd7a03e83392e6c3911e9526376217bd91885b8c",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"auditor",
-				"dashboard/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "auditor", "dashboard/01-overview"]
 		},
 		{
 			"id": "web-raw-auditor-dashboard-02-sidebar-collapsed-01",
@@ -12344,15 +9708,7 @@
 			"bytes": 341798,
 			"format": "png",
 			"sha256": "61b29f501e279dafe9781868495da15b23b2ad00c53ff70ac07eafea5df42351",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"auditor",
-				"dashboard/02-sidebar-collapsed"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "auditor", "dashboard/02-sidebar-collapsed"]
 		},
 		{
 			"id": "web-raw-auditor-dashboard-02-sidebar-collapsed-02",
@@ -12377,15 +9733,7 @@
 			"bytes": 383376,
 			"format": "png",
 			"sha256": "78ef42850dede46362c9221f9ccd43d4d3286b2ab5585a4ac3b13dcc8e14046d",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"auditor",
-				"dashboard/02-sidebar-collapsed"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "auditor", "dashboard/02-sidebar-collapsed"]
 		},
 		{
 			"id": "web-raw-auditor-dashboard-03-mobile-nav-open",
@@ -12410,15 +9758,7 @@
 			"bytes": 44636,
 			"format": "png",
 			"sha256": "40c1bbaad6f8f39c003307a5149f73aba8b1b4f4a12faa9c660ccc93e14a1ca7",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"auditor",
-				"dashboard"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "auditor", "dashboard"]
 		},
 		{
 			"id": "web-raw-auditor-dashboard-04-account-menu-open",
@@ -12443,15 +9783,7 @@
 			"bytes": 412294,
 			"format": "png",
 			"sha256": "bcea745cfb5a3bdc961d400967f97fe3edea86d7ea60fd33989137493513e9fa",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"auditor",
-				"dashboard"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "auditor", "dashboard"]
 		},
 		{
 			"id": "web-raw-auditor-execute-01-overview",
@@ -12476,15 +9808,7 @@
 			"bytes": 92633,
 			"format": "png",
 			"sha256": "bf5b894d47a5cf746f80f2b57db5c907d3978fb527c7b13361b5223f1f71837f",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"auditor",
-				"execute"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "auditor", "execute"]
 		},
 		{
 			"id": "web-raw-auditor-reports-01-overview-01",
@@ -12509,15 +9833,7 @@
 			"bytes": 376782,
 			"format": "png",
 			"sha256": "7ef3d087fed82ea19247b2c59c553c931c78abb7695e487bcf9e29198a7370e1",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"auditor",
-				"reports/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "auditor", "reports/01-overview"]
 		},
 		{
 			"id": "web-raw-auditor-reports-01-overview-02",
@@ -12542,15 +9858,7 @@
 			"bytes": 373201,
 			"format": "png",
 			"sha256": "2ae1a6da134e52e122509536b42ff8b518ebaacc6dd43588b7d1846869b0f26f",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"auditor",
-				"reports/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "auditor", "reports/01-overview"]
 		},
 		{
 			"id": "web-raw-auditor-reports-detail-01-overview-01",
@@ -12575,15 +9883,7 @@
 			"bytes": 413130,
 			"format": "png",
 			"sha256": "2379d960a4921e2ebf57690a13da1a7e6128ad147d3c626348fa093c0e94a4ca",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"auditor",
-				"reports/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "auditor", "reports/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-auditor-reports-detail-01-overview-02",
@@ -12608,15 +9908,7 @@
 			"bytes": 493237,
 			"format": "png",
 			"sha256": "0edaa1a1e73a07ef6171c2b35a9333bd25ecd7ba36065a1bcadda3b3ae749abd",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"auditor",
-				"reports/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "auditor", "reports/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-auditor-settings-01-overview-01",
@@ -12641,15 +9933,7 @@
 			"bytes": 433791,
 			"format": "png",
 			"sha256": "6eb6eb4e2cfc6ce11511e7b3b81d5bdd1f7bb1127b9d68e7ca8622c3ef975e55",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"auditor",
-				"settings/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "auditor", "settings/01-overview"]
 		},
 		{
 			"id": "web-raw-auditor-settings-01-overview-02",
@@ -12674,15 +9958,7 @@
 			"bytes": 326830,
 			"format": "png",
 			"sha256": "6d743ea6b780aa3016e4392319a1ae2a2497ac6261ac5eebee262c86d841fa92",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"auditor",
-				"settings/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "auditor", "settings/01-overview"]
 		},
 		{
 			"id": "web-raw-auditor-settings-02-account-menu-open",
@@ -12707,15 +9983,7 @@
 			"bytes": 448963,
 			"format": "png",
 			"sha256": "976586605d00dc154eec2d6950d57bf8d0881bf6e9293aa726f4692633eb12a2",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"auditor",
-				"settings"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "auditor", "settings"]
 		},
 		{
 			"id": "web-raw-auth-login-01-overview",
@@ -12740,15 +10008,7 @@
 			"bytes": 164044,
 			"format": "png",
 			"sha256": "3c633f5dc75a8b7a0676872952b2ce441bb1838626306dbb001dedecc4ee6235",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"auth",
-				"login"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "auth", "login"]
 		},
 		{
 			"id": "web-raw-auth-signup-01-overview",
@@ -12773,15 +10033,7 @@
 			"bytes": 96422,
 			"format": "png",
 			"sha256": "4dcea2513a877e62e86825397a370c3e2cb2796cbf09e6edf4431671e1f01c50",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"auth",
-				"signup"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "auth", "signup"]
 		},
 		{
 			"id": "web-raw-manager-auditors-01-overview-01",
@@ -12806,15 +10058,7 @@
 			"bytes": 379979,
 			"format": "png",
 			"sha256": "bf4dfedaf4858fda1674ccfe126290803faeb35bbbf93a27548b8190ab04bfa0",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"auditors/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "auditors/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-auditors-01-overview-02",
@@ -12839,15 +10083,7 @@
 			"bytes": 314914,
 			"format": "png",
 			"sha256": "e6dafe9ea3e2dc8c7eb85665731f3e23ea1694f5568dca7cc3463da84265979b",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"auditors/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "auditors/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-auditors-02-invite-dialog-open",
@@ -12872,15 +10108,7 @@
 			"bytes": 572650,
 			"format": "png",
 			"sha256": "a64a763b60416152b9f7b778ed1fffeef9c17b46d4e1b406472d3b08fafb3884",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"auditors"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "auditors"]
 		},
 		{
 			"id": "web-raw-manager-auditors-detail-01-overview-01",
@@ -12905,15 +10133,7 @@
 			"bytes": 386333,
 			"format": "png",
 			"sha256": "e4dadc686b6f68bcb502092d7aa6ab07ebf3c6fc9d46d1c4f0a9189e0a88a4be",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"auditors/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "auditors/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-auditors-detail-01-overview-02",
@@ -12938,15 +10158,7 @@
 			"bytes": 347238,
 			"format": "png",
 			"sha256": "dec9e5bf9095fbb0741bf3a2cc672a64b67c9610d6707582349bc43d1e588260",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"auditors/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "auditors/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-audits-01-overview-01",
@@ -12971,15 +10183,7 @@
 			"bytes": 400159,
 			"format": "png",
 			"sha256": "666b8c73b5c100e61d39dcee8b28242af8cbef4ac2ff924f447e91113dbb8faa",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"audits/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "audits/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-audits-01-overview-02",
@@ -13004,15 +10208,7 @@
 			"bytes": 468039,
 			"format": "png",
 			"sha256": "09535a4cbf2d9d180435a66cac00c8cd0bb7bd38a22ddbba676fc8bd5cd7bc04",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"audits/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "audits/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-audits-01-overview-03",
@@ -13037,15 +10233,7 @@
 			"bytes": 430649,
 			"format": "png",
 			"sha256": "86d41180856dc444032b601850c343737361639418511c3da1dd8f4353506fe0",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"audits/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "audits/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-audits-02-filter-popover-open",
@@ -13070,15 +10258,7 @@
 			"bytes": 417767,
 			"format": "png",
 			"sha256": "fb099b3e8542bf97378108bc8e27dc5be5508233cb6cd92d33718471b522c2c8",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"audits"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "audits"]
 		},
 		{
 			"id": "web-raw-manager-audits-detail-01-overview-01",
@@ -13103,15 +10283,7 @@
 			"bytes": 389151,
 			"format": "png",
 			"sha256": "ab66a098d57900da7147884181441122b2efacf3743f5f41821cc87534a915de",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"audits/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "audits/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-audits-detail-01-overview-02",
@@ -13136,15 +10308,7 @@
 			"bytes": 385506,
 			"format": "png",
 			"sha256": "02435088a8d38b6a1a1c1137eb228a19215c58f2596e11846643f17c6a08df4b",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"audits/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "audits/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-audits-detail-01-overview-03",
@@ -13169,15 +10333,7 @@
 			"bytes": 334308,
 			"format": "png",
 			"sha256": "ce889e781ac5503273d9e6ced8c719d73ba596e3b3d347fb56637b8ada4f4b7c",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"audits/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "audits/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-audits-detail-01-overview-04",
@@ -13202,15 +10358,7 @@
 			"bytes": 436622,
 			"format": "png",
 			"sha256": "898e9d21a50e36b6a960b7c9d18a3f3184122c61dac46e11af2a08df28fce183",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"audits/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "audits/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-audits-detail-01-overview-05",
@@ -13235,15 +10383,7 @@
 			"bytes": 422762,
 			"format": "png",
 			"sha256": "6c243e2ff8625da91f53cb121de5df813a0694445db2f6c557aea024bdbac7c4",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"audits/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "audits/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-audits-detail-01-overview-06",
@@ -13268,15 +10408,7 @@
 			"bytes": 482370,
 			"format": "png",
 			"sha256": "54eb38a9c12cbf74afdceffa8d6aa2bf8fd573ff86ca127f99eda45ff54e5dd6",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"audits/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "audits/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-audits-detail-01-overview-07",
@@ -13301,15 +10433,7 @@
 			"bytes": 415491,
 			"format": "png",
 			"sha256": "dfd8ebc91454ebd213d7597f3cd5d14de54bdadc34e22a3f41f84204c3cf35f9",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"audits/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "audits/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-audits-detail-01-overview-08",
@@ -13334,15 +10458,7 @@
 			"bytes": 372668,
 			"format": "png",
 			"sha256": "667f6edbd787757fe4c15603c93833e95c6fa1e0aa965db55e1785c1a068e76e",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"audits/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "audits/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-audits-detail-01-overview-09",
@@ -13367,15 +10483,7 @@
 			"bytes": 373240,
 			"format": "png",
 			"sha256": "27b6a0fdaf04634b26af241bf618c93d40e892d7bce7a05f85ea406656f3e9fb",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"audits/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "audits/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-audits-detail-01-overview-10",
@@ -13400,15 +10508,7 @@
 			"bytes": 420289,
 			"format": "png",
 			"sha256": "785f9b131a152c99b7543e7848c8ee0666bdf521cde3f2ef5150cc5673793ce6",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"audits/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "audits/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-audits-detail-01-overview-11",
@@ -13433,15 +10533,7 @@
 			"bytes": 466887,
 			"format": "png",
 			"sha256": "017c44aee733ac1dfcd1187a13522ef5aac9aefde702b0b5e4c71078c1858b06",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"audits/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "audits/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-audits-detail-01-overview-12",
@@ -13466,15 +10558,7 @@
 			"bytes": 408924,
 			"format": "png",
 			"sha256": "0625f13f122c5c02afb72254d990160aa0a023bf0557fb155933b3b1021c5006",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"audits/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "audits/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-dashboard-01-overview-01",
@@ -13499,15 +10583,7 @@
 			"bytes": 384516,
 			"format": "png",
 			"sha256": "efd6c60cc72257f30f38a11270f1d8ad5151822eff0ef8080898e22949b8715c",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"dashboard/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "dashboard/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-dashboard-01-overview-02",
@@ -13532,15 +10608,7 @@
 			"bytes": 362660,
 			"format": "png",
 			"sha256": "982fa7b11d7bbff4c1cdadc523ea6ce5671e3f51dfaf7ac47dbffd73d90668c0",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"dashboard/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "dashboard/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-dashboard-01-overview-03",
@@ -13565,15 +10633,7 @@
 			"bytes": 351848,
 			"format": "png",
 			"sha256": "0acf2e0e6e96117c6baedabbd958026b708301efda805a6c9ce7d2bc96387331",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"dashboard/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "dashboard/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-dashboard-02-sidebar-collapsed-01",
@@ -13598,15 +10658,7 @@
 			"bytes": 329684,
 			"format": "png",
 			"sha256": "21702f22b47e9bc10b44e512c5ae2b94b1fe86456f98b9ead19171f594af3636",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"dashboard/02-sidebar-collapsed"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "dashboard/02-sidebar-collapsed"]
 		},
 		{
 			"id": "web-raw-manager-dashboard-02-sidebar-collapsed-02",
@@ -13631,15 +10683,7 @@
 			"bytes": 387591,
 			"format": "png",
 			"sha256": "e25f294f06fe6530d8b38827e15fabf06927eb7abca0ad5ea19daec1ba9101fd",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"dashboard/02-sidebar-collapsed"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "dashboard/02-sidebar-collapsed"]
 		},
 		{
 			"id": "web-raw-manager-dashboard-02-sidebar-collapsed-03",
@@ -13664,15 +10708,7 @@
 			"bytes": 379826,
 			"format": "png",
 			"sha256": "f34a2f516dfae663c23a306b310c34c554eb62843eb63db8c0a81db691c70d99",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"dashboard/02-sidebar-collapsed"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "dashboard/02-sidebar-collapsed"]
 		},
 		{
 			"id": "web-raw-manager-dashboard-03-mobile-nav-open",
@@ -13697,15 +10733,7 @@
 			"bytes": 61742,
 			"format": "png",
 			"sha256": "f02e9330fb39bf7b760699889ef3e279b0d5ceea6d5062ef121b766a4301cc3a",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"dashboard"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "dashboard"]
 		},
 		{
 			"id": "web-raw-manager-dashboard-04-account-menu-open",
@@ -13730,15 +10758,7 @@
 			"bytes": 399219,
 			"format": "png",
 			"sha256": "bffb63774d9ac1b8f66d2654b5b16de6debc8966adf98c62eb0f5599e7712557",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"dashboard"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "dashboard"]
 		},
 		{
 			"id": "web-raw-manager-places-01-overview-01",
@@ -13763,15 +10783,7 @@
 			"bytes": 384493,
 			"format": "png",
 			"sha256": "aafea2d73111b57720ae2eda851bf9d904607c1b5111df13480471b8e7b4cd88",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"places/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "places/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-places-01-overview-02",
@@ -13796,15 +10808,7 @@
 			"bytes": 495080,
 			"format": "png",
 			"sha256": "30db62f533c853c2607b7ed48df45b39ca8befabbf642a98f0f7d683e289470b",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"places/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "places/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-places-detail-01-overview-01",
@@ -13829,15 +10833,7 @@
 			"bytes": 968233,
 			"format": "png",
 			"sha256": "5bf9b8ba92f889fb8430b7742dcfac6370fd5458cb9c2571962bb15e620c2d17",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"places/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "places/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-places-detail-01-overview-02",
@@ -13862,15 +10858,7 @@
 			"bytes": 284654,
 			"format": "png",
 			"sha256": "35aed3fd909643ec78b5f4f1ecedf5b72d719439590a4c72a6ef994cde0a9ba3",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"places/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "places/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-places-detail-01-overview-03",
@@ -13895,15 +10883,7 @@
 			"bytes": 259314,
 			"format": "png",
 			"sha256": "c5fea4e5a8d247a9517c2918285218778ce9a69a2bee15d151791226db11572c",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"places/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "places/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-projects-01-overview-01",
@@ -13928,15 +10908,7 @@
 			"bytes": 436831,
 			"format": "png",
 			"sha256": "805bbcfed0faf8ca79839dc7d1ad6de5ff67ae49b1d36d81492726af4397b13b",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"projects/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "projects/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-projects-01-overview-02",
@@ -13961,15 +10933,7 @@
 			"bytes": 408325,
 			"format": "png",
 			"sha256": "62aa8bdd18e39d1589643615367456bbe3e5c45d03a7915df64a85aadcecdf58",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"projects/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "projects/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-projects-02-create-dialog-open",
@@ -13994,15 +10958,7 @@
 			"bytes": 689013,
 			"format": "png",
 			"sha256": "f63d1a00d4a80b6bbab33ede0306fd5a6257b0d8171390afb36fda24aae39950",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"projects"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "projects"]
 		},
 		{
 			"id": "web-raw-manager-projects-03-create-dialog-closed-01",
@@ -14027,15 +10983,7 @@
 			"bytes": 436831,
 			"format": "png",
 			"sha256": "805bbcfed0faf8ca79839dc7d1ad6de5ff67ae49b1d36d81492726af4397b13b",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"projects/03-create-dialog-closed"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "projects/03-create-dialog-closed"]
 		},
 		{
 			"id": "web-raw-manager-projects-03-create-dialog-closed-02",
@@ -14060,15 +11008,7 @@
 			"bytes": 408325,
 			"format": "png",
 			"sha256": "62aa8bdd18e39d1589643615367456bbe3e5c45d03a7915df64a85aadcecdf58",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"projects/03-create-dialog-closed"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "projects/03-create-dialog-closed"]
 		},
 		{
 			"id": "web-raw-manager-projects-detail-01-overview",
@@ -14093,15 +11033,7 @@
 			"bytes": 397516,
 			"format": "png",
 			"sha256": "caf8352bf17a59811f83f011be2115bce5cdc8ff2902bc0af3bf4fe5295415e0",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"projects/detail"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "projects/detail"]
 		},
 		{
 			"id": "web-raw-manager-raw-data-01-overview-01",
@@ -14126,15 +11058,7 @@
 			"bytes": 387434,
 			"format": "png",
 			"sha256": "bee7c938f39ab35eb07314d5a0f8dd3d05e7e6df0fb885bba74c18b1ac385f73",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"raw-data/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "raw-data/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-raw-data-01-overview-02",
@@ -14159,15 +11083,7 @@
 			"bytes": 383262,
 			"format": "png",
 			"sha256": "e878d87efa66c832bab4722b862928ab43e31639cbdbf1c7d3748ee8c9523e9e",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"raw-data/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "raw-data/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-reports-01-overview-01",
@@ -14192,15 +11108,7 @@
 			"bytes": 449067,
 			"format": "png",
 			"sha256": "0cc2cbe11a6d724e186396bad1bacfddb69d345f0810034251d8d1ff8bac928f",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"reports/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "reports/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-reports-01-overview-02",
@@ -14225,15 +11133,7 @@
 			"bytes": 517864,
 			"format": "png",
 			"sha256": "52403500273942a630882ee5cdc80d5c552e2e6a0c55ee3440fbf166f9eeed1d",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"reports/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "reports/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-reports-01-overview-03",
@@ -14258,15 +11158,7 @@
 			"bytes": 517173,
 			"format": "png",
 			"sha256": "34733afa99da5df4342bf05c3aecc01c5b2a5305ba7a97c516d0d257db5c5d16",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"reports/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "reports/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-reports-01-overview-04",
@@ -14291,15 +11183,7 @@
 			"bytes": 497862,
 			"format": "png",
 			"sha256": "91422408977c6951bab96686d0142e9b58304cf54073a07c0e7aa95fbb0294a5",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"reports/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "reports/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-reports-02-combined-builder-pair-selected",
@@ -14324,15 +11208,7 @@
 			"bytes": 704574,
 			"format": "png",
 			"sha256": "d8ee5dbe3d8b68b68c5a278877725fa58f229f64fc3832132bbb89aab0867a11",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"reports"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "reports"]
 		},
 		{
 			"id": "web-raw-manager-reports-detail-01-overview-01",
@@ -14357,15 +11233,7 @@
 			"bytes": 401982,
 			"format": "png",
 			"sha256": "57550ed56b371e9daa70140e82c78dfad53ab3abba3b5c17c677ce5778725b85",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"reports/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "reports/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-reports-detail-01-overview-02",
@@ -14390,15 +11258,7 @@
 			"bytes": 229711,
 			"format": "png",
 			"sha256": "7151c5a3b63b6446a3b2039aaa998e51d3fd1c7fba30b7d519b752fa83741b1d",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"reports/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "reports/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-reports-detail-01-overview-03",
@@ -14423,15 +11283,7 @@
 			"bytes": 359773,
 			"format": "png",
 			"sha256": "078c720ea44bc71b3d0490c5cbd05419fe826d48e57bdc76cb98614fcab0efcf",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"reports/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "reports/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-reports-detail-01-overview-04",
@@ -14456,15 +11308,7 @@
 			"bytes": 353937,
 			"format": "png",
 			"sha256": "7393024c985a4c8c3ceb592083e186714ec1ecc0dec395653a020cf75a242944",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"reports/detail/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "reports/detail/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-reports-detail-02-export-menu-open",
@@ -14489,15 +11333,7 @@
 			"bytes": 414089,
 			"format": "png",
 			"sha256": "cf08d9909dba8c6526da87ca5984473a895cd7182c5aeb990791048adba5d207",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"reports/detail"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "reports/detail"]
 		},
 		{
 			"id": "web-raw-manager-reports-place-report-01-overview-01",
@@ -14522,15 +11358,7 @@
 			"bytes": 401022,
 			"format": "png",
 			"sha256": "7305f0850b6d3807c7927eb15a55cfa4336a8c6bcdf7011a2b841fe5648dceb8",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"reports/place-report/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "reports/place-report/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-reports-place-report-01-overview-02",
@@ -14555,15 +11383,7 @@
 			"bytes": 281301,
 			"format": "png",
 			"sha256": "6bfcbe1e6751c5fc840831e0d5f490da58b49ac28692b875490130e0277ee549",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"reports/place-report/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "reports/place-report/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-reports-place-report-01-overview-03",
@@ -14588,15 +11408,7 @@
 			"bytes": 232850,
 			"format": "png",
 			"sha256": "3f202aff0afd58a4f32ec392ddda88ae5f09f9a7731cf56dd256046f00ccdced",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"reports/place-report/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "reports/place-report/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-reports-place-report-01-overview-04",
@@ -14621,15 +11433,7 @@
 			"bytes": 367934,
 			"format": "png",
 			"sha256": "a5338f4dbecb77362a381d338c07d8c0698261cc596cb0cda7fbee5cf03f5b23",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"reports/place-report/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "reports/place-report/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-reports-place-report-01-overview-05",
@@ -14654,15 +11458,7 @@
 			"bytes": 359884,
 			"format": "png",
 			"sha256": "f3ccb795742e6880419bb7a2fccc90e3a33ca053610e9fd364b3d1a0983c8d76",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"reports/place-report/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "reports/place-report/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-settings-01-overview-01",
@@ -14687,15 +11483,7 @@
 			"bytes": 457044,
 			"format": "png",
 			"sha256": "48a45d9e8685c926700946b6a0e782c24c3f84536f7f980add6e312836da3a61",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"settings/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "settings/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-settings-01-overview-02",
@@ -14720,15 +11508,7 @@
 			"bytes": 371142,
 			"format": "png",
 			"sha256": "746acba74a8314db9ff3e84d3e17901e41fddd6436a219f932cf886f497f44bf",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"settings/01-overview"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "settings/01-overview"]
 		},
 		{
 			"id": "web-raw-manager-settings-02-account-menu-open",
@@ -14753,15 +11533,7 @@
 			"bytes": 473395,
 			"format": "png",
 			"sha256": "01f32c092940a8ab34b0c3257617b048a6f9531cbcdb55cdd9c279a33be1e58b",
-			"tags": [
-				"desktop",
-				"light",
-				"web",
-				"raw",
-				"screenshots",
-				"manager",
-				"settings"
-			]
+			"tags": ["desktop", "light", "web", "raw", "screenshots", "manager", "settings"]
 		},
 		{
 			"id": "web-marketing-composites-field-trio-dark",
@@ -14786,11 +11558,7 @@
 			"bytes": 2149731,
 			"format": "jpg",
 			"sha256": "1c13e253464e4158777961a06ffe9ad34155b6cb680b08966ace204b1ebd3bc7",
-			"tags": [
-				"marketing",
-				"web",
-				"composites"
-			]
+			"tags": ["marketing", "web", "composites"]
 		},
 		{
 			"id": "web-marketing-composites-offline-ready",
@@ -14815,11 +11583,7 @@
 			"bytes": 1943747,
 			"format": "jpg",
 			"sha256": "ff6a6fc56ab403e2846962e5905e76ada3aa62ffc6a9baae40ca1f9b8daba9ba",
-			"tags": [
-				"marketing",
-				"web",
-				"composites"
-			]
+			"tags": ["marketing", "web", "composites"]
 		},
 		{
 			"id": "web-marketing-field-questions-dark",
@@ -14844,11 +11608,7 @@
 			"bytes": 1336693,
 			"format": "png",
 			"sha256": "d64d53337aeeebf6c4fc0c20938b2fb9e116733fceb538e8c9ff31f2db6178cc",
-			"tags": [
-				"marketing",
-				"web",
-				"field-questions-dark"
-			]
+			"tags": ["marketing", "web", "field-questions-dark"]
 		},
 		{
 			"id": "web-marketing-hero-dashboard-dark",
@@ -14873,11 +11633,7 @@
 			"bytes": 1266345,
 			"format": "png",
 			"sha256": "dc7853ef895850bea9611ae8cf8d954422a0e78f16a779bc6e6232f40423edd3",
-			"tags": [
-				"marketing",
-				"web",
-				"hero-dashboard-dark"
-			]
+			"tags": ["marketing", "web", "hero-dashboard-dark"]
 		},
 		{
 			"id": "web-marketing-report-scoring-tilted",
@@ -14902,11 +11658,7 @@
 			"bytes": 1464163,
 			"format": "png",
 			"sha256": "100ea769f1679dafc1d431a24dfba2e4668ff1be993429b5dcf9fdbbca41de08",
-			"tags": [
-				"marketing",
-				"web",
-				"report-scoring-tilted"
-			]
+			"tags": ["marketing", "web", "report-scoring-tilted"]
 		},
 		{
 			"id": "web-marketing-reports-preview-portrait",
@@ -14931,11 +11683,7 @@
 			"bytes": 1119277,
 			"format": "png",
 			"sha256": "79a45ea6833c511e866d8f7c408f8523699fbc383efcf94e986c2e5be5c198a5",
-			"tags": [
-				"marketing",
-				"web",
-				"reports-preview-portrait"
-			]
+			"tags": ["marketing", "web", "reports-preview-portrait"]
 		},
 		{
 			"id": "web-marketing-step-execute-section",
@@ -14960,11 +11708,7 @@
 			"bytes": 1526014,
 			"format": "png",
 			"sha256": "ddcac1993d94e1359fff741d33da3dd6a3d6ba83c0a748a3284c5b51518ecda6",
-			"tags": [
-				"marketing",
-				"web",
-				"step-execute-section"
-			]
+			"tags": ["marketing", "web", "step-execute-section"]
 		},
 		{
 			"id": "web-marketing-step-place-detail",
@@ -14989,11 +11733,7 @@
 			"bytes": 1879059,
 			"format": "png",
 			"sha256": "340ba18c5c7abb3aeeaee5ef4311b6a05de96571a608d35d021d12ee96e27812",
-			"tags": [
-				"marketing",
-				"web",
-				"step-place-detail"
-			]
+			"tags": ["marketing", "web", "step-place-detail"]
 		},
 		{
 			"id": "web-marketing-step-report-detail",
@@ -15018,11 +11758,7 @@
 			"bytes": 1464163,
 			"format": "png",
 			"sha256": "100ea769f1679dafc1d431a24dfba2e4668ff1be993429b5dcf9fdbbca41de08",
-			"tags": [
-				"marketing",
-				"web",
-				"step-report-detail"
-			]
+			"tags": ["marketing", "web", "step-report-detail"]
 		},
 		{
 			"id": "web-marketing-step-section-notes",
@@ -15047,11 +11783,7 @@
 			"bytes": 1329053,
 			"format": "png",
 			"sha256": "9b4e0752a5fd69fa3f1dad33c26189623cdf53669523f5f5de4ef15366ab3e9e",
-			"tags": [
-				"marketing",
-				"web",
-				"step-section-notes"
-			]
+			"tags": ["marketing", "web", "step-section-notes"]
 		}
 	]
 }

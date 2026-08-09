@@ -115,10 +115,7 @@ export function InstrumentEditor({
 	);
 	const sociabilityPendingCount = sociabilityTargets.filter(target => !target.alreadyApplied).length;
 
-	const sociabilityPreview = useMemo(
-		() => applySociabilityMultiSelectToContent(draftContent),
-		[draftContent]
-	);
+	const sociabilityPreview = useMemo(() => applySociabilityMultiSelectToContent(draftContent), [draftContent]);
 	const sociabilityBulkChanges = useMemo(
 		() => getInstrumentChanges(draftContent, sociabilityPreview),
 		[draftContent, sociabilityPreview]
@@ -512,9 +509,7 @@ export function InstrumentEditor({
 						<AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-status-warning" aria-hidden="true" />
 						<p className="min-w-0 text-xs leading-relaxed text-muted-foreground">
 							{t("sociabilityBulk.translationApprovalNeeded", {
-								languages: untranslatedSociabilityLangs
-									.map(lang => languageLabel(lang))
-									.join(", ")
+								languages: untranslatedSociabilityLangs.map(lang => languageLabel(lang)).join(", ")
 							})}
 						</p>
 					</div>

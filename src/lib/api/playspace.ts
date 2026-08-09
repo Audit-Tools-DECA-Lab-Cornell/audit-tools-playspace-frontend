@@ -6,12 +6,12 @@ import { z } from "zod";
 import { api } from "@/lib/api/api-client";
 
 import {
-	type AccountDetail,
-	accountDetailSchema,
 	type AccountDeletionPreview,
 	accountDeletionPreviewSchema,
 	type AccountDeletionRequest,
 	accountDeletionRequestSchema,
+	type AccountDetail,
+	accountDetailSchema,
 	type AccountManagementResponse,
 	accountManagementResponseSchema,
 	accountUpdateRequestSchema,

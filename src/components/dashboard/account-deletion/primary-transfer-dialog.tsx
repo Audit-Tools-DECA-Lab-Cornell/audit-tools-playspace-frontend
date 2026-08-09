@@ -14,7 +14,15 @@ import {
 	DialogTitle
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+	Select,
+	SelectContent,
+	SelectGroup,
+	SelectItem,
+	SelectLabel,
+	SelectTrigger,
+	SelectValue
+} from "@/components/ui/select";
 import { type ManagerProfile, playspaceApi, PlayspaceApiError } from "@/lib/api/playspace";
 
 export interface PrimaryTransferDialogProps {
