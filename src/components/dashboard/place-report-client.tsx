@@ -14,6 +14,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import * as React from "react";
 
+import { useAuthSession } from "@/components/app/auth-session-provider";
 import { AuditExportActions } from "@/components/dashboard/audit-export-actions";
 import { AuditReportView } from "@/components/dashboard/audit-report-view";
 import { BackButton } from "@/components/dashboard/back-button";
@@ -32,6 +33,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator";
 import type { AuditSession } from "@/lib/api/playspace";
 import { playspaceApi } from "@/lib/api/playspace";
+import { buildReportIdentity } from "@/lib/audit/report-filter-cache";
+import { getReportKnownDomainKeys } from "@/lib/audit/report-helpers";
+import { useReportFilter } from "@/lib/audit/use-report-filter";
 
 /**
  * Format source-submission timestamps consistently for the place report.
@@ -126,6 +130,7 @@ interface PlaceReportClientProps {
 }
 
 export function PlaceReportClient({ rolePrefix }: PlaceReportClientProps) {
+	const session = useAuthSession();
 	const searchParams = useSearchParams();
 	const queryClient = useQueryClient();
 
@@ -176,6 +181,15 @@ export function PlaceReportClient({ rolePrefix }: PlaceReportClientProps) {
 		},
 		enabled: reportSession !== undefined
 	});
+	const knownDomainKeys =
+		reportSession !== undefined && instrumentQuery.data !== undefined
+			? getReportKnownDomainKeys(reportSession, instrumentQuery.data)
+			: undefined;
+	const placeReportFilter = useReportFilter(
+		buildReportIdentity(reportSession?.audit_id ?? "", isCombined ? (surveySession?.audit_id ?? null) : null),
+		session?.userEmail ?? null,
+		knownDomainKeys
+	);
 
 	// Save to place mutation
 	const saveMutation = useMutation({
@@ -294,7 +308,11 @@ export function PlaceReportClient({ rolePrefix }: PlaceReportClientProps) {
 				actions={
 					<div className="flex flex-col gap-2 sm:flex-row sm:items-center">
 						{reportSession !== undefined && instrumentQuery.data !== undefined && (
-							<AuditExportActions audit={reportSession} instrument={instrumentQuery.data} />
+							<AuditExportActions
+								audit={reportSession}
+								instrument={instrumentQuery.data}
+								resultFilter={placeReportFilter.filter}
+							/>
 						)}
 						<BackButton href={reportsBasePath} label="Back to Reports" />
 					</div>
@@ -398,6 +416,11 @@ export function PlaceReportClient({ rolePrefix }: PlaceReportClientProps) {
 				audit={reportSession}
 				instrument={instrumentQuery.data ?? null}
 				basePath={isCombined ? undefined : `/${rolePrefix}`}
+				reportIdentity={buildReportIdentity(
+					reportSession.audit_id,
+					isCombined ? (surveySession?.audit_id ?? null) : null
+				)}
+				userEmail={session?.userEmail ?? null}
 			/>
 		</div>
 	);

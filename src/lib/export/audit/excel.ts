@@ -18,6 +18,7 @@ import { hexToXlsxRgb, type PvScaleKey, SCALE_ACCENT_COLORS, SCALE_SOFT_COLORS }
 import { sanitizeSheetName, stringifyCell } from "./format-utils";
 import {
 	buildOverviewRows,
+	buildSingleAuditResponseHeaders,
 	buildSingleAuditResponseRowMetadata,
 	buildSingleAuditResponseRows,
 	buildSpaceAuditRows,
@@ -187,6 +188,8 @@ export function styleWorkbookSheet(sheet: XLSX.WorkSheet, table: WorkbookTable, 
 	const noBorder = { style: "thin", color: { rgb: "E2E8F0" } } as const;
 
 	const isResponsesTable = table.name === "Responses";
+	const playValueColumnIndex = table.rows[0]?.indexOf(SINGLE_RESPONSE_HEADERS[14]) ?? -1;
+	const usabilityColumnIndex = table.rows[0]?.indexOf(SINGLE_RESPONSE_HEADERS[15]) ?? -1;
 
 	// Collect merge ranges for section note rows (applied after the loop).
 	const merges: XLSX.Range[] = [];
@@ -226,7 +229,7 @@ export function styleWorkbookSheet(sheet: XLSX.WorkSheet, table: WorkbookTable, 
 
 			const scaleKey = SCALE_COLUMN_MAP[colIndex];
 			const isScaleCol = scaleKey !== undefined;
-			const isPvUCol = colIndex === 14 || colIndex === 15;
+			const isPvUCol = colIndex === playValueColumnIndex || colIndex === usabilityColumnIndex;
 
 			const baseStyle = {
 				alignment: {
@@ -458,6 +461,7 @@ export function generateXlsxBlob(
 	const overviewRows = buildOverviewRows(exportableAudit, instrument);
 	const spaceAuditRows = buildSpaceAuditRows(exportableAudit, instrument);
 	const responseRows = buildSingleAuditResponseRows(exportableAudit, instrument);
+	const responseHeaders = buildSingleAuditResponseHeaders(exportableAudit, instrument);
 	const responseRowMetadata = buildSingleAuditResponseRowMetadata(exportableAudit, instrument);
 	const palette = resolveExportPalette(appearance);
 
@@ -482,8 +486,16 @@ export function generateXlsxBlob(
 		{
 			name: "Responses",
 			title: "PVUA Response Matrix",
-			rows: [[...SINGLE_RESPONSE_HEADERS], ...responseRows],
-			columnWidths: SINGLE_RESPONSE_COLUMN_WIDTHS,
+			rows: [[...responseHeaders], ...responseRows],
+			columnWidths:
+				responseHeaders === SINGLE_RESPONSE_HEADERS
+					? SINGLE_RESPONSE_COLUMN_WIDTHS
+					: responseHeaders.map(header => {
+							const index = SINGLE_RESPONSE_HEADERS.indexOf(
+								header as (typeof SINGLE_RESPONSE_HEADERS)[number]
+							);
+							return SINGLE_RESPONSE_COLUMN_WIDTHS[index] ?? 14;
+						}),
 			rowMetadata: [null, ...responseRowMetadata]
 		}
 	];
@@ -517,12 +529,22 @@ export function generateXlsxBlob(
  */
 export function generateCsvBlob(exportableAudit: ExportableAudit, instrument: PlayspaceInstrument): Blob {
 	const responseRows = buildSingleAuditResponseRows(exportableAudit, instrument);
+	const responseHeaders = buildSingleAuditResponseHeaders(exportableAudit, instrument);
 	const spaceAuditRows = buildSpaceAuditRows(exportableAudit, instrument);
+	const provenanceRows = buildOverviewRows(exportableAudit, instrument).filter(
+		row => row[0] === "Results Included" || row[0] === "Shared-scale scope"
+	);
 
 	const spaceAuditBlock: SpreadsheetRow[] =
 		spaceAuditRows.length > 0 ? [["Space Audit Setup"], [...SPACE_AUDIT_HEADERS], ...spaceAuditRows, []] : [];
 
-	const allRows: SpreadsheetRow[] = [...spaceAuditBlock, [...SINGLE_RESPONSE_HEADERS], ...responseRows];
+	const allRows: SpreadsheetRow[] = [
+		...provenanceRows,
+		...(provenanceRows.length > 0 ? [[]] : []),
+		...spaceAuditBlock,
+		[...responseHeaders],
+		...responseRows
+	];
 	const csvContent = buildCsvText(allRows);
 	return new Blob([csvContent], { type: "text/csv;charset=utf-8" });
 }

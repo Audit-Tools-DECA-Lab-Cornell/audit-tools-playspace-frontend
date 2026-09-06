@@ -6,7 +6,24 @@
  * identical outputs with no side effects.
  */
 
-import { buildVisibleQuestionEntries } from "@/lib/audit/report-helpers";
+import {
+	buildQuestionLookup,
+	type ConstructSelection,
+	getQuestionConstructKeys,
+	isDefaultReportFilter,
+	maskScoreTotalsByConstructSelection,
+	questionMatchesReportFilter,
+	type ReportResultFilter,
+	resolveDomainConstructSelection,
+	resolveQuestionConstructSelection
+} from "@/lib/audit/report-filter";
+import {
+	buildConstructRankings,
+	buildReportScoreProjection,
+	buildVisibleQuestionEntries,
+	formatConstructDomainLine,
+	getQuestionDomainKeys
+} from "@/lib/audit/report-helpers";
 import {
 	getCombinedReportLegend,
 	getCombinedReportSources,
@@ -47,6 +64,7 @@ import type {
 	SpreadsheetRow,
 	WorkbookRowMetadata
 } from "./types";
+import { SINGLE_RESPONSE_HEADERS } from "./types";
 
 interface ResponseTableBuildResult {
 	readonly rows: readonly SpreadsheetRow[];
@@ -69,9 +87,11 @@ export const SOCIABILITY_DIMENSION_LABELS: Readonly<Record<SociabilityDimensionK
 function formatVariantScoreRow(
 	label: string,
 	variant: ScoreVariantKey,
-	auditSession: ExportableAudit["auditSession"]
+	auditSession: ExportableAudit["auditSession"],
+	filteredTotals?: AuditScoreTotals | null
 ): SpreadsheetRow {
-	const totals = getEffectiveScoreTotals(auditSession.scores, variant);
+	const totals =
+		filteredTotals === undefined ? getEffectiveScoreTotals(auditSession.scores, variant) : filteredTotals;
 	if (totals === null) {
 		return [label, "--"];
 	}
@@ -94,7 +114,8 @@ export function buildOverviewRows(
 	instrument: PlayspaceInstrument
 ): readonly SpreadsheetRow[] {
 	const { auditSession, context, auditorProfile } = exportableAudit;
-	const overallScores = auditSession.scores.overall;
+	const projection = buildReportScoreProjection(auditSession, instrument, exportableAudit.resultFilter);
+	const overallScores = projection.isFiltered ? projection.overall : auditSession.scores.overall;
 	const combinedSources = getCombinedReportSources(auditSession);
 	const finalComments = auditSession.meta.final_comments?.trim() ?? "";
 
@@ -134,17 +155,114 @@ export function buildOverviewRows(
 				]
 			: [];
 
-	const unsureRows: SpreadsheetRow[] = hasUnsureVariants(auditSession.scores)
+	const unsureRows: SpreadsheetRow[] =
+		projection.unsureAnswerCount > 0 && hasUnsureVariants(auditSession.scores)
+			? [
+					["Unsure Answers", projection.unsureAnswerCount],
+					formatVariantScoreRow(
+						"Unsure Excluded",
+						"canonical",
+						auditSession,
+						projection.isFiltered ? projection.overall : undefined
+					),
+					formatVariantScoreRow(
+						"Unsure As Zero",
+						"unsure_as_zero",
+						auditSession,
+						projection.isFiltered
+							? buildReportScoreProjection(auditSession, instrument, projection.filter, "unsure_as_zero")
+									.overall
+							: undefined
+					),
+					formatVariantScoreRow(
+						"Unsure As Maximum",
+						"unsure_as_max",
+						auditSession,
+						projection.isFiltered
+							? buildReportScoreProjection(auditSession, instrument, projection.filter, "unsure_as_max")
+									.overall
+							: undefined
+					)
+				]
+			: [];
+	const resultsIncludedRows: SpreadsheetRow[] = projection.isFiltered
 		? [
-				["Unsure Answers", auditSession.scores.unsure_answer_count],
-				formatVariantScoreRow("Unsure Excluded", "canonical", auditSession),
-				formatVariantScoreRow("Unsure As Zero", "unsure_as_zero", auditSession),
-				formatVariantScoreRow("Unsure As Maximum", "unsure_as_max", auditSession)
+				["Results Included", describeResultFilter(projection.filter)],
+				...(projection.visibleConstructs.playValue !== projection.visibleConstructs.usability
+					? [
+							[
+								"Shared-scale scope",
+								projection.visibleConstructs.playValue
+									? "Totals cover Play Value results only."
+									: "Totals cover Usability results only."
+							] as SpreadsheetRow
+						]
+					: [])
 			]
 		: [];
+	const domainRows: SpreadsheetRow[] = projection.isFiltered
+		? projection.domainRows.flatMap(domain => {
+				const totals = domain.scoreTotals;
+				if (totals === null) {
+					return [[`Domain: ${domain.domainTitle}`, "No included scored results"]];
+				}
+				const selection = resolveDomainConstructSelection(projection.filter, domain.domainKey);
+				const coverage = projection.domainCoverage[domain.domainKey] ?? {
+					playValue: false,
+					usability: false
+				};
+				const values = [
+					...(selection.playValue && coverage.playValue
+						? [`PV ${formatConstructDomainLine(totals.play_value_total, totals.play_value_total_max)}`]
+						: []),
+					...(selection.usability && coverage.usability
+						? [`U ${formatConstructDomainLine(totals.usability_total, totals.usability_total_max)}`]
+						: []),
+					`Provision ${formatConstructDomainLine(totals.provision_total, totals.provision_total_max)}`,
+					`Variety ${formatConstructDomainLine(totals.variety_total, totals.variety_total_max)}`,
+					`Sociability ${formatConstructDomainLine(totals.sociability_total, totals.sociability_total_max)}`,
+					`Challenge ${formatConstructDomainLine(totals.challenge_total, totals.challenge_total_max)}`
+				];
+				return [[`Domain: ${domain.domainTitle}`, values.join(" · ")]];
+			})
+		: [];
+	const rankingRows: SpreadsheetRow[] = projection.isFiltered
+		? buildConstructRankings([...projection.domainRows]).flatMap(ranking => {
+				if (
+					(ranking.constructKey === "play_value" && !projection.visibleConstructs.playValue) ||
+					(ranking.constructKey === "usability" && !projection.visibleConstructs.usability)
+				) {
+					return [];
+				}
+				const label = ranking.constructKey
+					.split("_")
+					.map(part => part.charAt(0).toUpperCase() + part.slice(1))
+					.join(" ");
+				return [
+					[
+						`Highest ${label} Domain`,
+						ranking.bestDomain === null
+							? "Not enough data"
+							: `${ranking.bestDomain.domainTitle} (${formatConstructDomainLine(ranking.bestDomain.score, ranking.bestDomain.max)})`
+					],
+					[
+						`Lowest ${label} Domain`,
+						ranking.worstDomain === null
+							? "Not enough data"
+							: `${ranking.worstDomain.domainTitle} (${formatConstructDomainLine(ranking.worstDomain.score, ranking.worstDomain.max)})`
+					]
+				];
+			})
+		: [];
+	const summaryScore = projection.isFiltered
+		? overallScores === null
+			? "Pending"
+			: Math.round((overallScores.play_value_total + overallScores.usability_total) * 100) / 100
+		: deriveSummaryScore(auditSession);
 
 	return [
 		["Field", "Value"],
+		...resultsIncludedRows,
 		["Instrument", `${instrument.instrument_name} v${instrument.instrument_version}`],
 		["Audit Code", auditSession.audit_code],
 		["Place Name", auditSession.place_name],
@@ -155,16 +273,47 @@ export function buildOverviewRows(
 		["Total Minutes", auditSession.total_minutes ?? "Pending"],
 		...(finalComments.length > 0 ? ([["Final Comments", finalComments]] as SpreadsheetRow[]) : []),
 		...sourceRows,
-		["Summary Score", deriveSummaryScore(auditSession)],
-		["Play Value Total", overallScores?.play_value_total ?? "Pending"],
-		["Usability Total", overallScores?.usability_total ?? "Pending"],
+		["Summary Score", summaryScore],
+		...(projection.isFiltered && !projection.visibleConstructs.playValue
+			? []
+			: [["Play Value Total", overallScores?.play_value_total ?? "Pending"]]),
+		...(projection.isFiltered && !projection.visibleConstructs.usability
+			? []
+			: [["Usability Total", overallScores?.usability_total ?? "Pending"]]),
 		["Provision Total", overallScores?.provision_total ?? "Pending"],
 		["Variety Total", overallScores?.variety_total ?? "Pending"],
 		["Sociability Total", overallScores?.sociability_total ?? "Pending"],
 		["Challenge Total", overallScores?.challenge_total ?? "Pending"],
+		...domainRows,
+		...rankingRows,
 		...unsureRows,
 		...auditorRows
 	];
+}
+
+/**
+ * Plain-language description of what a filtered export contains.
+ *
+ * This is stamped into the exported document itself, not only its metadata: a
+ * Play-Value-only export that is not visibly labelled could otherwise be read as
+ * a complete audit, which matters for a research instrument.
+ *
+ * @param resultFilter - Filter applied to the export, if any.
+ * @returns A sentence naming the constructs and whether domains were customized.
+ */
+export function describeResultFilter(resultFilter: ReportResultFilter | undefined): string {
+	if (resultFilter === undefined || isDefaultReportFilter(resultFilter)) {
+		return "Play Value and Usability (complete audit)";
+	}
+	const customized = Object.keys(resultFilter.domainOverrides).length > 0;
+	const customizedNote = customized ? "; some domains customized" : "";
+	if (!resultFilter.overall.usability) {
+		return `Play Value only${customizedNote}`;
+	}
+	if (!resultFilter.overall.playValue) {
+		return `Usability only${customizedNote}`;
+	}
+	return `Play Value and Usability${customizedNote}`;
 }
 
 // ── Space Audit sheet ─────────────────────────────────────────────────────────
@@ -268,27 +417,59 @@ function buildSingleAuditResponseTable(
 	const rowMetadata: Array<WorkbookRowMetadata | null> = [];
 	let overallTotals = createEmptyScoreTotals();
 
-	for (const [sectionIndex, section] of instrument.sections.entries()) {
-		const visibleEntries = buildVisibleQuestionEntries(auditSession, section);
+	const questionLookup = buildQuestionLookup(instrument);
+	const projection = buildReportScoreProjection(auditSession, instrument, exportableAudit.resultFilter);
+	const resultFilter = projection.filter;
+	const isFiltering = projection.isFiltered;
 
-		if (visibleEntries.length === 0) {
+	for (const [sectionIndex, section] of instrument.sections.entries()) {
+		const allVisibleEntries = buildVisibleQuestionEntries(auditSession, section);
+
+		if (allVisibleEntries.length === 0) {
 			continue;
 		}
 
 		let sectionTotals = createEmptyScoreTotals();
+		let sectionConstructs: ConstructSelection = { playValue: false, usability: false };
+		let includedScoredQuestionCount = 0;
 
 		rows.push(buildSectionHeaderRow(sectionIndex, section.title, section.description, section.instruction));
 		rowMetadata.push(null);
 
-		for (const [questionIndex, visibleEntry] of visibleEntries.entries()) {
+		for (const [questionIndex, visibleEntry] of allVisibleEntries.entries()) {
 			const { question, answers, sourceComponent } = visibleEntry;
-			const questionScores = calculateQuestionScores(question, answers);
+			const included =
+				!isFiltering ||
+				questionMatchesReportFilter(question, questionLookup, getQuestionDomainKeys, resultFilter);
+			const selection = isFiltering
+				? resolveQuestionConstructSelection(question, questionLookup, getQuestionDomainKeys, resultFilter)
+				: { playValue: true, usability: true };
+			const constructKeys = getQuestionConstructKeys(question, questionLookup);
 
-			rows.push(buildQuestionResponseRow(sectionIndex, questionIndex, question, answers, questionScores));
-			rowMetadata.push(sourceComponent === null ? null : { sourceComponent });
+			if (included) {
+				const calculatedScores = calculateQuestionScores(question, answers);
+				const questionScores = isFiltering
+					? maskScoreTotalsByConstructSelection(calculatedScores, selection)
+					: calculatedScores;
+				rows.push(
+					buildQuestionResponseRow(sectionIndex, questionIndex, question, answers, questionScores, {
+						selection,
+						constructKeys
+					})
+				);
+				rowMetadata.push(sourceComponent === null ? null : { sourceComponent });
+				sectionTotals = addScoreTotals(sectionTotals, questionScores);
+				if (question.question_type === "scaled") {
+					includedScoredQuestionCount += 1;
+				}
+				sectionConstructs = {
+					playValue:
+						sectionConstructs.playValue || (selection.playValue && constructKeys.includes("play_value")),
+					usability:
+						sectionConstructs.usability || (selection.usability && constructKeys.includes("usability"))
+				};
+			}
 
-			// Per-question auditor comment row - emitted directly after the
-			// question item row, before score rows, matching the PDF layout.
 			const questionComment = typeof answers.question_note === "string" ? answers.question_note.trim() : "";
 			if (questionComment.length > 0) {
 				rows.push(
@@ -302,8 +483,6 @@ function buildSingleAuditResponseTable(
 				);
 				rowMetadata.push(null);
 			}
-
-			sectionTotals = addScoreTotals(sectionTotals, questionScores);
 		}
 
 		const notesPrompt = typeof section.notes_prompt === "string" ? stripPromptMarkup(section.notes_prompt) : "";
@@ -311,7 +490,7 @@ function buildSingleAuditResponseTable(
 		if (notesPrompt.length > 0) {
 			const notePromptRows = buildSectionNoteRow(
 				sectionIndex,
-				visibleEntries.length + 1,
+				allVisibleEntries.length + 1,
 				questionDomainFallback(section.title),
 				notesPrompt,
 				""
@@ -325,7 +504,7 @@ function buildSingleAuditResponseTable(
 			if (sectionNote.trim().length > 0) {
 				const noteRows = buildSectionNoteRow(
 					sectionIndex,
-					visibleEntries.length + 1,
+					allVisibleEntries.length + 1,
 					questionDomainFallback(section.title),
 					"",
 					sectionNote
@@ -342,7 +521,7 @@ function buildSingleAuditResponseTable(
 				}
 				const noteRows = buildSectionNoteRow(
 					sectionIndex,
-					visibleEntries.length + 1,
+					allVisibleEntries.length + 1,
 					questionDomainFallback(section.title),
 					"",
 					`${getReportSourceLabel(sourceComponent)}: ${sectionNote}`
@@ -352,21 +531,48 @@ function buildSingleAuditResponseTable(
 			});
 		}
 
-		rows.push(...buildSectionSummaryRows(sectionTotals));
-		rowMetadata.push(null, null, null);
-		overallTotals = addScoreTotals(overallTotals, sectionTotals);
+		if (!isFiltering || includedScoredQuestionCount > 0) {
+			rows.push(...buildSectionSummaryRows(sectionTotals, isFiltering ? sectionConstructs : undefined));
+			rowMetadata.push(null, null, null);
+		}
+		if (!isFiltering) {
+			overallTotals = addScoreTotals(overallTotals, sectionTotals);
+		}
 	}
 
-	if (rows.length > 0) {
+	if (rows.length > 0 && (!isFiltering || projection.overall !== null)) {
+		if (isFiltering) {
+			overallTotals = projection.overall ?? createEmptyScoreTotals();
+		}
 		rows.push(buildEmptyResponseRow());
-		rows.push(...buildOverallSummaryRows(overallTotals));
+		rows.push(...buildOverallSummaryRows(overallTotals, isFiltering ? projection.visibleConstructs : undefined));
 		rowMetadata.push(null, null, null, null);
 	}
 
 	return {
-		rows,
+		rows: isFiltering ? rows.map(row => projectResponseRow(row, projection.visibleConstructs)) : rows,
 		rowMetadata
 	};
+}
+
+function projectResponseRow(row: SpreadsheetRow, visibleConstructs: ConstructSelection): SpreadsheetRow {
+	return row.filter(
+		(_cell, index) => (index !== 14 || visibleConstructs.playValue) && (index !== 15 || visibleConstructs.usability)
+	);
+}
+
+export function buildSingleAuditResponseHeaders(
+	exportableAudit: ExportableAudit,
+	instrument: PlayspaceInstrument
+): readonly string[] {
+	const projection = buildReportScoreProjection(
+		exportableAudit.auditSession,
+		instrument,
+		exportableAudit.resultFilter
+	);
+	return projection.isFiltered
+		? projectResponseRow([...SINGLE_RESPONSE_HEADERS], projection.visibleConstructs).map(String)
+		: SINGLE_RESPONSE_HEADERS;
 }
 
 export function buildSingleAuditResponseRows(
@@ -418,14 +624,24 @@ export function buildQuestionResponseRow(
 	_questionIndex: number,
 	question: import("@/types/audit").ParsedInstrumentQuestion,
 	answers: import("@/types/audit").QuestionResponsePayload,
-	questionScores: AuditScoreTotals
+	questionScores: AuditScoreTotals,
+	filtering?: Readonly<{
+		selection: ConstructSelection;
+		constructKeys: readonly import("@/types/audit").ConstructKey[];
+	}>
 ): SpreadsheetRow {
 	const sociabilityColumns = buildSociabilityResponseColumns(question, answers);
+	const constructKeys = filtering?.constructKeys ?? question.constructs;
+	const visibleConstructKeys = constructKeys.filter(constructKey =>
+		constructKey === "play_value"
+			? filtering?.selection.playValue !== false
+			: filtering?.selection.usability !== false
+	);
 	if (question.question_type === "checklist") {
 		return [
 			formatQuestionKeyForDisplay(question.question_key),
 			formatQuestionModeLabel(question.mode),
-			formatConstructLabel(question.constructs),
+			formatConstructLabel(visibleConstructKeys),
 			formatQuestionDomainLabel(question),
 			"",
 			"",
@@ -435,8 +651,8 @@ export function buildQuestionResponseRow(
 			"",
 			...sociabilityColumns.map(column => column.value),
 			"",
-			"N/A",
-			"N/A"
+			filtering?.selection.playValue === false ? "" : "N/A",
+			filtering?.selection.usability === false ? "" : "N/A"
 		];
 	}
 
@@ -460,7 +676,7 @@ export function buildQuestionResponseRow(
 	return [
 		formatQuestionKeyForDisplay(question.question_key),
 		formatQuestionModeLabel(question.mode),
-		formatConstructLabel(question.constructs),
+		formatConstructLabel(visibleConstructKeys),
 		formatQuestionDomainLabel(question),
 		"",
 		"",
@@ -470,8 +686,16 @@ export function buildQuestionResponseRow(
 		sociabilityAnswer,
 		...sociabilityColumns.map(column => column.value),
 		formatQuestionAnswer(question, "challenge", typeof rawChallenge === "string" ? rawChallenge : undefined),
-		question.constructs.includes("play_value") ? questionScores.play_value_total : "N/A",
-		question.constructs.includes("usability") ? questionScores.usability_total : "N/A"
+		filtering?.selection.playValue === false
+			? ""
+			: constructKeys.includes("play_value")
+				? questionScores.play_value_total
+				: "N/A",
+		filtering?.selection.usability === false
+			? ""
+			: constructKeys.includes("usability")
+				? questionScores.usability_total
+				: "N/A"
 	];
 }
 
@@ -568,20 +792,26 @@ export function buildSectionNoteRow(
 export const SCORE_ROW_KIND_COL = 1;
 
 /** Produces the three per-section summary rows (raw, max, percentage). */
-export function buildSectionSummaryRows(totals: AuditScoreTotals): readonly SpreadsheetRow[] {
+export function buildSectionSummaryRows(
+	totals: AuditScoreTotals,
+	visibleConstructs?: ConstructSelection
+): readonly SpreadsheetRow[] {
 	return [
-		buildScoreSummaryRow("Total", "Raw Scores", totals, "raw"),
-		buildScoreSummaryRow("Max", "Max Possible", totals, "maximum"),
-		buildScoreSummaryRow("%", "Final Percentage", totals, "percentage")
+		buildScoreSummaryRow("Total", "Raw Scores", totals, "raw", visibleConstructs),
+		buildScoreSummaryRow("Max", "Max Possible", totals, "maximum", visibleConstructs),
+		buildScoreSummaryRow("%", "Final Percentage", totals, "percentage", visibleConstructs)
 	];
 }
 
 /** Produces the three overall summary rows appended at the end of the matrix. */
-export function buildOverallSummaryRows(totals: AuditScoreTotals): readonly SpreadsheetRow[] {
+export function buildOverallSummaryRows(
+	totals: AuditScoreTotals,
+	visibleConstructs?: ConstructSelection
+): readonly SpreadsheetRow[] {
 	return [
-		buildScoreSummaryRow("Overall Total", "Raw Scores", totals, "raw"),
-		buildScoreSummaryRow("Overall Max", "Max Possible", totals, "maximum"),
-		buildScoreSummaryRow("Overall %", "Final Percentage", totals, "percentage")
+		buildScoreSummaryRow("Overall Total", "Raw Scores", totals, "raw", visibleConstructs),
+		buildScoreSummaryRow("Overall Max", "Max Possible", totals, "maximum", visibleConstructs),
+		buildScoreSummaryRow("Overall %", "Final Percentage", totals, "percentage", visibleConstructs)
 	];
 }
 
@@ -603,7 +833,8 @@ export function buildScoreSummaryRow(
 	idLabel: string,
 	modeLabel: string,
 	totals: AuditScoreTotals,
-	rowKind: ScoreRowKind
+	rowKind: ScoreRowKind,
+	visibleConstructs?: ConstructSelection
 ): SpreadsheetRow {
 	const base = [idLabel, modeLabel, SCORE_ROW_SENTINEL, "", "", "", ""] as const;
 	const breakdown = totals.sociability_breakdown;
@@ -625,8 +856,8 @@ export function buildScoreSummaryRow(
 			totals.sociability_total,
 			...sociabilityBreakdownCells,
 			totals.challenge_total,
-			totals.play_value_total,
-			totals.usability_total
+			visibleConstructs?.playValue === false ? "" : totals.play_value_total,
+			visibleConstructs?.usability === false ? "" : totals.usability_total
 		];
 	}
 
@@ -638,8 +869,8 @@ export function buildScoreSummaryRow(
 			totals.sociability_total_max,
 			...sociabilityBreakdownCells,
 			totals.challenge_total_max,
-			totals.play_value_total_max,
-			totals.usability_total_max
+			visibleConstructs?.playValue === false ? "" : totals.play_value_total_max,
+			visibleConstructs?.usability === false ? "" : totals.usability_total_max
 		];
 	}
 
@@ -650,8 +881,12 @@ export function buildScoreSummaryRow(
 		formatPercentage(totals.sociability_total, totals.sociability_total_max),
 		...sociabilityBreakdownCells,
 		formatPercentage(totals.challenge_total, totals.challenge_total_max),
-		formatPercentage(totals.play_value_total, totals.play_value_total_max),
-		formatPercentage(totals.usability_total, totals.usability_total_max)
+		visibleConstructs?.playValue === false
+			? ""
+			: formatPercentage(totals.play_value_total, totals.play_value_total_max),
+		visibleConstructs?.usability === false
+			? ""
+			: formatPercentage(totals.usability_total, totals.usability_total_max)
 	];
 }
 

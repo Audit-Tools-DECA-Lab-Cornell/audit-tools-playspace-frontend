@@ -485,7 +485,25 @@
 			"constructChallengeOpportunities": "Challenge Opportunities",
 			"constructSociabilitySupport": "Sociability Support",
 			"constructPlayValue": "Play Value",
-			"constructUsability": "Usability"
+			"constructUsability": "Usability",
+			"filterTitle": "Results included",
+			"filterHelp": "Choose which results this report shows. Each domain can differ from the report setting.",
+			"filterOverallGroupLabel": "Report results included",
+			"filterDomainGroupLabel": "{domain} results included",
+			"filterApplyToAllDomains": "Apply to all domains",
+			"filterResetToFullReport": "Reset to full report",
+			"filterUseReportSetting": "Use report setting",
+			"filterIncludeDomainConstruct": "Include {construct} in this domain",
+			"filterExcludeDomainConstruct": "Exclude {construct} from this domain",
+			"filterShowFullReport": "Show full report",
+			"filterBannerPlayValueOnly": "Showing Play Value results only.",
+			"filterBannerUsabilityOnly": "Showing Usability results only.",
+			"filterBannerCustomized": "Showing results with some domains customized.",
+			"filterBannerAlsoCustomized": "Some domains are customized too.",
+			"filterDomainMeasuresOnly": "This domain measures {construct} only.",
+			"filterDomainEmptyPlayValue": "No Play Value results were recorded for this domain.",
+			"filterDomainEmptyUsability": "No Usability results were recorded for this domain.",
+			"filterScopeNote": "Totals cover {construct} results only."
 		}
 	},
 	"tables": {

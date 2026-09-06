@@ -1,9 +1,31 @@
-import { calculateQuestionScores, findScale, findScaleOption } from "@/lib/audit/question-scoring";
+import {
+	addScoreTotals,
+	calculateQuestionScores,
+	createEmptyScoreTotals,
+	findScale,
+	findScaleOption,
+	type UnsurePolicy
+} from "@/lib/audit/question-scoring";
+import {
+	type ConstructSelection,
+	createDefaultReportFilter,
+	type DomainConstructCoverage,
+	getQuestionConstructKeys,
+	getVisibleReportConstructs,
+	isDefaultReportFilter,
+	maskScoreTotalsByConstructSelection,
+	pruneUnknownDomainOverrides,
+	questionMatchesConstructSelection,
+	questionMatchesReportFilter,
+	type ReportResultFilter,
+	resolveDomainConstructSelection
+} from "@/lib/audit/report-filter";
 import {
 	getCombinedReportSources,
 	getReportSourceLabel,
 	type ReportSourceComponent
 } from "@/lib/audit/report-source-sessions";
+import { getEffectiveScoreTotals, getScoreVariantBuckets, type ScoreVariantKey } from "@/lib/audit/score-mode-helpers";
 import type {
 	AuditScoreTotals,
 	AuditSession,
@@ -35,6 +57,16 @@ export interface DomainReportRow {
 	readonly itemCount: number;
 	readonly sectionNotes: string[];
 	readonly questions: DomainQuestionRow[];
+}
+
+export interface ReportScoreProjection {
+	readonly filter: ReportResultFilter;
+	readonly isFiltered: boolean;
+	readonly domainRows: readonly DomainReportRow[];
+	readonly overall: AuditScoreTotals | null;
+	readonly visibleConstructs: ConstructSelection;
+	readonly domainCoverage: Readonly<Record<string, DomainConstructCoverage>>;
+	readonly unsureAnswerCount: number;
 }
 
 /**
@@ -178,11 +210,23 @@ const CONSTRUCT_ACCESSORS: readonly ConstructAccessor[] = [
 	}
 ];
 
+const UNSURE_POLICY_BY_VARIANT: Record<ScoreVariantKey, UnsurePolicy> = {
+	canonical: "unsure_as_excluded",
+	unsure_as_zero: "unsure_as_zero",
+	unsure_as_max: "unsure_as_max"
+};
+
 // ---------------------------------------------------------------------------
 // Domain/report helper internals
 // ---------------------------------------------------------------------------
 
-function normalizeDomainKey(domainKey: string): string {
+/**
+ * Normalize a raw domain label into the key domain rows and filter overrides use.
+ *
+ * @param domainKey - Raw domain label from the instrument or `scores.by_domain`.
+ * @returns Lowercased key with whitespace collapsed to underscores.
+ */
+export function normalizeDomainKey(domainKey: string): string {
 	return domainKey.trim().toLowerCase().replace(/\s+/g, "_");
 }
 
@@ -263,9 +307,11 @@ function formatChecklistAnswerLabel(question: InstrumentQuestion, answers: Quest
 function buildDomainQuestionRow(
 	question: InstrumentQuestion,
 	answers: QuestionResponsePayload,
-	sourceComponent: ReportSourceComponent | null
+	sourceComponent: ReportSourceComponent | null,
+	selection: ConstructSelection | null = null,
+	unsurePolicy: UnsurePolicy = "unsure_as_excluded"
 ): DomainQuestionRow {
-	const scores = calculateQuestionScores(question, answers);
+	const scores = calculateQuestionScores(question, answers, unsurePolicy);
 	const provisionAnswerKey = readStringAnswer(answers, "provision");
 	const provisionInfo = resolveScaleOptionInfo(question, "provision", provisionAnswerKey);
 	const provisionScale = findScale(question, "provision");
@@ -315,10 +361,10 @@ function buildDomainQuestionRow(
 		sociabilitySelections: sociabilityMultipleSelection?.keys ?? null,
 		sociabilityLabels: sociabilityMultipleSelection?.labels ?? null,
 		followUpScalesAsked,
-		playValueScore: playValueMax <= 0 ? null : scores.play_value_total,
-		playValueMax: playValueMax <= 0 ? null : playValueMax,
-		usabilityScore: usabilityMax <= 0 ? null : scores.usability_total,
-		usabilityMax: usabilityMax <= 0 ? null : usabilityMax,
+		playValueScore: selection?.playValue === false || playValueMax <= 0 ? null : scores.play_value_total,
+		playValueMax: selection?.playValue === false || playValueMax <= 0 ? null : playValueMax,
+		usabilityScore: selection?.usability === false || usabilityMax <= 0 ? null : scores.usability_total,
+		usabilityMax: selection?.usability === false || usabilityMax <= 0 ? null : usabilityMax,
 		checklistAnswerLabel:
 			question.question_type === "checklist" ? formatChecklistAnswerLabel(question, answers) : null
 	};
@@ -529,6 +575,99 @@ export function getQuestionDomainKeys(
 	return resolveQuestionDomainKeys(question, questionLookup, new Set([question.question_key]));
 }
 
+export function getReportDomainConstructCoverage(
+	auditSession: AuditSession,
+	instrumentInput: PlayspaceInstrumentInput
+): Readonly<Record<string, DomainConstructCoverage>> {
+	const instrument = playspaceInstrumentSchema.parse(instrumentInput);
+	const questionLookup = Object.fromEntries(
+		instrument.sections.flatMap(section =>
+			section.questions.map(question => [question.question_key, question] as const)
+		)
+	) as Readonly<Record<string, InstrumentQuestion>>;
+	const coverage: Record<string, DomainConstructCoverage> = {};
+
+	instrument.sections.forEach(section => {
+		buildVisibleQuestionEntries(auditSession, section).forEach(({ question }) => {
+			const constructKeys = getQuestionConstructKeys(question, questionLookup);
+			getQuestionDomainKeys(question, questionLookup).forEach(domainKey => {
+				const current = coverage[domainKey] ?? { playValue: false, usability: false };
+				coverage[domainKey] = {
+					playValue: current.playValue || constructKeys.includes("play_value"),
+					usability: current.usability || constructKeys.includes("usability")
+				};
+			});
+		});
+	});
+
+	return coverage;
+}
+
+export function getReportKnownDomainKeys(
+	auditSession: AuditSession,
+	instrumentInput: PlayspaceInstrumentInput
+): readonly string[] {
+	return buildDomainReportRows(auditSession, instrumentInput).map(row => row.domainKey);
+}
+
+export function countIncludedUnsureAnswers(
+	auditSession: AuditSession,
+	instrumentInput: PlayspaceInstrumentInput,
+	filterInput?: ReportResultFilter
+): number {
+	const instrument = playspaceInstrumentSchema.parse(instrumentInput);
+	const questionLookup = Object.fromEntries(
+		instrument.sections.flatMap(section =>
+			section.questions.map(question => [question.question_key, question] as const)
+		)
+	) as Readonly<Record<string, InstrumentQuestion>>;
+	const filter = filterInput ?? createDefaultReportFilter();
+	let count = 0;
+
+	instrument.sections.forEach(section => {
+		buildVisibleQuestionEntries(auditSession, section).forEach(({ question, answers }) => {
+			if (
+				question.question_type !== "scaled" ||
+				question.scales.length === 0 ||
+				!questionMatchesReportFilter(question, questionLookup, getQuestionDomainKeys, filter)
+			) {
+				return;
+			}
+
+			const provisionScale = findScale(question, "provision");
+			const provisionAnswer = answers.provision;
+			if (provisionScale === undefined || typeof provisionAnswer !== "string") {
+				return;
+			}
+			const provisionOption = findScaleOption(provisionScale, provisionAnswer);
+			if (provisionOption === undefined) {
+				return;
+			}
+			if (provisionOption.is_unsure) {
+				count += 1;
+			}
+			if (!provisionOption.allows_follow_up_scales) {
+				return;
+			}
+
+			question.scales.forEach(scale => {
+				if (scale.key === "provision") {
+					return;
+				}
+				const answer = answers[scale.key];
+				if (typeof answer !== "string") {
+					return;
+				}
+				if (findScaleOption(scale, answer)?.is_unsure === true) {
+					count += 1;
+				}
+			});
+		});
+	});
+
+	return count;
+}
+
 /**
  * Count distinct scaled questions that carry at least one domain (for the
  * overall score table row). Avoids double-counting questions that appear
@@ -667,10 +806,27 @@ export function buildVisibleQuestionEntries(
 }
 
 /**
+ * Options controlling Play Value / Usability filtering of domain rows.
+ */
+export interface BuildDomainReportRowsOptions {
+	/** Report filter. Omitted or default-valued leaves the report unfiltered. */
+	readonly filter?: ReportResultFilter;
+	/** Unsure policy matching the selected score variant, used when recomputing filtered totals. */
+	readonly unsurePolicy?: UnsurePolicy;
+}
+
+/**
  * Build ordered domain rows from session scores and the instrument definition.
  *
+ * When a filter excludes a construct, each affected domain's questions are
+ * narrowed and its totals are recomputed from the questions that remain. With no
+ * filter — or a filter that excludes nothing — the backend's `by_domain` totals
+ * are passed through untouched, so an unfiltered report is byte-for-byte what it
+ * was before this option existed.
+ *
  * @param auditSession - Loaded audit with scores and aggregate responses.
- * @param instrument - Localized instrument definition.
+ * @param instrumentInput - Localized instrument definition.
+ * @param options - Optional construct filter and matching unsure policy.
  * @returns One row per domain in first-seen instrument order, plus orphan `by_domain` keys.
  *          Questions may belong to multiple domains; each domain row lists every question
  *          that includes that domain, filtered to the submission's execution mode so that
@@ -678,8 +834,12 @@ export function buildVisibleQuestionEntries(
  */
 export function buildDomainReportRows(
 	auditSession: AuditSession,
-	instrumentInput: PlayspaceInstrumentInput
+	instrumentInput: PlayspaceInstrumentInput,
+	options: BuildDomainReportRowsOptions = {}
 ): DomainReportRow[] {
+	const filter = options.filter;
+	const isFiltering = filter !== undefined && !isDefaultReportFilter(filter);
+	const unsurePolicy = options.unsurePolicy ?? "unsure_as_excluded";
 	const instrument = playspaceInstrumentSchema.parse(instrumentInput);
 	const questionLookup = Object.fromEntries(
 		instrument.sections.flatMap(section =>
@@ -783,8 +943,13 @@ export function buildDomainReportRows(
 	});
 
 	return domainOrder.map(domainKey => {
-		const scoreTotals = normalizedScoreByDomain.get(domainKey) ?? null;
+		const domainSelection = filter === undefined ? null : resolveDomainConstructSelection(filter, domainKey);
+		const domainIsFiltered =
+			isFiltering && domainSelection !== null && !(domainSelection.playValue && domainSelection.usability);
+		let recomputedTotals = domainIsFiltered ? createEmptyScoreTotals() : null;
+		let scoreTotals = normalizedScoreByDomain.get(domainKey) ?? null;
 		let itemCount = 0;
+		let scoredItemCount = 0;
 		const questions: DomainQuestionRow[] = [];
 		const sectionNotes: string[] = [];
 
@@ -797,13 +962,31 @@ export function buildDomainReportRows(
 					return;
 				}
 				sectionTouchesDomain = true;
-				itemCount += 1;
-				if (question.question_type === "scaled" || question.question_type === "checklist") {
-					questions.push(buildDomainQuestionRow(question, answers, sourceComponent));
-				}
 				const questionNote = collectQuestionNote(question, answers, sectionIndex + 1, sourceLabel);
 				if (questionNote !== null) {
 					sectionNotes.push(questionNote);
+				}
+				if (
+					domainSelection !== null &&
+					!questionMatchesConstructSelection(
+						getQuestionConstructKeys(question, questionLookup),
+						domainSelection
+					)
+				) {
+					return;
+				}
+				itemCount += 1;
+				if (recomputedTotals !== null && question.question_type === "scaled") {
+					scoredItemCount += 1;
+					recomputedTotals = addScoreTotals(
+						recomputedTotals,
+						calculateQuestionScores(question, answers, unsurePolicy)
+					);
+				}
+				if (question.question_type === "scaled" || question.question_type === "checklist") {
+					questions.push(
+						buildDomainQuestionRow(question, answers, sourceComponent, domainSelection, unsurePolicy)
+					);
 				}
 			});
 			if (sectionTouchesDomain) {
@@ -838,6 +1021,13 @@ export function buildDomainReportRows(
 
 		questions.sort(compareQuestionRowsByIdentifier);
 
+		if (recomputedTotals !== null) {
+			scoreTotals =
+				scoredItemCount === 0 || domainSelection === null
+					? null
+					: maskScoreTotalsByConstructSelection(recomputedTotals, domainSelection);
+		}
+
 		return {
 			domainKey,
 			domainTitle: toDomainTitle(domainKey),
@@ -850,12 +1040,78 @@ export function buildDomainReportRows(
 }
 
 /**
+ * Sum domain totals into one overall total.
+ *
+ * Overall figures are built by summing domain buckets, so a filtered report's
+ * overall total is the sum of the domain totals it still contains.
+ *
+ * @param domainRows - Domain rows, already filtered.
+ * @returns Combined totals, or null when no domain carries a score.
+ */
+export function sumDomainScoreTotals(domainRows: readonly DomainReportRow[]): AuditScoreTotals | null {
+	const scored = domainRows.filter(row => row.scoreTotals !== null);
+	if (scored.length === 0) {
+		return null;
+	}
+	return scored.reduce<AuditScoreTotals>(
+		(accumulated, row) => addScoreTotals(accumulated, row.scoreTotals as AuditScoreTotals),
+		createEmptyScoreTotals()
+	);
+}
+
+export function buildReportScoreProjection(
+	auditSession: AuditSession,
+	instrumentInput: PlayspaceInstrumentInput,
+	filterInput?: ReportResultFilter,
+	variant: ScoreVariantKey = "canonical"
+): ReportScoreProjection {
+	const selectedScores = getScoreVariantBuckets(auditSession.scores, variant);
+	const displayAudit: AuditSession = {
+		...auditSession,
+		scores: {
+			...auditSession.scores,
+			execution_mode: selectedScores.execution_mode,
+			audit: selectedScores.audit,
+			survey: selectedScores.survey,
+			overall: selectedScores.overall,
+			by_section: selectedScores.by_section,
+			by_domain: selectedScores.by_domain
+		}
+	};
+	const unfilteredRows = buildDomainReportRows(displayAudit, instrumentInput);
+	const knownDomainKeys = unfilteredRows.map(row => row.domainKey);
+	const filter = pruneUnknownDomainOverrides(filterInput ?? createDefaultReportFilter(), knownDomainKeys);
+	const isFiltered = !isDefaultReportFilter(filter);
+	const domainRows = isFiltered
+		? buildDomainReportRows(displayAudit, instrumentInput, {
+				filter,
+				unsurePolicy: UNSURE_POLICY_BY_VARIANT[variant]
+			})
+		: unfilteredRows;
+	const domainCoverage = getReportDomainConstructCoverage(displayAudit, instrumentInput);
+
+	return {
+		filter,
+		isFiltered,
+		domainRows,
+		overall: isFiltered ? sumDomainScoreTotals(domainRows) : getEffectiveScoreTotals(displayAudit.scores),
+		visibleConstructs: isFiltered
+			? getVisibleReportConstructs(filter, domainCoverage)
+			: { playValue: true, usability: true },
+		domainCoverage,
+		unsureAnswerCount: isFiltered
+			? countIncludedUnsureAnswers(displayAudit, instrumentInput, filter)
+			: auditSession.scores.unsure_answer_count
+	};
+}
+
+/**
  * Build best- and worst-domain rankings for each construct.
  *
  * @param domainRows - Domain rows with titles and score totals.
  * @returns Six construct rankings in a stable order.
  */
-export function buildConstructRankings(domainRows: DomainReportRow[]): ConstructRanking[] {
+export function buildConstructRankings(domainRows: readonly DomainReportRow[]): ConstructRanking[] {
 	return CONSTRUCT_ACCESSORS.map(accessor => {
 		const candidates: {
 			title: string;

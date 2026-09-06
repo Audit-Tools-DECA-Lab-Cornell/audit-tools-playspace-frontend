@@ -18,6 +18,13 @@ import {
 import { useTranslations } from "next-intl";
 import * as React from "react";
 
+import {
+	DomainEmptyNotice,
+	DomainFilterControls,
+	FilteredScopeNote,
+	ReportFilterBanner,
+	ReportFilterControls
+} from "@/components/dashboard/report-filter-controls";
 import { formatAuditCodeReference } from "@/components/dashboard/utils";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Badge } from "@/components/ui/badge";
@@ -25,6 +32,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import type { AuditSession } from "@/lib/api/playspace";
 import { parsePromptSegments } from "@/lib/audit/prompt-segments";
+import {
+	type ConstructSelection,
+	createDefaultReportFilter,
+	resolveDomainConstructSelection
+} from "@/lib/audit/report-filter";
 import type {
 	ConstructRanking,
 	DomainQuestionRow,
@@ -33,10 +45,13 @@ import type {
 } from "@/lib/audit/report-helpers";
 import {
 	buildConstructRankings,
-	buildDomainReportRows,
+	buildReportScoreProjection,
 	buildSociabilityDimensionRankings,
 	formatConstructDomainLine,
+	getReportDomainConstructCoverage,
+	getReportKnownDomainKeys,
 	getSociabilityCoverage,
+	normalizeDomainKey,
 	roundedPercentOfMax,
 	toDomainTitle
 } from "@/lib/audit/report-helpers";
@@ -47,6 +62,7 @@ import {
 	hasUnsureVariants,
 	type ScoreVariantKey
 } from "@/lib/audit/score-mode-helpers";
+import { useReportFilter } from "@/lib/audit/use-report-filter";
 import {
 	joinSpaceAuditDisplayValues,
 	readSpaceAuditQuestionValues,
@@ -223,9 +239,17 @@ function formatTotalMaxPct(total: number, max: number): string {
 	return `${total} / ${max} (${pct(total, max)})`;
 }
 
-function VariantComparisonTable({ scores }: Readonly<{ scores: AuditSession["scores"] }>) {
+function VariantComparisonTable({
+	unsureAnswerCount,
+	totalsByVariant,
+	visibleConstructs
+}: Readonly<{
+	unsureAnswerCount: number;
+	totalsByVariant: Readonly<Record<ScoreVariantKey, AuditScoreTotals | null>>;
+	visibleConstructs: ConstructSelection;
+}>) {
 	const t = useTranslations("shared.reportView");
-	if (!hasUnsureVariants(scores)) {
+	if (unsureAnswerCount <= 0) {
 		return null;
 	}
 	const rows: ScoreVariantKey[] = ["canonical", "unsure_as_zero", "unsure_as_max"];
@@ -236,38 +260,55 @@ function VariantComparisonTable({ scores }: Readonly<{ scores: AuditSession["sco
 			</CardHeader>
 			<CardContent>
 				<div className="overflow-x-auto">
-					<table className="w-full min-w-[560px] text-sm">
+					<table className="w-full min-w-[440px] text-sm">
 						<thead className="text-left text-muted-foreground">
 							<tr>
 								<th className="py-2 pr-4 font-medium">{t("interpretation")}</th>
-								<th className="py-2 pr-4 font-medium">{t("metricPlayValue")}</th>
-								<th className="py-2 pr-4 font-medium">{t("metricUsability")}</th>
+								{visibleConstructs.playValue ? (
+									<th className="py-2 pr-4 font-medium">{t("metricPlayValue")}</th>
+								) : null}
+								{visibleConstructs.usability ? (
+									<th className="py-2 pr-4 font-medium">{t("metricUsability")}</th>
+								) : null}
 								<th className="py-2 font-medium">{t("summary")}</th>
 							</tr>
 						</thead>
 						<tbody>
 							{rows.map(row => {
-								const totals = getEffectiveScoreTotals(scores, row);
+								const totals = totalsByVariant[row];
 								const summaryTotal =
-									totals === null ? 0 : totals.play_value_total + totals.usability_total;
+									totals === null
+										? 0
+										: (visibleConstructs.playValue ? totals.play_value_total : 0) +
+											(visibleConstructs.usability ? totals.usability_total : 0);
 								const summaryMax =
-									totals === null ? 0 : totals.play_value_total_max + totals.usability_total_max;
+									totals === null
+										? 0
+										: (visibleConstructs.playValue ? totals.play_value_total_max : 0) +
+											(visibleConstructs.usability ? totals.usability_total_max : 0);
 								return (
 									<tr key={row} className="border-t border-border/60">
 										<td className="py-2 pr-4 font-medium">{t(SCORE_VARIANT_LABEL_KEYS[row])}</td>
-										<td className="py-2 pr-4 tabular-nums">
-											{totals === null
-												? "--"
-												: formatTotalMaxPct(
-														totals.play_value_total,
-														totals.play_value_total_max
-													)}
-										</td>
-										<td className="py-2 pr-4 tabular-nums">
-											{totals === null
-												? "--"
-												: formatTotalMaxPct(totals.usability_total, totals.usability_total_max)}
-										</td>
+										{visibleConstructs.playValue ? (
+											<td className="py-2 pr-4 tabular-nums">
+												{totals === null
+													? "--"
+													: formatTotalMaxPct(
+															totals.play_value_total,
+															totals.play_value_total_max
+														)}
+											</td>
+										) : null}
+										{visibleConstructs.usability ? (
+											<td className="py-2 pr-4 tabular-nums">
+												{totals === null
+													? "--"
+													: formatTotalMaxPct(
+															totals.usability_total,
+															totals.usability_total_max
+														)}
+											</td>
+										) : null}
 										<td className="py-2 tabular-nums">
 											{formatTotalMaxPct(summaryTotal, summaryMax)}
 										</td>
@@ -278,7 +319,7 @@ function VariantComparisonTable({ scores }: Readonly<{ scores: AuditSession["sco
 					</table>
 				</div>
 				<p className="mt-3 text-xs text-muted-foreground">
-					{t("unsureCountFound", { count: scores.unsure_answer_count })}
+					{t("unsureCountFound", { count: unsureAnswerCount })}
 				</p>
 			</CardContent>
 		</Card>
@@ -445,11 +486,19 @@ function BarGroup({
  */
 function AlignedScoreDisplay({
 	scores,
-	showLabels = true
-}: Readonly<{ scores: AuditScoreTotals | null; showLabels?: boolean }>) {
+	showLabels = true,
+	visibleConstructs = { playValue: true, usability: true }
+}: Readonly<{
+	scores: AuditScoreTotals | null;
+	showLabels?: boolean;
+	visibleConstructs?: ConstructSelection;
+}>) {
 	const t = useTranslations("shared.reportView");
 	const capturesDimensions = scores?.sociability_breakdown != null;
 	const sociabilityMetrics = capturesDimensions ? SOCIABILITY_DIMENSION_METRICS : SOCIABILITY_TOTAL_METRICS;
+	const constructMetrics = CONSTRUCT_METRICS.filter(metric =>
+		metric.key === "play_value" ? visibleConstructs.playValue : visibleConstructs.usability
+	);
 
 	const scaleTableW = LABEL_COL_W + SCALE_DATA_COL_W * SCALE_METRICS.length;
 	// The Sociability group keeps one footprint whether it shows three opportunities or the single
@@ -457,7 +506,7 @@ function AlignedScoreDisplay({
 	// stranded narrow column and the "not captured" note has full width to wrap in.
 	const sociabilityTableW = LABEL_COL_W + SCALE_DATA_COL_W * SOCIABILITY_DIMENSION_METRICS.length;
 	const sociabilityDataColW = (sociabilityTableW - LABEL_COL_W) / sociabilityMetrics.length;
-	const constructTableW = LABEL_COL_W + CONSTRUCT_DATA_COL_W * CONSTRUCT_METRICS.length;
+	const constructTableW = LABEL_COL_W + CONSTRUCT_DATA_COL_W * constructMetrics.length;
 
 	return (
 		<div className="flex flex-wrap items-end gap-x-4 gap-y-6">
@@ -495,18 +544,20 @@ function AlignedScoreDisplay({
 			</div>
 
 			{/* Play Value, Usability */}
-			<div className="max-w-full overflow-x-auto">
-				<div style={{ width: constructTableW }}>
-					{showLabels ? <GroupHeading>{t("playValueUsability")}</GroupHeading> : null}
-					<BarGroup metrics={CONSTRUCT_METRICS} scores={scores} colWidth={CONSTRUCT_DATA_COL_W} />
-					<ScoreSubTable
-						metrics={CONSTRUCT_METRICS}
-						scores={scores}
-						dataColW={CONSTRUCT_DATA_COL_W}
-						tableW={constructTableW}
-					/>
+			{constructMetrics.length > 0 ? (
+				<div className="max-w-full overflow-x-auto">
+					<div style={{ width: constructTableW }}>
+						{showLabels ? <GroupHeading>{t("playValueUsability")}</GroupHeading> : null}
+						<BarGroup metrics={constructMetrics} scores={scores} colWidth={CONSTRUCT_DATA_COL_W} />
+						<ScoreSubTable
+							metrics={constructMetrics}
+							scores={scores}
+							dataColW={CONSTRUCT_DATA_COL_W}
+							tableW={constructTableW}
+						/>
+					</div>
 				</div>
-			</div>
+			) : null}
 		</div>
 	);
 }
@@ -673,7 +724,15 @@ function ReportStatCard({
 
 // ── Domain items table (extended view) ───────────────────────────────────────
 
-function DomainItemsTable({ questions }: Readonly<{ questions: DomainQuestionRow[] }>) {
+function DomainItemsTable({
+	questions,
+	visibleConstructs,
+	selection
+}: Readonly<{
+	questions: DomainQuestionRow[];
+	visibleConstructs: ConstructSelection;
+	selection: ConstructSelection;
+}>) {
 	const t = useTranslations("shared.reportView");
 	const notApplicableLabel = t("notApplicable");
 	const unsureLabel = t("unsure");
@@ -704,12 +763,20 @@ function DomainItemsTable({ questions }: Readonly<{ questions: DomainQuestionRow
 						<th className="w-20 border-b border-r border-edge/40 px-3 py-2 text-center font-bold text-muted-foreground">
 							{t("metricSociability")}
 						</th>
-						<th className="w-20 border-b border-r border-edge/40 px-3 py-2 text-center font-bold text-primary">
-							{t("metricPvShort")}
-						</th>
-						<th className="w-20 border-b border-edge/40 px-3 py-2 text-center font-bold text-primary">
-							{t("metricUShort")}
-						</th>
+						{visibleConstructs.playValue ? (
+							<th
+								className={cn(
+									"w-20 border-b border-edge/40 px-3 py-2 text-center font-bold text-primary",
+									visibleConstructs.usability && "border-r"
+								)}>
+								{t("metricPvShort")}
+							</th>
+						) : null}
+						{visibleConstructs.usability ? (
+							<th className="w-20 border-b border-edge/40 px-3 py-2 text-center font-bold text-primary">
+								{t("metricUShort")}
+							</th>
+						) : null}
 					</tr>
 				</thead>
 				<tbody>
@@ -795,16 +862,28 @@ function DomainItemsTable({ questions }: Readonly<{ questions: DomainQuestionRow
 										})
 									)}
 								</td>
-								<td className="border-r border-edge/40 px-3 py-2 text-center font-mono tabular-nums">
-									{q.playValueScore !== null && q.playValueMax !== null
-										? `${q.playValueScore}/${q.playValueMax}`
-										: "-"}
-								</td>
-								<td className="px-3 py-2 text-center font-mono tabular-nums">
-									{q.usabilityScore !== null && q.usabilityMax !== null
-										? `${q.usabilityScore}/${q.usabilityMax}`
-										: "-"}
-								</td>
+								{visibleConstructs.playValue ? (
+									<td
+										className={cn(
+											"px-3 py-2 text-center font-mono tabular-nums",
+											visibleConstructs.usability && "border-r border-edge/40"
+										)}>
+										{selection.playValue
+											? q.playValueScore !== null && q.playValueMax !== null
+												? `${q.playValueScore}/${q.playValueMax}`
+												: "-"
+											: ""}
+									</td>
+								) : null}
+								{visibleConstructs.usability ? (
+									<td className="px-3 py-2 text-center font-mono tabular-nums">
+										{selection.usability
+											? q.usabilityScore !== null && q.usabilityMax !== null
+												? `${q.usabilityScore}/${q.usabilityMax}`
+												: "-"
+											: ""}
+									</td>
+								) : null}
 							</tr>
 						);
 					})}
@@ -969,9 +1048,21 @@ function RankedDomainList({ domains }: Readonly<{ domains: readonly RankedDomain
 	);
 }
 
-function BestWorstSection({ rankings }: Readonly<{ rankings: ConstructRanking[] }>) {
+function BestWorstSection({
+	rankings,
+	visibleConstructs
+}: Readonly<{ rankings: ConstructRanking[]; visibleConstructs: ConstructSelection }>) {
 	const t = useTranslations("shared.reportView");
 	const rankingByKey = new Map(rankings.map(r => [r.constructKey, r] as const));
+	const visibleGrid = CONSTRUCT_GRID.map(row =>
+		row.filter(key =>
+			key === "play_value"
+				? visibleConstructs.playValue
+				: key === "usability"
+					? visibleConstructs.usability
+					: true
+		)
+	).filter(row => row.length > 0);
 
 	return (
 		<Card>
@@ -983,7 +1074,7 @@ function BestWorstSection({ rankings }: Readonly<{ rankings: ConstructRanking[] 
 					<p className="text-sm text-muted-foreground">{t("notEnoughDomainData")}</p>
 				) : (
 					<div className="space-y-3">
-						{CONSTRUCT_GRID.map((row, rowIdx) => (
+						{visibleGrid.map((row, rowIdx) => (
 							<div key={`bw-row-${rowIdx}`} className="grid gap-3 sm:grid-cols-3">
 								{row.map(key => {
 									const ranking = rankingByKey.get(key);
@@ -1063,13 +1154,26 @@ export interface AuditReportViewProps {
 	readonly instrument?: PlayspaceInstrument | null;
 	/** Role-scoped base path (e.g. "/admin", "/manager") for cross-navigation links. */
 	readonly basePath?: string | undefined;
+	/**
+	 * Report key from `buildReportIdentity`, naming where this report's construct
+	 * filter is stored. Omit to render without filter controls.
+	 */
+	readonly reportIdentity?: string | undefined;
+	/** Signed-in reader's email, used to namespace stored filter selections. */
+	readonly userEmail?: string | null | undefined;
 }
 
 /**
  * Full formatted audit report view with aligned score bars, domain breakdown,
  * item-level toggle, overall scores, best/worst table, and export.
  */
-export function AuditReportView({ audit, instrument = null, basePath }: Readonly<AuditReportViewProps>) {
+export function AuditReportView({
+	audit,
+	instrument = null,
+	basePath,
+	reportIdentity,
+	userEmail
+}: Readonly<AuditReportViewProps>) {
 	const t = useTranslations("shared.reportView");
 	const [selectedVariant, setSelectedVariant] = React.useState<ScoreVariantKey>("canonical");
 	const displayAudit = React.useMemo<AuditSession>(() => {
@@ -1087,16 +1191,74 @@ export function AuditReportView({ audit, instrument = null, basePath }: Readonly
 			}
 		};
 	}, [audit, selectedVariant]);
-	const overall = getEffectiveScoreTotals(displayAudit.scores);
+	const knownDomainKeys = React.useMemo(
+		() =>
+			instrument === null
+				? Object.keys(audit.scores.by_domain).map(normalizeDomainKey)
+				: getReportKnownDomainKeys(audit, instrument),
+		[audit, instrument]
+	);
+	const reportFilter = useReportFilter(reportIdentity ?? "", userEmail, knownDomainKeys);
+	const filteringEnabled = reportIdentity !== undefined && instrument !== null;
+	const activeFilter = filteringEnabled ? reportFilter.filter : createDefaultReportFilter();
+
+	const domainConstructCoverage = React.useMemo(() => {
+		if (instrument === null) return {};
+		return getReportDomainConstructCoverage(audit, instrument);
+	}, [audit, instrument]);
+
+	const projection = React.useMemo(
+		() =>
+			instrument === null ? null : buildReportScoreProjection(audit, instrument, activeFilter, selectedVariant),
+		[audit, instrument, activeFilter, selectedVariant]
+	);
+	const domainRows = React.useMemo(() => projection?.domainRows ?? [], [projection]);
+	const isFiltered = projection?.isFiltered ?? false;
+	const visibleConstructs = projection?.visibleConstructs ?? {
+		playValue: true,
+		usability: true
+	};
+	const includedUnsureAnswerCount = projection?.unsureAnswerCount ?? audit.scores.unsure_answer_count;
+
+	const overall = projection === null ? getEffectiveScoreTotals(displayAudit.scores) : projection.overall;
 	const overallPvPct = overall !== null ? pct(overall.play_value_total, overall.play_value_total_max) : "-";
 	const overallUPct = overall !== null ? pct(overall.usability_total, overall.usability_total_max) : "-";
 	const overallSocPct = overall !== null ? pct(overall.sociability_total, overall.sociability_total_max) : "-";
-	const overallCombined = overall !== null ? `PV ${overallPvPct} · U ${overallUPct}` : t("pending");
-
-	const domainRows = React.useMemo(() => {
-		if (instrument === null) return [];
-		return buildDomainReportRows(displayAudit, instrument);
-	}, [displayAudit, instrument]);
+	const overallCombined =
+		overall === null
+			? t("pending")
+			: [
+					...(visibleConstructs.playValue ? [`PV ${overallPvPct}`] : []),
+					...(visibleConstructs.usability ? [`U ${overallUPct}`] : [])
+				].join(" · ");
+	const overallMaxHelper =
+		overall === null
+			? undefined
+			: visibleConstructs.playValue && visibleConstructs.usability
+				? t("maxPvU", {
+						pv: overall.play_value_total_max,
+						u: overall.usability_total_max
+					})
+				: t("maxScoreEq", {
+						value: visibleConstructs.playValue ? overall.play_value_total_max : overall.usability_total_max
+					});
+	const totalsByVariant = React.useMemo<Record<ScoreVariantKey, AuditScoreTotals | null>>(
+		() => ({
+			canonical:
+				instrument === null
+					? getEffectiveScoreTotals(audit.scores, "canonical")
+					: buildReportScoreProjection(audit, instrument, activeFilter, "canonical").overall,
+			unsure_as_zero:
+				instrument === null
+					? getEffectiveScoreTotals(audit.scores, "unsure_as_zero")
+					: buildReportScoreProjection(audit, instrument, activeFilter, "unsure_as_zero").overall,
+			unsure_as_max:
+				instrument === null
+					? getEffectiveScoreTotals(audit.scores, "unsure_as_max")
+					: buildReportScoreProjection(audit, instrument, activeFilter, "unsure_as_max").overall
+		}),
+		[audit, instrument, activeFilter]
+	);
 
 	const rankings = React.useMemo(() => {
 		if (domainRows.length < 2) return [];
@@ -1212,7 +1374,19 @@ export function AuditReportView({ audit, instrument = null, basePath }: Readonly
 
 			<PlayspaceContextCard audit={audit} instrument={instrument} />
 
-			{hasUnsureVariants(audit.scores) ? (
+			{filteringEnabled ? (
+				<>
+					<ReportFilterBanner filter={activeFilter} onShowFullReport={reportFilter.showFullReport} />
+					<ReportFilterControls
+						filter={activeFilter}
+						onOverallChange={reportFilter.setOverall}
+						onApplyToAllDomains={reportFilter.applyToAllDomains}
+						onReset={reportFilter.reset}
+					/>
+				</>
+			) : null}
+
+			{hasUnsureVariants(audit.scores) && includedUnsureAnswerCount > 0 ? (
 				<Card>
 					<CardHeader>
 						<CardTitle className="text-base">{t("scoreInterpretation")}</CardTitle>
@@ -1235,7 +1409,11 @@ export function AuditReportView({ audit, instrument = null, basePath }: Readonly
 				</Card>
 			) : null}
 
-			<VariantComparisonTable scores={audit.scores} />
+			<VariantComparisonTable
+				unsureAnswerCount={includedUnsureAnswerCount}
+				totalsByVariant={totalsByVariant}
+				visibleConstructs={visibleConstructs}
+			/>
 
 			{/* ── 2. Score summary ─────────────────────────────────── */}
 			<div className="space-y-3">
@@ -1244,28 +1422,29 @@ export function AuditReportView({ audit, instrument = null, basePath }: Readonly
 					<ReportStatCard
 						label={t("overallScore")}
 						value={overallCombined}
-						helper={
-							overall !== null
-								? t("maxPvU", {
-										pv: overall.play_value_total_max,
-										u: overall.usability_total_max
-									})
-								: undefined
-						}
+						helper={overallMaxHelper}
 						accent="bg-accent-terracotta"
 					/>
-					<ReportStatCard
-						label={t("metricPlayValue")}
-						value={overall !== null ? `${overall.play_value_total} (${overallPvPct})` : "-"}
-						helper={overall !== null ? t("maxScoreEq", { value: overall.play_value_total_max }) : undefined}
-						accent="bg-amber-500"
-					/>
-					<ReportStatCard
-						label={t("metricUsability")}
-						value={overall !== null ? `${overall.usability_total} (${overallUPct})` : "-"}
-						helper={overall !== null ? t("maxScoreEq", { value: overall.usability_total_max }) : undefined}
-						accent="bg-primary"
-					/>
+					{visibleConstructs.playValue ? (
+						<ReportStatCard
+							label={t("metricPlayValue")}
+							value={overall !== null ? `${overall.play_value_total} (${overallPvPct})` : "-"}
+							helper={
+								overall !== null ? t("maxScoreEq", { value: overall.play_value_total_max }) : undefined
+							}
+							accent="bg-amber-500"
+						/>
+					) : null}
+					{visibleConstructs.usability ? (
+						<ReportStatCard
+							label={t("metricUsability")}
+							value={overall !== null ? `${overall.usability_total} (${overallUPct})` : "-"}
+							helper={
+								overall !== null ? t("maxScoreEq", { value: overall.usability_total_max }) : undefined
+							}
+							accent="bg-primary"
+						/>
+					) : null}
 					<ReportStatCard
 						label={t("metricSociability")}
 						value={overall !== null ? `${overall.sociability_total} (${overallSocPct})` : "-"}
@@ -1310,8 +1489,50 @@ export function AuditReportView({ audit, instrument = null, basePath }: Readonly
 											scores={row.scoreTotals}
 											notes={row.sectionNotes}
 											questions={row.questions}
+											selection={resolveDomainConstructSelection(activeFilter, row.domainKey)}
+											visibleConstructs={visibleConstructs}
 											showItems={itemToggles[row.domainKey] === true}
 											onToggleItems={() => toggleItems(row.domainKey)}
+											filterControls={
+												filteringEnabled ? (
+													<DomainFilterControls
+														domainKey={row.domainKey}
+														domainTitle={row.domainTitle}
+														selection={resolveDomainConstructSelection(
+															activeFilter,
+															row.domainKey
+														)}
+														coverage={domainConstructCoverage[row.domainKey]}
+														hasOverride={row.domainKey in activeFilter.domainOverrides}
+														onChange={selection =>
+															reportFilter.setDomain(row.domainKey, selection)
+														}
+														onUseReportSetting={() =>
+															reportFilter.clearDomain(row.domainKey)
+														}
+													/>
+												) : null
+											}
+											emptyNotice={
+												filteringEnabled && row.itemCount === 0 ? (
+													<DomainEmptyNotice
+														selection={resolveDomainConstructSelection(
+															activeFilter,
+															row.domainKey
+														)}
+													/>
+												) : null
+											}
+											scopeNote={
+												filteringEnabled ? (
+													<FilteredScopeNote
+														selection={resolveDomainConstructSelection(
+															activeFilter,
+															row.domainKey
+														)}
+													/>
+												) : null
+											}
 										/>
 									))
 								: domainKeys.map(domainKey => (
@@ -1322,6 +1543,8 @@ export function AuditReportView({ audit, instrument = null, basePath }: Readonly
 											scores={displayAudit.scores.by_domain[domainKey] ?? null}
 											notes={[]}
 											questions={[]}
+											selection={{ playValue: true, usability: true }}
+											visibleConstructs={{ playValue: true, usability: true }}
 											showItems={false}
 											onToggleItems={() => undefined}
 										/>
@@ -1337,7 +1560,7 @@ export function AuditReportView({ audit, instrument = null, basePath }: Readonly
 					<CardTitle className="text-base">{t("overallScores")}</CardTitle>
 				</CardHeader>
 				<CardContent className="space-y-3">
-					<AlignedScoreDisplay scores={overall} />
+					<AlignedScoreDisplay scores={overall} visibleConstructs={visibleConstructs} />
 					{sociabilityCoverage !== null ? (
 						<p className="text-xs text-muted-foreground">
 							{t("sociabilityCoverage", {
@@ -1350,11 +1573,15 @@ export function AuditReportView({ audit, instrument = null, basePath }: Readonly
 			</Card>
 
 			{/* ── 6. Best & Worst ─────────────────────────────────── */}
-			{rankings.length > 0 ? <BestWorstSection rankings={rankings} /> : null}
+			{rankings.length > 0 ? (
+				<BestWorstSection rankings={rankings} visibleConstructs={visibleConstructs} />
+			) : null}
 			<SociabilityBestWorstSection rankings={sociabilityRankings} />
 
 			{/* ── 7. Raw JSON toggle ──────────────────────────────── */}
-			<JsonViewer data={audit.scores} title="audit-scores.json" defaultOpen={true} />
+			{/* Hidden while filtered: this panel shows the unfiltered backend scores,
+			    which would contradict every figure above it. */}
+			{isFiltered ? null : <JsonViewer data={audit.scores} title="audit-scores.json" defaultOpen={true} />}
 		</div>
 	);
 }
@@ -1367,33 +1594,55 @@ function DomainAccordionItem({
 	scores,
 	notes,
 	questions,
+	selection,
+	visibleConstructs,
 	showItems,
-	onToggleItems
+	onToggleItems,
+	filterControls = null,
+	emptyNotice = null,
+	scopeNote = null
 }: Readonly<{
 	domainKey: string;
 	title: string;
 	scores: AuditScoreTotals | null;
 	notes: string[];
 	questions: DomainQuestionRow[];
+	selection: ConstructSelection;
+	visibleConstructs: ConstructSelection;
 	showItems: boolean;
 	onToggleItems: () => void;
+	/** Construct toggles for this domain, or null when filtering is unavailable. */
+	filterControls?: React.ReactNode;
+	/** Shown when a filter has removed every question in this domain. */
+	emptyNotice?: React.ReactNode;
+	/** Scope label for shared-scale totals under a single-construct filter. */
+	scopeNote?: React.ReactNode;
 }>) {
 	const t = useTranslations("shared.reportView");
+	const scoreLabel =
+		scores === null
+			? t("pending")
+			: [
+					...(selection.playValue ? [`PV ${pct(scores.play_value_total, scores.play_value_total_max)}`] : []),
+					...(selection.usability ? [`U ${pct(scores.usability_total, scores.usability_total_max)}`] : [])
+				].join(" · ");
 	return (
 		<AccordionItem value={domainKey}>
 			<AccordionTrigger className="text-sm">
 				<div className="flex flex-1 items-center justify-between gap-3 pr-2">
 					<span className="text-left font-bold text-foreground">{title}</span>
 					<span className="shrink-0 rounded-md bg-primary/10 px-2 py-0.5 text-xs font-mono tabular-nums text-primary">
-						{scores !== null
-							? `PV ${pct(scores.play_value_total, scores.play_value_total_max)} · U ${pct(scores.usability_total, scores.usability_total_max)}`
-							: t("pending")}
+						{scoreLabel}
 					</span>
 				</div>
 			</AccordionTrigger>
 			<AccordionContent>
 				<div className="space-y-4 pt-1">
-					<AlignedScoreDisplay scores={scores} showLabels={false} />
+					{filterControls}
+					{emptyNotice}
+
+					<AlignedScoreDisplay scores={scores} showLabels={false} visibleConstructs={selection} />
+					{scores !== null ? scopeNote : null}
 
 					{notes.length > 0 ? (
 						<div className="space-y-1.5 rounded-md bg-muted/40 px-4 py-3">
@@ -1423,7 +1672,13 @@ function DomainAccordionItem({
 									<ChevronDownIcon className="size-3" />
 								)}
 							</Button>
-							{showItems ? <DomainItemsTable questions={questions} /> : null}
+							{showItems ? (
+								<DomainItemsTable
+									questions={questions}
+									visibleConstructs={visibleConstructs}
+									selection={selection}
+								/>
+							) : null}
 						</div>
 					) : null}
 				</div>

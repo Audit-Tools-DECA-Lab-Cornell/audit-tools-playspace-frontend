@@ -22,7 +22,9 @@ import {
 	playspaceApi,
 	PlayspaceApiError
 } from "@/lib/api/playspace";
-import { clearBrowserAuthSession } from "@/lib/auth/browser-session";
+import { buildCacheIdentity, clearReportFilters } from "@/lib/audit/report-filter-cache";
+import { resetReportFilterSnapshots } from "@/lib/audit/use-report-filter";
+import { clearBrowserAuthSession, getBrowserAuthSession } from "@/lib/auth/browser-session";
 
 /** Sign-in screen shows a confirmation when it is opened with this flag. */
 const ACCOUNT_DELETED_LOGIN_PATH = "/login?account_deleted=1";
@@ -75,10 +77,14 @@ export function DeleteAccountDialog({
 			}),
 		onSuccess: () => {
 			/**
-			 * Order matters. The session cookies go first so nothing can
-			 * re-authenticate, then the cached responses, then a full page load so
-			 * no screen can briefly render the deleted account's data.
+			 * Order matters. The stored report filters are namespaced by the signed-in
+			 * reader, so they are read and removed while the session still identifies
+			 * them. The session cookies go next so nothing can re-authenticate, then
+			 * the cached responses, then a full page load so no screen can briefly
+			 * render the deleted account's data.
 			 */
+			clearReportFilters(buildCacheIdentity(getBrowserAuthSession()?.userEmail ?? null));
+			resetReportFilterSnapshots();
 			clearBrowserAuthSession();
 			queryClient.clear();
 			globalThis.window.location.replace(ACCOUNT_DELETED_LOGIN_PATH);

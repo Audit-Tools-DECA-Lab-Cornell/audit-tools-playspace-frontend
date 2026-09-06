@@ -53,6 +53,7 @@ import {
 	type MyManagerProfile,
 	playspaceApi
 } from "@/lib/api/playspace";
+import { resetReportFilterSnapshots } from "@/lib/audit/use-report-filter";
 import { clearBrowserAuthSession, getBrowserAuthSession, setBrowserAuthSession } from "@/lib/auth/browser-session";
 import type { AuthSession } from "@/lib/auth/session";
 import { cn } from "@/lib/utils";
@@ -1839,6 +1840,7 @@ export default function SettingsPage() {
 				<SecurityCard
 					session={session}
 					onSignOut={() => {
+						resetReportFilterSnapshots();
 						clearBrowserAuthSession();
 						router.push("/login");
 					}}

@@ -485,7 +485,25 @@
 			"constructChallengeOpportunities": "Herausforderungsmöglichkeiten",
 			"constructSociabilitySupport": "Unterstützung sozialer Interaktion",
 			"constructPlayValue": "Spielwert",
-			"constructUsability": "Nutzbarkeit"
+			"constructUsability": "Nutzbarkeit",
+			"filterTitle": "Enthaltene Ergebnisse",
+			"filterHelp": "Wählen Sie, welche Ergebnisse dieser Bericht zeigt. Jeder Bereich kann von der Berichtseinstellung abweichen.",
+			"filterOverallGroupLabel": "Im Bericht enthaltene Ergebnisse",
+			"filterDomainGroupLabel": "In {domain} enthaltene Ergebnisse",
+			"filterApplyToAllDomains": "Auf alle Bereiche anwenden",
+			"filterResetToFullReport": "Vollständigen Bericht anzeigen",
+			"filterUseReportSetting": "Berichtseinstellung verwenden",
+			"filterIncludeDomainConstruct": "{construct} in diesem Bereich einschließen",
+			"filterExcludeDomainConstruct": "{construct} aus diesem Bereich ausschließen",
+			"filterShowFullReport": "Vollständigen Bericht anzeigen",
+			"filterBannerPlayValueOnly": "Es werden nur Ergebnisse zum Spielwert angezeigt.",
+			"filterBannerUsabilityOnly": "Es werden nur Ergebnisse zur Nutzbarkeit angezeigt.",
+			"filterBannerCustomized": "Es werden Ergebnisse mit einigen angepassten Bereichen angezeigt.",
+			"filterBannerAlsoCustomized": "Einige Bereiche sind ebenfalls angepasst.",
+			"filterDomainMeasuresOnly": "Dieser Bereich misst nur {construct}.",
+			"filterDomainEmptyPlayValue": "Für diesen Bereich wurden keine Ergebnisse zum Spielwert erfasst.",
+			"filterDomainEmptyUsability": "Für diesen Bereich wurden keine Ergebnisse zur Nutzbarkeit erfasst.",
+			"filterScopeNote": "Die Summen umfassen nur Ergebnisse zu {construct}."
 		}
 	},
 	"tables": {

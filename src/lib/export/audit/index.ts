@@ -27,6 +27,8 @@ export type {
 
 // ── Public utilities ──────────────────────────────────────────────────────────
 
+import { isDefaultReportFilter, type ReportResultFilter } from "@/lib/audit/report-filter";
+
 import { generateCsvBlob, generateXlsxBlob } from "./excel";
 import { slugifySegment } from "./format-utils";
 import { generateJsonBlob } from "./json";
@@ -68,9 +70,36 @@ function triggerBrowserDownload(blob: Blob, filename: string): void {
  * buildExportFileName("AUD-ACME-24-001234", "pdf")
  * // → "pvua-aud-acme-24-001234.pdf"
  */
-export function buildExportFileName(auditCode: string, format: AuditExportFormat): string {
+export function buildExportFileName(
+	auditCode: string,
+	format: AuditExportFormat,
+	resultFilter?: ReportResultFilter
+): string {
 	const slug = slugifySegment(auditCode);
-	return `pvua-${slug}.${format}`;
+	const suffix = buildFilterFileNameSuffix(resultFilter);
+	return `pvua-${slug}${suffix}.${format}`;
+}
+
+/**
+ * Filename fragment naming the construct a filtered export covers.
+ *
+ * Without it a Play-Value-only export and a full export land in the downloads
+ * folder under the same name, and the second silently replaces the first.
+ *
+ * @param resultFilter - Filter applied to the export, if any.
+ * @returns An empty string for an unfiltered export, otherwise a leading-dash suffix.
+ */
+function buildFilterFileNameSuffix(resultFilter: ReportResultFilter | undefined): string {
+	if (resultFilter === undefined || isDefaultReportFilter(resultFilter)) {
+		return "";
+	}
+	if (!resultFilter.overall.usability) {
+		return "-play-value";
+	}
+	if (!resultFilter.overall.playValue) {
+		return "-usability";
+	}
+	return "-filtered";
 }
 
 /** Result of a blob-only export: the generated blob plus its conventional filename. */
@@ -100,7 +129,7 @@ export function generateSingleAuditBlob(
 		throw new Error("An instrument definition is required for export.");
 	}
 
-	const filename = buildExportFileName(exportableAudit.auditSession.audit_code, format);
+	const filename = buildExportFileName(exportableAudit.auditSession.audit_code, format, exportableAudit.resultFilter);
 	const blob =
 		format === "json"
 			? generateJsonBlob(exportableAudit, instrument, exportedAt)
@@ -126,7 +155,7 @@ export async function generateSingleAuditPdfBlob(
 		throw new Error("An instrument definition is required for export.");
 	}
 
-	const filename = buildExportFileName(exportableAudit.auditSession.audit_code, "pdf");
+	const filename = buildExportFileName(exportableAudit.auditSession.audit_code, "pdf", exportableAudit.resultFilter);
 	const blob = await generatePdfBlob(exportableAudit, instrument);
 	return { blob, filename };
 }
@@ -156,7 +185,7 @@ export async function downloadSingleAuditExport(
 		throw new Error("An instrument definition is required for export.");
 	}
 
-	const fileName = buildExportFileName(exportableAudit.auditSession.audit_code, format);
+	const fileName = buildExportFileName(exportableAudit.auditSession.audit_code, format, exportableAudit.resultFilter);
 
 	let blob: Blob;
 

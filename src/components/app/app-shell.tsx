@@ -38,6 +38,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import { resetReportFilterSnapshots } from "@/lib/audit/use-report-filter";
 import { clearBrowserAuthSession } from "@/lib/auth/browser-session";
 import type { UserRole } from "@/lib/auth/role";
 import { isBugReportingEnabled } from "@/lib/bug-report/feature";
@@ -281,6 +282,7 @@ function UserMenu({
 				<DropdownMenuItem
 					className="flex items-center gap-2"
 					onClick={() => {
+						resetReportFilterSnapshots();
 						clearBrowserAuthSession();
 						router.push("/login");
 					}}>

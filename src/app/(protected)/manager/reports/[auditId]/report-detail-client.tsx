@@ -3,6 +3,7 @@
 import { useQuery } from "@tanstack/react-query";
 import Link from "next/link";
 
+import { useAuthSession } from "@/components/app/auth-session-provider";
 import { AuditExportActions } from "@/components/dashboard/audit-export-actions";
 import { AuditReportView } from "@/components/dashboard/audit-report-view";
 import { BackButton } from "@/components/dashboard/back-button";
@@ -10,6 +11,9 @@ import { DashboardHeader } from "@/components/dashboard/dashboard-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { playspaceApi } from "@/lib/api/playspace";
+import { buildReportIdentity } from "@/lib/audit/report-filter-cache";
+import { getReportKnownDomainKeys } from "@/lib/audit/report-helpers";
+import { useReportFilter } from "@/lib/audit/use-report-filter";
 
 /**
  * Manager-facing individual audit report detail page.
@@ -20,6 +24,7 @@ interface ManagerReportDetailClientProps {
 }
 
 export function ManagerReportDetailClient({ auditId }: Readonly<ManagerReportDetailClientProps>) {
+	const session = useAuthSession();
 	const auditQuery = useQuery({
 		queryKey: ["playspace", "audit", auditId],
 		queryFn: () => playspaceApi.auditor.getAudit(auditId),
@@ -41,6 +46,11 @@ export function ManagerReportDetailClient({ auditId }: Readonly<ManagerReportDet
 		},
 		enabled: audit !== undefined
 	});
+	const knownDomainKeys =
+		audit !== undefined && instrumentQuery.data !== undefined
+			? getReportKnownDomainKeys(audit, instrumentQuery.data)
+			: undefined;
+	const reportFilter = useReportFilter(buildReportIdentity(auditId), session?.userEmail ?? null, knownDomainKeys);
 
 	return (
 		<div className="space-y-6">
@@ -56,7 +66,11 @@ export function ManagerReportDetailClient({ auditId }: Readonly<ManagerReportDet
 				actions={
 					<div className="flex flex-col items-end gap-2">
 						{audit !== undefined && instrumentQuery.data !== undefined && (
-							<AuditExportActions audit={audit} instrument={instrumentQuery.data} />
+							<AuditExportActions
+								audit={audit}
+								instrument={instrumentQuery.data}
+								resultFilter={reportFilter.filter}
+							/>
 						)}
 						<BackButton href="/manager/reports" label="Back to Reports" />
 					</div>
@@ -90,7 +104,13 @@ export function ManagerReportDetailClient({ auditId }: Readonly<ManagerReportDet
 			) : null}
 
 			{audit !== undefined ? (
-				<AuditReportView audit={audit} instrument={instrumentQuery.data ?? null} basePath="/manager" />
+				<AuditReportView
+					audit={audit}
+					instrument={instrumentQuery.data ?? null}
+					basePath="/manager"
+					reportIdentity={buildReportIdentity(audit.audit_id)}
+					userEmail={session?.userEmail ?? null}
+				/>
 			) : null}
 		</div>
 	);

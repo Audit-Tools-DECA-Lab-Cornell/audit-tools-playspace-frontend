@@ -5,15 +5,21 @@ import * as React from "react";
 
 import { Button } from "@/components/ui/button";
 import type { AuditSession } from "@/lib/api/playspace";
+import type { ReportResultFilter } from "@/lib/audit/report-filter";
 import { type AuditExportFormat, downloadSingleAuditExport } from "@/lib/export/audit";
 import type { PlayspaceInstrument } from "@/types/audit";
 
 export interface AuditExportActionsProps {
 	readonly audit: AuditSession;
 	readonly instrument: PlayspaceInstrument;
+	/**
+	 * Play Value / Usability selection to export. Omitted exports the whole
+	 * audit; a narrowed filter is stamped into the file and its name.
+	 */
+	readonly resultFilter?: ReportResultFilter | undefined;
 }
 
-export function AuditExportActions({ audit, instrument }: AuditExportActionsProps) {
+export function AuditExportActions({ audit, instrument, resultFilter }: AuditExportActionsProps) {
 	const [isExporting, setIsExporting] = React.useState(false);
 
 	async function handleExport(format: AuditExportFormat) {
@@ -34,7 +40,8 @@ export function AuditExportActions({ audit, instrument }: AuditExportActionsProp
 						gender: null,
 						country: null,
 						role: null
-					}
+					},
+					resultFilter
 				},
 				instrument,
 				format

@@ -33,7 +33,17 @@ import {
 	normalizePromptTypographyForPdf,
 	parsePromptSegments
 } from "@/lib/audit/prompt-segments";
-import { buildVisibleQuestionEntries } from "@/lib/audit/report-helpers";
+import {
+	buildQuestionLookup,
+	maskScoreTotalsByConstructSelection,
+	questionMatchesReportFilter,
+	resolveQuestionConstructSelection
+} from "@/lib/audit/report-filter";
+import {
+	buildReportScoreProjection,
+	buildVisibleQuestionEntries,
+	getQuestionDomainKeys
+} from "@/lib/audit/report-helpers";
 import {
 	getCombinedReportLegend,
 	getCombinedReportSources,
@@ -60,6 +70,7 @@ import {
 	buildSociabilityBreakdownScoreRows,
 	buildSociabilityResponseColumns,
 	buildSpaceAuditRows,
+	describeResultFilter,
 	SOCIABILITY_DIMENSION_LABELS
 } from "./row-builders";
 import { addScoreTotals, calculateQuestionScores, createEmptyScoreTotals, deriveSummaryScore } from "./score-utils";
@@ -157,8 +168,6 @@ const RESPONSE_HEADERS = [
 	"PV Score", // 8
 	"U Score" // 9
 ] as const;
-
-const COL_COUNT = RESPONSE_HEADERS.length;
 
 // ── Rich-cell helpers (verbatim from instrument-pdf.ts) ───────────────────────
 
@@ -298,7 +307,10 @@ export async function generatePdfBlob(
 	const autoTable = autoTableModule.default;
 
 	const { auditSession, context, auditorProfile } = exportableAudit;
-	const overallScores = auditSession.scores.overall;
+	const projection = buildReportScoreProjection(auditSession, instrument, exportableAudit.resultFilter);
+	const resultFilter = projection.filter;
+	const isFiltering = projection.isFiltered;
+	const overallScores = isFiltering ? projection.overall : auditSession.scores.overall;
 	const combinedSources = getCombinedReportSources(auditSession);
 	const finalComments = auditSession.meta.final_comments?.trim() ?? "";
 
@@ -332,6 +344,9 @@ export async function generatePdfBlob(
 		["Project", auditSession.project_name],
 		["Status", formatAuditStatusLabel(auditSession.status)]
 	];
+	if (isFiltering) {
+		detailsBody.push(["Results Included", describeResultFilter(resultFilter)]);
+	}
 
 	if (combinedSources === null) {
 		detailsBody.push(
@@ -528,67 +543,82 @@ export async function generatePdfBlob(
 		}));
 	}
 
+	const summaryScore =
+		isFiltering && overallScores !== null
+			? formatScoreValue(
+					(projection.visibleConstructs.playValue ? overallScores.play_value_total : 0) +
+						(projection.visibleConstructs.usability ? overallScores.usability_total : 0)
+				)
+			: isFiltering
+				? "No included scored results"
+				: String(deriveSummaryScore(auditSession));
 	const scoreRows: ScoreRow[] = [
 		{
-			cells: ["Summary Score", String(deriveSummaryScore(auditSession))],
+			cells: ["Summary Score", summaryScore],
 			labelFill: summaryFill,
 			valueFill: summaryFill,
 			labelText: summaryText,
 			valueText: summaryText,
 			bold: true
-		},
-		{
+		}
+	];
+	if (projection.visibleConstructs.playValue && (!isFiltering || overallScores !== null)) {
+		scoreRows.push({
 			cells: ["Play Value Total", formatScoreValue(overallScores?.play_value_total ?? 0)],
 			labelFill: neutral,
 			valueFill: neutral,
 			labelText: neutralText,
 			valueText: neutralText,
 			bold: true
-		},
-		{
+		});
+	}
+	if (projection.visibleConstructs.usability && (!isFiltering || overallScores !== null)) {
+		scoreRows.push({
 			cells: ["Usability Total", formatScoreValue(overallScores?.usability_total ?? 0)],
 			labelFill: neutral,
 			valueFill: neutral,
 			labelText: neutralText,
 			valueText: neutralText,
 			bold: true
-		},
-		{
-			cells: ["Provision Total", formatScoreValue(overallScores?.provision_total ?? 0)],
-			labelFill: AUDIT_PDF_PALETTE.scaleFill.provision,
-			valueFill: AUDIT_PDF_PALETTE.scaleFill.provision,
-			labelText: AUDIT_PDF_PALETTE.scaleAccent.provision,
-			valueText: AUDIT_PDF_PALETTE.scaleAccent.provision,
-			bold: false
-		},
-		{
-			cells: ["Variety Total", formatScoreValue(overallScores?.variety_total ?? 0)],
-			labelFill: AUDIT_PDF_PALETTE.scaleFill.variety,
-			valueFill: AUDIT_PDF_PALETTE.scaleFill.variety,
-			labelText: AUDIT_PDF_PALETTE.scaleAccent.variety,
-			valueText: AUDIT_PDF_PALETTE.scaleAccent.variety,
-			bold: false
-		},
-		{
-			cells: ["Sociability Total", formatScoreValue(overallScores?.sociability_total ?? 0)],
-			labelFill: AUDIT_PDF_PALETTE.scaleFill.sociability,
-			valueFill: AUDIT_PDF_PALETTE.scaleFill.sociability,
-			labelText: AUDIT_PDF_PALETTE.scaleAccent.sociability,
-			valueText: AUDIT_PDF_PALETTE.scaleAccent.sociability,
-			bold: false
-		},
-		{
-			cells: ["Challenge Total", formatScoreValue(overallScores?.challenge_total ?? 0)],
-			labelFill: AUDIT_PDF_PALETTE.scaleFill.challenge,
-			valueFill: AUDIT_PDF_PALETTE.scaleFill.challenge,
-			labelText: AUDIT_PDF_PALETTE.scaleAccent.challenge,
-			valueText: AUDIT_PDF_PALETTE.scaleAccent.challenge,
-			bold: false
-		},
-		// The three play opportunities follow the Sociability aggregate as their own block. All
-		// three share the Sociability fill so the printed page reads them as equal measures.
-		...buildSociabilityBreakdownSummaryRows(overallScores)
-	];
+		});
+	}
+	if (!isFiltering || overallScores !== null) {
+		scoreRows.push(
+			{
+				cells: ["Provision Total", formatScoreValue(overallScores?.provision_total ?? 0)],
+				labelFill: AUDIT_PDF_PALETTE.scaleFill.provision,
+				valueFill: AUDIT_PDF_PALETTE.scaleFill.provision,
+				labelText: AUDIT_PDF_PALETTE.scaleAccent.provision,
+				valueText: AUDIT_PDF_PALETTE.scaleAccent.provision,
+				bold: false
+			},
+			{
+				cells: ["Variety Total", formatScoreValue(overallScores?.variety_total ?? 0)],
+				labelFill: AUDIT_PDF_PALETTE.scaleFill.variety,
+				valueFill: AUDIT_PDF_PALETTE.scaleFill.variety,
+				labelText: AUDIT_PDF_PALETTE.scaleAccent.variety,
+				valueText: AUDIT_PDF_PALETTE.scaleAccent.variety,
+				bold: false
+			},
+			{
+				cells: ["Sociability Total", formatScoreValue(overallScores?.sociability_total ?? 0)],
+				labelFill: AUDIT_PDF_PALETTE.scaleFill.sociability,
+				valueFill: AUDIT_PDF_PALETTE.scaleFill.sociability,
+				labelText: AUDIT_PDF_PALETTE.scaleAccent.sociability,
+				valueText: AUDIT_PDF_PALETTE.scaleAccent.sociability,
+				bold: false
+			},
+			{
+				cells: ["Challenge Total", formatScoreValue(overallScores?.challenge_total ?? 0)],
+				labelFill: AUDIT_PDF_PALETTE.scaleFill.challenge,
+				valueFill: AUDIT_PDF_PALETTE.scaleFill.challenge,
+				labelText: AUDIT_PDF_PALETTE.scaleAccent.challenge,
+				valueText: AUDIT_PDF_PALETTE.scaleAccent.challenge,
+				bold: false
+			},
+			...buildSociabilityBreakdownSummaryRows(overallScores)
+		);
+	}
 
 	// ── Page 1: Space Audit Setup (before scores; only when space-setup questions exist) ─
 
@@ -667,30 +697,56 @@ export async function generatePdfBlob(
 
 	// ── Page 1: Unsure interpretations (only when Unsure answers exist) ───────
 
-	if (hasUnsureVariants(auditSession.scores)) {
+	if (hasUnsureVariants(auditSession.scores) && projection.unsureAnswerCount > 0) {
 		const variantOrder: readonly { key: ScoreVariantKey; label: string }[] = [
 			{ key: "canonical", label: "Unsure excluded (saved score)" },
 			{ key: "unsure_as_zero", label: "Unsure as zero" },
 			{ key: "unsure_as_max", label: "Unsure as maximum" }
 		];
 		const variantRows = variantOrder.map(({ key, label }) => {
-			const totals = getEffectiveScoreTotals(auditSession.scores, key);
+			const totals = isFiltering
+				? buildReportScoreProjection(auditSession, instrument, resultFilter, key).overall
+				: getEffectiveScoreTotals(auditSession.scores, key);
 			if (totals === null) {
-				return [label, "--", "--", "--"];
+				return [
+					label,
+					...(projection.visibleConstructs.playValue ? ["--"] : []),
+					...(projection.visibleConstructs.usability ? ["--"] : []),
+					"--"
+				];
 			}
-			const summaryTotal = totals.play_value_total + totals.usability_total;
-			const summaryMax = totals.play_value_total_max + totals.usability_total_max;
+			const summaryTotal =
+				(projection.visibleConstructs.playValue ? totals.play_value_total : 0) +
+				(projection.visibleConstructs.usability ? totals.usability_total : 0);
+			const summaryMax =
+				(projection.visibleConstructs.playValue ? totals.play_value_total_max : 0) +
+				(projection.visibleConstructs.usability ? totals.usability_total_max : 0);
 			return [
 				label,
-				`${totals.play_value_total} / ${totals.play_value_total_max} (${formatPercentage(totals.play_value_total, totals.play_value_total_max)})`,
-				`${totals.usability_total} / ${totals.usability_total_max} (${formatPercentage(totals.usability_total, totals.usability_total_max)})`,
+				...(projection.visibleConstructs.playValue
+					? [
+							`${totals.play_value_total} / ${totals.play_value_total_max} (${formatPercentage(totals.play_value_total, totals.play_value_total_max)})`
+						]
+					: []),
+				...(projection.visibleConstructs.usability
+					? [
+							`${totals.usability_total} / ${totals.usability_total_max} (${formatPercentage(totals.usability_total, totals.usability_total_max)})`
+						]
+					: []),
 				`${summaryTotal} / ${summaryMax} (${formatPercentage(summaryTotal, summaryMax)})`
 			];
 		});
 
-		const unsureCount = auditSession.scores.unsure_answer_count;
+		const unsureCount = projection.unsureAnswerCount;
 		autoTable(doc, {
-			head: [["Unsure interpretation", "Play Value", "Usability", "Summary"]],
+			head: [
+				[
+					"Unsure interpretation",
+					...(projection.visibleConstructs.playValue ? ["Play Value"] : []),
+					...(projection.visibleConstructs.usability ? ["Usability"] : []),
+					"Summary"
+				]
+			],
 			body: variantRows,
 			startY: docWithAutoTable.lastAutoTable.finalY + 8,
 			theme: "plain",
@@ -741,18 +797,24 @@ export async function generatePdfBlob(
 	 * 9  U Score      - 6%
 	 *                   ≈ 100%
 	 */
-	const colWidths: Record<number, number> = {
-		0: usableWidth * 0.08,
-		1: usableWidth * 0.055,
-		2: usableWidth * 0.065,
-		3: usableWidth * 0.28,
-		4: usableWidth * 0.1,
-		5: usableWidth * 0.1,
-		6: usableWidth * 0.1,
-		7: usableWidth * 0.1,
-		8: usableWidth * 0.06,
-		9: usableWidth * 0.06
-	};
+	const responseHeaderIndexes = RESPONSE_HEADERS.map((_header, index) => index).filter(
+		index =>
+			(index !== 8 || projection.visibleConstructs.playValue) &&
+			(index !== 9 || projection.visibleConstructs.usability)
+	);
+	const responseHeaders = responseHeaderIndexes.map(index => RESPONSE_HEADERS[index] ?? "");
+	const responseColCount = responseHeaders.length;
+	const baseColumnWeights = [0.08, 0.055, 0.065, 0.28, 0.1, 0.1, 0.1, 0.1, 0.06, 0.06] as const;
+	const visibleWeightTotal = responseHeaderIndexes.reduce(
+		(total, index) => total + (baseColumnWeights[index] ?? 0),
+		0
+	);
+	const colWidths: Record<number, number> = Object.fromEntries(
+		responseHeaderIndexes.map((sourceIndex, visibleIndex) => [
+			visibleIndex,
+			usableWidth * ((baseColumnWeights[sourceIndex] ?? 0) / visibleWeightTotal)
+		])
+	);
 
 	doc.setFontSize(13);
 	doc.setTextColor(...AUDIT_PDF_PALETTE.headerFill);
@@ -862,8 +924,12 @@ export async function generatePdfBlob(
 			scaleCell("variety", totals.variety_total, totals.variety_total_max),
 			scaleCell("sociability", totals.sociability_total, totals.sociability_total_max),
 			scaleCell("challenge", totals.challenge_total, totals.challenge_total_max),
-			scoreCell(totals.play_value_total, totals.play_value_total_max),
-			scoreCell(totals.usability_total, totals.usability_total_max)
+			...(projection.visibleConstructs.playValue
+				? [scoreCell(totals.play_value_total, totals.play_value_total_max)]
+				: []),
+			...(projection.visibleConstructs.usability
+				? [scoreCell(totals.usability_total, totals.usability_total_max)]
+				: [])
 		]);
 		pdfBodyRowIndex += 1;
 	}
@@ -875,7 +941,7 @@ export async function generatePdfBlob(
 	let questionRowIndex = 0;
 
 	/**
-	 * Pushes a full-width banner row (colSpan = COL_COUNT).
+	 * Pushes a full-width banner row.
 	 * Used for section headers, descriptions, instructions, notes, and score
 	 * summary lines - all follow the instrument-PDF style.
 	 */
@@ -891,7 +957,7 @@ export async function generatePdfBlob(
 		body.push([
 			{
 				content,
-				colSpan: COL_COUNT,
+				colSpan: responseColCount,
 				styles: {
 					fillColor,
 					lineColor: fillColor,
@@ -904,11 +970,21 @@ export async function generatePdfBlob(
 		]);
 	}
 
-	for (const [sectionIndex, section] of instrument.sections.entries()) {
-		const visibleEntries = buildVisibleQuestionEntries(auditSession, section);
+	const questionLookup = buildQuestionLookup(instrument);
+	const applyFilter = (entries: ReturnType<typeof buildVisibleQuestionEntries>) =>
+		isFiltering
+			? entries.filter(entry =>
+					questionMatchesReportFilter(entry.question, questionLookup, getQuestionDomainKeys, resultFilter)
+				)
+			: entries;
 
-		if (visibleEntries.length === 0) continue;
+	for (const [sectionIndex, section] of instrument.sections.entries()) {
+		const allVisibleEntries = buildVisibleQuestionEntries(auditSession, section);
+		const visibleEntries = applyFilter(allVisibleEntries);
+
+		if (allVisibleEntries.length === 0) continue;
 		let sectionTotals = createEmptyScoreTotals();
+		let includedScoredQuestionCount = 0;
 
 		// ── Section title banner ────────────────────────────────────────────
 
@@ -1000,8 +1076,15 @@ export async function generatePdfBlob(
 
 		for (const visibleEntry of visibleEntries) {
 			const { question, answers, sourceComponent } = visibleEntry;
-			const scores = calculateQuestionScores(question, answers);
+			const selection = isFiltering
+				? resolveQuestionConstructSelection(question, questionLookup, getQuestionDomainKeys, resultFilter)
+				: { playValue: true, usability: true };
+			const rawScores = calculateQuestionScores(question, answers);
+			const scores = isFiltering ? maskScoreTotalsByConstructSelection(rawScores, selection) : rawScores;
 			sectionTotals = addScoreTotals(sectionTotals, scores);
+			if (question.question_type === "scaled") {
+				includedScoredQuestionCount += 1;
+			}
 
 			const isEven = questionRowIndex % 2 === 0;
 			const rowFill = isEven ? AUDIT_PDF_PALETTE.rowEven : AUDIT_PDF_PALETTE.rowOdd;
@@ -1012,7 +1095,14 @@ export async function generatePdfBlob(
 
 			const questionKeyDisplay = formatQuestionKeyForDisplay(question.question_key || "");
 			const modeLabel = formatQuestionModeLabel(question.mode);
-			const constructsLabel = formatConstructLabel(question.constructs);
+			const visibleQuestionConstructs = isFiltering
+				? question.constructs.filter(
+						construct =>
+							(construct !== "play_value" || selection.playValue) &&
+							(construct !== "usability" || selection.usability)
+					)
+				: question.constructs;
+			const constructsLabel = formatConstructLabel(visibleQuestionConstructs);
 			const promptPlain = normalizePromptTypographyForPdf(stripPromptMarkup(question.prompt));
 			const promptSegments = parsePrompt(question.prompt);
 
@@ -1059,8 +1149,16 @@ export async function generatePdfBlob(
 							typeof rawChallenge === "string" ? rawChallenge : undefined
 						);
 
-			const pvScore = question.constructs.includes("play_value") ? String(scores.play_value_total) : "N/A";
-			const uScore = question.constructs.includes("usability") ? String(scores.usability_total) : "N/A";
+			const pvScore = question.constructs.includes("play_value")
+				? selection.playValue
+					? String(scores.play_value_total)
+					: ""
+				: "N/A";
+			const uScore = question.constructs.includes("usability")
+				? selection.usability
+					? String(scores.usability_total)
+					: ""
+				: "N/A";
 
 			body.push([
 				{
@@ -1116,26 +1214,34 @@ export async function generatePdfBlob(
 						fontSize: 6.5
 					}
 				},
-				{
-					content: pvScore,
-					styles: {
-						fillColor: AUDIT_PDF_PALETTE.summaryFill,
-						textColor: AUDIT_PDF_PALETTE.summaryText,
-						fontStyle: "bold",
-						fontSize: 7,
-						halign: "right"
-					}
-				},
-				{
-					content: uScore,
-					styles: {
-						fillColor: AUDIT_PDF_PALETTE.summaryFill,
-						textColor: AUDIT_PDF_PALETTE.summaryText,
-						fontStyle: "bold",
-						fontSize: 7,
-						halign: "right"
-					}
-				}
+				...(projection.visibleConstructs.playValue
+					? [
+							{
+								content: pvScore,
+								styles: {
+									fillColor: AUDIT_PDF_PALETTE.summaryFill,
+									textColor: AUDIT_PDF_PALETTE.summaryText,
+									fontStyle: "bold",
+									fontSize: 7,
+									halign: "right"
+								}
+							}
+						]
+					: []),
+				...(projection.visibleConstructs.usability
+					? [
+							{
+								content: uScore,
+								styles: {
+									fillColor: AUDIT_PDF_PALETTE.summaryFill,
+									textColor: AUDIT_PDF_PALETTE.summaryText,
+									fontStyle: "bold",
+									fontSize: 7,
+									halign: "right"
+								}
+							}
+						]
+					: [])
 			]);
 
 			// Register rich cell for the Prompt column (col 3) if it has bold segments.
@@ -1147,6 +1253,24 @@ export async function generatePdfBlob(
 
 			pdfBodyRowIndex += 1;
 			questionRowIndex += 1;
+		}
+
+		if (isFiltering) {
+			for (const { question, answers, sourceComponent } of allVisibleEntries) {
+				const questionComment = typeof answers.question_note === "string" ? answers.question_note.trim() : "";
+				if (questionComment.length === 0) continue;
+				const sourceLabel = sourceComponent === null ? "" : ` (${REPORT_SOURCE_STYLES[sourceComponent].label})`;
+				pushBanner(
+					`Auditor Comment${sourceLabel} - ${formatQuestionKeyForDisplay(question.question_key)}: ${questionComment}`,
+					"italic",
+					AUDIT_PDF_PALETTE.sectionNotesColor,
+					AUDIT_PDF_PALETTE.sectionFill,
+					7,
+					1,
+					2
+				);
+				pdfBodyRowIndex += 1;
+			}
 		}
 
 		// ── Auditor note row ────────────────────────────────────────────────
@@ -1187,41 +1311,46 @@ export async function generatePdfBlob(
 		// Three structured rows - Total / Max / % - each value aligned under
 		// its scale column header with the canonical scale soft fill.
 
-		pushScoreRow(`Section ${sectionIndex + 1}  Total`, sectionTotals, "total");
-		pushScoreRow(`Section ${sectionIndex + 1}  Max`, sectionTotals, "max");
-		pushScoreRow(`Section ${sectionIndex + 1}  Percent`, sectionTotals, "pct");
+		if (!isFiltering || includedScoredQuestionCount > 0) {
+			pushScoreRow(`Section ${sectionIndex + 1}  Total`, sectionTotals, "total");
+			pushScoreRow(`Section ${sectionIndex + 1}  Max`, sectionTotals, "max");
+			pushScoreRow(`Section ${sectionIndex + 1}  Percent`, sectionTotals, "pct");
+		}
 	}
 
 	// ── Overall summary banners ───────────────────────────────────────────────
 
 	if (body.length > 0) {
-		// Recompute overall totals from the instrument (cleaner than carrying
-		// a mutable outer var through the loop).
-		let overallTotals = createEmptyScoreTotals();
-		for (const section of instrument.sections) {
-			const visibleEntries = buildVisibleQuestionEntries(auditSession, section);
-			if (visibleEntries.length === 0) continue;
-			for (const visibleEntry of visibleEntries) {
-				overallTotals = addScoreTotals(
-					overallTotals,
-					calculateQuestionScores(visibleEntry.question, visibleEntry.answers)
-				);
+		let overallTotals: AuditScoreTotals | null = projection.overall;
+		if (!isFiltering) {
+			overallTotals = createEmptyScoreTotals();
+			for (const section of instrument.sections) {
+				const visibleEntries = buildVisibleQuestionEntries(auditSession, section);
+				if (visibleEntries.length === 0) continue;
+				for (const visibleEntry of visibleEntries) {
+					overallTotals = addScoreTotals(
+						overallTotals,
+						calculateQuestionScores(visibleEntry.question, visibleEntry.answers)
+					);
+				}
 			}
 		}
 
-		// Thin separator before overall rows
-		pushBanner("", "normal", AUDIT_PDF_PALETTE.sectionTitleColor, AUDIT_PDF_PALETTE.sectionFill, 4, 2, 2);
+		if (overallTotals !== null) {
+			// Thin separator before overall rows
+			pushBanner("", "normal", AUDIT_PDF_PALETTE.sectionTitleColor, AUDIT_PDF_PALETTE.sectionFill, 4, 2, 2);
 
-		// Three structured overall rows - Total / Max / %
-		pushScoreRow("Overall  Total", overallTotals, "total");
-		pushScoreRow("Overall  Max", overallTotals, "max");
-		pushScoreRow("Overall  Percent", overallTotals, "pct");
+			// Three structured overall rows - Total / Max / %
+			pushScoreRow("Overall  Total", overallTotals, "total");
+			pushScoreRow("Overall  Max", overallTotals, "max");
+			pushScoreRow("Overall  Percent", overallTotals, "pct");
+		}
 	}
 
 	// ── Render the table ──────────────────────────────────────────────────────
 
 	autoTable(doc, {
-		head: [Array.from(RESPONSE_HEADERS)],
+		head: [responseHeaders],
 		body,
 		startY: combinedSources === null ? 20 : 26,
 
